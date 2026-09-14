@@ -1,0 +1,7 @@
+# finance02 自己的 /etc/exports —— **仍在导出，未在本窗口处理**
+
+/data 192.168.1.48(rw,sync,no_subtree_check,root_squash)
+
+## showmount -e 127.0.0.1
+Export list for 127.0.0.1:
+/data 192.168.1.48

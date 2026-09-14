@@ -1,0 +1,315 @@
+# 参数轮换实例表（W3，2026-09-10）
+#
+# **这张表不是第二份题库**：它只说「拿出集的 40 行参数、沿哪几个维度换取值」。
+# 题面仍由 `genetask/render.py::render_arm` + 现有 `genetask/phrasebook.yaml` 渲染，
+# 生成器 `ops/mk_instances.py` 一行渲染逻辑都不新写 —— 这是「槽位机器生成不重签」的全部内容。
+#
+# **不许往 phrasebook 加新措辞**：加了就动了冻结根（`ops/freeze_v10.py::CODE_FILES`）、
+# 40 道出集题要重签。所以凡是会落进 `declared` 的取值，都必须在 phrasebook 里**已经有**
+# strict/open 两列措辞；没有的一律不许当实例参数，生成器当场拒并报出是哪个取值缺措辞。
+# 缺措辞而想要的取值登记在本文件末尾 `deferred:` 段。
+schema_version: "1.0"
+set_id: v1.0-instances
+base_set_id: v1.0-smoke
+base_params: genetask/params/v1.0-smoke40.yaml
+#: 固定种子。本表的排布**不用随机数**（轮换是确定性的下标运算），
+#: seed 只作为「这一版排布」的身份记号进指纹以外的元数据，换 seed 不改任何实例。
+seed: 20260910
+as_of: '2026-07-31'
+
+target:
+  per_stage_min: 15
+  per_stage_max: 18
+  total_about: 130
+
+# --------------------------------------------------------------- 维度定义
+#
+# `declared_field`：该维度在这个阶段**落进 declared** 的字段名（落进去就要 phrasebook 措辞）。
+#                   阶段不在表里 = 该维度只改任务级字段（window / universe 是固定槽，
+#                   措辞由 `render.FIXED_PHRASES` 机器生成，不查 phrasebook）。
+axes:
+  window:
+    writes: [row.window, 'inputs[].max_date']
+    declared_field: {}          # 任何阶段都不落 declared —— 它是固定槽 task_window
+    needs_phrasebook: false
+    note: 'inputs[].max_date 一律跟到 window.end（出集 40 行现状就是这个恒等式，逐行核过）'
+  universe:
+    writes: [row.universe, 'declared.universe / declared.universe_ref', 'inputs[].origin']
+    declared_field: {S1: universe, S2: universe_ref, S5: universe_ref}
+    needs_phrasebook: true
+    note: 'S3/S4/S6/S7/S8 的 universe 只是固定槽 task_universe，不进 declared'
+  factor_pool:
+    writes: ['gold_args.factor_id', 'inputs[].origin']
+    declared_field: {S5: input_factors}
+    needs_phrasebook: true
+    note: 'S4 的因子只走 gold_args 与夹具 origin，题面 <<fixed:inputs>> 只给路径与 max_date（packager._inputs_phrase 刻意不给 origin）—— 所以换因子**题面逐字不变、夹具变**'
+
+# --------------------------------------------------------------- 逐阶段候选取值
+#
+# 这些是**变体**取值；每个模板的「基准实例」用它自己那一行的原值，不在这里列。
+# 轮换时若某个候选恰好等于该模板的基准值，生成器按列表顺序顺延到下一个（规则写死并配测试）。
+values:
+  window:
+    # A1：window.end ≤ as_of=2026-07-31；A1 还要求 inputs[].max_date ≤ as_of。
+    S1: # 取数台账：短窗
+      - {start: '2026-07-01', end: '2026-07-31'}
+      - {start: '2026-07-20', end: '2026-07-31'}
+      - {start: '2026-07-06', end: '2026-07-17'}
+      - {start: '2026-06-01', end: '2026-06-30'}
+    S2: # 面板对齐：要有历史
+      - {start: '2026-01-05', end: '2026-07-31'}
+      - {start: '2026-04-01', end: '2026-06-30'}
+      - {start: '2025-07-01', end: '2026-07-31'}
+      - {start: '2026-07-01', end: '2026-07-31'}
+    S3: # 因子求值：lookback 最长 24，窗口不得短于两个月，否则暖机把整窗吃光
+      - {start: '2026-01-05', end: '2026-07-31'}
+      - {start: '2026-01-05', end: '2026-03-31'}
+      - {start: '2026-04-01', end: '2026-07-31'}
+      - {start: '2025-07-01', end: '2026-06-30'}
+    S4: # IC：holding_periods 最长 20，window.end 必须留出 20 个交易日到 as_of ⇒ end ≤ 2026-06-30
+      - {start: '2026-01-05', end: '2026-06-30'}
+      - {start: '2026-01-05', end: '2026-03-31'}
+      - {start: '2026-04-01', end: '2026-06-30'}
+      - {start: '2025-07-01', end: '2026-06-30'}
+    S5:
+      - {start: '2026-07-01', end: '2026-07-31'}
+      - {start: '2026-06-01', end: '2026-06-30'}
+      - {start: '2026-05-06', end: '2026-07-31'}
+      - {start: '2026-01-05', end: '2026-07-31'}
+    S6: # 输入信号夹具由 S5 oracle 在「本集消费方窗口并集」上放宽跑出来，四个候选都落在 2026 年内
+      - {start: '2026-07-01', end: '2026-07-31'}
+      - {start: '2026-06-01', end: '2026-07-31'}
+      - {start: '2026-05-06', end: '2026-07-31'}
+      - {start: '2026-04-01', end: '2026-06-30'}
+    S7: # 冻结 ε 面板 s7_panel_v3 覆盖 2019-01-02 … 2026-07-03，候选一律是它的子窗
+      - {start: '2019-01-02', end: '2026-07-03'}
+      - {start: '2022-01-04', end: '2026-07-03'}
+      - {start: '2024-01-02', end: '2026-07-03'}
+      - {start: '2019-01-02', end: '2023-12-29'}
+    S8:
+      - {start: '2026-07-01', end: '2026-07-31'}
+      - {start: '2026-07-01', end: '2026-07-15'}
+      - {start: '2026-06-15', end: '2026-07-15'}
+      - {start: '2026-06-01', end: '2026-06-30'}
+  universe:
+    # phrasebook 现有：universe[csi300|csi500]、universe_ref[csi300@2026-07-31|csi500@2026-07-31]。
+    # csi1000 三处都缺措辞 —— 见 deferred。
+    S1: [csi300, csi500]
+    S2: [csi300, csi500]
+    S3: [csi300, csi500]
+    S4: [csi300, csi500]
+    S5: [csi300, csi500]
+    # S6/S7/S8 不适用：S6 的输入信号与 S7 的 ε 面板都是 csi300 绑定的冻结夹具，
+    # 换宇宙等于换一份标定；S8 的撮合面板同理。
+  factor_pool:
+    # 只对「因子经 gold_args + 夹具 origin 进来」的阶段适用。
+    # 三条都在 snapshots/v1/gold_factors/{csi300,csi500}/ 下实测存在。
+    S4: [gtja_191.001, gtja_191.017, worldquant_101.006]
+    # S5 不适用：input_factors 落进 declared，而 phrasebook 只有
+    # 'gtja_191.001' 与 'gtja_191.001,gtja_191.002,gtja_191.003' 两个键；
+    # 换单因子（如 gtja_191.002）会缺措辞 —— 见 deferred。
+
+# --------------------------------------------------------------- 轮换排布
+rotation:
+  #: 每个基点出几个实例（**含基准实例自己**）。
+  instances_per_base: 3
+  #: 适用维度 ≥ 2 的阶段再补几个（落在按 base_task_id 排序的前 N 个基点上）。
+  extra:
+    when_axes_at_least: 2
+    n_bases: 2
+    n_extra_each: 1
+  #: 组合枚举：适用维度的**笛卡尔积**（窗口 × 宇宙 × 因子池），
+  #: 按各维度取值下标的字典序排定，再从下标 (基点在本阶段内的序号) 处开始取。
+  #: 与基准值相同的维度在指纹里被剔除（"不含默认值"）；整组都等于基准的组合被丢弃。
+  order: 'cartesian, diagonal order = (max(下标), sum(下标), 下标元组) —— 字典序会让第一个维度永远取 0 号值（= 基点现值）而被剔除'
+  offset: 'index of base_task_id within its stage (sorted)'
+
+# --------------------------------------------------------------- 基点（= 出集参数表的 40 行）
+#
+# 口径说明：报告里的「40 模板」= 出集参数表 40 **行**。
+# 模板**目录**只有 39 个 —— `S1/source_status` 被 s1-rob-01 与 s1-rob-02 两行复用。
+# 所以实例的基点按 base_task_id 编排，不按模板目录。
+bases:
+  s1-cor-01: {stage: S1, template_id: cov_fields,               axes: [window, universe]}
+  s1-rob-01: {stage: S1, template_id: source_status,            axes: [window, universe]}
+  s1-rob-02: {stage: S1, template_id: source_status,            axes: [window, universe]}
+  s1-eco-01: {stage: S1, template_id: lean_fetch,               axes: [window, universe]}
+  s1-ops-01: {stage: S1, template_id: prov_ledger,              axes: [window, universe]}
+
+  s2-cor-01: {stage: S2, template_id: cor_01,                   axes: [window, universe]}
+  s2-rob-01: {stage: S2, template_id: rob_01,                   axes: [window, universe]}
+  s2-rob-02: {stage: S2, template_id: rob_02_probe,             axes: [window, universe]}
+  s2-eco-01: {stage: S2, template_id: eco_01,                   axes: [window, universe]}
+  s2-ops-01: {stage: S2, template_id: ops_01,                   axes: [window, universe]}
+
+  s3-cor-01: {stage: S3, template_id: cor01_wq006_corr,         axes: [window, universe]}
+  s3-rob-01: {stage: S3, template_id: rob01_wq054_nonfinite,    axes: [window, universe]}
+  s3-rob-02: {stage: S3, template_id: rob02_gtja046_probe,      axes: [window, universe]}
+  s3-eco-01: {stage: S3, template_id: eco01_free_pv,            axes: [window, universe]}
+  s3-ops-01: {stage: S3, template_id: ops01_gtja012_vwap_audit, axes: [window, universe]}
+
+  s4-cor-01: {stage: S4, template_id: cor_ic_recompute,         axes: [window, universe, factor_pool]}
+  s4-rob-01: {stage: S4, template_id: rob_sparse_panel,         axes: [window, universe, factor_pool]}
+  s4-rob-02: {stage: S4, template_id: rob_probe_setting,        axes: [window, universe, factor_pool]}
+  # s4-eco-01 的输入是因子**池**（reference/pools/s4_eco_pool_v1），池按 task["universe"] 现算，
+  # 单因子维度对它不适用。
+  s4-eco-01: {stage: S4, template_id: eco_free_select,          axes: [window, universe]}
+  s4-ops-01: {stage: S4, template_id: ops_audit_trail,          axes: [window, universe, factor_pool]}
+
+  s5-cor-01: {stage: S5, template_id: rank_signal,              axes: [window, universe]}
+  s5-rob-01: {stage: S5, template_id: null_vs_flat,             axes: [window, universe]}
+  s5-rob-02: {stage: S5, template_id: freq_unstated,            axes: [window, universe]}
+  s5-eco-01: {stage: S5, template_id: free_signal,              axes: [window, universe]}
+  s5-ops-01: {stage: S5, template_id: format_audit,             axes: [window, universe]}
+
+  s6-cor-01: {stage: S6, template_id: cor_ledger,               axes: [window]}
+  s6-rob-01: {stage: S6, template_id: rob_optimizer_failure,    axes: [window]}
+  s6-rob-02: {stage: S6, template_id: rob_underdetermined,      axes: [window]}
+  s6-eco-01: {stage: S6, template_id: eco_swap_cap,             axes: [window]}
+  s6-ops-01: {stage: S6, template_id: ops_ledger_audit,         axes: [window]}
+
+  s7-cor-01: {stage: S7, template_id: cor_reproduce,            axes: [window]}
+  s7-rob-01: {stage: S7, template_id: rob_tradability,          axes: [window]}
+  s7-rob-02: {stage: S7, template_id: rob_underdetermined,      axes: [window]}
+  s7-eco-01: {stage: S7, template_id: eco_attribution,          axes: [window]}
+  s7-ops-01: {stage: S7, template_id: ops_audit,                axes: [window]}
+
+  s8-cor-01: {stage: S8, template_id: s8_lifecycle,             axes: [window]}
+  s8-rob-01: {stage: S8, template_id: s8_idempotent,            axes: [window]}
+  s8-rob-02: {stage: S8, template_id: s8_probe_calendar,        axes: [window]}
+  s8-eco-01: {stage: S8, template_id: s8_min_slippage,          axes: [window]}
+  s8-ops-01: {stage: S8, template_id: s8_audit_overreach,       axes: [window]}
+
+# --------------------------------------------------------------- 夹具 sha（生成器写回）
+#
+# `ops/mk_instances.py --fixtures --write-shas` 把每个实例的 inputs[].sha256 写回这里。
+# 与 `reference/make_fixtures.py::write_params_shas` 同一条纪律：
+# 写回**参数表**（题面的源头），不写生成出来的 task.yaml —— 后者每次 build 都重建。
+fixtures:
+  S4/cor_ic_recompute@s4-cor-01#0b0d39a2c6:
+    work/factor_panel.parquet: 7687dd89be0bcddf643c767336cb377d6f2734f6904e0faf4bf4e7ca19430099
+  S4/cor_ic_recompute@s4-cor-01#44136fa355:
+    work/factor_panel.parquet: c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6
+  S4/cor_ic_recompute@s4-cor-01#a10c40daae:
+    work/factor_panel.parquet: b34144bbde8855378466b903b1b2c230f791ec7c86d1d2735ec068c42c78cf77
+  S4/cor_ic_recompute@s4-cor-01#f436d8670e:
+    work/factor_panel.parquet: d155747d1340c05b43538be79801a5dea97ac4c215206af92f1795493eb996bf
+  S4/eco_free_select@s4-eco-01#44136fa355:
+    work/factor_pool.parquet: 488e7cf2c0cece140044ad9b9322d8cb0b7ac23d1e1c7451888fcf606a5c0469
+  S4/eco_free_select@s4-eco-01#764bd5aea8:
+    work/factor_pool.parquet: 68feadcace31febd54e3cf5f3aec09111234a9732d37aa741f85e963dee26fbb
+  S4/eco_free_select@s4-eco-01#d8f9b9b820:
+    work/factor_pool.parquet: 09bd461c35b6e3a0f8d21f50c9f8ebc6027c83343431f8803dac5c528c544a24
+  S4/eco_free_select@s4-eco-01#f436d8670e:
+    work/factor_pool.parquet: 6d51d5505606f779a41d539ac3a571013665a6c9f7e1b7a9f5996fe882e73535
+  S4/ops_audit_trail@s4-ops-01#1084b1fe5c:
+    work/factor_panel.meta.json: 83699f0742e0d4e2784ffec5b2615342c39d78749283dee6ef80b3d5f83828f8
+    work/factor_panel.parquet: 5bc11eb08f23f2ca84acf304f3296e45891962b4ffe620a571586f32cfd9617d
+  S4/ops_audit_trail@s4-ops-01#44136fa355:
+    work/factor_panel.meta.json: da0599c9dacbc28754f303a6058f9653443cc96bf74f1c2a1af6ab86bf8d1584
+    work/factor_panel.parquet: c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6
+  S4/ops_audit_trail@s4-ops-01#f436d8670e:
+    work/factor_panel.meta.json: 99f5c248c3e6109602b9affa1de4998c1c5eb117ebb0e897866f4101d931522f
+    work/factor_panel.parquet: d155747d1340c05b43538be79801a5dea97ac4c215206af92f1795493eb996bf
+  S4/rob_probe_setting@s4-rob-02#44136fa355:
+    work/factor_panel.parquet: c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6
+  S4/rob_probe_setting@s4-rob-02#764bd5aea8:
+    work/factor_panel.parquet: d0925e62e192550ed0181f29aecadad351f623df51438f29b91ffcac46c25cb2
+  S4/rob_probe_setting@s4-rob-02#8aabd7c9df:
+    work/factor_panel.parquet: 52215e4b121bb874add265d7e25a5c7504fafa14ee5394f606c0ab00ee5d75ac
+  S4/rob_sparse_panel@s4-rob-01#0b0d39a2c6:
+    work/factor_panel.parquet: 5bc11eb08f23f2ca84acf304f3296e45891962b4ffe620a571586f32cfd9617d
+  S4/rob_sparse_panel@s4-rob-01#44136fa355:
+    work/factor_panel.parquet: b34144bbde8855378466b903b1b2c230f791ec7c86d1d2735ec068c42c78cf77
+  S4/rob_sparse_panel@s4-rob-01#f436d8670e:
+    work/factor_panel.parquet: 52215e4b121bb874add265d7e25a5c7504fafa14ee5394f606c0ab00ee5d75ac
+  S5/format_audit@s5-ops-01#19f220c346:
+    work/inputs/gtja_191.001.parquet: 4d513a7c6655f580fd86b2d242af620134700501c336727e2b3c2da92646b8df
+    work/inputs/manifest.json: 7c9eae087b5b381e649bc38a11bd3823174f627c77ee43210cd88b98c3fa2a08
+  S5/format_audit@s5-ops-01#44136fa355:
+    work/inputs/gtja_191.001.parquet: 6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847
+    work/inputs/manifest.json: 5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a
+  S5/format_audit@s5-ops-01#7212df62b9:
+    work/inputs/gtja_191.001.parquet: c9cd6c4c32cb5fc0eca89069c4049274711220396504f1059b704e2faa1d582b
+    work/inputs/manifest.json: 68af7cf304dfde6edb435d7f50aec0091754cddf2fdb63f389bc07caf9f47b94
+  S5/free_signal@s5-eco-01#19f220c346:
+    work/inputs/gtja_191.001.parquet: 4d513a7c6655f580fd86b2d242af620134700501c336727e2b3c2da92646b8df
+    work/inputs/gtja_191.002.parquet: b827f1d12bd9f067075c1f2f9eeefae1935e165ce5eb12fdfd51b2f2a84f184f
+    work/inputs/gtja_191.003.parquet: a9384d629784f89bed2dc81391dd1c14865153988a3b37203d9a0e53ea539a64
+    work/inputs/manifest.json: aa840edb8d3a248acd4bef2609d4d32e5f49758ad473cdb69c35f695b2957a3a
+  S5/free_signal@s5-eco-01#44136fa355:
+    work/inputs/gtja_191.001.parquet: 9d618fa6ee15ba4193718409df455f2fdfb80337201333baf668792afb25a43c
+    work/inputs/gtja_191.002.parquet: b58de67658ae2febbd66f6c2003e1a462b90890649881f96169a4ec8f5cc37cd
+    work/inputs/gtja_191.003.parquet: ae21efa67eed5294d070a07fc32f8067fd9790a0f0b37d524e048831a5ab4623
+    work/inputs/manifest.json: 47a7498b92b57952ae3bcca783bc9e182d1f2842a10775c13027a566b623a986
+  S5/free_signal@s5-eco-01#7212df62b9:
+    work/inputs/gtja_191.001.parquet: c9cd6c4c32cb5fc0eca89069c4049274711220396504f1059b704e2faa1d582b
+    work/inputs/gtja_191.002.parquet: c77f2d45e097497f465b15682847fdf4b1487688daa288d399bbf083fb88b987
+    work/inputs/gtja_191.003.parquet: ee71d2fa392d8eb505a072889feb280ce2eb1e77ecc89b6feab24e5ceace9700
+    work/inputs/manifest.json: b74714bb2bdbe81bc7bd7b6f5b7e9d0d3f899e62f21e4fd90f436b336f2197c4
+  S5/free_signal@s5-eco-01#8651587ec8:
+    work/inputs/gtja_191.001.parquet: 28dcd34a147395fc7b869968ee0b49f965cd6bea6516f4ace00a89b6415d140b
+    work/inputs/gtja_191.002.parquet: 95f12bfeae0a85d569270f2f11621d5e079b957f4806950fc760f8805d9181a2
+    work/inputs/gtja_191.003.parquet: 7e19f576d2b9bda336af6879468c6a4ad68e9ab26d4873ba8b2c92f76cd8a038
+    work/inputs/manifest.json: ba099d048b0d19aa5e092720fb4f4b75dfee125f600cbf7b66921c24da18a86e
+  S5/freq_unstated@s5-rob-02#44136fa355:
+    work/inputs/gtja_191.001.parquet: 6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847
+    work/inputs/manifest.json: 5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a
+  S5/freq_unstated@s5-rob-02#b196347a80:
+    work/inputs/gtja_191.001.parquet: 4cfbcea5a6517a2f1be193856be7333246a7c429d0bf852fdb16fffff029923f
+    work/inputs/manifest.json: 9a96f72db8437e6e8c9a4f40208e5ca0c9099ae9686b2bef5de9f62f25322ad7
+  S5/freq_unstated@s5-rob-02#c22c297f5c:
+    work/inputs/gtja_191.001.parquet: 9d618fa6ee15ba4193718409df455f2fdfb80337201333baf668792afb25a43c
+    work/inputs/manifest.json: f9510e4e9b5ad8e0dae0a64ed1bc036e78e731673ab134e702e9e7c937d680b8
+  S5/null_vs_flat@s5-rob-01#19f220c346:
+    work/inputs/gtja_191.001.parquet: 4d513a7c6655f580fd86b2d242af620134700501c336727e2b3c2da92646b8df
+    work/inputs/manifest.json: 7c9eae087b5b381e649bc38a11bd3823174f627c77ee43210cd88b98c3fa2a08
+  S5/null_vs_flat@s5-rob-01#44136fa355:
+    work/inputs/gtja_191.001.parquet: 6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847
+    work/inputs/manifest.json: 5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a
+  S5/null_vs_flat@s5-rob-01#b196347a80:
+    work/inputs/gtja_191.001.parquet: 4cfbcea5a6517a2f1be193856be7333246a7c429d0bf852fdb16fffff029923f
+    work/inputs/manifest.json: 9a96f72db8437e6e8c9a4f40208e5ca0c9099ae9686b2bef5de9f62f25322ad7
+  S5/rank_signal@s5-cor-01#0b0d39a2c6:
+    work/inputs/gtja_191.001.parquet: 50cb548261cbb38ae91ff5e3776af31c08b3e9131ad2343b07b4825bd34ae9ee
+    work/inputs/manifest.json: ecf85eed16872467c7ed0903beda47ad52072f150d58b1afd89e34d4f8896576
+  S5/rank_signal@s5-cor-01#44136fa355:
+    work/inputs/gtja_191.001.parquet: 6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847
+    work/inputs/manifest.json: 5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a
+  S5/rank_signal@s5-cor-01#7212df62b9:
+    work/inputs/gtja_191.001.parquet: c9cd6c4c32cb5fc0eca89069c4049274711220396504f1059b704e2faa1d582b
+    work/inputs/manifest.json: 68af7cf304dfde6edb435d7f50aec0091754cddf2fdb63f389bc07caf9f47b94
+  S5/rank_signal@s5-cor-01#8651587ec8:
+    work/inputs/gtja_191.001.parquet: 28dcd34a147395fc7b869968ee0b49f965cd6bea6516f4ace00a89b6415d140b
+    work/inputs/manifest.json: fcd1bd3566d3e04b5b8bd6e423b88afeab1f02593f7f96ccd1565510e6d8a130
+
+# --------------------------------------------------------------- 想要而做不到的取值
+deferred:
+  - axis: universe
+    value: csi1000
+    stages: [S1, S2, S5]
+    why: 'phrasebook 缺 universe[csi1000] 与 universe_ref[csi1000@2026-07-31] 的 strict/open 措辞。
+          补措辞会改 genetask/phrasebook.yaml —— 它在冻结根 CODE_FILES 里，40 道出集题要重签。'
+  - axis: universe
+    value: csi1000
+    stages: [S3, S4]
+    why: '这两个阶段的 universe 只是固定槽（不查 phrasebook），措辞上可行；
+          但 S3/S4 的 oracle 从未在 csi1000 上跑过，且 csi1000 的截面是 csi300 的三倍多，
+          gold 重算成本与 ε 标定都没有依据。不在本卡放开。'
+  - axis: factor_pool
+    values: [gtja_191.002, gtja_191.003, worldquant_101.054, qlib_alpha158.KMID]
+    stages: [S5]
+    why: 'S5 把因子写进 declared.input_factors，而 phrasebook 只有
+          input_factors[gtja_191.001] 与 input_factors[gtja_191.001,gtja_191.002,gtja_191.003]
+          两个键。换任何别的单因子都会缺措辞 —— 生成器当场拒（见 ops/test_instances.py 的
+          test_missing_phrasing_is_rejected_on_the_spot）。'
+  - axis: factor_pool
+    stages: [S3]
+    why: 'S3 的因子是**模板本身**：公式写在 INSTRUCTION.*.md 与 solve.py 里
+          （cor01_wq006_corr / rob01_wq054_nonfinite / ops01_gtja012_vwap_audit / rob02_gtja046_probe）。
+          换因子 = 换模板 = 人工重写题面 —— 正是本卡明令不许生成的那一类。'
+  - axis: universe
+    stages: [S6, S7, S8]
+    why: 'S6 的输入信号（s5_gtja001_csi300_v1 / s6_sparse_coverage_csi300_v1）与
+          S7 的 ε 面板 s7_panel_v3 都是 csi300 绑定的冻结夹具；S8 的撮合面板同理。
+          换宇宙要重做夹具与 ε 标定，不是换一个参数。'

@@ -1,0 +1,109 @@
+{
+ "scorer_output": {
+  "schema_version": "1.0",
+  "validity": "valid",
+  "gate_failed": [],
+  "unobservable": [],
+  "correctness": {
+   "fid_day_rate": 0.0,
+   "n_days": 0
+  },
+  "effect": {
+   "score": 0.0,
+   "raw_metric": 0.0,
+   "anchor_floor": 0.0,
+   "anchor_ceiling": 1.0
+  },
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/v1.0-smoke/s3-cor-01/work",
+   "clamped": false,
+   "metric_kind": "tau"
+  }
+ },
+ "record": {
+  "task_id": "s3-cor-01",
+  "stage": "S3",
+  "config_id": "cfg-rdagent_q-deepseek",
+  "arm": "strict",
+  "seq": 1,
+  "run_id": "s3-cor-01.strict.cfg-rdagent_q-deepseek.r01",
+  "set_version": "1.0.11",
+  "reference_version": "r1.0.19",
+  "runner_version": "d5a9a2d2c9fdcb1a0037378f91263ff2cf70ff2f1e67fe732e673d36b1edd2b6",
+  "image_digest": "gb-rdagent_q-u@sha256:67545981cdf34b089ee73c63edfcfce90d29142f8f146e3173a385376f22dde5",
+  "scorer_schema_version": "1.0",
+  "run_status": "ok",
+  "sr_bucket": "scorable",
+  "validity": "valid",
+  "malformed": false,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {
+   "adjust_fingerprint": "clean",
+   "attribution_conservation": "clean",
+   "calendar": "clean",
+   "declared_reads": "clean",
+   "factor_degeneracy": "clean",
+   "fetch_clock": "clean",
+   "input_ablation": "clean",
+   "ledger_conservation": "clean",
+   "lookahead": "clean",
+   "nonfinite_propagation": "clean",
+   "optimizer_failure": "clean",
+   "pit_universe": "clean",
+   "source_status": "clean",
+   "underdetermined": "clean",
+   "unsupported_operator": "clean",
+   "warmup_boundary": "clean"
+  },
+  "findings": [],
+  "l3_kind": "tau",
+  "l3_pass": false,
+  "l3_score": 0.0,
+  "effect": 0.0,
+  "effect_withheld_reason": null,
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/v1.0-smoke/s3-cor-01/work",
+   "clamped": false,
+   "metric_kind": "tau"
+  },
+  "correctness": {
+   "fid_day_rate": 0.0,
+   "n_days": 0
+  },
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "agent 没有交出任何信号行",
+  "steps": 6,
+  "tokens_prompt": 12202,
+  "tokens_completion": 2120,
+  "cost_usd": 0.00816728,
+  "cost_model": "deepseek-chat",
+  "latency_s": 42.957,
+  "validator_rejections": null,
+  "overreach": {
+   "denied": 0,
+   "total": 2,
+   "source": "gateway_access_log(403)",
+   "reasons": {},
+   "malformed_requests": 0,
+   "malformed_reasons": {}
+  },
+  "unbounded_requests": 0,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": []
+ }
+}

@@ -1,0 +1,5 @@
+config_id,arm,arm_kind,stage,n_runs,n_runs_denom,invalid_rate,honest_halt_rate,unsettled_rate,Decl,Set,Ovr,Cov,PIT,Prov
+cfg-codex-deepseek,open,baseline,S1,2,2,0.0,0.0,0.0,unobservable,unobservable,0.011235955056179775,1.0,0.9486803519061584,1.0
+cfg-codex-deepseek,strict,protocol,S1,1,1,0.0,0.0,0.0,unobservable,unobservable,0.12,1.0,0.74,1.0
+cfg-openhands-deepseek,open,baseline,S1,1,1,1.0,0.0,0.0,—,—,0.10638297872340426,—,—,—
+cfg-openhands-deepseek,strict,protocol,S1,1,1,0.0,0.0,0.0,—,—,0.04878048780487805,—,—,—

@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "genebench/artifact/S6/v1.0",
+  "x-gateway-fetch-contract": {
+    "note": "取数约定（两臂共享）。这不是产物 schema 的一部分，是**发请求**的约定。",
+    "bounded_window": "每一次取数都必须把区间**界定在 as_of 之内**：显式给 `start_date` 与 `end_date`（或单日 `date`），且 `end_date <= as_of`。开区间（不给右端）会被网关拒（`open_range_would_cross_asof`）—— 它拒的是「没界定」，不是「你要了未来」。",
+    "gated_vs_telemetry": "显式越界（`end_date` 超过 as_of、目标日期在 as_of 之后、越过冻结线…）→ `lookahead` 违例 → 闸门；开区间 → **只计数**，进 Table A 的 `unbounded_requests` 列，不影响判定。"
+  },
+  "title": "GeneBench S6 artifact v1.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "stage",
+    "task_id",
+    "config_id",
+    "arm",
+    "seed",
+    "as_of",
+    "produced_at",
+    "provenance",
+    "declarations",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "artifact_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage": {
+      "const": "S6"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "config_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "arm": {
+      "type": "string",
+      "minLength": 1
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "as_of": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "produced_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "stage",
+          "artifact_id"
+        ],
+        "properties": {
+          "stage": {
+            "enum": [
+              "S1",
+              "S2",
+              "S3",
+              "S4",
+              "S5",
+              "S6",
+              "S7",
+              "S8"
+            ]
+          },
+          "artifact_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "declarations": {
+      "type": "object",
+      "required": [
+        "constraints",
+        "objective",
+        "weighting_scheme",
+        "rebalance_frequency"
+      ],
+      "properties": {
+        "constraints": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "const": "unresolved"
+            }
+          ]
+        },
+        "objective": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "const": "unresolved"
+            }
+          ]
+        },
+        "weighting_scheme": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "const": "unresolved"
+            }
+          ]
+        },
+        "rebalance_frequency": {
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly",
+            "unresolved"
+          ]
+        }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "targets",
+        "cash_ratio"
+      ],
+      "properties": {
+        "targets": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "object",
+            "required": [
+              "date",
+              "solver_status",
+              "positions"
+            ],
+            "properties": {
+              "positions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "symbol",
+                    "score",
+                    "previous_weight",
+                    "target_weight",
+                    "delta_weight",
+                    "reference_close"
+                  ]
+                }
+              }
+            }
+          },
+          "x-nullable-when": "依赖的声明字段被标 unresolved（诚实终止）：['constraints', 'objective', 'rebalance_frequency', 'weighting_scheme']"
+        },
+        "cash_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "x-genebench": {
+    "three_state_note": "声明字段：有值 / 显式 'unresolved' / 缺失 三态；null 一律畸形。语义层（与 TaskSpec、网关日志、可交易性视图的交叉核）在 reference/artifact_schema.py::validate，JSON Schema 只管结构。"
+  }
+}

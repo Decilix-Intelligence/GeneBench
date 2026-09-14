@@ -1,0 +1,9 @@
+# 卡 Y2 票据（裁定 ⑮ 结果导出与合并 / ⑰ 版本锁）
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | `ops/api_usage.py::parse_run_id` 还不认机器段 | 待办（不挡发布） | 裁定 ⑮ 之后 `run_id` 是 `<题>.<臂>.<配置>.rNN@<machine_id>`。那个解析器按 `.` 切四段，第四段现在是 `r01@finance01-e3887dfa` —— task/arm/config 三个切片键**仍然是对的**，只有 `rep` 带上了机器段。用量表因此不会认错题，只是 `rep` 这一列变长。要修就在 `parse_run_id` 里先 `runner.inject.split_run_id`，再补一个 `machine_id` 列。**不在本卡路径里，没动。** |
+| N-? | f02 的 exec 树还没拿到机器标识 | 待办（下一个要在 f02 真跑的卡必须先做） | `runner/inject.py` 改了，f02 上的 `exec/` 是旧的。表现：f01 的 `job_id` 带 `@machine`、f02 算出来的 `run_id` 不带 → `ops/run_joblist.py::run_one` 会打一条 `[黄] run_id ≠ job_id` 并照旧按返回的 run_id 结算（不会丢数据）。修法：`ops/push_exec_to_f02.sh --with-launch-data`。**本卡没推**：f02 上可能有别的卡的批在跑，中途换 runner 代码会让同一批里出现两种形状的 run_id。 |
+| N-? | `RELEASE_MANIFEST.json` / `CHANGELOG.md` 是重冻的确定性下游 | 已闭（本卡顺手） | A 卡重冻到 1.0.15/r1.0.22 之后这两件还停在 1.0.14/r1.0.21，`ops/test_release_manifest.py` 两条红，而 ⑰ 的版本锁会因此把**所有入口**拦死。已跑 `ops/mk_release_manifest.py --write-changelog` + `ops/mk_release_manifest.py`，17 条测试转绿。以后每次重冻都要跟着跑这两条 —— 建议写进收口清单。 |
+| N-? | 归档包（`--archive`）是一条显式的旁路，要有人定期看 | 登记不修 | 跨版本的读数合进库**不会**变得可比，出表那一步仍按混轴拒。但「两端都显式说出口」是靠操作员，不是靠门。v1 接受这个形态（口径写在手册 §6.9 末段）。 |
+| N-? | 机器标识退回 `hostname-only` 时两台同名机器会撞 | 登记不修 | `/etc/machine-id` 与 `IOPlatformUUID` 都拿不到时（某些容器、精简镜像），指纹退化成主机名的哈希。`machine_info().fingerprint_source` **如实写 `hostname-only`**，手册让这种部署显式设 `GENEBENCH_MACHINE_ID`。没有静默的降级。 |

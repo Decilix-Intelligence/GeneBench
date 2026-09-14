@@ -1,0 +1,14 @@
+# example_minimal 的被测配置。
+#
+# enabled: false —— 本示例不调模型，没有真要跑的模型配置；这一条只作为
+# 「七个键长什么样」的模板存在，只进 PENDING_CONFIGS，不进 CONFIGS。
+# 真接一个系统时把它抄过去、改成自己的 config_id、确认三条判据后再翻 true：
+#   ① base_url 必须 https；② api_key_env 必须以 _API_KEY 结尾；
+#   ③ host 不在 MARKET_DATA_HOSTS 里（行情/新闻源域名一律不得入表）。
+config_id: example-minimal-deepseek-v3
+harness: example_minimal
+model: deepseek-chat
+base_url: https://api.deepseek.com/v1
+api_key_env: DEEPSEEK_API_KEY
+note: 最小示例的模板配置，不用于真跑
+enabled: false

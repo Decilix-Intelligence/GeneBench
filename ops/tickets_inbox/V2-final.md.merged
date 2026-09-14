@@ -1,0 +1,73 @@
+# 卡 V2 —— 终核（外部用户侧，只读复核）  2026-09-13T09:25–10:05Z
+
+**范围**：验卡 W 有没有真修好卡 V 的 3 block + 4 major，有没有修出新的。
+**全部结论都是本卡自己动手实测的**，命令与原始输出在 `$GB/scratch/V2/`
+（`clone.log` / `scan_tree.txt` / `pytest.log` / `testenv.log` / `anon.log`）。
+**本卡零写入**（除本文件）、零模型 API、没碰 Release、没碰树、没碰 f02。
+
+## 一、卡 V 的 7 条：逐条复核结论
+
+| 卡 V 原条目 | 本卡实测 | 判 |
+| --- | --- | --- |
+| block①`HANDOFF` §19.6.1 终值表指着上一轮 sha 却给了核对命令 | 表已加「**2026-09-13 R1–R3 轮终值（留证，非当前值）**」列名 + 抬头三段，并改口成「当前终值以 `git ls-remote` 现查为准，树里不再记」，指向 §19.6.6 | **已修** |
+| block②`release_upload_report` §4.1 仍在说「有一条真红、文档在对外说假话」 | §4.1 标题已划掉并标「2026-09-13 卡 F 已闭合（N-739），本节原样留证」，原文前有一整段现状更正 | **已修** |
+| block③`HANDOFF` §19.6.4 第一行仍把已闭合的事列成「挡」 | 整张表有「逐行核过一遍的日期：2026-09-13（卡 W）」，前两行划掉标「已闭合」，后三行复核仍成立 | **已修** |
+| major④`push_result` §8.1/§8.2 标题说「公开树里没有这一小节」而它们就在树里 | 更正文**已进树**，但在 **§8.3（:621）**，离 §8.1 标题（:454）167 行；§8.1/§8.2 的标题本身**一字未动**，且 §8.1 指向的 §5 更正末尾恰恰又重申了那句错话 | **部分修**（见下 F-3） |
+| major⑤`RELEASE_MANIFEST` `package.parts` 形态 A 三处过时 | 现文「已打好的公开数据包（形态 A）—— **2026-09-13 已发布**」/`ship` 三句全核过为真 | **已修** |
+| major⑥`RELEASE_MANIFEST` `blockers[data_license_text].blocks` | 现文与现实一致（§2.1 确为显式占位；形态 A 匿名可下） | **已修** |
+| ⑦ 包内 `MANIFEST.license.published=false`（知情保留） | 实测 `$GB/release/public_v1/MANIFEST.json`：`state=granted` / `text_in_repo=true` / `published=false` / `publishable=true` —— 与登记一致 | 知情保留 |
+
+## 二、本卡新发现（卡 V、卡 W 都没查到的）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **公开树上 `ops/test_release_manifest.py::test_the_judgement_sections_match_the_worktree` 在干净 clone 上是红的；`ops/mk_release_manifest.py --check` 退 1** | **block** | 根因：`ops/mk_release_manifest.py:362` `"status_now": ("有 remote" if has_remote else declared_why)` —— `has_remote` 读的是本树 `.git/config` 有没有 `[remote `。内网 `$GB/repo` 无远端 → 落盘值「两个地址已定…」；**任何 clone 都有 origin** → 现算「有 remote」→ `blockers` 在 `FATAL_KEYS` 里 → 当场红。同一函数 `clone_urls_declared` 的 docstring 自己写着「刻意不查可达性，那会让清单取决于跑它的机器」，而 `has_remote` 正是它要避免的那种机器依赖。README §5（`:447`）明写「`--check` … 1 判据变了（**停下**）」，于是外部用户第一次自核就被叫停。第二处同类：`public_channel_zero_runs.status_now` 在没有 `$GB/runs_in/m6_public` 的机器上也会漂（f01 上跑 clone 复现不出，因为它读的是 `$GENEBENCH_ROOT`）。 |
+| N-? | **公开树里没有卡 C2 的任何成果**：没有 `ops/selfcheck_public.py`，README 没有那两条「不是发布件损坏」的注 | **block（同一次重推可一起解）** | C2 已在内网把这两件事写清楚（README `:243` / `:618`），但**内网 HEAD 的东西还没推**。今天拿到公开树的人：① 照 README §2.1 敲 `cd $REPO` 就断（公开树那版写死 `GB=/data/shared/genebench`，无写权限、无 venv）；② 照 `docs/OPERATOR_MANUAL.md:57` 跑 `freeze_v10.py --check-all` 核不绿（公开题集树在仓库之外，缺的那堆是还没上传的第三件附件）。 |
+| N-? | `push_result.md` §8.1/§8.2 标题的那句错话没定点改 | major | 见上 major④。改法与 §6 标题已用过的写法一致（**不改值，只在标题里点名那一轮**）。 |
+| N-? | `RELEASE_MANIFEST.blockers[no_clone_url].closes_when` 仍引用 `_staging_unpublished/`（卡 R2 按 N-714 已整棵删） | minor | 该 blocker 已 `satisfied=true`，`closes_when` 是历史判据；改它要重出清单，不急。 |
+| N-? | `HANDOFF` §19.6.5 ② 仍叫下一张卡用 `scratch/R2/r2_patch_release.py` + 手改 `NEW_SHA` | minor | 与卡 W 自己的 N-749 / 交接语相反（应用 `scratch/W/w_patch_release.py`，它现读 HEAD 并在 PATCH 前断言远端已等于它）。 |
+| N-? | **f01 上 `ops/test_env.py` 现在 2 红，是卡 B2 的 `$GB/scratch/B2/cleanroom/` 造成的** | major（内部，不是发布件问题） | `test_gold_only_lives_under_reference_or_snapshots`：78+ 条 `scratch/B2/cleanroom/dl/genebench_public_runtime_v1/reference/tasks/.../gold`；`test_no_api_key_material_in_run_dirs`：18+ 条 `B2/cleanroom/repo/ops/test_env.py:850 OpenAI / DeepSeek 形态`。**把解包出来的运行时树放在 `$GB/scratch` 下会同时踩红线 2 与红线 5 的守门**。外部用户机器上不会有这个红。 |
+
+## 三、本卡实际跑过的命令与结果（照抄可复现）
+
+    git ls-remote git@github.com:Decilix-Intelligence/GeneBench.git
+      06678a44bb7a980d175b4393984ffb51f78a1803  HEAD / refs/heads/main / refs/tags/v1.0.16^{}
+      0c662a379f96bdcdd25f960f90291c51c8928d2b  refs/tags/v1.0.16
+    git ls-remote git@github.com:Decilix-Intelligence/GeneQuant.git
+      6ce7664e84e467c39d11bb4ec88209bdae6a7c92  HEAD / refs/heads/main      （没被误推）
+
+    git clone --depth 1 git@…/GeneBench.git   → 73 秒，2,191 件，单次提交
+      自核不变量三者同值 [绿]；作者=提交者 深情代码大师 <2994718175@qq.com>；body 空
+      树里无 `gold` 路径段；`reference/` + `scorer/` 33 件**按 EXCLUDED.txt 的既定口径有意保留**
+
+    env/bin/python scratch/W/w_scan_stale.py scratch/V2/clone/GeneBench
+      (a) 10 条 —— **0 条真错**（全是上游第三方 pin：TradingAgents / FinMem / AlphaAgent 的
+          codeload commit、`@anthropic-ai/claude-code` 的 npm shasum、因子表达式 sha1）
+      (b) 244 条 —— **0 条真错**（留证 / 门的断言常量 / 票据与已知限制表里对子串的**描述**）
+      (c) 32 条 —— **0 条真错**（表头、签字包只读归档、`specs` 里「它挡什么」的无关语义；
+          两张活表 `HANDOFF` §19.6.4 与 `release_upload_report` §四逐行核过，仍成立的三行确实仍挡）
+
+    pytest ops/test_e.py                 14 passed                      [绿]
+    pytest ops/test_d.py                 17 passed / 1 skipped          [绿]
+    pytest ops/test_release_manifest.py  19 passed / **1 failed**       [**红**]
+    ops/mk_release_manifest.py --check   退 1（**判据变了：blockers**）  [**红**]
+    pytest ops/test_env.py               61 passed / 1 skipped / 2 failed（**B2 的 cleanroom**，不是树的问题）
+
+    匿名（无 token、无 SSH key）：
+      GET /releases/tags/v1.0.16 → id 387775425 / draft=False / prerelease=False
+        gold_subset  157,448,605  state=uploaded  digest sha256:edc5ea7c…
+        provider     782,100,276  state=uploaded  digest sha256:33083ff2…
+      GET /git/ref/heads/main   → 06678a44…（commit）= Release 的 target_commitish，**不悬空**
+      GET /git/ref/tags/v1.0.16 → 0c662a37…（tag）
+      Range 0-0：provider 206 `content-range: bytes 0-0/782100276`
+                 gold     206 `content-range: bytes 0-0/157448605`
+      三处（README §2.1a 表 / `ops/release/attachments.json` / `RELEASE_MANIFEST.release_attachments`）
+      与 GitHub digest **四方逐字一致**；公开树里附件仍是 **2 件**（B2 的第三件不在这棵树里，对）。
+
+## 四、一句话回答「外部用户会不会被文档误导」
+
+**会，两步**：① README §2.1 的第一个代码块（公开树那版）把发布方内部落点写死成
+`GB=/data/shared/genebench`，`cd $REPO` 当场断 —— 内网卡 C2 已改好，**只差一次重推**；
+② README §5 (`:447`) 叫人跑 `ops/mk_release_manifest.py --check` 并把「退 1」定义成
+「判据变了（**停下**）」，而干净 clone 上它必退 1 —— 这一条即使推了 C2 的树也还在，
+因为 C2 的注加在 §2.1，§5 那一行没跟改。

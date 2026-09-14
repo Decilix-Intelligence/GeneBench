@@ -1,0 +1,512 @@
+{
+ "schema_version": 1,
+ "generated_by": "ops/mk_release_manifest.py",
+ "note": "`releasable` 是推导出来的：任何缺件、任何未闭合的 blocker、任何一份未定的许可 → false。手改这个字段会被 ops/test_release_manifest.py 当场抓到。",
+ "axes": {
+  "set_version": "1.0.15",
+  "set_root": "622f720c95cf2249e5a8c5479b2a9d5d620f4b30e420f2e5dfe9d698f6766d61",
+  "reference_version": "r1.0.22",
+  "reference_root": "c61b066734e3192f67c04ede148da46f9bc16f8b51e9440403ceceb523604bf0",
+  "protocol_version": "geneprotocol_v1@<逐 run 反算，见 VERSIONS.md §1.3>",
+  "channels": [
+   "private",
+   "public"
+  ],
+  "comparable_iff": "四条轴全部相同"
+ },
+ "package": {
+  "min_spec": {
+   "ram_data_plane_gb": {
+    "min": 16,
+    "why": "网关常驻 ≈ 2.3 GB；一道 S7 真题把它顶过 6 GB 上限并触发 4 次 oom-kill，上限现为 12 GiB"
+   },
+   "ram_data_plane_rebuild_gb": {
+    "min": 30,
+    "why": "run_public_chain 的 gold 重算：792 个面板常驻 22 GiB"
+   },
+   "ram_exec_plane_gb": {
+    "min": 16,
+    "why": "一次真跑起两个容器"
+   },
+   "ram_single_node_gb": {
+    "min": 30,
+    "why": "上面两条相加的上界"
+   },
+   "disk_gb": {
+    "min": 50,
+    "rebuild": 200,
+    "why": "包解开 1.52 GiB；每个 run 目录约 600 MB（逐 run 物化 provider 树）"
+   },
+   "docker": {
+    "min": "24 + compose v2",
+    "tested": "29.1.3 / compose 2.40.3",
+    "why": "纯数据面那台不需要 docker"
+   },
+   "python_data_plane": {
+    "min": "3.10",
+    "tested": "3.10 与 3.12",
+    "deps": [
+     "fastapi",
+     "uvicorn",
+     "pandas",
+     "pyarrow",
+     "duckdb",
+     "pyyaml"
+    ],
+    "why": "仓库里没有 requirements 文件，六个包是演练里试出来的（手册 §1.2）"
+   }
+  },
+  "inventory_source": "ops/reports/i_rehearsal_v2/package_inventory.json",
+  "gold_subset_source": "ops/reports/i_rehearsal_v2/gold_subset.json",
+  "totals_bytes": {
+   "必发合计_bytes": 1183182032,
+   "必发_加答案面_bytes": 1631194152,
+   "若发全量gold_bytes": 17025756197
+  },
+  "parts": [
+   {
+    "part": "代码树（git archive HEAD）",
+    "bytes": 19763200,
+    "ship": "必发"
+   },
+   {
+    "part": "公开通道行情表 snapshots/public_v1/tables",
+    "bytes": 468016569,
+    "ship": "必发（网关只读这一棵）"
+   },
+   {
+    "part": "公开通道 qlib_provider",
+    "bytes": 369118133,
+    "ship": "必发（注入器按 sha 根核）"
+   },
+   {
+    "part": "公开通道 tradability",
+    "bytes": 153540937,
+    "ship": "必发"
+   },
+   {
+    "part": "公开通道 epsilon（含 S7 信号源面板）",
+    "bytes": 11245846,
+    "ship": "必发"
+   },
+   {
+    "part": "公开通道 universe / calibration / crosscheck",
+    "bytes": 2139649,
+    "ship": "必发"
+   },
+   {
+    "part": "gold 因子面板 **全量**",
+    "bytes": 16001931863,
+    "ship": "**不发**（超 5 GB 线）"
+   },
+   {
+    "part": "gold 因子面板 **子集**（本卡新增）",
+    "bytes": 159357698,
+    "ship": "发这一份"
+   },
+   {
+    "part": "答案面 reference/（gold 产物 + 夹具）",
+    "bytes": 448012120,
+    "ship": "发给**运行者**，绝不进容器"
+   },
+   {
+    "part": "已打好的公开数据包（形态 A，今天 publishable=false）",
+    "bytes": 788422669,
+    "ship": "许可到位后发"
+   },
+   {
+    "part": "harness 镜像",
+    "bytes": 0,
+    "ship": "**不发**（本机 `harnesses/build.sh` 构建）"
+   }
+  ],
+  "gold": {
+   "ships": "subset",
+   "why": "全量超过 5 GB 的发布线（裁定 ⑯）",
+   "n_factors": 41,
+   "limitation": "子集能复现夹具内容，不能重新推导池子的选取 —— build_pool() 的合格判定要扫全族每一条（gtja_191 186 条 / worldquant_101 82 条 / qlib_alpha158 158 条）。要重新推导得有全量 gold，走手册 §1.4 (b) 的重建链。",
+   "data_card": "ops/data_cards/gold_subset_v1.md",
+   "channels": {
+    "private": {
+     "n_files": 41,
+     "bytes": 159350146,
+     "full_bytes": 16007090394,
+     "missing": 0,
+     "list_sha256": "728e86fda980fb4ed399d0f11fbf9a9d75ed019de4538cc202482d10863046a1"
+    },
+    "public": {
+     "n_files": 41,
+     "bytes": 159357698,
+     "full_bytes": 16001931863,
+     "missing": 0,
+     "list_sha256": "6e9696f056986fabacebb3b92717c9a1f44e8c959611979e66b13394054d047d"
+    }
+   }
+  }
+ },
+ "repository": "https://github.com/Decilix-Intelligence/GeneBench.git",
+ "genequant": {
+  "repository": "https://github.com/Decilix-Intelligence/GeneQuant.git",
+  "version": "v1",
+  "manifest_path": "genequant/MANIFEST.json",
+  "manifest_sha256": "c145af300c4c3c2ee20605e8a28eb84eed10141247a4890d2e5063b6c90b8513",
+  "protocols": [
+   "geneprotocol_v1",
+   "geneprotocol_v1_doc",
+   "geneprotocol_v1_adapt"
+  ],
+  "how_to_refresh": "改了协议工件之后：ops/test_genequant_subtree.py --rebuild → 再跑本生成器。顺序倒过来的话清单钉的是上一版，而两边都不会红。"
+ },
+ "freeze_line": "2026-07-31",
+ "task_counts": {
+  "drafted": 40,
+  "released": 34,
+  "held": 6
+ },
+ "license": {
+  "data": {
+   "state": "pending_license_text",
+   "file": "DATA_LICENSE",
+   "text_in_repo": false
+  },
+  "code": {
+   "spdx": "Apache-2.0",
+   "file": "LICENSE",
+   "decided": true
+  }
+ },
+ "blockers": [
+  {
+   "id": "data_license_text",
+   "what": "baostock 的书面再分发许可**原文未入库**",
+   "status_now": "DATA_LICENSE = `pending_license_text`",
+   "blocks": "形态 A（冻结包下载）：包只落 $GB/release/_staging_unpublished/，MANIFEST.license.publishable=false，外部用户拿不到包",
+   "closes_when": "原文放进 ops/terms/baostock/permission/，DATA_LICENSE 的「## 2. 许可原文」一节引用其文件名/日期/签署方，顶部状态改 granted",
+   "evidence": [
+    "DATA_LICENSE",
+    "ops/reports/public/release_forms.md",
+    "ops/terms/baostock/index.json"
+   ],
+   "satisfied": false
+  },
+  {
+   "id": "no_clone_url",
+   "what": "仓库**没有可 clone 的地址**",
+   "status_now": "两个地址已定，README 与 CITATION.cff 两处一致",
+   "blocks": "形态 B（用户自建）：第一步是「拿一份完整仓库」，地址是占位符时这一步走不下去",
+   "closes_when": "给出两个真地址并写进 README 的 clone 步骤与 CITATION.cff 的 repository-code（本清单的 repository / genequant.repository 与它们同源）；**推送本身由仓库所有者执行**，推完再重打一次公开包（_staging_unpublished/ 里那份 README 是旧文本）",
+   "evidence": [
+    "README.md",
+    "CITATION.cff",
+    "ops/reports/push_instructions.md",
+    "ops/reports/public/release_forms.md"
+   ],
+   "satisfied": true
+  },
+  {
+   "id": "frozen_artifacts_missing",
+   "what": "PUBLIC_FROZEN_ARTIFACTS 声明的冻结件缺件",
+   "status_now": "全部到位",
+   "blocks": "缺的是 gold 的**定义面**（「τ 标定于此实现对」）——少了它们，拿到包的人**复现不了 τ**",
+   "closes_when": "把 factor_library/compiled/ 三个 jsonl 补齐，或改 snapshots/public/manifest.py 的清单并说明为什么不需要",
+   "evidence": [
+    "snapshots/public/manifest.py",
+    "ops/reports/public/release_forms.md"
+   ],
+   "satisfied": true
+  },
+  {
+   "id": "public_channel_zero_runs",
+   "what": "**公开通道的真跑背书** —— `m6_public` 的 18 行清单立项时全是 `pending`",
+   "status_now": "m6_public：8 个有 run 的行 / 共 18 行",
+   "blocks": "公开通道的就绪报告 §4 / §4b 渲染不出逐 run 证据（报告自己说了）——「外部用户按手册跑得通」这条在**公开通道**上没有实测背书。不挡外部用户自己跑",
+   "closes_when": "`$PY ops/run_joblist.py --jobs $GB/runs_in/m6_public/jobs.jsonl --resume` 至少跑出一个 run 并结算入库，再重出 `ops/reports/m6_public/v1_0_readiness_public.md`",
+   "evidence": [
+    "ops/reports/m6_public/README.md",
+    "ops/reports/m6_public/v1_0_readiness_public.md"
+   ],
+   "satisfied": true
+  },
+  {
+   "id": "code_license_undecided",
+   "what": "**代码许可未定** —— 这是用户的决定，不由施工方替他选",
+   "status_now": "SPDX-License-Identifier: Apache-2.0",
+   "blocks": "整个仓库的对外分发：没有许可的代码，别人不知道能不能用",
+   "closes_when": "用户选定一个许可（建议 Apache-2.0 或 MIT，差别写在 LICENSE 里），把 SPDX 行与正文换成该许可的原文",
+   "evidence": [
+    "LICENSE"
+   ],
+   "satisfied": true
+  }
+ ],
+ "missing": [],
+ "releasable": false,
+ "files": {
+  "CHANGELOG.md": {
+   "group": "入口与许可",
+   "sha256": "6e26bae83deb03b01fc239a72fc227ff034c2c8f788d00e01e8617e2c7d4253b",
+   "bytes": 65998
+  },
+  "CITATION.cff": {
+   "group": "入口与许可",
+   "sha256": "d58b3949dcbefe35c8250a49ed8777e13a41e05989b790315c54018a272e9a53",
+   "bytes": 3037
+  },
+  "DATA_LICENSE": {
+   "group": "入口与许可",
+   "sha256": "babf467a786d8c1648453a0f382b95431945dc1c7b54041be103c2a403523ff3",
+   "bytes": 7706
+  },
+  "LICENSE": {
+   "group": "入口与许可",
+   "sha256": "6717c2fe3b14e0fa488a2a7bb06d6083678321897bac23fff3f6bed7fc515ea7",
+   "bytes": 15674
+  },
+  "README.md": {
+   "group": "入口与许可",
+   "sha256": "45e4b5e4ad124f2e899009de9c8bf616d862ee563a0b298d160dce4580fb40d1",
+   "bytes": 30236
+  },
+  "VERSIONS.md": {
+   "group": "入口与许可",
+   "sha256": "8cf1bb786b72765afc8091c05895df8306587f2a4b3582f979518fecd3fbff62",
+   "bytes": 11289
+  },
+  "docs/OPERATOR_MANUAL.md": {
+   "group": "手册",
+   "sha256": "e9ffe82434e641526b47bb0a74385e9ee8a62e8bd7aefc4a3c2b283df4878ca0",
+   "bytes": 87417
+  },
+  "factor_library/compiled/blocked.jsonl": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": "955f7a66c4e7a63d727fce9cb3b6fa6f22ca1b725d7db4e864bbbe76cb2bb5cc",
+   "bytes": 27539
+  },
+  "factor_library/compiled/qlib_native.jsonl": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": "f0ea97c6bd5b1a8c41736b31a68756d1543d9e11c26ee3d1f8cf42727b2a4698",
+   "bytes": 552199
+  },
+  "factor_library/compiled/qlib_panel.jsonl": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": "cbf4ba183edfaabb30211decb57297c391b888ff1e6fc5fd77cc62720f882384",
+   "bytes": 165036
+  },
+  "genequant/CITATION.cff": {
+   "group": "协议子树（GeneQuant）",
+   "sha256": "dda4085c6f4fd577c9670e22e219b57c68c83c10c826a1f13a70821a73e7887a",
+   "bytes": 1981
+  },
+  "genequant/MANIFEST.json": {
+   "group": "协议子树（GeneQuant）",
+   "sha256": "c145af300c4c3c2ee20605e8a28eb84eed10141247a4890d2e5063b6c90b8513",
+   "bytes": 5959
+  },
+  "genequant/PLACEMENT.md": {
+   "group": "协议子树（GeneQuant）",
+   "sha256": "08b5fd152fd8686e900ff8807025b7ee1189ae11754762d059d868a4937a3b51",
+   "bytes": 4633
+  },
+  "genequant/README.md": {
+   "group": "协议子树（GeneQuant）",
+   "sha256": "0f5d03c45d86959d43c91dab3e261f170c1ff3411f8227083d7b4cb49c6f3e05",
+   "bytes": 6115
+  },
+  "harnesses/README.md": {
+   "group": "手册",
+   "sha256": "36d010d960f1ecd83d2ddaf45683b3bbe4ee25993a5a1c40f2832b7679b09ff4",
+   "bytes": 35308
+  },
+  "integrations/P2_CONTRACT.md": {
+   "group": "口径与协议",
+   "sha256": "981f3c8a4d979353ce6eb6c281a64b9a983384cdb1beaaad7b3a106b51572487",
+   "bytes": 56592
+  },
+  "integrations/README.md": {
+   "group": "手册",
+   "sha256": "2516cd275fb8324e3bf490e1ec61014ab3cbb156353737f759a1e90f8268e0ff",
+   "bytes": 61202
+  },
+  "ops/HANDOFF.md": {
+   "group": "内部交接（非面向外部运行者）",
+   "sha256": "8c37ecfd62144fedd9b4255d6b91a986073e2f8713124657ba1da72831b78a8e",
+   "bytes": 164399
+  },
+  "ops/data_cards/README.md": {
+   "group": "数据卡",
+   "sha256": "c9d983db1fdfca06cafe721d4eef956b8a27f674cf887a537989269c34314fe9",
+   "bytes": 8779
+  },
+  "ops/data_cards/fixture_s4_eco_pool_v1.md": {
+   "group": "数据卡",
+   "sha256": "40624706fcf00b726a56f7596ff60bbe58bd5b2f1ea5b77f007421236dd8ff8c",
+   "bytes": 1416
+  },
+  "ops/data_cards/fixture_s6_signals.md": {
+   "group": "数据卡",
+   "sha256": "523c4843b4ad9aa1e5c34c92f6fd016fdf185ea8bddfdd23fe301159b72d8e45",
+   "bytes": 1046
+  },
+  "ops/data_cards/gold_factors.md": {
+   "group": "数据卡",
+   "sha256": "791e663feda85b8dff5152cbcc4b3cda346bfce6d066b1bb2a1e46b341f07c45",
+   "bytes": 7035
+  },
+  "ops/data_cards/gold_subset_v1.md": {
+   "group": "数据卡",
+   "sha256": "e6d43ec57028157e8b0ffca281c50ad545bbfb3482b8ea17937bdc4f64a34ebb",
+   "bytes": 3961
+  },
+  "ops/data_cards/public_channel.md": {
+   "group": "数据卡",
+   "sha256": "9e23541647a606030640e4bc7fcc4622012eaf775f6bd777e0e152da7e9caa0d",
+   "bytes": 21936
+  },
+  "ops/data_cards/qlib_provider.md": {
+   "group": "数据卡",
+   "sha256": "40176750063612fc83476c069db8e1951b1b87f94c414f84792d7e4f60314d85",
+   "bytes": 8422
+  },
+  "ops/data_cards/s7_backtest_gold.md": {
+   "group": "数据卡",
+   "sha256": "45bac93dda4648f56f8f533e6386fdd5f6b74e1a6f93f90e42b15ad97bd9d052",
+   "bytes": 6503
+  },
+  "ops/data_cards/tradability.md": {
+   "group": "数据卡",
+   "sha256": "03af9706e1ac5a674b1d05e4166ed46ee9da04890e0c3202edabc01769b9a50f",
+   "bytes": 13763
+  },
+  "ops/data_cards/universe_pit.md": {
+   "group": "数据卡",
+   "sha256": "b88bb07e7de9b3e80e4a31a88c5997f0c1bcf6b99ab637fdc069e929517f21e6",
+   "bytes": 27441
+  },
+  "ops/manifests/v1.0-smoke.json": {
+   "group": "冻结清单",
+   "sha256": "b7735fa96a61e1b4363e0a7613436168d13eed2d55b8e4354d039fe3d09e7744",
+   "bytes": 126183
+  },
+  "ops/manifests/v1.0-smoke.reference.json": {
+   "group": "冻结清单",
+   "sha256": "f668cd8fe6c19d8bd6a265b2c05436773632ab51e795365bc69e75cb81a93b9c",
+   "bytes": 61416
+  },
+  "ops/reports/calibration_spec_v1.md": {
+   "group": "报告",
+   "sha256": "4b99aeb775b192e42fb50c9caf2bd30df966f2ddf765574a0a6159d571711ecc",
+   "bytes": 4353
+  },
+  "ops/reports/known_limits_v1.md": {
+   "group": "报告",
+   "sha256": "859b136ece61ad6c98b1c9b687c3b27be7bf6cf34a1d52a8f6a6c84201625a41",
+   "bytes": 24109
+  },
+  "ops/reports/public/release_forms.md": {
+   "group": "报告",
+   "sha256": "467d39f3461c19d08d886cfdc9881d5f378c0cc580ab8392e707fc1752688ba7",
+   "bytes": 21644
+  },
+  "ops/reports/rehearsal_v2.md": {
+   "group": "报告",
+   "sha256": "c184c48f1574b0af2530cf2c928da72347f8f6c56f256f31ec510828c0efe408",
+   "bytes": 23110
+  },
+  "ops/reports/v1_0_readiness.md": {
+   "group": "报告",
+   "sha256": "f2915b8ffb5ae19e680ced4b376813aefad3edf771d88b4cf817f8ce7d781d0a",
+   "bytes": 23905
+  },
+  "ops/reports/validator_validation_v1.md": {
+   "group": "报告",
+   "sha256": "ebb6ffb2709ec9e58e6aa593871f762ed293132568e3ce6503acf3fd7f515725",
+   "bytes": 4073
+  },
+  "ops/specs/GeneBench指标对接决定_v1.md": {
+   "group": "口径与协议",
+   "sha256": "4585dd1ef5271a2fb5ac75f7959c447b432b2db8b2433e2800b5cf257a490df2",
+   "bytes": 14109
+  },
+  "ops/specs/GeneBench指标规格_v1.md": {
+   "group": "口径与协议",
+   "sha256": "da1fe73f833842035b4e63c4770d1cdcac316706b2cb3da9be7a300bd70f40e1",
+   "bytes": 32357
+  },
+  "ops/specs/GeneBench秩相关与标定口径_v1.md": {
+   "group": "口径与协议",
+   "sha256": "d339f1776527266d9ac63ffede9f65ca1667e7edb6a034ab0974ac293e76d7e2",
+   "bytes": 4620
+  },
+  "ops/specs/artifact_schema/v1.0/S1.json": {
+   "group": "artifact schema",
+   "sha256": "4c8c374dd31cfdd2b9f5fbd91a30c4bf0e6fd7ab0f81a99c020fa804619f9a1e",
+   "bytes": 4658
+  },
+  "ops/specs/artifact_schema/v1.0/S2.json": {
+   "group": "artifact schema",
+   "sha256": "1b1be8fd780c37039ed1fa6da9ebea9c5afe58f0b4d2855ba48ded6c7ff1c9d8",
+   "bytes": 5156
+  },
+  "ops/specs/artifact_schema/v1.0/S3.json": {
+   "group": "artifact schema",
+   "sha256": "bfc7e08a370ee8d60539c03f100fa613a7e175d421c46be604bd5c6c8c97046f",
+   "bytes": 7052
+  },
+  "ops/specs/artifact_schema/v1.0/S4.json": {
+   "group": "artifact schema",
+   "sha256": "e0c43ca6a0783105d975c7e761791eec47e5827fe0ef0d8bf07faaab52a084e0",
+   "bytes": 5027
+  },
+  "ops/specs/artifact_schema/v1.0/S5.json": {
+   "group": "artifact schema",
+   "sha256": "2d2c7d47564154145ded37f5a9cfabacc88e9a77bb1c56f2af7a25953686af04",
+   "bytes": 5523
+  },
+  "ops/specs/artifact_schema/v1.0/S6.json": {
+   "group": "artifact schema",
+   "sha256": "2f90f299ac132966b8f8e70063238bda3562dd14fe02214d5865eb7aedc678ba",
+   "bytes": 4730
+  },
+  "ops/specs/artifact_schema/v1.0/S7.json": {
+   "group": "artifact schema",
+   "sha256": "9fb584b7a7bd6909a65bc432fcb8d00ad7734a7ad3618ab693597ebb63d7aec1",
+   "bytes": 9016
+  },
+  "ops/specs/artifact_schema/v1.0/S8.json": {
+   "group": "artifact schema",
+   "sha256": "c54d38580c3abc56223a43418357d3738c6a55e063c30305540c6b91937df214",
+   "bytes": 9187
+  },
+  "ops/specs/backtest_contract.md": {
+   "group": "口径与协议",
+   "sha256": "7cd6c853da378482b6889df20ac53151a41f134358b31f3831d7c2471806e3f5",
+   "bytes": 22985
+  },
+  "ops/specs/fairness_protocol.md": {
+   "group": "口径与协议",
+   "sha256": "b216035e321ea2567e69f9c1652adc7f1e2987171c6b9d3c541595abff5c4255",
+   "bytes": 42099
+  },
+  "ops/specs/metrics_as_implemented_v1.md": {
+   "group": "口径与协议",
+   "sha256": "95169344703a867389cb969ba37cb3e1608185d9886693b7f1380f7523afed36",
+   "bytes": 23993
+  },
+  "reference/factorlib_pinned/formula.py": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": "3eaf99b7dc829e824cc37cea4a414858ffc34dec9b317ab807df960bf9cb17a4",
+   "bytes": 11431
+  },
+  "reference/factorlib_pinned/qlib_loader.py": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": "bbad13f3b7152df1566b5719290baa6426f717e79227c7009a51c9208224cf96",
+   "bytes": 19019
+  },
+  "reference/factorlib_pinned/qlib_ops.py": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": "f3d16a7925c5778cf3760516ac62671958fdef675e26fb90983077aca8c7ced2",
+   "bytes": 4897
+  }
+ },
+ "generated_at": "2026-09-11T14:27:30Z"
+}

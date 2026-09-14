@@ -1,0 +1,150 @@
+# GeneBench 价目表（卡 1.5，2026-09-06）—— 主表 `$` 列的唯一价源。
+#
+# **为什么价要钉进仓库**：`$` 是主表列之一。价目从网页现查，同一份 run 记录在两个月后
+# 结算出的 `$` 会不一样，而表上看不出是价变了还是模型变了。钉在这里 + 带 `source_url`
+# / `retrieved_at`，「这个数是怎么来的」就有出处。
+#
+# **口径三条**：
+# 1. 单位一律 **每 1M token 的美元数**（`*_per_mtok`），与各家定价页的单位一致；
+# 2. **价字段为 null = 缺价**，`pricing.cost_usd` 对它返回 `None`，**不是 0** ——
+#    0 会进均值与排名，把「没接这家」读成「这家不要钱」；
+# 3. DeepSeek 从 2026-08-16 16:00 UTC 起分**高峰 / 低谷**两档（低谷是高峰的一半）。
+#    边车的 `llm_log.jsonl` 不记这次调用落在哪一档，因此本表的 `*_per_mtok`
+#    **一律取高峰价（上界）**，低谷价另列 `offpeak_*` 只作参考。
+#    主表的 `$` 因此是**成本上界**，不是账单实数 —— 表下要写这句话。
+#    （按调用时刻逐条判高峰/低谷 = v1.1，见 ops/tickets_inbox/1.5.md。）
+#
+# `alias_of`: 该行的空价字段从目标行继承（`pricing.load()` 解析）。用来把
+# 「注册表写的 model id」与「上游实际服务的 model id」连起来而不抄第二份数字。
+schema_version: 1
+prices:
+
+  # —— DeepSeek（v1.0 唯一接入的一家）——————————————————————————————
+  - model: deepseek-v4-flash
+    provider: deepseek
+    base_url_host: api.deepseek.com
+    input_per_mtok: 0.44                 # 高峰 · cache miss
+    output_per_mtok: 1.32                # 高峰
+    cache_hit_input_per_mtok: 0.014      # 高峰 · cache hit
+    offpeak_input_per_mtok: 0.22
+    offpeak_output_per_mtok: 0.66
+    offpeak_cache_hit_input_per_mtok: 0.007
+    peak_window_utc: "周一至周五 01:00-04:00 与 06:00-10:00 UTC 为高峰，其余为低谷"
+    currency: USD
+    effective_date: "2026-08-16"
+    source_url: https://api-docs.deepseek.com/quick_start/pricing
+    retrieved_at: "2026-09-06"
+    note: >-
+      M6/M6b 两批 run 的**网络侧真值**：1196 条响应体的 `model` 字段全是 deepseek-v4-flash
+      （证据 ops/reports/m6_all/served_model_evidence.json）。
+
+  - model: deepseek-chat
+    provider: deepseek
+    base_url_host: api.deepseek.com
+    alias_of: deepseek-v4-flash
+    input_per_mtok: null
+    output_per_mtok: null
+    cache_hit_input_per_mtok: null
+    currency: USD
+    effective_date: "2026-08-16"
+    source_url: https://api-docs.deepseek.com/quick_start/pricing
+    retrieved_at: "2026-09-06"
+    note: >-
+      `runner/registry.py` 三条配置写的 model id 是这个。**官方定价页与 `/v1/models`
+      都已不再列 deepseek-chat**（2026-09-06 复核），而 M6/M6b 的响应体说上游实际服务的是
+      deepseek-v4-flash —— 所以按别名指过去，不另抄一份数字。
+      注册表该不该改写成实际 id 是另一件事（登记在 ops/tickets_inbox/1.5.md，不在本卡改）。
+
+  - model: deepseek-v4-pro
+    provider: deepseek
+    base_url_host: api.deepseek.com
+    input_per_mtok: 1.32
+    output_per_mtok: 3.96
+    cache_hit_input_per_mtok: 0.044
+    offpeak_input_per_mtok: 0.66
+    offpeak_output_per_mtok: 1.98
+    offpeak_cache_hit_input_per_mtok: 0.022
+    peak_window_utc: "周一至周五 01:00-04:00 与 06:00-10:00 UTC 为高峰，其余为低谷"
+    currency: USD
+    effective_date: "2026-08-16"
+    source_url: https://api-docs.deepseek.com/quick_start/pricing
+    retrieved_at: "2026-09-06"
+    note: v1.0 未使用；`/v1/models` 列出，换配置时可直接用。
+
+  - model: deepseek-v4-flash-vision-exp
+    provider: deepseek
+    base_url_host: api.deepseek.com
+    alias_of: deepseek-v4-flash
+    input_per_mtok: null
+    output_per_mtok: null
+    cache_hit_input_per_mtok: null
+    currency: USD
+    effective_date: "2026-08-16"
+    source_url: https://api-docs.deepseek.com/quick_start/pricing
+    retrieved_at: "2026-09-06"
+    note: v1.0 未使用；官方定价页与 deepseek-v4-flash 同价（多模态实验版）。
+
+  # —— 未接入的几家：**留位**，价一律 null ————————————————————————
+  # 这些行存在的意义是：`price_of()` 对它们返回 None 而不是 KeyError，
+  # 主表上「这家没接」与「这家不要钱」因此可分。接入时把 model 换成实际调用的 id 再填价。
+  - model: claude
+    provider: anthropic
+    base_url_host: api.anthropic.com
+    input_per_mtok: null
+    output_per_mtok: null
+    cache_hit_input_per_mtok: null
+    currency: USD
+    effective_date: null
+    source_url: https://claude.com/pricing
+    retrieved_at: null
+    note: 未接入，待 key。两台机对 api.anthropic.com 返回 403（地区封锁，见 registry 模块 docstring）；接入时把 model 改成实际调用的 id。
+
+  - model: gemini
+    provider: google
+    base_url_host: generativelanguage.googleapis.com
+    input_per_mtok: null
+    output_per_mtok: null
+    cache_hit_input_per_mtok: null
+    currency: USD
+    effective_date: null
+    source_url: https://ai.google.dev/gemini-api/docs/pricing
+    retrieved_at: null
+    note: 未接入，待 key。接入时把 model 改成实际调用的 id。
+
+  - model: grok
+    provider: xai
+    base_url_host: api.x.ai
+    input_per_mtok: null
+    output_per_mtok: null
+    cache_hit_input_per_mtok: null
+    currency: USD
+    effective_date: null
+    source_url: https://docs.x.ai/developers/models
+    retrieved_at: null
+    note: 未接入，待 key。接入时把 model 改成实际调用的 id。
+
+  - model: gpt
+    provider: openai
+    base_url_host: api.openai.com
+    input_per_mtok: null
+    output_per_mtok: null
+    cache_hit_input_per_mtok: null
+    currency: USD
+    effective_date: null
+    source_url: https://developers.openai.com/api/docs/pricing
+    retrieved_at: null
+    note: 未接入，待 key。api.openai.com 从两台机 TCP 层不通（见 registry 模块 docstring）；接入时把 model 改成实际调用的 id。
+
+  - model: opencode-default
+    provider: opencode
+    base_url_host: null
+    input_per_mtok: null
+    output_per_mtok: null
+    cache_hit_input_per_mtok: null
+    currency: USD
+    effective_date: null
+    source_url: https://opencode.ai/docs/models/
+    retrieved_at: null
+    note: >-
+      未接入，待 key。opencode 的默认模型由用户的 provider 配置决定（它自己不托管模型），
+      因此接入时这一行要**拆成实际 provider 的那几行**，而不是给 opencode 定一个价。

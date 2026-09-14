@@ -1,0 +1,67 @@
+{
+ "scorer_output": null,
+ "record": {
+  "task_id": "s4-cor-01",
+  "stage": "S4",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "strict",
+  "seq": 1,
+  "run_id": "s4-cor-01.strict.cfg-codex-deepseek.r01@finance01-e3887dfa",
+  "set_version": "p1.0.0",
+  "reference_version": "r1.0.23",
+  "runner_version": "a22b0bf33fa61061a153e029b9f8d045661625c46321a023243bbbf74d8b775d",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "identity_mismatch",
+  "sr_bucket": "unscorable_agent",
+  "validity": null,
+  "malformed": null,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {},
+  "findings": [],
+  "l3_kind": null,
+  "l3_pass": null,
+  "l3_score": null,
+  "effect": null,
+  "effect_withheld_reason": null,
+  "anchor": null,
+  "correctness": {},
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "",
+  "steps": 32,
+  "tokens_prompt": 1279418,
+  "tokens_completion": 31078,
+  "cost_usd": 0.60396688,
+  "cost_model": "deepseek-chat",
+  "latency_s": 201.926,
+  "validator_rejections": 0,
+  "overreach": {
+   "denied": 1,
+   "total": 181,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "open_range_would_cross_asof": 1
+   },
+   "malformed_requests": 12,
+   "malformed_reasons": {
+    "asof_missing": 3,
+    "unclassified": 2,
+    "param_malformed": 7
+   }
+  },
+  "unbounded_requests": 1,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": [
+   "work/_work/adj.json",
+   "work/_work/bars.json",
+   "work/_work/build_artifact.py",
+   "work/_work/compute.py",
+   "work/_work/fetch.py",
+   "work/_work/trading.json",
+   "work/_work/universe.json"
+  ]
+ }
+}

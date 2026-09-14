@@ -1,0 +1,20 @@
+# 被测配置（数据驱动，W-0）。**enabled: true —— 这是第一条从数据里进主表的配置。**
+#
+# 翻开这个开关会把 ops/test_c41.py 里那条 `len(REG.CONFIGS) == 3` 跑红。
+# 那不是回归：断言本身写死了「主表只有内置三条」，而数据驱动之后主表是
+# 「内置三条 + 数据里 enabled 的」。本卡按 W-0 收件箱的写法把它改成
+# 「内置三条 ⊆ CONFIGS 且 config_id 互异」。
+#
+# **模型待换**：Claude Code 说的是 Anthropic Messages API，而 api.anthropic.com
+# 从 f01/f02 两台机都是 403（地区封锁，N-32）。现在经 DeepSeek 的 anthropic 兼容端点
+# （https://api.deepseek.com/anthropic）接入，模型仍是 deepseek-chat ——
+# 于是 assert_registry_sane 的「所有已启用配置同一模型」成立，主表上暴露的是
+# harness 差异而不是模型差异（这正是 v1.0 的实验设计：一个模型 × 多种 harness）。
+# 要换回 Claude 真模型，见 harnesses/claude-code/README.md 的「模型待换」一节。
+config_id: cfg-claude-code-deepseek
+harness: Claude Code
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: CLI harness（Anthropic Messages API），经 DeepSeek 的 anthropic 兼容端点接入；模型待换（要换回 Claude 真模型需要 ANTHROPIC key 与一条能到 api.anthropic.com 的出口）
+enabled: true

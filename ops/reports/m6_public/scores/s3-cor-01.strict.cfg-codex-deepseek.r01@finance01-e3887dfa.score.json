@@ -1,0 +1,83 @@
+{
+ "scorer_output": null,
+ "record": {
+  "task_id": "s3-cor-01",
+  "stage": "S3",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "strict",
+  "seq": 1,
+  "run_id": "s3-cor-01.strict.cfg-codex-deepseek.r01@finance01-e3887dfa",
+  "set_version": "p1.0.0",
+  "reference_version": "r1.0.23",
+  "runner_version": "a22b0bf33fa61061a153e029b9f8d045661625c46321a023243bbbf74d8b775d",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "malformed",
+  "sr_bucket": "malformed",
+  "validity": "invalid",
+  "malformed": true,
+  "gate_failed": [
+   "lookahead"
+  ],
+  "unobservable": [
+   "declared_reads"
+  ],
+  "probe_states": {
+   "adjust_fingerprint": "clean",
+   "attribution_conservation": "clean",
+   "calendar": "clean",
+   "declared_reads": "unobservable",
+   "factor_degeneracy": "clean",
+   "fetch_clock": "clean",
+   "input_ablation": "clean",
+   "ledger_conservation": "clean",
+   "lookahead": "violation",
+   "nonfinite_propagation": "clean",
+   "optimizer_failure": "clean",
+   "pit_universe": "clean",
+   "source_status": "clean",
+   "underdetermined": "clean",
+   "unsupported_operator": "clean",
+   "warmup_boundary": "clean"
+  },
+  "findings": [
+   "violation:lookahead_attempt [lookahead] @$gateway_log — 1 次请求**显式**越过 as-of 边界被拒（{'beyond_freeze_line': 1}）—— 例：GET /universe params={'as_of': '2026-07-31'} as_of=2026-07-31。被拒 ≠ 没发生：挡住它的是网关，不是被测方的克制",
+   "malformed:fields_not_explicit @$gateway_log — 1 次 /bars 请求没传 fields —— S3 任务要求显式 fields（不传即畸形，不是缺省 *）"
+  ],
+  "l3_kind": null,
+  "l3_pass": null,
+  "l3_score": null,
+  "effect": null,
+  "effect_withheld_reason": null,
+  "anchor": null,
+  "correctness": {},
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "",
+  "steps": 28,
+  "tokens_prompt": 910970,
+  "tokens_completion": 23452,
+  "cost_usd": 0.43178344,
+  "cost_model": "deepseek-chat",
+  "latency_s": 277.115,
+  "validator_rejections": 0,
+  "overreach": {
+   "denied": 1,
+   "total": 341,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "beyond_freeze_line": 1
+   },
+   "malformed_requests": 14,
+   "malformed_reasons": {
+    "param_malformed": 7,
+    "unclassified": 3,
+    "asof_missing": 4
+   }
+  },
+  "unbounded_requests": 0,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": []
+ }
+}

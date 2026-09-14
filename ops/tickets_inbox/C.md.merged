@@ -1,0 +1,16 @@
+# 卡 C（报告器口径 ⑩⑪⑫⑬）的收件箱 —— 编号先写 N-?
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | 主表固定十九列落地（⑩） | 已做 | `scorer/report.py::MAIN_TABLE_COLUMNS` + `main_table()`；`ops/mk_tables.py --table main` 出 csv/md/latex。列名与顺序由 `ops/test_report_columns.py` 逐字钉住（列集相等 + 顺序相等），十六个阶段列另有「每阶段两列、八阶段一个不缺」的断言 |
+| N-? | 取消聚合 / 四态空值词汇（⑪） | 已做 | 不出总分（`AGGREGATE_COLUMN_NAMES` + 断言）；`effect` 不进主表与两张全量指标表，仍逐 run 留在结果库；「拒绝 / 诚实终止 / 未结算 / 预算截断」四类各造一条夹具，CSV / md / LaTeX 三种格式各断言一次渲染成 `—` |
+| N-? | **`TABLE_A_COLUMNS` 没动，`effect` 仍在 Table A 的诊断 CSV 里** | 待收口卡裁 | ⑪ 说的是「不进**发布表**」。把 `effect` 从 `TABLE_A_COLUMNS` 里去掉会让 `ops/test_results_db.py` 的七条「从结果库出的表与既有 `ops/reports/<batch>/table_a.csv` 逐格相同」结构性变红 —— 那不是回归，是因为列集变了，修它要**重出各 batch 的表**，而本卡任务书写明不重出。**收口卡重出表时**：若判定 `table_a.csv` 也算发布件，从 `scorer/report.py::TABLE_A_COLUMNS` 里删掉 `"effect"` 一项，再逐批 `python ops/mk_tables.py --table a --format csv --filter batch=<批次> --out ops/reports/<批次>`，合表另出 `m6_all` |
+| N-? | 全量指标表生成器（⑫） | 已做 | 新增 `ops/mk_metric_tables.py`：`--table agent`（18 项）/ `--table stage`（六条跨阶段 + 39 条逐阶段），从 `ops/results_db.py` 取数、聚合复用 `scorer.report.table_a/table_b`（不另写一份）。`--check` 只查「生成器 vs 规格 §9」是否逐项相等 |
+| N-? | **逐阶段指标实测 39 条，用户裁定写的是 37 条** | 待编排方裁 | 入表规则：①进 `l3_pass` 判据 ②进主表十九列 ③规格 §3 点名且 v1 出得了数；纯计数 `n_*`、常数 `tau`、`gold_*`、`reported_*` 不入表。按这条规则数出来是 39（S1 3 / S2 4 / S3 5 / S4 6 / S5 7 / S6 3 / S7 4 / S8 7）。比 37 多的两条是 S8 的 `orders_replayable` 与 `fills_linked_to_orders` —— 它们是 `Audit` 四条子判据里的两条，v1 真的出数且进判据；删掉它们等于让 Audit 的四条里有两条在表上没有落点。**倾向：保留 39，把数字从 37 改成 39**；要压到 37 就把 S8 的四条子判据整体并进 `Audit` 一列（那样是 35，还得再补两条），或另择两条删 —— 两种都得给理由 |
+| N-? | 指标规格补 §9 指标登记表（⑫） | 已做 | `ops/specs/GeneBench指标规格_v1.md` **追加** §9（§0–§8 一字未动）：§9.0 Role 与空值词汇、§9.1 agent 18 项、§9.2 逐阶段 39 条、§9.3 跨阶段 6 条、§9.4 主表十九列对照。Role 四取一：`gate` / `fidelity` / `reported` / `telemetry` —— **`effect` 作为 Role 一处不留**（⑫），测试断言 |
+| N-? | Slip 的 Role 由 `reported` 改成 `gate`（④） | 已做（文档侧） | 规格 §9.2 的 `S8 / SlipSelfConsistent` 一行 Role 写 `gate`，`ops/mk_metric_tables.py` 与它一致，`test_slip_self_consistency_is_a_gate_now` 两边都断言。**判据实现本来就在**（`scorer/l3.py::compare_fill` 的 `SlipSelfConsistent` 进 `l3_pass`），本卡只改口径登记 |
+| N-? | 核六列补齐（⑬） | 已做 | `Prov` / `W-agr` / `Ovr` 原本就算得出；**新补三个量**：`Decl`（契约必填声明完整率）、`Set`（payload 依赖的设定申明率）在 `scorer/l3.py::declaration_metrics`，由 `scorer/score_run.py` 贴进 `correctness`；`Ledger` 从 `record.probe_states.ledger_conservation` 的三态读（无需改 scorer）。另补 `rho_mean`（主表 S5 的 `ρ̄`，`compare_tau` / `compare_sig` 各一行） |
+| N-? | **`Decl` / `Set` / `ρ̄` 在既有记录上是 `unobservable`** | 待收口卡 | 这三个量由 v1.0.14 起的 scorer 才产出；库里 118 条记录全部早于它，主表上因此显示 `unobservable`（**不是 0、不是 `—`**）。真数据上已验证算得出：`runs_in/m6/*/work/artifact.json` 十二份产物逐份出数，`s7-rob-02` 带题面上下文时 `Decl=1.0`（如实标 `unresolved` 的 `sell_rule` 计入分子）、不带时 `0.9375`。**收口卡重结算那一批 run 之后这三列就有数**；不重结算也不阻塞发布 |
+| N-? | `Ovr` 有两个同名的数 | 已登记 | 主表 S8 那一列只数 **S8** 的 run；全量 agent 指标表里的 `Ovr` 数**全部** run。两者都对，不能并排读 —— 规格 §9.1 与 `ops/reports/report_spec_v1.md` §1 都写明了 |
+| N-? | LaTeX 上 `—` 与「没有 run」同形 | 已登记，不修 | booktabs 里没有第二种空格，两者都写 `---`。CSV / md 分得开。论文表需要区分时把 `n_runs` / `n_tasks` 一起放出来 —— 已写进 `ops/reports/report_spec_v1.md` §0.2 |
+| N-? | 主表口径页 | 已做 | `ops/reports/report_spec_v1.md`：十九列逐列（定义 / 数据源 / 闸门条件 / 不可得时显示什么）+ §3「这张表怎么被绕」给红队 |

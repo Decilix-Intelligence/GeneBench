@@ -1,0 +1,61 @@
+{
+ "harness": "ops/screen_runner.py",
+ "patch": null,
+ "impls": {
+  "B1": {
+   "src": "/data/shared/genebench/snapshots/v1/epsilon/impl_v2_b1.py",
+   "src_sha256": "01dd4ed17db5708cf3a60e32b85b960e4ca22a6e3e7d6270f3559347bf260c54"
+  },
+  "B2": {
+   "src": "/data/shared/genebench/snapshots/v1/epsilon/impl_v2_b2.py",
+   "src_sha256": "83a8134750746b2f64ce180eb21b1b8f57aeaefa8e590aaddb65d417bb0f982a"
+  },
+  "B3": {
+   "src": "/data/shared/genebench/snapshots/v1/epsilon/impl_v2_b3.py",
+   "src_sha256": "c97dfe5b113e592488d5d8e6f0a5a901d39a48734fc7041562ac98ed04ce55dd"
+  }
+ },
+ "runs": [
+  {
+   "impl": "B1",
+   "freq": "daily",
+   "env": {},
+   "wall_s": 1.25,
+   "out_sha256": "3df0fb869778ab132596e8c93628155f7c337521a460b82217ee6897f418df4f",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B2",
+   "freq": "daily",
+   "env": {},
+   "wall_s": 1.43,
+   "out_sha256": "3acf8cddaa857025c485dc89d8ff6c8d754f398fb72866563aa0b2d9d0c59a86",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B3",
+   "freq": "daily",
+   "env": {},
+   "wall_s": 0.73,
+   "out_sha256": "a9801a7e7c3faa4a340dc925af421a2398a108509b43fa36208735f732965602",
+   "stderr_tail": ""
+  }
+ ],
+ "gates": {
+  "baseline_reproduces": true
+ },
+ "repro": {
+  "B1/daily": {
+   "max_rel": 0.0,
+   "worst_metric": ""
+  },
+  "B2/daily": {
+   "max_rel": 3.4821556607309196e-15,
+   "worst_metric": "sharpe_net"
+  },
+  "B3/daily": {
+   "max_rel": 1.538888146839135e-14,
+   "worst_metric": "sharpe_net"
+  }
+ }
+}

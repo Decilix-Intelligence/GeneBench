@@ -1,0 +1,11 @@
+# 票据收件箱 —— 卡 3.2-opencode（harness「opencode」接入）
+
+编号先写 `N-?`，由维护者并入 `ops/tickets.md` 时统一编号。
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | `RUN_BUDGET.max_tokens = 600_000` 对多轮 CLI harness 一律不够，而 `runner/registry.py:84` 的注释说它「够 100 次长上下文调用」 | 待裁定 | **第三个 harness 给出同向证据**。Codex 每次 43k~68k（`harnesses/codex/README.md` §2）；opencode 本卡真跑 34 次调用 = 1,047,805 token、52 次 = 1,643,466 token，**平均每次约 30k，prompt 占 98%**（多轮工具调用每轮重发整个上下文）。按 600k 默认值跑，两臂都会在第 20 次左右撞闸，而**表现是「agent 半途放弃」**，不是一条显眼的错误。倾向仍是**不改默认值**（它是成本护栏不是判据），但那句注释是错的，且应当在手册里把「长上下文 harness 显式给 `--max-tokens`」写成硬要求。本卡没有动 `registry.py`（冻结根边上、且不在本卡路径清单里），只在 `harnesses/opencode/README.md` §3.1/§5 写死了 `--max-tokens 3000000`。 |
+| N-? | `harnesses/README.md` §4④ 的结算命令少了一层 `runs` | 已由 3.2-gemini-cli 登记，本卡**复现确认** | 手册写 `--remote /data/genebench_runner/<batch>/runs`，而 `run_f02_a1.py --run-root <X>` 会在 `<X>/runs/` 下再建一层，正确的是 `--remote .../runs/runs`。照手册抄的结果是「runs: 0；问题: 0」——**不报错、退 0、像是跑完了但没结果**。本卡因为读了 gemini 那张卡的 notes 才没撞上；下一位如果不读 notes 还会撞。`harnesses/README.md` 是共享文件，本卡没有动它（`harnesses/opencode/README.md` §5 写的是正确的那条）。**建议改手册那一侧**（改落点会让 m6/m6b 的历史 run 根对不上）。 |
+| N-? | agent 运行期的 HOME 目录会整棵进 `unexpected_files` | 登记不修 | 本卡真跑的两个 run 的 `unexpected_files` 里有 `work/.opencode_home/{.config,.local/share}/…`（含 `opencode.db`、`opencode.log`）。这不是错：P8 在注入结束时结账，运行期写的东西按 `harvest.PRODUCED_*` 允许集分类，落在允许集外就进这份清单。`claude-code` 的 `.claude_home`、`codex` 的 `.codex` 同理。只是这份清单读起来像「有人往 work/ 里塞了文件」，值得在手册里加一句。已写进 `harnesses/opencode/README.md` §4.2 第 3 条。 |
+| N-? | opencode 启动时会往 `opencode.json` 里插一行 `"$schema"` | 登记不修 | 实测：容器里 printf 写出去的是紧凑 JSON，跑完读回来第一行多了 `"$schema": "https://opencode.ai/config.json",`。是编辑器提示用的字段，`--network none` 下一切正常（**不会去下载那个 URL**）。记在这里只为免得后人把「配置文件被改过」当成污染去查。 |
+| N-? | 官方 troubleshooting 说 provider 包在运行期动态安装，**对 1.18.26 不成立** | 登记不修（反例已钉进单测） | 文档说自定义 provider 的 npm 包（这里是 `@ai-sdk/openai-compatible`）会在运行期装到 `~/.cache/opencode`。照那句读，下一步就是给出向白名单加 `registry.npmjs.org` —— 而那是白名单膨胀的唯一真实来源。实测：`docker run --network none` 全程跑通（README §4.1），包已打进单文件二进制。`ops/test_harness_opencode.py` 里钉的是它的推论：启动命令里不许有任何安装动作。 |

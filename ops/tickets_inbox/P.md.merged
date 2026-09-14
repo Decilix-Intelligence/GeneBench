@@ -1,0 +1,13 @@
+# 卡 P（⑪–⑮ 推送两棵树 + Release 附件）票据
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **公开 provider 包里的 `instruments/` 再分发依据未确认，挡住 ⑭** | **BLOCKED，待用户定** | 宇宙定义面来自私有 `universe_pit`（湖 `index_member_all` 派生，上游 tushare），不是 baostock 的产物。裁定 ⑨ 的授权摘要只覆盖「派生日线数据」；`DATA_LICENSE` §5 明写「正文到位之后也不会覆盖」「发布前须单独确认」。两条出路（取得上游许可 / 不发 `instruments/` 改发重建脚本）都要人定。证据：`ops/reports/release_scan_final.md` §2.3、`ops/reports/push_result.md` §2.1 |
+| N-? | **公开 provider 包没有可发布的版本** | **未做，登记** | 盘上只有 `release/_staging_unpublished/public_v1/…tar.gz`（2026-09-06 打的，`code_head e642468`，`license.publishable=false`、`published=false`）。`DATA_LICENSE` §2.1 说 `granted` 之后落点应是 `release/public_v1/` —— 那个目录**不存在**，即 `ops/release/pack_public_provider.py` 在许可翻 granted 之后一次都没重跑。许可定了之后要先重跑它 |
+| N-? | **gold 子集包从来没打过** | **未做，登记** | ⑭ 说传「gold 子集（152 MiB）」，盘上只有清单 `ops/reports/i_rehearsal_v2/gold_subset.json`（公开通道 41 件，清单指纹 `6e9696f0…`）与数据卡 `ops/data_cards/gold_subset_v1.md`，**没有 tar/zip**。打包脚本也没有 —— 要新写一个（按清单逐件取 `snapshots/public_v1/gold_factors/<rel>`，逐件核 sha256 后打包） |
+| N-? | `ops/reports/push_instructions.md` 通篇是**陈的**，且是发布件 | **未改，登记** | 三处与现状不符：① §0② 说「两棵树里**没有**答案面」——按裁定 ④ 现在**有意带全部答案面**；② §0③ 说 `DATA_LICENSE` 仍是 `pending_license_text`、`releasable=false` —— 现在是 `granted` / `releasable=true`；③ §0③ 说 LICENSE 版权行是 `Copyright <待用户填>` —— 裁定 ⑩ 已定为 `Copyright 2026 Decilix Intelligence`（`LICENSE` 已改）。它在 `RELEASE_MANIFEST` 的发布件清单里（两份签字包都收），改完要重跑 `$PY ops/mk_release_manifest.py`。**不在卡 P 路径内**（共享发布件） |
+| N-? | `ops/HANDOFF.md:1457` 那条票据提到内部 `Co-Authored-By` trailer | **未删，交定** | 边界判定：它不是署名，是**关于内部署名不统一的票据**；但它向外说明「本仓库内部历史带 AI 助手 trailer」，而那些 trailer 不在公开树里（新历史）。倾向删。逐条理由见 `ops/reports/release_scan_claude_mentions.md` §三①。`ops/HANDOFF.md` 是共享文件且不在本卡路径 |
+| N-? | `ops/specs/card_3.2_smoke40.md:127,132` 写死本地 Mac scratchpad 绝对路径 | **未改，登记** | `/private/tmp/claude-501/…/scratchpad/…`，外部读者永远够不着，且路径里带 `claude-501`。改成相对描述不影响那两句话为真。见 `release_scan_claude_mentions.md` §三② |
+| N-? | `RELEASE_MANIFEST.json` 的 `genequant` pin 钉的是 `MANIFEST.json` 的 sha256，不是 commit sha | **登记不修** | 裁定 ⑮ 说「GeneBench 以 MANIFEST sha 钉住 GeneQuant 的版本」——现口径**符合**裁定字面。但公开树推上去之后，「哪一次提交」才是外部用户能核的东西。要改成同时钉 commit sha 得动 `ops/mk_release_manifest.py` 的 schema，不在本卡路径 |
+| N-? | `release/trees/genequant` 旧提交 `915d664` 的作者是 `GeneQuant release <noreply@<anthropic 域>>` | **已修** | 卡 Z 打树时用的 anthropic 域占位邮箱，落在 commit author/committer 里（文件内容扫描看不见，跳过 `.git`）。本卡按裁定 ⑫ 重打为 `1269121`，作者与提交者均为 深情代码大师 `<2994718175@qq.com>`，message `GeneQuant v1.0 release`。**旧提交从未推送，无对外痕迹** |
+| N-? | 两个远端的 push **本卡未执行** | **BLOCKED，待用户本人确认** | 技术前置全通（`ssh -T` 实测 `Hi JensenLuan!`、两棵树验过、远端只有初始提交）。没推的理由与照抄的命令见 `ops/reports/push_result.md` §3 |

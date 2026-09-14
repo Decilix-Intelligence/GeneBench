@@ -1,0 +1,54 @@
+{
+ "source": "https://www.baostock.com/",
+ "api": "https://www.baostock.com/articleMall/api/contract?contract_type=<contract_type>",
+ "fetched_utc": "2026-09-04T17:10:51Z",
+ "operator": "阿尔法联合（上海）软件技术有限公司",
+ "note": "现行五份文件全部治理「Baostock交易技术商城」；未见任何一条针对**行情数据 API 所取数据**的再分发条款。",
+ "documents": [
+  {
+   "contract_type": 1,
+   "file": "01_user_service_agreement.md",
+   "title": "一、首部及导言",
+   "contract_id": 7,
+   "version": "V1.0.1",
+   "chars": 5869,
+   "response_sha256": "71bd9741c9fe4617f3370bbcb546330865218986b549ccab5764f5a43ba023fb"
+  },
+  {
+   "contract_type": 2,
+   "file": "02_author_agreement.md",
+   "title": "Baostock交易技术商城作者签约协议",
+   "contract_id": 8,
+   "version": "V1.0.0",
+   "chars": 7891,
+   "response_sha256": "3f39a5e2c5d1877233bdbb2466a7cd2cd5e8d226d149b5894a2d92f962c27946"
+  },
+  {
+   "contract_type": 3,
+   "file": "03_privacy_policy.md",
+   "title": "Baostock交易技术商城隐私政策",
+   "contract_id": 9,
+   "version": "V1.0.1",
+   "chars": 7175,
+   "response_sha256": "e63e6bfa527f1c8fc88354583a3cfc944b6b96357361c019bed19dc47118c35c"
+  },
+  {
+   "contract_type": 4,
+   "file": "04_platform_trade_rules.md",
+   "title": "平台交易规则",
+   "contract_id": 10,
+   "version": "V1.0.0",
+   "chars": 1815,
+   "response_sha256": "bf5a482f0ca9923a7ccd35cbde0bf51c17140b22fe89be859b3eaac739de0fe3"
+  },
+  {
+   "contract_type": 5,
+   "file": "05_disclaimer.md",
+   "title": "免责声明",
+   "contract_id": 11,
+   "version": "V1.0.0",
+   "chars": 887,
+   "response_sha256": "4172ee9f39f0e33f12be4e84d319fa066a5b48655aa1ea572f6ce905159e9d13"
+  }
+ ]
+}

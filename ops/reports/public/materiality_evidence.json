@@ -1,0 +1,513 @@
+{
+ "card": "阶段一 1.1-c",
+ "what": "应写进 genetask/schema.py::DIVERGENCE_EVIDENCE 的条目（本卡不改冻结根，见 pending_freeze_bumps）",
+ "how_to_apply": [
+  "① 把下面每条 entries[*].python_key -> entries[*].text 加进 genetask/schema.py::DIVERGENCE_EVIDENCE；",
+  "② s6-rob-02 出集要推**任务集版本**（ops/freeze_v10.py 的 TASKSET_VERSION 与记因），因为 DIVERGENCE_EVIDENCE 在冻结根里，且它一变，那道题就从「不落盘」变成「落盘」；",
+  "③ 推完重跑 ops/run_oracles.py --tasks s6-rob-02 出它的 oracle 产物（现在被 E9c 拦着）。"
+ ],
+ "generated_at_channel_reports": {
+  "public": {
+   "path": "/data/shared/genebench/repo/ops/reports/public/materiality_screen.json",
+   "sha256": "09e9c78eaaba7cf6b9261e6746d07301fe4040b799e23f1c511d97390216abf7"
+  },
+  "private": {
+   "path": "/data/shared/genebench/scratch/1.1c/materiality_screen_private.json",
+   "sha256": "10c193194c033f4086d950f990be9a7964f75a34db55f2ea97ebaa7efaeb8344"
+  }
+ },
+ "gates": {
+  "public": {
+   "baseline_reproduces": true,
+   "baseline_detail": [],
+   "patch_neutral:P-SELL": true,
+   "patch_neutral_detail:P-SELL": []
+  },
+  "private": {
+   "baseline_reproduces": true,
+   "baseline_detail": [],
+   "patch_neutral:P-SELL": true,
+   "patch_neutral_detail:P-SELL": []
+  }
+ },
+ "already_in_schema": [
+  "sell_rule / (('rebalance_frequency','daily'),) 这一条 2026-09-03 已在 DIVERGENCE_EVIDENCE 里。本卡复跑复现了它的核心数字（ann_return_gross 0.378%–0.446% vs ε=0.2372%，与条目原文「0.38–0.45%（ε=0.237%）」逐位对上）。**唯一多出来的一处**是 win_rate_net：私有 daily 档它标 no_implementation_freedom、`ops/screen_band.py` 对这一档的读法是「要求精确相等」（那一行标着【待签字 §7-①】），而 2026-09-03 那次没有这一条 —— 说明当时的临时 harness 对 ε 为 None 的指标是跳过的。结论方向不变（都 material），但**逐实现条数从 5/6/6 变成 6/6/6**。要不要把条目里的条数改掉，取决于 §7-① 怎么裁；本卡不动既有条目。"
+ ],
+ "entries": [
+  {
+   "task_id": "s6-rob-02",
+   "key": {
+    "field": "rebalance_frequency",
+    "condition": [
+     [
+      "weighting_scheme",
+      "equal"
+     ]
+    ]
+   },
+   "python_key": "(\"rebalance_frequency\", (('weighting_scheme', 'equal'),))",
+   "text": "rebalance_frequency：三份冻结独立实现（B1/B2/B3，`snapshots/v1/epsilon/impl_v2_b*.py`，由 `ops/screen_runner.py` 复制到沙箱后子进程跑）逐可行值 daily/weekly/monthly 各跑一遍。2026-09-07 私有通道实测（判据：daily 档 ε 带）：三份实现内部各有 26/26/27 处指标超带（共 79 处；同一取值下跨实现分叉 50 处）—— material。逐指标（实测差 vs 带）：ann_return_gross 0.03083–0.4674（rel，ε=0.002372，9 处）；ann_return_net 0.02366–0.07723（abs，ε=0.0001241，9 处）；ann_vol_net 0.0002985–0.04001（rel，ε=7.454e-05，9 处）；max_drawdown_net 0.1196–0.3371（rel，ε=0.0001761，9 处）；sharpe_net 0.2098–0.7178（rel，ε=0.004387，9 处）；total_cost 0.7159–0.938（rel，ε=0.001008，9 处）；turnover_one_way_mean 0.7453–0.9442（rel，ε=1.397e-05，9 处）；turnover_two_way_mean 0.7364–0.9417（rel，ε=1.389e-05，9 处）；win_rate_net 2.428e-06–0.009923（rel，要求精确相等（ε 未标定：no_implementation_freedom），7 处）。公开通道（baostock，`snapshots/public_v1/epsilon`）同法复跑作旁证：27/27/27 处、共 81 处，结论同为 material。Gate 0（未打补丁的沙箱副本逐指标复现快照产物）两条通道均过；本字段**不打任何补丁**（频率就是三份实现的 argv），因此 Gate 1 不适用。 产物 `ops/reports/public/materiality_screen.json`（公开）与 `$GB/scratch/1.1c/materiality_screen_private.json`（私有）。",
+   "measured": {
+    "private": {
+     "n_diffs_total": 79,
+     "by_impl": {
+      "B1": 26,
+      "B2": 26,
+      "B3": 27
+     },
+     "by_metric": {
+      "ann_return_gross": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 0.0023715703958198733,
+       "observed_max": 0.4673866132397869,
+       "observed_min": 0.030833828582795274,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "ann_return_net": {
+       "n": 9,
+       "kind": "absolute",
+       "epsilon": 0.00012405026030160027,
+       "observed_max": 0.07723202466634671,
+       "observed_min": 0.023663536400861274,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "ann_vol_net": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 7.453562271987931e-05,
+       "observed_max": 0.04001014268685939,
+       "observed_min": 0.00029846450422873084,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "max_drawdown_net": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 0.00017609593643301493,
+       "observed_max": 0.33708356849297166,
+       "observed_min": 0.11962923708340518,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "sharpe_net": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 0.004387188894937694,
+       "observed_max": 0.7178234597974936,
+       "observed_min": 0.20978308907785026,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "total_cost": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 0.0010084598333818802,
+       "observed_max": 0.9380065981658561,
+       "observed_min": 0.7158837040971947,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "turnover_one_way_mean": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 1.3969265290944861e-05,
+       "observed_max": 0.9441533441092391,
+       "observed_min": 0.7453072839168905,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "turnover_two_way_mean": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 1.3885208414764633e-05,
+       "observed_max": 0.9416517453111717,
+       "observed_min": 0.7363569732879316,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "win_rate_net": {
+       "n": 7,
+       "kind": "relative",
+       "epsilon": null,
+       "observed_max": 0.009922822491730989,
+       "observed_min": 2.4284930230041944e-06,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      }
+     },
+     "cross_by_metric": {
+      "ann_return_gross": 6,
+      "ann_return_net": 6,
+      "max_drawdown_net": 5,
+      "sharpe_net": 5,
+      "total_cost": 6,
+      "turnover_one_way_mean": 6,
+      "turnover_two_way_mean": 6,
+      "ann_vol_net": 5,
+      "win_rate_net": 5
+     },
+     "n_cross_total": 50
+    },
+    "public": {
+     "n_diffs_total": 81,
+     "by_impl": {
+      "B1": 27,
+      "B2": 27,
+      "B3": 27
+     },
+     "by_metric": {
+      "ann_return_gross": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 0.00512451349304595,
+       "observed_max": 0.47101194936915697,
+       "observed_min": 0.012688127596711103,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "ann_return_net": {
+       "n": 9,
+       "kind": "absolute",
+       "epsilon": 0.00027571768075396186,
+       "observed_max": 0.07677452616634506,
+       "observed_min": 0.024272855499848367,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "ann_vol_net": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 9.667188085405075e-05,
+       "observed_max": 0.040850549884251054,
+       "observed_min": 0.0003968569319158419,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "max_drawdown_net": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 3.745596156599482e-05,
+       "observed_max": 0.34019495019545976,
+       "observed_min": 0.1236317682654084,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "sharpe_net": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 0.009340599143368175,
+       "observed_max": 0.7091265901400889,
+       "observed_min": 0.21379853912267732,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "total_cost": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 2.850604135317977e-06,
+       "observed_max": 0.9384514184200048,
+       "observed_min": 0.7170631814224593,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "turnover_one_way_mean": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 1.6500131604170237e-05,
+       "observed_max": 0.9441558871267184,
+       "observed_min": 0.7453191523624205,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "turnover_two_way_mean": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 1.665389023460425e-05,
+       "observed_max": 0.9416542166253178,
+       "observed_min": 0.7363687370809273,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "win_rate_net": {
+       "n": 9,
+       "kind": "relative",
+       "epsilon": 0.0016519823788545898,
+       "observed_max": 0.011013215859030822,
+       "observed_min": 0.00169889912073227,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      }
+     },
+     "cross_by_metric": {
+      "ann_return_gross": 5,
+      "ann_return_net": 5,
+      "max_drawdown_net": 6,
+      "sharpe_net": 5,
+      "total_cost": 6,
+      "turnover_one_way_mean": 6,
+      "turnover_two_way_mean": 6,
+      "ann_vol_net": 5,
+      "win_rate_net": 4
+     },
+     "n_cross_total": 48
+    }
+   },
+   "values": [
+    "daily",
+    "weekly",
+    "monthly"
+   ],
+   "band_tier": "daily",
+   "patch": null
+  },
+  {
+   "task_id": "s7-rob-02",
+   "key": {
+    "field": "sell_rule",
+    "condition": [
+     [
+      "rebalance_frequency",
+      "daily"
+     ]
+    ]
+   },
+   "python_key": "(\"sell_rule\", (('rebalance_frequency', 'daily'),))",
+   "text": "sell_rule：三份冻结独立实现（B1/B2/B3，`snapshots/v1/epsilon/impl_v2_b*.py`，由 `ops/screen_runner.py` 复制到沙箱后子进程跑）逐可行值 worst_n_drop/dropped_from_target 各跑一遍。2026-09-07 私有通道实测（判据：daily 档 ε 带）：三份实现内部各有 6/6/6 处指标超带（共 18 处；同一取值下跨实现分叉 2 处）—— material。逐指标（实测差 vs 带）：ann_return_gross 0.00378–0.00446（rel，ε=0.002372，3 处）；ann_vol_net 0.0001391–0.0001579（rel，ε=7.454e-05，3 处）；max_drawdown_net 0.0002121（rel，ε=0.0001761，2 处）；total_cost 0.002632–0.002803（rel，ε=0.001008，3 处）；turnover_one_way_mean 0.003446–0.003466（rel，ε=1.397e-05，3 处）；turnover_two_way_mean 0.003437–0.003457（rel，ε=1.389e-05，3 处）；win_rate_net 0.001103（rel，要求精确相等（ε 未标定：no_implementation_freedom），1 处）。公开通道（baostock，`snapshots/public_v1/epsilon`）同法复跑作旁证：5/5/5 处、共 15 处，结论同为 material。Gate 0（未打补丁的沙箱副本逐指标复现快照产物）两条通道均过；Gate 1（P-SELL 补丁中性）两条通道均过。 产物 `ops/reports/public/materiality_screen.json`（公开）与 `$GB/scratch/1.1c/materiality_screen_private.json`（私有）。",
+   "measured": {
+    "private": {
+     "n_diffs_total": 18,
+     "by_impl": {
+      "B1": 6,
+      "B2": 6,
+      "B3": 6
+     },
+     "by_metric": {
+      "ann_return_gross": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 0.0023715703958198733,
+       "observed_max": 0.0044602046597610225,
+       "observed_min": 0.003780238409852306,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "ann_vol_net": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 7.453562271987931e-05,
+       "observed_max": 0.00015793559643943582,
+       "observed_min": 0.00013912910088932022,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "total_cost": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 0.0010084598333818802,
+       "observed_max": 0.002802625920469018,
+       "observed_min": 0.0026324082464387363,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "turnover_one_way_mean": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 1.3969265290944861e-05,
+       "observed_max": 0.003465889671111424,
+       "observed_min": 0.0034458923156905747,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "turnover_two_way_mean": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 1.3885208414764633e-05,
+       "observed_max": 0.0034568237709817133,
+       "observed_min": 0.0034367513239258415,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "win_rate_net": {
+       "n": 1,
+       "kind": "relative",
+       "epsilon": null,
+       "observed_max": 0.0011025358324146409,
+       "observed_min": 0.0011025358324146409,
+       "impls": [
+        "B1"
+       ]
+      },
+      "max_drawdown_net": {
+       "n": 2,
+       "kind": "relative",
+       "epsilon": 0.00017609593643301493,
+       "observed_max": 0.0002120702945635616,
+       "observed_min": 0.000212070294561883,
+       "impls": [
+        "B2",
+        "B3"
+       ]
+      }
+     },
+     "cross_by_metric": {
+      "win_rate_net": 2
+     },
+     "n_cross_total": 2
+    },
+    "public": {
+     "n_diffs_total": 15,
+     "by_impl": {
+      "B1": 5,
+      "B2": 5,
+      "B3": 5
+     },
+     "by_metric": {
+      "ann_vol_net": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 9.667188085405075e-05,
+       "observed_max": 0.00014641711581648084,
+       "observed_min": 0.00011876584435550844,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "max_drawdown_net": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 3.745596156599482e-05,
+       "observed_max": 0.00015526281056332892,
+       "observed_min": 4.5200986418241564e-05,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "total_cost": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 2.850604135317977e-06,
+       "observed_max": 0.002844807484531398,
+       "observed_min": 0.0026780722320120824,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "turnover_one_way_mean": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 1.6500131604170237e-05,
+       "observed_max": 0.0034850506209606487,
+       "observed_min": 0.0034750157716816445,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      },
+      "turnover_two_way_mean": {
+       "n": 3,
+       "kind": "relative",
+       "epsilon": 1.665389023460425e-05,
+       "observed_max": 0.0034759753687683627,
+       "observed_min": 0.0034658713881585727,
+       "impls": [
+        "B1",
+        "B2",
+        "B3"
+       ]
+      }
+     },
+     "cross_by_metric": {
+      "max_drawdown_net": 2,
+      "total_cost": 2
+     },
+     "n_cross_total": 4
+    }
+   },
+   "values": [
+    "worst_n_drop",
+    "dropped_from_target"
+   ],
+   "band_tier": "daily",
+   "patch": "P-SELL"
+  }
+ ]
+}

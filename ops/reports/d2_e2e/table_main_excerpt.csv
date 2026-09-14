@@ -1,0 +1,3 @@
+config_id,arm,arm_kind,n_tasks,n_runs,SR,P@1,$,Cov,Prov,Cell%,Adj,Fid,Decl,IC-agr,Set,Sig,ρ̄,W-agr,Cons,ε-agr,Ledger,Audit,Ovr
+cfg-codex-deepseek,open,baseline,3,3,0.3333333333333333,0.0,1.3943554533333333,—,—,0.0,1.0,—,—,,,,,,,,,,
+cfg-codex-deepseek,strict,protocol,3,3,0.3333333333333333,0.0,1.42652136,—,—,—,—,—,—,,,,,,,,,,

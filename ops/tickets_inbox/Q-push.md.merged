@@ -1,0 +1,19 @@
+# 卡 Q（传与推）收件箱 —— 2026-09-13
+
+> 本份**落盘即 `.merged`**：本卡在同一次提交里已把下表并进 `ops/tickets.md`
+> 的「发布前最后一轮（2026-09-13）」那一节（§Q 表），不留一个会被下一张卡再并一次的 `Q.md`。
+> 口径出处：N-792（一卡一名、不复用；卡 P3 立）。任务书写的是 `ops/tickets_inbox/Q.md`，
+> 两条路径都在 `ops/tickets_inbox/**` 之内，按 N-792 取 `.merged` 名。
+
+取号先看盘上实际最大号：本卡动手时是 **N-796**（卡 P3），所以本卡从 **N-797** 起。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| **N-797** | 第三件附件 `genebench_public_runtime_v1.tar.gz` 上传并回填 —— N-779 闭合 | **已做** | 传上**已在的** Release `v1.0.16`（id `387775425`），**不新建 Release、已在的两件附件一个字节没碰**（上传前后两次读 assets 列表：两件的 id / size / digest / `created_at` / `updated_at` 逐字相同）。盘上实测 `42,046,516 B` / `sha256 49e9b250d398a1ce…`（**没有照抄任何文档里的旧值**，脚本现场算），与登记表逐字相同。上传后从 API 读回 `digest = sha256:49e9b250…`、`state=uploaded`、asset id `561398049`。三件各做一次**匿名**（不带 token）带 `Range` 的 GET：全部 **206**，`content-range` 总长分别 `782100276 / 157448605 / 42046516`，与登记逐字对得上。`download_url` 已回填进 `ops/release/attachments.json`；`RELEASE_MANIFEST.release_attachments` 重出后 **`n=3 / uploaded=3`**。 出处：用户裁定（本轮明令「传第三个附件并回填 `download_url`」），卡 Q 执行。 |
+| **N-798** | `ops/test_b2.py::test_attachment_is_registered_and_not_uploaded` 的判据随状态翻面 | **已做（路径越界，标 CONFLICT）** | 那条门断言「本轮不上传，`download_url` 必须是空串」——**用户本轮裁定要传**，状态真的变了，门必须跟着翻，否则本卡干的正事当场把它打红。新判据**比旧的更严**：旧的只查「是不是空串」，新的**逐字比对完整规范地址**（`…/releases/download/v1.0.16/<包名>`），且要求**三件**的地址一件都不许被后来的打包抹掉（旧的只查两件）。函数改名成 `…_and_uploaded`，全仓库没有第二处引用旧名（已 grep）。补丁：`$GB/scratch/Q/patch_q3.py`（幂等）。**`ops/test_b2.py` 不在卡 Q 的可改路径枚举里** —— 见 CONFLICT。 出处：卡 Q。 |
+| **N-799** | 手册 `docs/OPERATOR_MANUAL.md` §1.4 (a) 的第三件附件口径改口 | **已做（路径越界，标 CONFLICT）** | 回填之后那三句成了**现在时的假话**：「仍然缺一块 —— 而且它是第三件附件，不在上面那两条 `curl` 里」「**但它本轮还没有上传到 Release**」「可粘贴的四条命令」。已改成现状并保留判据子串「`download_url` 是空串」（`ops/test_docs_consistency.py::attachments_registry_is_source_of_truth` 要求 README 与手册两处都出现它 —— 它说的是**登记表的格式规则**，不是「现在有空串」）。前序卡 P3 交接 ④ 明列这是「回填之后要跟着改口的五处」之一，任务书明令照用，但该路径不在本卡枚举里。补丁：`$GB/scratch/Q/patch_q2.py`（幂等）。 出处：卡 P3 交接 ④，卡 Q 执行。 |
+| **N-800** | N-782 闭合：`ops/test_docs_consistency.py` 那条 fact 翻面 | **已做（路径越界，标 CONFLICT）** | `manifest_check_nonzero_is_not_damage` 的 `require`（README 与手册两处都要写「非零 ≠ 发布件损坏」）正是**用户裁定②点名要删掉**的那句话；根因（`has_remote` / `m6_public` 两处机器依赖）已由卡 P1 修完，那句话本身成了假话。跑的是**卡 P2 早就写好、卡 P3 只读校验过**的幂等补丁 `$GB/scratch/P2/p2_fact_patch_for_P1.py`：fact 改名 `manifest_check_is_machine_independent`，`require=刻意不取决于跑它的机器`、`forbid=非零 ≠ 发布件损坏`，**两个方向都有牙**。卡 P1 / P2 / P3 连续三张因路径边界停手，本卡第 1 步的验收门（「先核 P3 收绿了」）又卡在这一条上 —— 见 CONFLICT。 出处：卡 P2 写补丁、卡 P3 校验、卡 Q 执行。 |
+| **N-801** | `ops/data_cards/public_runtime_v1.md` 的 `download_url` 那一格随上传改口 | **已做（路径越界，标 CONFLICT）** | 表里原写 `| download_url | **空 —— 本轮未上传** |`，上传之后是现在时的假话，且这份数据卡随包随树发给外部用户。已填成规范地址。 出处：卡 Q 打树前扫描。 |
+| **N-802** | Release `v1.0.16` 的 `target_commitish` 改写分支名 `main`（裁定①） | **已做** | `PATCH /repos/…/releases/387775425 {"target_commitish":"main"}` 回 **200**，读回来确认就是 `"main"`；tag 名、release id、三件附件的 `size` 与 `digest` **一个字节没变**（PATCH 前后各读一次逐字比对）。裁定①同时把 N-736「每次 force-push 之后手工 PATCH」整条纪律作废 —— 落点已由卡 P2（HANDOFF §19.6.5 ②、`push_result.md` §8.2/§8.3）与卡 P3（`tickets.md` 的 N-736/N-748 行）改完，剩 `ops/reports/release_upload_report.md:85`（N-785）仍开着。 出处：用户裁定①，卡 Q 执行。 |
+| **N-803** | `ops/data_cards/public_runtime_v1.md` 的「构建 HEAD」与 `attachments.json` 的 `code_head` 对不上 | **登记不修** | 数据卡写 `efe17e81695fe57c71ef0906dc508bc7fc336ee5`，`ops/release/attachments.json` 写 `85f5acf2bddcc742658c7a77c12c04274ccf1f18`。**不是本轮带的**（两者都是卡 B2 那轮落的，包本身一次没重打 —— 盘上 `bytes`/`sha256` 与 B2 交接时逐字相同）。哪一个是真的构建 HEAD 要回卡 B2 的打包日志查；改错一个比不改坏。不挡外部用户使用（他校验的是 `sha256`，不是 `code_head`）。 出处：卡 Q 打树前扫描。 |
+| **N-804** | `ops/reports/public/release_forms.md` §7.2 仍写两个附件的 `download_url`「现在是**空串**」 | **登记不修（不是本轮带的）** | 那句话说的是**前两件**，而前两件 2026-09-13 上午就已上传回填 —— 也就是说它**在本卡动手之前就已经是假话**，与第三件无关。该文件不在本卡可改路径内，且本卡已越界改了四个文件，不再扩大。改法（原文留证不删，加一句）：「2026-09-13 起三件的 `download_url` 全部已回填，见 `ops/release/attachments.json`」。 出处：卡 Q 打树前扫描。 |

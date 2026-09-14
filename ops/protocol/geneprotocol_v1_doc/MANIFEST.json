@@ -1,0 +1,13 @@
+{
+ "protocol_id": "geneprotocol_v1_doc",
+ "status": "released",
+ "released_at": "2026-09-07",
+ "_what_this_is": "**文档臂**（doc）相对裸臂多出的全部东西 = geneprotocol_v1 里**只读的那两件**（协议说明 README.md + 契约 contract.md）。**不含 validate_artifact.py** ——文档臂要回答的问题是「把规则写给 agent 看，够不够」，而验证器是执行机制（三态强制 / 结构化反馈 / 修复回路），那是 strict 臂的东西。",
+ "_why_a_separate_copy": "清单里的路径相对清单自己所在目录（注入器 `base / k`），所以文档臂只能另存一份而不是指回 geneprotocol_v1。两份**逐字节相同**，由 ops/test_arms_registry.py::test_doc_arm_files_are_byte_identical_to_v1 钉住。",
+ "_placement": "被动存在于 /task/protocol/（与 strict 臂同一个挂载点）；题面**不提它**（题面层等价红线）。",
+ "_not_frozen": "本目录不在 ops/freeze_v10.py 的冻结根里 —— 与 geneprotocol_v1 同样处置（它也不在）。改它要推的是协议版本，不是任务集版本。",
+ "artifacts": {
+  "README.md": "95e6bc508c1a677c89d8ad8f7245649a0bcf853debe581bb69fa85447f05846c",
+  "contract.md": "83307155756096c6225aaccdd0851b01457cd2bcccd079478659fac9d30d22e3"
+ }
+}

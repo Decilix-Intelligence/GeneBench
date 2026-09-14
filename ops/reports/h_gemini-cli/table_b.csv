@@ -1,0 +1,3 @@
+arm,arm_kind,config_id,image_digest,n_runs,reference_version,runner_version,set_version,honest_halts,invalid_rate,n_runs_denom,stage,unobservable_probes_mean
+open,baseline,cfg-gemini-cli-deepseek,gb-gemini-cli-u@sha256:03d5bddf2502…,1,r1.0.18,37392fdc2392…,1.0.11,0,0.0,1,S2,0.0
+strict,protocol,cfg-gemini-cli-deepseek,gb-gemini-cli-u@sha256:03d5bddf2502…,1,r1.0.18,37392fdc2392…,1.0.11,0,0.0,1,S2,0.0

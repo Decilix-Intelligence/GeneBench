@@ -1,0 +1,2371 @@
+{
+ "card": "1.1",
+ "title": "PIT 宇宙收口表 universe_pit:三源合并",
+ "generated_at_utc": "2026-09-01T02:42:58+00:00",
+ "generator": "snapshots/universe_build.py",
+ "freeze_line": "2026-07-31",
+ "calendar": {
+  "view": "trade_cal",
+  "n_trading_days": 4269,
+  "first": "2009-01-05",
+  "last": "2026-07-31",
+  "note": "湖 trade_cal 只有 SSE 一个交易所;A 股两所日历一致。"
+ },
+ "membership_rule": "(源A ∪ 源B) ∩ 第三源在市窗口",
+ "boundary_tolerance_trading_days": 23,
+ "base_period_min_fill": 0.5,
+ "columns": {
+  "ambiguous": "该段与**对账第 5 类（一方缺整段 / 多一个中间段）**有交集。两源对这段成员身份实质不一致，且本项目**不做公告考古**（M1 签字裁定）——所以任务与窗口生成器一律避开命中该标记的 `(code, 时段)`。⚠️ 行级标记是**保守**的（整行命中即为 True，可能宽于真实分歧跨度）；精确到日的排除请用 `ambiguous_spans()` / `is_ambiguous()`，它是权威来源 —— 有的分歧段在 canonical 口径下**根本没有对应行**（例：`300114.SZ` 只有源B 说它在），只看本列会漏掉。",
+  "code": "成分股代码,**湖内形态** `600000.SH`(不是 qlib 的 `SH600000`)。",
+  "universe": "csi300 / csi500 / csi1000 / all(市场全集)。",
+  "in_date": "区间起(**含**),`date32`。一定是交易日。",
+  "out_date": "区间止(**含**),`date32`。一定是交易日,**永不为空**。等于冻结线且 `right_censored=True` 时表示'截至冻结线仍在',**不是**'当天被调出'。",
+  "source": "这一段是哪些源说的:`both` / `index_weight` / `qlib_instruments` / `basic_fallback`(见 `cfg.UNIVERSE_SOURCES`)。",
+  "agreement_flag": "两源在这一段上是否一致(**可空**)。True = 两源都说在,或差异在容忍口径内;False = 不一致且不能用约定差解释;NULL = 不适用(`all` 宇宙只有一个源)。为什么是这个值看 `agreement_basis`。",
+  "agreement_basis": "`agreement_flag` 的判据,取值见 `AGREEMENT_BASIS`。",
+  "canonical": "**这一行属不属于主力读法**(实施稿方案甲:月末快照 diff 自建为主、qlib instruments 交叉对账)。True 的三种情形:`all` 宇宙全部;源A 说在(`both` / `index_weight`);源A 在该宇宙**首期之前**、只有源B 有数据的那段。**只取 canonical 行,宇宙规模就回到名义值;取全表(union)会在两源边界不齐的日子上把宇宙撑大到名义值以上。**",
+  "segment_id": "`{universe}|{code}|{segment_idx}|{part_idx}`,全表唯一行键。",
+  "segment_idx": "这只票在这个宇宙里的**第几次进出**(0 起)。**数进出次数用 distinct segment_idx,不要数行数。**",
+  "part_idx": "同一次进出内部,按'哪些源这么说'切出来的第几个片段(0 起)。同一 segment_idx 下各 part 在交易日网格上首尾相接,并起来是完整区间。",
+  "left_censored": "**行级**谓词:`in_date` 就是该宇宙**可观测下界**那一天,真实入场日更早或不可知。指数宇宙的下界 = 两源覆盖的第一个交易日;`all` 宇宙 = 交易日历起点。等价写法 `in_date == valid_from_of(universe)`。注意 `part_idx > 0` 的行的 `in_date` 也不是真实入场日 —— 那是**来源切换**的边界,不是截断,看 `part_idx` 就能分辨。",
+  "right_censored": "**行级**谓词,与 `out_date == 冻结线` **等价**:未观测到出场。**不是**'当天被调出'。",
+  "listing_clipped": "**行级**谓词:紧挨着**这一行**端点外侧的那个交易日,有源说它还在成分里、但第三源说它那天不在市(已退市 / 尚未上市)—— 这一端是被**在市窗口**裁掉的,不是指数调仓。",
+  "n_trading_days": "本段覆盖的交易日数(闭区间,两端都算)。",
+  "in_date_compact": "`in_date` 的 8 位 `YYYYMMDD` 字符串形态,供直接 join 湖。",
+  "out_date_compact": "`out_date` 的 8 位 `YYYYMMDD` 字符串形态,供直接 join 湖。"
+ },
+ "agreement_basis_legend": {
+  "both_sources_agree": {
+   "agreement_flag": true,
+   "why": "两源都说这段在成分内。最强的一档。"
+  },
+  "tolerated_boundary_lag": {
+   "agreement_flag": true,
+   "why": "单源段,但它紧贴同一次进出里的 `both` 段(是这次进出的头或尾),且长度 <= cfg.BOUNDARY_TOL_TD=23 个交易日 —— 这正是源A 月末快照粒度相对源B 生效日的系统性滞后,是**约定差,不是数据错误**。"
+  },
+  "source_b_base_period_gap": {
+   "agreement_flag": false,
+   "why": "只有源A 说在,且整段落在源B 的**基期缺口**内(源B 在该宇宙的成员数低于名义规模的 50%)。源B 已登记为缺陷 B-01(csi1000 在 2015-05-29 之前只有 3 个成员)。**这段该信源A。**"
+  },
+  "source_a_before_first_snapshot": {
+   "agreement_flag": false,
+   "why": "只有源B 说在,且整段早于源A 在该宇宙的**首期快照**——源A 那时还没有数据,不是它说'不在'。**这段该信源B。**"
+  },
+  "boundary_lag_beyond_tolerance": {
+   "agreement_flag": false,
+   "why": "单源段且贴着 `both` 段,但长度超过一个快照周期 —— 已经不能用月末粒度解释,**必须逐条查**。"
+  },
+  "interior_single_source_hole": {
+   "agreement_flag": false,
+   "why": "单源段夹在同一次进出的两个 `both` 段**中间**:一源在中途挖了个洞。不是边界对不齐,是整段的有无之差。"
+  },
+  "whole_run_single_source": {
+   "agreement_flag": false,
+   "why": "整整一次进出**只有一个源**说它发生过,另一源全程说不在。常见成因:代码映射(同一实体两源用不同 ts_code)、源B 换仓格点粗漏掉的临时调整。"
+  },
+  "single_source_universe": {
+   "agreement_flag": null,
+   "why": "这个宇宙只有一个来源(`all` = 第三源 stock_basic 的在市窗口),**没有第二源可对**,一致性不适用。"
+  }
+ },
+ "sources": {
+  "source_a": {
+   "path_relative_to_root": "snapshots/v1/universe/index_weight_intervals.parquet",
+   "rows": 6729,
+   "n_null_out_date_right_censored": 1800,
+   "n_rows_dropped_off_grid": 0,
+   "n_segments_merged_away": 0,
+   "merge_is_noop": true,
+   "first_snapshot_by_universe": {
+    "csi300": "20090123",
+    "csi500": "20090123",
+    "csi1000": "20141031"
+   },
+   "date_form_in_source": "字符串 YYYYMMDD;out_date IS NULL = 右截断"
+  },
+  "source_b": {
+   "path_relative_to_root": "snapshots/v1/universe/qlib_instruments_intervals.parquet",
+   "rows_all_universes": 256220,
+   "rows_in_compared_universes": 71709,
+   "universes_ignored": [
+    "all",
+    "csi800",
+    "csiall"
+   ],
+   "n_rows_dropped_off_grid": 5700,
+   "n_rows_on_grid": 66009,
+   "n_segments_after_merge": 6688,
+   "date_form_in_source": "date32;out_date == 2026-07-31 = 右删失",
+   "merge_note": "源B 是贴片式:同一 code 在每个 epoch 各占一行,相邻行首尾相接。不合并就会把'一直在成分内'读成几十次进出。",
+   "off_grid_note": "掉出网格的行绝大多数是**源B 早于交易日历起点 2009-01-05 的历史**(csi300 回溯到 2005-04-08、csi500 到 2007-01-31)。湖 trade_cal 只从 2009-01-05 起,那段没有网格可展开 —— 不是丢数,是**表达不了**,对应的段在产物里表现为 left_censored。"
+  },
+  "listing": {
+   "view": "stock_basic",
+   "convention": "list_date <= D < delist_date(左闭右开);证据见 docstring",
+   "n_codes_in_view": 5892,
+   "n_codes_with_window_in_grid": 5813,
+   "n_codes_delisted_before_grid": 60,
+   "n_codes_outside_grid_other": 19,
+   "n_still_listed_at_freeze": 5534,
+   "n_listed_before_grid_start": 1602,
+   "multi_snapshot_note": "stock_basic 是多快照表(19 个 snapshot_date 分区被 view 全部 union),直接 join 会把行数乘 19;DISTINCT 之后一码一行这件事在代码里被断言。"
+  },
+  "namechange": {
+   "view": "namechange",
+   "n_rows": 14156,
+   "n_codes": 5875,
+   "delist_phase_rows": 153,
+   "delist_phase_after_delist_date": [],
+   "delist_phase_check": "PASS —— 退市整理期全部落在 delist_date 之前,在市窗口的右端裁剪点站得住。",
+   "n_codes_with_namechange_before_list_date": 1,
+   "namechange_before_list_date_examples": [
+    {
+     "code": "601975.SH",
+     "earliest_namechange": "20181211",
+     "list_date": "20190108"
+    }
+   ],
+   "codes_absent_from_stock_basic": [
+    "000022.SZ",
+    "000043.SZ",
+    "300114.SZ",
+    "601313.SH"
+   ],
+   "codes_absent_from_stock_basic_note": "这些 code 在源A/源B 里出现过,但湖 stock_basic 里**没有** —— `stock_basic` 用当前 ts_code 回溯改写历史,改过码的公司只留新码、旧码整条消失(namechange 里同样查不到)。所以第三源不是历史注册表,它兜不住'当年用旧码在市'的实体;这些 code 在本表里被在市窗口过滤掉了。"
+  },
+  "pit": {
+   "membership_rule": "(源A ∪ 源B) ∩ 第三源在市窗口",
+   "n_rows": 15259,
+   "agreement_basis_counts": {
+    "both_sources_agree": 6633,
+    "boundary_lag_beyond_tolerance": 49,
+    "interior_single_source_hole": 2,
+    "single_source_universe": 5813,
+    "source_a_before_first_snapshot": 799,
+    "source_b_base_period_gap": 1086,
+    "tolerated_boundary_lag": 871,
+    "whole_run_single_source": 6
+   },
+   "member_days_removed_by_listing_filter": {
+    "csi1000": 4413,
+    "csi1000::a_only": 0,
+    "csi1000::b_only": 4397,
+    "csi300": 366,
+    "csi300::a_only": 4,
+    "csi300::b_only": 285,
+    "csi500": 1254,
+    "csi500::a_only": 15,
+    "csi500::b_only": 1152
+   },
+   "codes_with_no_listing_window": {
+    "csi500": [
+     "000022.SZ",
+     "000043.SZ",
+     "300114.SZ"
+    ],
+    "csi1000": [
+     "000022.SZ",
+     "000043.SZ",
+     "300114.SZ",
+     "601313.SH"
+    ]
+   },
+   "window_start_grid_index": {
+    "csi300": 0,
+    "csi500": 0,
+    "csi1000": 1412,
+    "all": 0
+   },
+   "window_start_date": {
+    "csi300": "20090105",
+    "csi500": "20090105",
+    "csi1000": "20141031",
+    "all": "20090105"
+   },
+   "source_b_base_gap_trading_days": {
+    "csi300": 0,
+    "csi500": 0,
+    "csi1000": 141
+   },
+   "source_b_base_gap_last_day": {
+    "csi300": null,
+    "csi500": null,
+    "csi1000": "20150528"
+   },
+   "base_period_min_fill": 0.5
+  }
+ },
+ "universes": {
+  "csi300": {
+   "n_rows": 1690,
+   "n_membership_runs": 1024,
+   "n_distinct_codes": 825,
+   "nominal_size": 300,
+   "first_in_date": "2009-01-05",
+   "last_out_date": "2026-07-31",
+   "n_left_censored": 300,
+   "n_right_censored": 300,
+   "n_listing_clipped": 11,
+   "source_counts": {
+    "both": 1023,
+    "index_weight": 184,
+    "qlib_instruments": 483
+   },
+   "agreement_counts": {
+    "true": 1384,
+    "false": 306,
+    "null": 0
+   },
+   "agreement_basis_counts": {
+    "both_sources_agree": 1023,
+    "boundary_lag_beyond_tolerance": 5,
+    "source_a_before_first_snapshot": 300,
+    "tolerated_boundary_lag": 361,
+    "whole_run_single_source": 1
+   },
+   "n_canonical_rows": 1507,
+   "member_days": 1284235,
+   "size_on_probe_days": {
+    "2009-01-05": 300,
+    "2010-01-04": 298,
+    "2011-01-04": 300,
+    "2012-01-04": 300,
+    "2013-01-04": 300,
+    "2014-01-02": 300,
+    "2015-01-05": 300,
+    "2016-01-04": 300,
+    "2017-01-03": 300,
+    "2018-01-02": 300,
+    "2019-01-02": 300,
+    "2020-01-02": 300,
+    "2021-01-04": 300,
+    "2022-01-04": 300,
+    "2023-01-03": 300,
+    "2024-01-02": 300,
+    "2025-01-02": 300,
+    "2026-01-05": 300,
+    "2026-07-31": 300
+   },
+   "size_on_probe_days_union": {
+    "2009-01-05": 300,
+    "2010-01-04": 316,
+    "2011-01-04": 326,
+    "2012-01-04": 324,
+    "2013-01-04": 315,
+    "2014-01-02": 300,
+    "2015-01-05": 300,
+    "2016-01-04": 300,
+    "2017-01-03": 300,
+    "2018-01-02": 300,
+    "2019-01-02": 300,
+    "2020-01-02": 300,
+    "2021-01-04": 300,
+    "2022-01-04": 300,
+    "2023-01-03": 300,
+    "2024-01-02": 300,
+    "2025-01-02": 300,
+    "2026-01-05": 300,
+    "2026-07-31": 300
+   },
+   "n_codes_with_multiple_runs": 166,
+   "max_runs_per_code": 5
+  },
+  "csi500": {
+   "n_rows": 3281,
+   "n_membership_runs": 2316,
+   "n_distinct_codes": 1738,
+   "nominal_size": 500,
+   "first_in_date": "2009-01-05",
+   "last_out_date": "2026-07-31",
+   "n_left_censored": 499,
+   "n_right_censored": 500,
+   "n_listing_clipped": 11,
+   "source_counts": {
+    "both": 2265,
+    "index_weight": 261,
+    "qlib_instruments": 755
+   },
+   "agreement_counts": {
+    "true": 2766,
+    "false": 515,
+    "null": 0
+   },
+   "agreement_basis_counts": {
+    "both_sources_agree": 2265,
+    "boundary_lag_beyond_tolerance": 12,
+    "interior_single_source_hole": 1,
+    "source_a_before_first_snapshot": 499,
+    "tolerated_boundary_lag": 501,
+    "whole_run_single_source": 3
+   },
+   "n_canonical_rows": 3025,
+   "member_days": 2139867,
+   "size_on_probe_days": {
+    "2009-01-05": 499,
+    "2010-01-04": 500,
+    "2011-01-04": 500,
+    "2012-01-04": 500,
+    "2013-01-04": 500,
+    "2014-01-02": 500,
+    "2015-01-05": 500,
+    "2016-01-04": 500,
+    "2017-01-03": 500,
+    "2018-01-02": 500,
+    "2019-01-02": 499,
+    "2020-01-02": 500,
+    "2021-01-04": 500,
+    "2022-01-04": 500,
+    "2023-01-03": 500,
+    "2024-01-02": 500,
+    "2025-01-02": 500,
+    "2026-01-05": 500,
+    "2026-07-31": 500
+   },
+   "size_on_probe_days_union": {
+    "2009-01-05": 499,
+    "2010-01-04": 550,
+    "2011-01-04": 550,
+    "2012-01-04": 501,
+    "2013-01-04": 500,
+    "2014-01-02": 500,
+    "2015-01-05": 500,
+    "2016-01-04": 500,
+    "2017-01-03": 500,
+    "2018-01-02": 500,
+    "2019-01-02": 499,
+    "2020-01-02": 500,
+    "2021-01-04": 500,
+    "2022-01-04": 500,
+    "2023-01-03": 500,
+    "2024-01-02": 500,
+    "2025-01-02": 500,
+    "2026-01-05": 500,
+    "2026-07-31": 500
+   },
+   "n_codes_with_multiple_runs": 476,
+   "max_runs_per_code": 5
+  },
+  "csi1000": {
+   "n_rows": 4475,
+   "n_membership_runs": 3437,
+   "n_distinct_codes": 2839,
+   "nominal_size": 1000,
+   "first_in_date": "2014-10-31",
+   "last_out_date": "2026-07-31",
+   "n_left_censored": 1000,
+   "n_right_censored": 1000,
+   "n_listing_clipped": 4,
+   "source_counts": {
+    "both": 3345,
+    "index_weight": 1110,
+    "qlib_instruments": 20
+   },
+   "agreement_counts": {
+    "true": 3354,
+    "false": 1121,
+    "null": 0
+   },
+   "agreement_basis_counts": {
+    "both_sources_agree": 3345,
+    "boundary_lag_beyond_tolerance": 32,
+    "interior_single_source_hole": 1,
+    "source_b_base_period_gap": 1086,
+    "tolerated_boundary_lag": 9,
+    "whole_run_single_source": 2
+   },
+   "n_canonical_rows": 4455,
+   "member_days": 2858166,
+   "size_on_probe_days": {
+    "2009-01-05": 0,
+    "2010-01-04": 0,
+    "2011-01-04": 0,
+    "2012-01-04": 0,
+    "2013-01-04": 0,
+    "2014-01-02": 0,
+    "2015-01-05": 1000,
+    "2016-01-04": 1000,
+    "2017-01-03": 1000,
+    "2018-01-02": 1000,
+    "2019-01-02": 1000,
+    "2020-01-02": 1000,
+    "2021-01-04": 1000,
+    "2022-01-04": 1000,
+    "2023-01-03": 1000,
+    "2024-01-02": 1000,
+    "2025-01-02": 1000,
+    "2026-01-05": 1000,
+    "2026-07-31": 1000
+   },
+   "size_on_probe_days_union": {
+    "2009-01-05": 0,
+    "2010-01-04": 0,
+    "2011-01-04": 0,
+    "2012-01-04": 0,
+    "2013-01-04": 0,
+    "2014-01-02": 0,
+    "2015-01-05": 1000,
+    "2016-01-04": 1000,
+    "2017-01-03": 1000,
+    "2018-01-02": 1000,
+    "2019-01-02": 1000,
+    "2020-01-02": 1000,
+    "2021-01-04": 1000,
+    "2022-01-04": 1000,
+    "2023-01-03": 1000,
+    "2024-01-02": 1000,
+    "2025-01-02": 1000,
+    "2026-01-05": 1000,
+    "2026-07-31": 1000
+   },
+   "n_codes_with_multiple_runs": 547,
+   "max_runs_per_code": 4
+  },
+  "all": {
+   "n_rows": 5813,
+   "n_membership_runs": 5813,
+   "n_distinct_codes": 5813,
+   "nominal_size": null,
+   "first_in_date": "2009-01-05",
+   "last_out_date": "2026-07-31",
+   "n_left_censored": 1602,
+   "n_right_censored": 5534,
+   "n_listing_clipped": 0,
+   "source_counts": {
+    "basic_fallback": 5813
+   },
+   "agreement_counts": {
+    "true": 0,
+    "false": 0,
+    "null": 5813
+   },
+   "agreement_basis_counts": {
+    "single_source_universe": 5813
+   },
+   "n_canonical_rows": 5813,
+   "member_days": 14941017,
+   "size_on_probe_days": {
+    "2009-01-05": 1602,
+    "2010-01-04": 1696,
+    "2011-01-04": 2041,
+    "2012-01-04": 2320,
+    "2013-01-04": 2472,
+    "2014-01-02": 2468,
+    "2015-01-05": 2592,
+    "2016-01-04": 2808,
+    "2017-01-03": 3036,
+    "2018-01-02": 3467,
+    "2019-01-02": 3567,
+    "2020-01-02": 3760,
+    "2021-01-04": 4182,
+    "2022-01-04": 4685,
+    "2023-01-03": 5067,
+    "2024-01-02": 5335,
+    "2025-01-02": 5384,
+    "2026-01-05": 5469,
+    "2026-07-31": 5534
+   },
+   "size_on_probe_days_union": {
+    "2009-01-05": 1602,
+    "2010-01-04": 1696,
+    "2011-01-04": 2041,
+    "2012-01-04": 2320,
+    "2013-01-04": 2472,
+    "2014-01-02": 2468,
+    "2015-01-05": 2592,
+    "2016-01-04": 2808,
+    "2017-01-03": 3036,
+    "2018-01-02": 3467,
+    "2019-01-02": 3567,
+    "2020-01-02": 3760,
+    "2021-01-04": 4182,
+    "2022-01-04": 4685,
+    "2023-01-03": 5067,
+    "2024-01-02": 5335,
+    "2025-01-02": 5384,
+    "2026-01-05": 5469,
+    "2026-07-31": 5534
+   },
+   "n_codes_with_multiple_runs": 0,
+   "max_runs_per_code": 1
+  }
+ },
+ "daily_size": {
+  "canonical": {
+   "csi300": {
+    "scope": "canonical",
+    "nominal": 300,
+    "n_days_with_members": 4269,
+    "min": 298,
+    "max": 300,
+    "n_days_off_nominal": 92,
+    "days_off_nominal_first50": [
+     {
+      "date": "20091229",
+      "size": 298
+     },
+     {
+      "date": "20091230",
+      "size": 298
+     },
+     {
+      "date": "20091231",
+      "size": 298
+     },
+     {
+      "date": "20100104",
+      "size": 298
+     },
+     {
+      "date": "20100105",
+      "size": 298
+     },
+     {
+      "date": "20100106",
+      "size": 298
+     },
+     {
+      "date": "20100107",
+      "size": 298
+     },
+     {
+      "date": "20100108",
+      "size": 298
+     },
+     {
+      "date": "20100111",
+      "size": 298
+     },
+     {
+      "date": "20100112",
+      "size": 298
+     },
+     {
+      "date": "20100113",
+      "size": 298
+     },
+     {
+      "date": "20100114",
+      "size": 298
+     },
+     {
+      "date": "20100115",
+      "size": 298
+     },
+     {
+      "date": "20100118",
+      "size": 298
+     },
+     {
+      "date": "20100119",
+      "size": 298
+     },
+     {
+      "date": "20100120",
+      "size": 298
+     },
+     {
+      "date": "20100121",
+      "size": 298
+     },
+     {
+      "date": "20100122",
+      "size": 298
+     },
+     {
+      "date": "20100125",
+      "size": 298
+     },
+     {
+      "date": "20100126",
+      "size": 298
+     },
+     {
+      "date": "20100127",
+      "size": 298
+     },
+     {
+      "date": "20100128",
+      "size": 298
+     },
+     {
+      "date": "20110823",
+      "size": 299
+     },
+     {
+      "date": "20110824",
+      "size": 299
+     },
+     {
+      "date": "20110825",
+      "size": 299
+     },
+     {
+      "date": "20110826",
+      "size": 299
+     },
+     {
+      "date": "20110829",
+      "size": 299
+     },
+     {
+      "date": "20110830",
+      "size": 299
+     },
+     {
+      "date": "20130918",
+      "size": 299
+     },
+     {
+      "date": "20130923",
+      "size": 299
+     },
+     {
+      "date": "20130924",
+      "size": 299
+     },
+     {
+      "date": "20130925",
+      "size": 299
+     },
+     {
+      "date": "20130926",
+      "size": 299
+     },
+     {
+      "date": "20130927",
+      "size": 299
+     },
+     {
+      "date": "20150126",
+      "size": 299
+     },
+     {
+      "date": "20150127",
+      "size": 299
+     },
+     {
+      "date": "20150128",
+      "size": 299
+     },
+     {
+      "date": "20150129",
+      "size": 299
+     },
+     {
+      "date": "20150520",
+      "size": 298
+     },
+     {
+      "date": "20150521",
+      "size": 298
+     },
+     {
+      "date": "20150522",
+      "size": 298
+     },
+     {
+      "date": "20150525",
+      "size": 298
+     },
+     {
+      "date": "20150526",
+      "size": 298
+     },
+     {
+      "date": "20150527",
+      "size": 298
+     },
+     {
+      "date": "20150528",
+      "size": 298
+     },
+     {
+      "date": "20151230",
+      "size": 299
+     },
+     {
+      "date": "20170214",
+      "size": 299
+     },
+     {
+      "date": "20170215",
+      "size": 299
+     },
+     {
+      "date": "20170216",
+      "size": 299
+     },
+     {
+      "date": "20170217",
+      "size": 299
+     }
+    ],
+    "size_histogram": {
+     "298": 29,
+     "299": 63,
+     "300": 4177
+    }
+   },
+   "csi500": {
+    "scope": "canonical",
+    "nominal": 500,
+    "n_days_with_members": 4269,
+    "min": 498,
+    "max": 500,
+    "n_days_off_nominal": 108,
+    "days_off_nominal_first50": [
+     {
+      "date": "20090105",
+      "size": 499
+     },
+     {
+      "date": "20090106",
+      "size": 499
+     },
+     {
+      "date": "20090107",
+      "size": 499
+     },
+     {
+      "date": "20090108",
+      "size": 499
+     },
+     {
+      "date": "20090109",
+      "size": 499
+     },
+     {
+      "date": "20090112",
+      "size": 499
+     },
+     {
+      "date": "20090113",
+      "size": 499
+     },
+     {
+      "date": "20090114",
+      "size": 499
+     },
+     {
+      "date": "20090115",
+      "size": 499
+     },
+     {
+      "date": "20090116",
+      "size": 499
+     },
+     {
+      "date": "20090119",
+      "size": 499
+     },
+     {
+      "date": "20090120",
+      "size": 499
+     },
+     {
+      "date": "20090121",
+      "size": 499
+     },
+     {
+      "date": "20090122",
+      "size": 499
+     },
+     {
+      "date": "20090506",
+      "size": 499
+     },
+     {
+      "date": "20090507",
+      "size": 499
+     },
+     {
+      "date": "20090508",
+      "size": 499
+     },
+     {
+      "date": "20090511",
+      "size": 499
+     },
+     {
+      "date": "20090512",
+      "size": 499
+     },
+     {
+      "date": "20090513",
+      "size": 499
+     },
+     {
+      "date": "20090514",
+      "size": 499
+     },
+     {
+      "date": "20090515",
+      "size": 499
+     },
+     {
+      "date": "20090518",
+      "size": 499
+     },
+     {
+      "date": "20090519",
+      "size": 499
+     },
+     {
+      "date": "20090520",
+      "size": 499
+     },
+     {
+      "date": "20090521",
+      "size": 499
+     },
+     {
+      "date": "20090522",
+      "size": 499
+     },
+     {
+      "date": "20090525",
+      "size": 499
+     },
+     {
+      "date": "20090526",
+      "size": 499
+     },
+     {
+      "date": "20090827",
+      "size": 499
+     },
+     {
+      "date": "20090828",
+      "size": 499
+     },
+     {
+      "date": "20100212",
+      "size": 499
+     },
+     {
+      "date": "20100222",
+      "size": 499
+     },
+     {
+      "date": "20100223",
+      "size": 499
+     },
+     {
+      "date": "20100224",
+      "size": 499
+     },
+     {
+      "date": "20100225",
+      "size": 499
+     },
+     {
+      "date": "20110218",
+      "size": 499
+     },
+     {
+      "date": "20110221",
+      "size": 499
+     },
+     {
+      "date": "20110222",
+      "size": 499
+     },
+     {
+      "date": "20110223",
+      "size": 499
+     },
+     {
+      "date": "20110224",
+      "size": 499
+     },
+     {
+      "date": "20110225",
+      "size": 499
+     },
+     {
+      "date": "20120228",
+      "size": 499
+     },
+     {
+      "date": "20120301",
+      "size": 499
+     },
+     {
+      "date": "20120302",
+      "size": 499
+     },
+     {
+      "date": "20120305",
+      "size": 499
+     },
+     {
+      "date": "20120306",
+      "size": 499
+     },
+     {
+      "date": "20120307",
+      "size": 499
+     },
+     {
+      "date": "20120308",
+      "size": 499
+     },
+     {
+      "date": "20120309",
+      "size": 499
+     }
+    ],
+    "size_histogram": {
+     "498": 8,
+     "499": 100,
+     "500": 4161
+    }
+   },
+   "csi1000": {
+    "scope": "canonical",
+    "nominal": 1000,
+    "n_days_with_members": 2857,
+    "min": 998,
+    "max": 1000,
+    "n_days_off_nominal": 14,
+    "days_off_nominal_first50": [
+     {
+      "date": "20240812",
+      "size": 999
+     },
+     {
+      "date": "20240813",
+      "size": 999
+     },
+     {
+      "date": "20240814",
+      "size": 999
+     },
+     {
+      "date": "20240815",
+      "size": 999
+     },
+     {
+      "date": "20240816",
+      "size": 999
+     },
+     {
+      "date": "20240819",
+      "size": 999
+     },
+     {
+      "date": "20240820",
+      "size": 999
+     },
+     {
+      "date": "20240821",
+      "size": 999
+     },
+     {
+      "date": "20240822",
+      "size": 999
+     },
+     {
+      "date": "20240823",
+      "size": 999
+     },
+     {
+      "date": "20240826",
+      "size": 999
+     },
+     {
+      "date": "20240827",
+      "size": 999
+     },
+     {
+      "date": "20240828",
+      "size": 998
+     },
+     {
+      "date": "20240829",
+      "size": 998
+     }
+    ],
+    "size_histogram": {
+     "998": 2,
+     "999": 12,
+     "1000": 2843
+    }
+   },
+   "all": {
+    "scope": "canonical",
+    "nominal": null,
+    "n_days_with_members": 4269,
+    "min": 1600,
+    "max": 5534,
+    "n_days_off_nominal": null,
+    "days_off_nominal_first50": [],
+    "size_by_year_first_trading_day": {
+     "2009": 1602,
+     "2010": 1696,
+     "2011": 2041,
+     "2012": 2320,
+     "2013": 2472,
+     "2014": 2468,
+     "2015": 2592,
+     "2016": 2808,
+     "2017": 3036,
+     "2018": 3467,
+     "2019": 3567,
+     "2020": 3760,
+     "2021": 4182,
+     "2022": 4685,
+     "2023": 5067,
+     "2024": 5335,
+     "2025": 5384,
+     "2026": 5469
+    }
+   }
+  },
+  "union": {
+   "csi300": {
+    "scope": "union",
+    "nominal": 300,
+    "n_days_with_members": 4269,
+    "min": 298,
+    "max": 326,
+    "n_days_off_nominal": 353,
+    "days_off_nominal_first50": [
+     {
+      "date": "20090701",
+      "size": 324
+     },
+     {
+      "date": "20090702",
+      "size": 324
+     },
+     {
+      "date": "20090703",
+      "size": 324
+     },
+     {
+      "date": "20090706",
+      "size": 324
+     },
+     {
+      "date": "20090707",
+      "size": 324
+     },
+     {
+      "date": "20090708",
+      "size": 324
+     },
+     {
+      "date": "20090709",
+      "size": 324
+     },
+     {
+      "date": "20090710",
+      "size": 324
+     },
+     {
+      "date": "20090713",
+      "size": 324
+     },
+     {
+      "date": "20090714",
+      "size": 324
+     },
+     {
+      "date": "20090715",
+      "size": 324
+     },
+     {
+      "date": "20090716",
+      "size": 324
+     },
+     {
+      "date": "20090717",
+      "size": 324
+     },
+     {
+      "date": "20090720",
+      "size": 324
+     },
+     {
+      "date": "20090721",
+      "size": 324
+     },
+     {
+      "date": "20090722",
+      "size": 324
+     },
+     {
+      "date": "20090723",
+      "size": 324
+     },
+     {
+      "date": "20090724",
+      "size": 324
+     },
+     {
+      "date": "20090727",
+      "size": 324
+     },
+     {
+      "date": "20090728",
+      "size": 324
+     },
+     {
+      "date": "20090729",
+      "size": 324
+     },
+     {
+      "date": "20090730",
+      "size": 324
+     },
+     {
+      "date": "20091229",
+      "size": 298
+     },
+     {
+      "date": "20091230",
+      "size": 298
+     },
+     {
+      "date": "20091231",
+      "size": 298
+     },
+     {
+      "date": "20100104",
+      "size": 316
+     },
+     {
+      "date": "20100105",
+      "size": 316
+     },
+     {
+      "date": "20100106",
+      "size": 316
+     },
+     {
+      "date": "20100107",
+      "size": 316
+     },
+     {
+      "date": "20100108",
+      "size": 316
+     },
+     {
+      "date": "20100111",
+      "size": 316
+     },
+     {
+      "date": "20100112",
+      "size": 316
+     },
+     {
+      "date": "20100113",
+      "size": 316
+     },
+     {
+      "date": "20100114",
+      "size": 316
+     },
+     {
+      "date": "20100115",
+      "size": 316
+     },
+     {
+      "date": "20100118",
+      "size": 316
+     },
+     {
+      "date": "20100119",
+      "size": 316
+     },
+     {
+      "date": "20100120",
+      "size": 316
+     },
+     {
+      "date": "20100121",
+      "size": 316
+     },
+     {
+      "date": "20100122",
+      "size": 316
+     },
+     {
+      "date": "20100125",
+      "size": 316
+     },
+     {
+      "date": "20100126",
+      "size": 316
+     },
+     {
+      "date": "20100127",
+      "size": 316
+     },
+     {
+      "date": "20100128",
+      "size": 316
+     },
+     {
+      "date": "20100701",
+      "size": 318
+     },
+     {
+      "date": "20100702",
+      "size": 318
+     },
+     {
+      "date": "20100705",
+      "size": 318
+     },
+     {
+      "date": "20100706",
+      "size": 318
+     },
+     {
+      "date": "20100707",
+      "size": 318
+     },
+     {
+      "date": "20100708",
+      "size": 318
+     }
+    ],
+    "size_histogram": {
+     "298": 10,
+     "299": 63,
+     "300": 3916,
+     "301": 103,
+     "315": 19,
+     "316": 41,
+     "318": 42,
+     "323": 20,
+     "324": 36,
+     "326": 19
+    }
+   },
+   "csi500": {
+    "scope": "union",
+    "nominal": 500,
+    "n_days_with_members": 4269,
+    "min": 498,
+    "max": 550,
+    "n_days_off_nominal": 612,
+    "days_off_nominal_first50": [
+     {
+      "date": "20090105",
+      "size": 499
+     },
+     {
+      "date": "20090106",
+      "size": 499
+     },
+     {
+      "date": "20090107",
+      "size": 499
+     },
+     {
+      "date": "20090108",
+      "size": 499
+     },
+     {
+      "date": "20090109",
+      "size": 499
+     },
+     {
+      "date": "20090112",
+      "size": 499
+     },
+     {
+      "date": "20090113",
+      "size": 499
+     },
+     {
+      "date": "20090114",
+      "size": 499
+     },
+     {
+      "date": "20090115",
+      "size": 499
+     },
+     {
+      "date": "20090116",
+      "size": 499
+     },
+     {
+      "date": "20090119",
+      "size": 499
+     },
+     {
+      "date": "20090120",
+      "size": 499
+     },
+     {
+      "date": "20090121",
+      "size": 499
+     },
+     {
+      "date": "20090122",
+      "size": 499
+     },
+     {
+      "date": "20090701",
+      "size": 550
+     },
+     {
+      "date": "20090702",
+      "size": 550
+     },
+     {
+      "date": "20090703",
+      "size": 550
+     },
+     {
+      "date": "20090706",
+      "size": 550
+     },
+     {
+      "date": "20090707",
+      "size": 550
+     },
+     {
+      "date": "20090708",
+      "size": 550
+     },
+     {
+      "date": "20090709",
+      "size": 550
+     },
+     {
+      "date": "20090710",
+      "size": 550
+     },
+     {
+      "date": "20090713",
+      "size": 550
+     },
+     {
+      "date": "20090714",
+      "size": 550
+     },
+     {
+      "date": "20090715",
+      "size": 550
+     },
+     {
+      "date": "20090716",
+      "size": 550
+     },
+     {
+      "date": "20090717",
+      "size": 550
+     },
+     {
+      "date": "20090720",
+      "size": 550
+     },
+     {
+      "date": "20090721",
+      "size": 550
+     },
+     {
+      "date": "20090722",
+      "size": 550
+     },
+     {
+      "date": "20090723",
+      "size": 550
+     },
+     {
+      "date": "20090724",
+      "size": 550
+     },
+     {
+      "date": "20090727",
+      "size": 550
+     },
+     {
+      "date": "20090728",
+      "size": 550
+     },
+     {
+      "date": "20090729",
+      "size": 550
+     },
+     {
+      "date": "20090730",
+      "size": 550
+     },
+     {
+      "date": "20090827",
+      "size": 499
+     },
+     {
+      "date": "20090828",
+      "size": 499
+     },
+     {
+      "date": "20100104",
+      "size": 550
+     },
+     {
+      "date": "20100105",
+      "size": 550
+     },
+     {
+      "date": "20100106",
+      "size": 550
+     },
+     {
+      "date": "20100107",
+      "size": 550
+     },
+     {
+      "date": "20100108",
+      "size": 550
+     },
+     {
+      "date": "20100111",
+      "size": 550
+     },
+     {
+      "date": "20100112",
+      "size": 550
+     },
+     {
+      "date": "20100113",
+      "size": 550
+     },
+     {
+      "date": "20100114",
+      "size": 550
+     },
+     {
+      "date": "20100115",
+      "size": 550
+     },
+     {
+      "date": "20100118",
+      "size": 550
+     },
+     {
+      "date": "20100119",
+      "size": 550
+     }
+    ],
+    "size_histogram": {
+     "498": 8,
+     "499": 85,
+     "500": 3657,
+     "501": 418,
+     "550": 101
+    }
+   },
+   "csi1000": {
+    "scope": "union",
+    "nominal": 1000,
+    "n_days_with_members": 2857,
+    "min": 998,
+    "max": 1003,
+    "n_days_off_nominal": 701,
+    "days_off_nominal_first50": [
+     {
+      "date": "20170126",
+      "size": 1001
+     },
+     {
+      "date": "20170203",
+      "size": 1001
+     },
+     {
+      "date": "20170206",
+      "size": 1001
+     },
+     {
+      "date": "20170207",
+      "size": 1001
+     },
+     {
+      "date": "20170208",
+      "size": 1001
+     },
+     {
+      "date": "20170209",
+      "size": 1001
+     },
+     {
+      "date": "20170210",
+      "size": 1001
+     },
+     {
+      "date": "20170213",
+      "size": 1001
+     },
+     {
+      "date": "20170214",
+      "size": 1001
+     },
+     {
+      "date": "20170215",
+      "size": 1001
+     },
+     {
+      "date": "20170216",
+      "size": 1001
+     },
+     {
+      "date": "20170217",
+      "size": 1001
+     },
+     {
+      "date": "20170220",
+      "size": 1001
+     },
+     {
+      "date": "20170221",
+      "size": 1001
+     },
+     {
+      "date": "20170222",
+      "size": 1001
+     },
+     {
+      "date": "20170223",
+      "size": 1001
+     },
+     {
+      "date": "20170224",
+      "size": 1001
+     },
+     {
+      "date": "20170227",
+      "size": 1001
+     },
+     {
+      "date": "20170228",
+      "size": 1002
+     },
+     {
+      "date": "20170301",
+      "size": 1002
+     },
+     {
+      "date": "20170302",
+      "size": 1002
+     },
+     {
+      "date": "20170303",
+      "size": 1002
+     },
+     {
+      "date": "20170306",
+      "size": 1002
+     },
+     {
+      "date": "20170307",
+      "size": 1002
+     },
+     {
+      "date": "20170308",
+      "size": 1002
+     },
+     {
+      "date": "20170309",
+      "size": 1002
+     },
+     {
+      "date": "20170310",
+      "size": 1002
+     },
+     {
+      "date": "20170313",
+      "size": 1002
+     },
+     {
+      "date": "20170314",
+      "size": 1002
+     },
+     {
+      "date": "20170315",
+      "size": 1002
+     },
+     {
+      "date": "20170316",
+      "size": 1002
+     },
+     {
+      "date": "20170317",
+      "size": 1002
+     },
+     {
+      "date": "20170320",
+      "size": 1002
+     },
+     {
+      "date": "20170321",
+      "size": 1002
+     },
+     {
+      "date": "20170322",
+      "size": 1002
+     },
+     {
+      "date": "20170323",
+      "size": 1002
+     },
+     {
+      "date": "20170324",
+      "size": 1002
+     },
+     {
+      "date": "20170327",
+      "size": 1002
+     },
+     {
+      "date": "20170328",
+      "size": 1002
+     },
+     {
+      "date": "20170329",
+      "size": 1002
+     },
+     {
+      "date": "20170330",
+      "size": 1002
+     },
+     {
+      "date": "20170331",
+      "size": 1002
+     },
+     {
+      "date": "20170405",
+      "size": 1002
+     },
+     {
+      "date": "20170406",
+      "size": 1002
+     },
+     {
+      "date": "20170407",
+      "size": 1002
+     },
+     {
+      "date": "20170410",
+      "size": 1002
+     },
+     {
+      "date": "20170411",
+      "size": 1002
+     },
+     {
+      "date": "20170412",
+      "size": 1002
+     },
+     {
+      "date": "20170413",
+      "size": 1002
+     },
+     {
+      "date": "20170414",
+      "size": 1002
+     }
+    ],
+    "size_histogram": {
+     "998": 2,
+     "999": 12,
+     "1000": 2156,
+     "1001": 379,
+     "1002": 121,
+     "1003": 187
+    }
+   },
+   "all": {
+    "scope": "union",
+    "nominal": null,
+    "n_days_with_members": 4269,
+    "min": 1600,
+    "max": 5534,
+    "n_days_off_nominal": null,
+    "days_off_nominal_first50": [],
+    "size_by_year_first_trading_day": {
+     "2009": 1602,
+     "2010": 1696,
+     "2011": 2041,
+     "2012": 2320,
+     "2013": 2472,
+     "2014": 2468,
+     "2015": 2592,
+     "2016": 2808,
+     "2017": 3036,
+     "2018": 3467,
+     "2019": 3567,
+     "2020": 3760,
+     "2021": 4182,
+     "2022": 4685,
+     "2023": 5067,
+     "2024": 5335,
+     "2025": 5384,
+     "2026": 5469
+    }
+   }
+  },
+  "note": "在**每一个**交易日上展开后数的,不是只在抽查日看。canonical(方案甲主力读法)回到名义值;union 会在两源边界不齐的日子上撑大到名义值以上 —— 这正是为什么要有 `canonical` 这一列。"
+ },
+ "needs_manual_review": {
+  "note": "这三类是**不能**用两源约定差解释的残余分歧,应当逐条人工核。它们不是'脏数据'的同义词 —— 多数是代码映射(同一实体两源用不同 ts_code)或源B 换仓格点粗漏掉的临时调整,逐条判断见 ops/reports/universe_reconciliation.md 的人工签字清单。",
+  "bases": [
+   "boundary_lag_beyond_tolerance",
+   "interior_single_source_hole",
+   "whole_run_single_source"
+  ],
+  "n_rows": 57,
+  "n_member_days": 8697,
+  "by_basis": {
+   "boundary_lag_beyond_tolerance": 49,
+   "whole_run_single_source": 6,
+   "interior_single_source_hole": 2
+  },
+  "rows": [
+   {
+    "universe": "csi1000",
+    "code": "302132.SZ",
+    "in_date": "20141031",
+    "out_date": "20221229",
+    "n_trading_days": 1990,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "001914.SZ",
+    "in_date": "20150630",
+    "out_date": "20191230",
+    "n_trading_days": 1100,
+    "source": "index_weight",
+    "agreement_basis": "interior_single_source_hole",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "001872.SZ",
+    "in_date": "20150630",
+    "out_date": "20181227",
+    "n_trading_days": 856,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "601360.SH",
+    "in_date": "20141031",
+    "out_date": "20160629",
+    "n_trading_days": 407,
+    "source": "index_weight",
+    "agreement_basis": "whole_run_single_source",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "001872.SZ",
+    "in_date": "20090123",
+    "out_date": "20100729",
+    "n_trading_days": 369,
+    "source": "index_weight",
+    "agreement_basis": "whole_run_single_source",
+    "canonical": true
+   },
+   {
+    "universe": "csi300",
+    "code": "600685.SH",
+    "in_date": "20100730",
+    "out_date": "20101231",
+    "n_trading_days": 103,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi300",
+    "code": "601288.SH",
+    "in_date": "20100730",
+    "out_date": "20101231",
+    "n_trading_days": 103,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "002323.SZ",
+    "in_date": "20180731",
+    "out_date": "20181227",
+    "n_trading_days": 102,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "600596.SH",
+    "in_date": "20180731",
+    "out_date": "20181227",
+    "n_trading_days": 102,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "002670.SZ",
+    "in_date": "20170126",
+    "out_date": "20170629",
+    "n_trading_days": 101,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "002766.SZ",
+    "in_date": "20170126",
+    "out_date": "20170629",
+    "n_trading_days": 101,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi300",
+    "code": "600827.SH",
+    "in_date": "20110831",
+    "out_date": "20120130",
+    "n_trading_days": 96,
+    "source": "index_weight",
+    "agreement_basis": "whole_run_single_source",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "002154.SZ",
+    "in_date": "20110831",
+    "out_date": "20120130",
+    "n_trading_days": 96,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "600079.SH",
+    "in_date": "20260130",
+    "out_date": "20260629",
+    "n_trading_days": 96,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi500",
+    "code": "600827.SH",
+    "in_date": "20110831",
+    "out_date": "20120130",
+    "n_trading_days": 96,
+    "source": "qlib_instruments",
+    "agreement_basis": "interior_single_source_hole",
+    "canonical": false
+   },
+   {
+    "universe": "csi500",
+    "code": "601598.SH",
+    "in_date": "20190131",
+    "out_date": "20190627",
+    "n_trading_days": 96,
+    "source": "index_weight",
+    "agreement_basis": "whole_run_single_source",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "688037.SH",
+    "in_date": "20260130",
+    "out_date": "20260629",
+    "n_trading_days": 96,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "002428.SZ",
+    "in_date": "20110228",
+    "out_date": "20110630",
+    "n_trading_days": 85,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "002121.SZ",
+    "in_date": "20100226",
+    "out_date": "20100630",
+    "n_trading_days": 84,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "002776.SZ",
+    "in_date": "20170228",
+    "out_date": "20170629",
+    "n_trading_days": 83,
+    "source": "index_weight",
+    "agreement_basis": "whole_run_single_source",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "300038.SZ",
+    "in_date": "20210226",
+    "out_date": "20210629",
+    "n_trading_days": 83,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "300831.SZ",
+    "in_date": "20210226",
+    "out_date": "20210629",
+    "n_trading_days": 83,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "600848.SH",
+    "in_date": "20170228",
+    "out_date": "20170629",
+    "n_trading_days": 83,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi300",
+    "code": "600549.SH",
+    "in_date": "20170228",
+    "out_date": "20170629",
+    "n_trading_days": 83,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "002230.SZ",
+    "in_date": "20090831",
+    "out_date": "20091231",
+    "n_trading_days": 83,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "600549.SH",
+    "in_date": "20170228",
+    "out_date": "20170629",
+    "n_trading_days": 83,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi500",
+    "code": "600848.SH",
+    "in_date": "20170228",
+    "out_date": "20170629",
+    "n_trading_days": 83,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "002543.SZ",
+    "in_date": "20250829",
+    "out_date": "20251230",
+    "n_trading_days": 82,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "002581.SZ",
+    "in_date": "20250829",
+    "out_date": "20251230",
+    "n_trading_days": 82,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "300527.SZ",
+    "in_date": "20250829",
+    "out_date": "20251230",
+    "n_trading_days": 82,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "300917.SZ",
+    "in_date": "20250829",
+    "out_date": "20251230",
+    "n_trading_days": 82,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "688076.SH",
+    "in_date": "20250829",
+    "out_date": "20251230",
+    "n_trading_days": 82,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "688660.SH",
+    "in_date": "20250829",
+    "out_date": "20251230",
+    "n_trading_days": 82,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "002470.SZ",
+    "in_date": "20200831",
+    "out_date": "20201230",
+    "n_trading_days": 82,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi500",
+    "code": "603708.SH",
+    "in_date": "20200831",
+    "out_date": "20201230",
+    "n_trading_days": 82,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "301101.SZ",
+    "in_date": "20260130",
+    "out_date": "20260528",
+    "n_trading_days": 75,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "688037.SH",
+    "in_date": "20260130",
+    "out_date": "20260528",
+    "n_trading_days": 75,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "002589.SZ",
+    "in_date": "20210930",
+    "out_date": "20211230",
+    "n_trading_days": 61,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "300256.SZ",
+    "in_date": "20210930",
+    "out_date": "20211230",
+    "n_trading_days": 61,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "301500.SZ",
+    "in_date": "20240930",
+    "out_date": "20241230",
+    "n_trading_days": 61,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "600297.SH",
+    "in_date": "20210930",
+    "out_date": "20211230",
+    "n_trading_days": 61,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "600428.SH",
+    "in_date": "20210930",
+    "out_date": "20211230",
+    "n_trading_days": 61,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "600711.SH",
+    "in_date": "20240930",
+    "out_date": "20241230",
+    "n_trading_days": 61,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "688486.SH",
+    "in_date": "20260227",
+    "out_date": "20260528",
+    "n_trading_days": 61,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "600260.SH",
+    "in_date": "20210930",
+    "out_date": "20211230",
+    "n_trading_days": 61,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi500",
+    "code": "600297.SH",
+    "in_date": "20210930",
+    "out_date": "20211230",
+    "n_trading_days": 61,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi500",
+    "code": "601868.SH",
+    "in_date": "20210930",
+    "out_date": "20211230",
+    "n_trading_days": 61,
+    "source": "index_weight",
+    "agreement_basis": "whole_run_single_source",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "002437.SZ",
+    "in_date": "20210331",
+    "out_date": "20210629",
+    "n_trading_days": 60,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "002616.SZ",
+    "in_date": "20210331",
+    "out_date": "20210629",
+    "n_trading_days": 60,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "600764.SH",
+    "in_date": "20210331",
+    "out_date": "20210629",
+    "n_trading_days": 60,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "600956.SH",
+    "in_date": "20210331",
+    "out_date": "20210629",
+    "n_trading_days": 60,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi300",
+    "code": "601058.SH",
+    "in_date": "20250331",
+    "out_date": "20250627",
+    "n_trading_days": 60,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi300",
+    "code": "601298.SH",
+    "in_date": "20250930",
+    "out_date": "20251230",
+    "n_trading_days": 60,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "002668.SZ",
+    "in_date": "20211029",
+    "out_date": "20211230",
+    "n_trading_days": 45,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   },
+   {
+    "universe": "csi1000",
+    "code": "603906.SH",
+    "in_date": "20211029",
+    "out_date": "20211230",
+    "n_trading_days": 45,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "600452.SH",
+    "in_date": "20201030",
+    "out_date": "20201230",
+    "n_trading_days": 44,
+    "source": "index_weight",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": true
+   },
+   {
+    "universe": "csi1000",
+    "code": "600702.SH",
+    "in_date": "20201030",
+    "out_date": "20201230",
+    "n_trading_days": 44,
+    "source": "qlib_instruments",
+    "agreement_basis": "boundary_lag_beyond_tolerance",
+    "canonical": false
+   }
+  ]
+ },
+ "totals": {
+  "n_rows": 15259,
+  "n_canonical_rows": 14800,
+  "n_membership_runs": 12590,
+  "n_distinct_codes": 5813,
+  "member_days": 21223285
+ },
+ "integrity": {
+  "n_overlapping_rows": 0,
+  "n_out_before_in": 0,
+  "n_parts_not_contiguous_within_run": 0,
+  "n_adjacent_runs_without_real_gap": 0,
+  "n_rows_beyond_freeze": 0,
+  "n_rows_before_grid": 0,
+  "n_duplicate_segment_ids": 0,
+  "n_unknown_source_values": 0,
+  "n_unknown_agreement_basis": 0,
+  "n_code_format_violations": 0,
+  "n_compact_mismatch": 0
+ },
+ "artifact": {
+  "path": "/data/shared/genebench/snapshots/v1/universe/universe_pit.parquet",
+  "bytes": 286980,
+  "sha256": "f1c4e6b2047921b477c8bc368be791f1d8219c269c555142432fb6e6912c65ce",
+  "mode": "0o600",
+  "rows": 15259,
+  "columns": [
+   "code",
+   "universe",
+   "in_date",
+   "out_date",
+   "source",
+   "agreement_flag",
+   "agreement_basis",
+   "segment_id",
+   "segment_idx",
+   "part_idx",
+   "canonical",
+   "left_censored",
+   "right_censored",
+   "listing_clipped",
+   "n_trading_days",
+   "in_date_compact",
+   "out_date_compact",
+   "ambiguous"
+  ],
+  "schema_metadata": {
+   "genebench_card": "1.1",
+   "table": "universe_pit",
+   "generator": "snapshots/universe_build.py",
+   "freeze_line": "2026-07-31",
+   "valid_from": "2009-01-05",
+   "valid_to": "2026-07-31",
+   "calendar": "trade_cal(is_open=1,SSE),截到冻结线",
+   "n_trading_days": "4269",
+   "universes": "csi300,csi500,csi1000,all",
+   "interval_closure": "闭区间 [in_date, out_date],两端都含;out_date 永不为空",
+   "right_censored_note": "out_date == valid_to 且 right_censored=True 表示'截至冻结线仍在',不是'当天被调出'",
+   "safe_reader": "snapshots.universe_build.universe_at(universe, date)",
+   "data_card": "ops/data_cards/universe_pit.md",
+   "warning": "数进出次数用 distinct segment_idx,不要数行数 —— 一次进出会被来源切成多个 part。"
+  }
+ },
+ "data_card": {
+  "path": "/data/shared/genebench/repo/ops/data_cards/universe_pit.md",
+  "bytes": 27441,
+  "sha256": "b88bb07e7de9b3e80e4a31a88c5997f0c1bcf6b99ab637fdc069e929517f21e6",
+  "mode": "0o600"
+ }
+}

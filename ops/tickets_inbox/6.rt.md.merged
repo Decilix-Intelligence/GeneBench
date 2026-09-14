@@ -1,0 +1,20 @@
+# 卡 6.rt（阶段六红队修复）票据
+
+修完的是 3 条 block + 6 条 major（见提交与 `ops/test_6rt.py`）。下面是**登记不修**的：
+四条 minor（按任务书「minor 登记」）、两条顺手量到但不属于本卡范围的观察。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `ops/reports/public/release_forms.md` §0 前的引子只列三条挡发布的事，没提 `code_license_undecided` | 登记不修（minor） | README §5 把「形态层面的分析」指到这一页，读者顺指引过来只找得到三条。修法：引子里补一句「另有第四条 code_license_undecided，它不是形态层面的问题，本页不展开 —— 条数以 `RELEASE_MANIFEST.json` 的 blockers 为准」。本卡已把手册 §0.1 / `known_limits_v1.md` / `mk_release_manifest.py` / `HANDOFF` §12.6 四处改成「以清单为准」，这一页是剩下的一处 |
+| N-? | `ops/specs/metrics_as_implemented_v1.md:163` 手抄的真 API 用量（2418 次 / 71 run）已过期 | 登记不修（minor） | 机器统计是 `$PY ops/api_usage.py`（该工具自己打印「历史口径……以本表为准」）。`ops/HANDOFF.md` §12.5 也手抄了一份（2,255 / 63）。结论（CBC 不出）不受影响。修法：把括号里的数字换成「以 `ops/api_usage.py` 的机器统计为准」，两处一起 |
+| N-? | `mk_tables` 的 md / csv 渲染把「不可得」写成完全空白的单元格 | 登记不修（minor） | 只有 `.tex` 写 `---`（`scorer/report.py::to_latex`）。「空 ≠ 0」是 README §2.4 与手册 §6.5 都加粗强调的第一条读表规则，而 csv 恰是最常被单独摘出来的那一种。修法：md 渲染写 `—` 并在脚注加一行凡例；csv 的空值不动（改了会破坏机器读），凡例随表落一份 README 或写进 `table_a.axes.json` |
+| N-? | `ops/reports/v1_0_readiness.md` §4b 标题写「四件事」而正文列了 5 条，编号顺序是 1,2,3,5,4 | 登记不修（minor） | 那一段是 `ops/readiness_report.py` 里的写死叙述（私有批专用）。本卡只把它整段搬进 `_sec4` 的非零分支，**一字未改**。修法：标题改「五件事」或合并成四条，并把编号理正 |
+| N-? | `ops/reports/probe_run_oracle.cumulative.cumulative.json` 是一份 32/8 的陈旧快照 | 登记不修（观察） | 40 行、ok 32、没产物 8 —— 正是重冻前的读数。看形态是某次把 `--out …cumulative.json` 传给了 `run_oracles`（它再 `with_suffix` 一次）。没有任何生成器读它，但它与真产物同名前缀、数还不一样，留着会误导。修法：确认无人引用后删掉，或在 `run_oracles` 里拒绝 `--out` 指向 `*.cumulative.json` |
+| N-? | `ops/test_operator_manual.py::test_the_manual_states_the_three_release_blockers` 名字里的「three」已过期 | 登记不修（观察） | 该测试只按 token 判，不判条数，所以**没有变红**；条数判据本卡放在 `ops/test_6rt.py::test_手册开篇摆着每一条挡发布的事`（以 `RELEASE_MANIFEST.blockers` 现读）。改名要动别人的文件，留给收口卡 |
+
+## 本卡顺手修掉、但不在红队清单上的两处真缺陷
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `ops/merge_o1.py` 一跑就 `AttributeError` | 已修 | 它自己拼了一份 `SimpleNamespace`，少了 `tradability_rows`，而 `render_matrix` 用这个字段算「喂了可交易性视图的题」。现在两处共用 `run_oracles.rows_as_results` |
+| N-? | 公开通道的就绪报告 §3「验证验证器报告」一行写死私有路径 | 已修 | 与 O1 矩阵那一行同一个毛病。加了 `--validator-report`（默认不变），HANDOFF ⑥ 补了完整的四参数命令 |

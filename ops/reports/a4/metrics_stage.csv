@@ -1,0 +1,4 @@
+config_id,arm,arm_kind,stage,n_runs,n_runs_denom,invalid_rate,honest_halt_rate,unsettled_rate,Decl,Set,Ovr,Align,Adj,Cal,CellAgree
+cfg-codex-deepseek,doc,protocol,S2,2,2,0.0,0.0,0.0,unobservable,unobservable,0.00938337801608579,1.0,1.0,1.0,1.0
+cfg-codex-deepseek,hint,instruction_variant,S2,2,2,0.0,0.0,0.0,—,—,0.027874564459930314,—,—,—,—
+cfg-codex-deepseek,strict,protocol,S2,2,2,0.0,0.0,0.0,unobservable,unobservable,0.03977272727272727,1.0,1.0,1.0,0.9989448441247002

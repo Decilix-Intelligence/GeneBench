@@ -1,0 +1,8 @@
+{
+  "harness": "finmem",
+  "paradigm": "P2",
+  "image": "gb-finmem-u:r1",
+  "command": ["sh", "-c", "export HOME=/tmp/h XDG_CACHE_HOME=/tmp/h/.cache; mkdir -p $$HOME && cd /task && /opt/finmem/venv/bin/python /opt/finmem/run.py"],
+  "env_required": ["GENEBENCH_GATEWAY", "OPENAI_BASE_URL", "OPENAI_API_KEY"],
+  "notes": "FinMem（分层记忆的逐日交易 agent，arXiv:2311.13743）作为 P2 被测方：网关取数造 env_data（新闻/财报文本 NoData 并留痕），模型经边车（httpx 打 OPENAI_BASE_URL 的 chat/completions），train 段建记忆、test 段逐日出 buy/hold/sell，产出 /task/artifact.json 的 S5 信号。命令里的 $$ 是两个美元号（N-101）。"
+}

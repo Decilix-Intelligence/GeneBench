@@ -1,0 +1,12 @@
+# 3.1 通用 harness 启动契约 —— 待登记事项
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | 预算闸的状态码：注释说 402，实现回 429 | **待裁定（CONFLICT）** | `runner/registry.py:83` 写「超限边车直接 402 并落 `budget_exceeded`」；`runner/c41/egress_proxy.py` 实际是 `_deny_http(cli, 429, "budget_exceeded", …)`。任务书也写的 402。`harnesses/README.md` 按**代码为准**记 429，并写明「判据认 `llm_log` 的 `reason == "budget_exceeded"`，别 match 状态码」。要统一的话：429 更贴语义（限流/配额），改注释比改实现便宜；但 402 Payment Required 对"预算"更直白。**没动任何一处代码** —— 两处都不在 3.1 的路径清单里。 |
+| N-? | `harnesses/<id>/` 的四件文件里 `README.md` 是 3.1 新加的要求 | 已处理 | W-0 骨架只要求三件（`Dockerfile` / `launch.json` / `config.yaml`）；3.1 的任务书要求四件（加 `README.md`：该 harness 怎么把模型指到 OpenAI 兼容端点、已知限制）。为了让 `ops/test_harness_contract.py` 的四件文件断言对**已有的两个目录**也成立，补写了 `harnesses/codex/README.md` 与 `harnesses/openhands/README.md`（**只新建文件，没碰任何一份 `launch.json` / `config.yaml` / `Dockerfile`**）。 |
+| N-? | 测试断言的是「第一条**有效**指令是 `FROM gb-base:bookworm-r1`」，不是字面第一行 | 已处理（CONFLICT） | 任务书原文「Dockerfile 第一行 FROM gb-base:bookworm-r1」。但 W-0 同时要求「Dockerfile 顶部注明镜像名与 digest」，现有两份的字面第一行都是 `# 来源：f02 …`。照字面判会把 W-0 要求的来历注释判红。按保守方向：**保留来历注释**（它是「抄回来的这份 = 构建出镜像的那份」的唯一证据），判据改成第一条非空非注释行，并加一条「全文只有一条 FROM」（对齐注入器 P4c）。`harnesses/build.sh` 用同一条判据。 |
+| N-? | `ops/score_runs.py` 的 `CAPTION` 通用回退 | 已处理 | 原来未知 batch 落到 `f"Table A ({batch})"`，**表头里没有「不是实验数据」**。加了 `caption_for(batch)`，回退文案是 `Table A — <batch>（接入/harness 验证，不是实验数据）`。幂等补丁脚本 `/data/shared/genebench/scratch/3.1/patch_score_runs_caption.py`（不进仓库），已打过则 no-op。 |
+| N-? | `ops/test_c41.py:366` 的 `len(REG.CONFIGS) == 3`（W-0 已登记，此处只是复述） | 未处理 | 3.1 没有把任何 `config.yaml` 翻成 `enabled: true`，所以没碰它。第一个启用配置的代理照 W-0 收件箱里的写法改。`harnesses/README.md` §1.3 与 §5 都写了这条联动，外部运行者不会被它绊住。 |
+| N-? | `harnesses/build.sh` 在 f02 上没有执行位 | 已处理（写进文档） | `ops/push_exec_to_f02.sh` 的 rsync 用 `--chmod=D700,F600`，落地一律 0600。所以调用一律 `sh harnesses/build.sh <id>`。不打算为它放宽 rsync 的 chmod —— 那会连带放宽整棵 exec 树的权限口径。 |
+| N-? | f02 的 `exec/` 树默认看不见 `harnesses/`（W-0 的 N-? 待裁定项） | 仍待裁定 | 3.1 手册里把 `--with-launch-data` 写成**接 harness 的必带开关**，并在 §5 的症状表里给了「`by_id: 未知 config_id`（在 f02 上）→ 忘了 `--with-launch-data`」这一行。倾向仍是 W-0 的倾向：**默认打开**。 |
+| N-? | `vendor/` 不在仓库里 | 未处理（W-0 已登记） | 与 3.1 无关，只是构建/同步时会看到「跳过且不 --delete」那行输出，不是错误。 |

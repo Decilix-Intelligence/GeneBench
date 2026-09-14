@@ -1,0 +1,58 @@
+=== card 1.1-reconcile 验收 ===
+2026-08-31T06:46:15Z
+
+--- 1) 重建 ---
+报告      : /data/shared/genebench/repo/ops/reports/universe_reconciliation.md
+机器可读  : /data/shared/genebench/repo/ops/universe_reconciliation.json
+成员日 Jaccard        : 0.972570  (剔基期缺口 0.994849)
+区间段 完全一致       : 67.00%
+区间段 容忍内一致     : 87.44%
+归因配平              : True  未归类 0
+
+--- 2) pytest ops/test_universe_reconcile.py -v ---
+============================= test session starts ==============================
+platform linux -- Python 3.10.20, pytest-9.1.1, pluggy-1.6.0 -- /data/shared/genebench/env/bin/python
+cachedir: .pytest_cache
+rootdir: /data/shared/genebench/repo
+plugins: anyio-4.14.2
+collecting ... collected 27 items
+
+ops/test_universe_reconcile.py::test_artifacts_exist PASSED              [  3%]
+ops/test_universe_reconcile.py::test_artifact_modes_are_0600 PASSED      [  7%]
+ops/test_universe_reconcile.py::test_report_dir_mode_is_0700 PASSED      [ 11%]
+ops/test_universe_reconcile.py::test_member_day_set_identities[csi300] PASSED [ 14%]
+ops/test_universe_reconcile.py::test_member_day_set_identities[csi500] PASSED [ 18%]
+ops/test_universe_reconcile.py::test_member_day_set_identities[csi1000] PASSED [ 22%]
+ops/test_universe_reconcile.py::test_overall_member_day_is_the_sum_of_universes PASSED [ 25%]
+ops/test_universe_reconcile.py::test_attribution_is_exhaustive_and_disjoint PASSED [ 29%]
+ops/test_universe_reconcile.py::test_per_universe_class_breakdown_sums_to_class_total PASSED [ 33%]
+ops/test_universe_reconcile.py::test_segment_verdicts_sum_to_sample_size PASSED [ 37%]
+ops/test_universe_reconcile.py::test_window_right_edge_is_the_freeze_line PASSED [ 40%]
+ops/test_universe_reconcile.py::test_native_spans_use_calendar_dates_not_the_grid PASSED [ 44%]
+ops/test_universe_reconcile.py::test_source_a_merge_is_a_noop PASSED     [ 48%]
+ops/test_universe_reconcile.py::test_source_b_tiling_is_actually_collapsed PASSED [ 51%]
+ops/test_universe_reconcile.py::test_sampling_is_deterministic PASSED    [ 55%]
+ops/test_universe_reconcile.py::test_sampling_differs_across_universes PASSED [ 59%]
+ops/test_universe_reconcile.py::test_recorded_sample_matches_recomputation PASSED [ 62%]
+ops/test_universe_reconcile.py::test_sample_size_matches_the_acceptance_wording PASSED [ 66%]
+ops/test_universe_reconcile.py::test_signoff_has_twenty_usable_items PASSED [ 70%]
+ops/test_universe_reconcile.py::test_signoff_is_stratified_not_top_heavy PASSED [ 74%]
+ops/test_universe_reconcile.py::test_delist_verdicts_follow_the_direction_not_a_template PASSED [ 77%]
+ops/test_universe_reconcile.py::test_code_mapping_pairs_reproduce_the_source_b_findings PASSED [ 81%]
+ops/test_universe_reconcile.py::test_base_period_gap_matches_source_b_b01 PASSED [ 85%]
+ops/test_universe_reconcile.py::test_no_date_exceeds_the_freeze_line PASSED [ 88%]
+ops/test_universe_reconcile.py::test_report_headline_numbers_match_the_json PASSED [ 92%]
+ops/test_universe_reconcile.py::test_report_has_every_required_section PASSED [ 96%]
+ops/test_universe_reconcile.py::test_rebuild_is_byte_stable_except_the_timestamp PASSED [100%]
+
+============================== 27 passed in 2.87s ==============================
+
+--- 3) 全套合跑 pytest ops/ -q ---
+E       AssertionError: 这些地方绕过 snapshots/lake.py 直连了数据湖:['ops/reports/adv_sourceA/adv_a4.py:67', 'ops/reports/adv_sourceA/adv_a5.py:21']。要么改走 lake,要么把理由写进 CONNECT_ALLOWLIST。
+E       assert not ['ops/reports/adv_sourceA/adv_a4.py:67', 'ops/reports/adv_sourceA/adv_a5.py:21']
+
+ops/test_lake_baseline.py:1057: AssertionError
+=========================== short test summary info ============================
+FAILED ops/test_env.py::test_every_duckdb_connect_in_repo_is_read_only - Asse...
+FAILED ops/test_lake_baseline.py::test_lake_is_the_only_module_that_connects_to_the_lake
+2 failed, 388 passed in 31.66s

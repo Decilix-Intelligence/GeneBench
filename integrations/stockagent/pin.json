@@ -1,0 +1,41 @@
+{
+  "paper_url": "https://arxiv.org/abs/2407.18957",
+  "repo_url": "https://github.com/MingyuJ666/Stockagent",
+  "commit": "e2a9c052b81694067b1dbed4ccf39be9ab7f392c",
+  "dist": null,
+  "dist_repo_url": null,
+  "license": "none_declared",
+  "license_evidence": "仓库里没有 LICENSE 文件，GitHub API 的 license 字段是 null，README 里也没有许可证声明。不猜一个 MIT。",
+  "runnable_check": "sh -c \"python3 -c \\\"import os,sys; os.makedirs('/tmp/rc/log',exist_ok=True); os.chdir('/tmp/rc'); sys.path.insert(0,'/opt/stockagent/upstream'); import util, stock, secretary; print('runnable_check', len(util.STOCK_NAMES), hasattr(stock.Stock,'get_price'))\\\"\"",
+  "runnable_check_result": null,
+  "source_tarball": "stockagent-src-e2a9c05.tar.gz",
+  "source_tarball_sha256": "b041089917679424d2f071668e21058a895e5a01c973eec6c7f983dc2fd30f8a",
+  "source_tarball_origin": "https://api.github.com/repos/MingyuJ666/Stockagent/tarball/e2a9c052b81694067b1dbed4ccf39be9ab7f392c（codeload.github.com 在本机沙箱里 404，api.github.com 的 tarball 端点可达）",
+  "vendored": [
+    {
+      "name": "procoder",
+      "why": "上游 `prompt/agent_prompt.py` 与 `agent.py` 直接 import 它；**PyPI 上没有这个包**（pypi.org/pypi/procoder/json 返回 404），上游 README 让人从 GitHub clone。",
+      "repo_url": "https://github.com/dhh1995/PromptCoder",
+      "commit": "87155427e93f6ab95dbd658d7f500c2cedc05af6",
+      "license": "Apache-2.0（LICENSE 文件）；注意 setup.py 的 classifier 写的是 MIT —— 上游两处自相矛盾，以 LICENSE 文件为准",
+      "tarball": "promptcoder-8715542.tar.gz",
+      "tarball_sha256": "09009210ee85e812717dfc76180f778e677f24ef4bf7f1f6dbd0b3ecc5909832"
+    }
+  ],
+  "note": "两个 sha256 记的是**我们这次取到的那一份归档**。GitHub 生成的 tarball 不保证跨时间逐字节稳定，权威是 commit sha；两个数一起给，是为了让「同一个 commit、拿到的字节不一样」这件事看得见。",
+  "source_tarball_note": "**这不是 GitHub 那份归档**：上游 tarball 里 fig/ 有 4.5 MB 的 PNG（占全包 97%），本机到 f01 的链路上 4.3 MB 反复传断。所以 vendored 的是**只含代码的子集**（去掉 fig/ .idea/ __pycache__/），并逐文件记 sha256 —— 那比一个归档哈希更硬：归档哈希会随打包器与时间漂，逐文件哈希不会。",
+  "upstream_archive_sha256": "a945c2de020f026eca1840b9cb8147238ef1d1cd699f420912e422180745f0ec",
+  "source_files_sha256": {
+    "README.md": "16600c5e29c0dd99a6abdf9559a1bef801594bbffa66e619afe68f0541ee92b1",
+    "agent.py": "58bf3a4a5eb00393d030291a9399adb60971143d69742aabfb2110d698660f6b",
+    "log/custom_logger.py": "046a57cc5218100082e7f9de5c6e5137c7c9ebc6518d4c67d1926efc6967851e",
+    "main.py": "747228f8f84009e1adb5b298550cb1f400d9ab8347b1134c467e64f49ffd9bed",
+    "prompt/agent_prompt.py": "7dd0c93b29456017a366ff6735e80133fdd10c20da46e804a164aefa32b1d030",
+    "record.py": "4a1d9f1fc4e6d31729b2b61fc43c41f3e85c2b381dc1896dba424ce208582f66",
+    "requirements.txt": "dd68fc35a9520e0162db83caebd7c974c620705b2b704eedb11662415e82ec65",
+    "secretary.py": "63e0eeaee92c022de76af0c8c49419f23059c30fdaf3bf135117c68bfd21910c",
+    "stock.py": "bea33c9d597c9b1036d25fc9a76fceed3de27de8cd28457f795c31db3e73327d",
+    "util.py": "d02848dd5a5788b7aaa87d0db4e9c7f6a0fa4b839b7589cafc6939046e1b7111"
+  },
+  "runnable_check_note": "**先 chdir**：上游 log/custom_logger.py 在 import 期就开一个相对 CWD 的 FileHandler('log/test.txt')，基座的 WORKDIR 是 /task。不 chdir 的版本在构建期实测报 FileNotFoundError: '/task/log/test.txt'。"
+}

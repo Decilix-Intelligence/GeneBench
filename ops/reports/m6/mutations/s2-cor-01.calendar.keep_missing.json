@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s2-cor-01",
+  "probe": "calendar",
+  "name": "keep_missing 却报 0 缺行",
+  "why": "缺行被静默填上 —— 停牌 / 无数据不能消失",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "missing_rows_silently_filled"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:missing_rows_silently_filled [calendar] @$.payload.missing_rows.count — 声明 keep_missing，可交易性视图里有 44 个缺行/停牌格，artifact 却报 0 缺行"
+ ]
+}

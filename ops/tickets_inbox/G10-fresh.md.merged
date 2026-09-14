@@ -1,0 +1,64 @@
+# 卡 G10（用户裁定 ④⑤）：两道新门 + 把那条纪律写进 design_notes
+
+日期 2026-09-14。**不重打树、不 push、不碰 Release。**
+自验落点：`$GB/scratch/G10/`。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-?（建议 **N-882**；盘上最大 N-881，2026-09-14 查） | **`ops/test_Y.py::test_the_readme_shortest_path_runs_on_the_public_channel` 恒红**，且**不在本卡可改路径内** | **未修·已复现** | 卡 H10 的提交 `1fcfeb2` 把 README §2.4 拆成三个代码块（① 干跑 / ② 单机 / ③ 双机），而 `ops/test_Y.py::_readme_block` 只取**第一个**块 → 「§2.4 里只有 1 条 run_joblist 命令，期望 2 条」。卡 F10 已报过一次，至今未派卡。**修法**：把 `_readme_block` 改成取该节下**全部**围栏代码块（本卡新加的 `ops/test_readme.py::fenced_blocks` 就是这个形状，可直接照抄），而**不是**去 README 第一个块里补一条真跑命令 —— 后者会把「干跑先看一遍」那一步的教学顺序打乱。**它是一条真判据**（「每条 `run_joblist` 都要带 `--channel public`」），不许放宽。 |
+| N-?（建议 **N-883**） | `ops/specs/README.md` 的索引表里没有 D-34 那一行 | **未做·不在本卡可改路径** | 本卡把裁定 ④ 那条纪律写成 `ops/specs/design_notes.md` 的 **D-34**（「同一支的时间维：判据悄悄取决于这台机器历史上被手工修过什么」）。`ops/specs/README.md` 有一张索引表（现在只列到 D-11 附近），要跟一行。卡 H10 的收件箱里也记过同一件事。 |
+| N-?（建议 **N-884**） | `ops/test_A9.py` 与 `ops/test_single_machine.py` 两处 `/data` 字面量扫描**口径不一致** | **登记不修** | 卡 H10 已记：`test_A9` 连注释一起扫，`test_single_machine::value_position_hits` 跳过 `#` 开头的行。本卡新加的三个文件都是 `ops/test_*.py`（两处扫描都按 `ops/test_` 前缀跳过），没有踩到，但这条耦合仍然在。 |
+
+## 本卡落地的两道门
+
+### ① `ops/test_exec_tree_fresh.py`（裁定 ④）—— 从零铺一遍 + 注入冒烟
+
+**判据不是「改了」，是「在一棵这一刻才出现的目录上从零铺一遍，再在它上面跑冒烟」。**
+
+* **单机**（无 ssh，每台机器都跑）：`runner/placement --topology single --place-exec
+  --with-launch-data` 落进 `tmp_path`（铺之前断言它**不存在**），然后用**执行面自己那个解释器**
+  （`runner.placement.runner_py()`，默认 `python3`）跑四段：
+  **A** 整棵 runner import（h11 来自树自己的 `vendor/`）、**B** `preflight(check_modes=True)` 返回空、
+  **C** provider 父目录与数据面探针同源、**D** `run_f02_a1.py --dry` 全量注入 P0–P9 + 公平性比臂。
+* **四段一律 `cwd` 在仓库之外跑。** 这不是讲究：`cwd` 在仓库里时 `genebench_config` 从当前目录
+  就 import 得到，`CONFIG_AVAILABLE` 变成 `True`，**N-857 的现场根本复现不出来**
+  （本卡写就当天实测过一次，差点把一条空判据当成绿的）。有一条断言
+  `test_段B在一棵拿不到发布方配置的树上跑` 专门钉住它。
+* **双机**：`ops/push_exec_to_f02.sh` 里「从零铺一遍」靠的三步逐条钉住
+  （N-856 `runner.placement --stage-vendor` / N-881 `$DEST` 根 `chmod go-rwx` /
+  N-851 第 0 步解释器核查），外加**顺序**（h11 要在第 2/3 步两道扫描**之前**进 staging；
+  `$DEST` 收权限要在第 4 步 rsync **之前**）。真推那一半是**显式 opt-in**
+  （`GENEBENCH_FRESH_EXEC_PARENT`）：一次 `pytest` 不该在没人要求时往另一台机器上推东西。
+* **判别力自证（本卡的核心）**：把卡 F10 修掉的缺陷**逐条注入回一棵临时副本**，
+  每条必须让对应那一段**当场红**；**同一棵副本不注入时同一段必须绿**（否则那条红什么也证明不了）；
+  注入之后再核仓库那五个文件的 sha256 **逐字节零改动**。
+
+### ② 两个文档门对单机路径的断言（裁定 ⑤）
+
+实测事实：`placement` / `topology` / `single` / `push_exec` 在 `ops/test_readme.py` 与
+`ops/test_docs_consistency.py` 里**命中 0 次** —— 三道文档门全绿，却一条都没拦住交付终核
+在干净 Mac 上量到的 3 条 block + 6 条 major。**门全绿却一条都没拦住，靠的是派卡时人对交接。**
+
+* `ops/test_docs_consistency.py` 补 **5 条 Fact**（两份文档都要说、都不许说反话）：
+  单机落位入口 / 形态判据显式且默认 dual / 真跑带 `--topology single` /
+  执行面 provider 那一步 / `ufw` 端口与公开通道端口同源。
+  **端口从 `genebench_config.py` 现读**（AST 读模块级整数常量，不 import、不抄进测试）——
+  抄一份进测试就是两个真相。
+* `ops/test_readme.py` 补一组**逐条闭集**（不是通用扫描器）：§2.4 两支都在、单机那条真跑带
+  `--topology single`、`--check-plane` 与 provider 那一步在、以及**绝对句必须带形态限定**
+  （「只有这两个脚本」要带「双机」、「没有『推』这件事」与「直接 cp 就行」要带「单机」）。
+* **每条都配反证**：把文档改回旧写法的一份**临时副本**喂给**同一个判据函数**（不另写一份，
+  两份判据 = 两个真相），必须红。`require` 那五条的字符串在卡 H10 之前两份文档里**命中 0 次**，
+  所以「改回旧写法」对它们而言就是「这一句根本不在」—— 反证不是编的。
+
+## 给编排方 / 后续卡的话
+
+* **`ops/test_Y.py` 那条红要派卡**（见上表 N-882 建议号）。本卡与卡 F10 都不在它的可改路径内。
+* **`ops/specs/README.md` 的索引表要跟一行 D-34**（N-883 建议号）。
+* **照抄这两条复现本卡的证据**（f01 上）：
+  * 单机那一半 + 判别力自证：
+    `cd $GB/repo && ulimit -n 8192 && PYTHONDONTWRITEBYTECODE=1 $PY -m pytest -p no:cacheprovider ops/test_exec_tree_fresh.py -q -rs`
+  * 双机真推到一棵**全新**目录（推完自动删掉那棵，既有 `exec/` 一个字节不碰）：
+    `GENEBENCH_FRESH_EXEC_PARENT=<执行面上的父目录> GENEBENCH_F02=<你>@<执行面主机> $PY -m pytest -p no:cacheprovider ops/test_exec_tree_fresh.py -q -k 双机真推 -s`
+* **这道门的成本**：单机那一半约 20 秒（落位 0.8 秒 + 四段 + 四条注入反证各自再跑一段），
+  2.5 MB 的树；双机真推那一半约 7 秒。**不碰镜像、不起容器、不调模型、不读凭据。**

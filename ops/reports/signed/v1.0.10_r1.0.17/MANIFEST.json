@@ -1,0 +1,24 @@
+{
+ "label": "签字版",
+ "set_version": "1.0.10",
+ "set_root": "46daf034a3a24ab465dbc1d7b1d3684938c3e8294ded79a99345a9cf40e47bf6",
+ "reference_version": "r1.0.17",
+ "reference_root": "b28b6ed4c76c9c6b131c170d459590315ed0ecbb03c452f62a1945e8d70946f0",
+ "git_head": "6d4112a044affaa40eba23ba7c93fb7a048207a7",
+ "scope": "私有通道 · Codex 统一基座 · M6-lite 两次 pass",
+ "files": {
+  "v1_0_readiness.md": "6f4a63a782e99283f4f3f466301c372a134c0f68805351dd0b161f208dd95f1d",
+  "validator_validation_v1.md": "166ace4a8e360a0dafbfc319f5262f0d8daf3215f3ee0640c0c4fc47b72144e5",
+  "m6_all/table_a.csv": "fad7554f9c19ed952c84ecf716f053ab119499716e558c4a36571bbbb7dd8582",
+  "m6_all/table_b.csv": "b8b269d088e9ea1f40bcc01fa951e7a33fdf34f7b6642f8a9b279fad3a007fce",
+  "m6_all/table_a.tex": "00a665b74479a960e51f1f3a1255ccc4a0f1010e6e96ecc94642905ed2cba1c7",
+  "m6_all/summary.md": "c11e1cfab54620ca35910b5701a01f7527f205a002d699f7b9d3dfe4be994c18",
+  "m6/controls.md": "a15ad67019dccde9b3126be52f7df73a7d6fbb9d648e9877198f254631319668",
+  "m6/mutations.md": "62d2136403c9db22419abac740bc9ef075e941d1c5a4fc2feddf3796538bba01",
+  "probe_matrix_oracle.md": "651074e7f3e554c1453a4a7a8819652fa6c0a80316797debc01cd5cfdd466bea",
+  "probe_run_oracle.cumulative.json": "d65dbd54dc75eb7bdee9265e4e5008bcd0312d7a8257581059fbd008ab0d0b7c",
+  "crossver_probe_a1.md": "5b86acc5b2ee24c3dd9c5c44a865a16ea490b0f75a3bd2c20ceb1bb26cfcbf7f",
+  "a1_m4_report.md": "c81e4f772fb331f7e22dccd9ced17a93368f6148be890f888dd127494df92edb"
+ },
+ "note": "签字签的是这一版。报告是生成的，仓库里的那几份会被下一次跑批覆盖 —— 要引用「签过字的那份」就引用这里。文件 0400，改过即与 MANIFEST 的 sha 对不上。"
+}

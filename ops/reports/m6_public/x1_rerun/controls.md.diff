@@ -1,0 +1,11 @@
+--- /data/shared/genebench/repo/ops/reports/public/controls.md	2026-09-08 03:15:26.188242811 +0000
++++ /data/shared/genebench/repo/ops/reports/m6_public/x1_rerun/controls.md	2026-09-10 13:04:02.761741415 +0000
+@@ -7,7 +7,7 @@
+ 复现这一跑（**照抄整条**；`GB=/data/shared/genebench`、`PY=$GB/env/bin/python`）：
+ 
+ ```bash
+-cd $GB/repo && ulimit -n 8192 && ops/public_gateway.sh run -- env GENEBENCH_CHANNEL=public PYTHONDONTWRITEBYTECODE=1 $PY ops/run_controls.py --answer-root /data/shared/genebench/reference/tasks/public/v1.0-smoke-public --gateway-log /data/shared/genebench/logs/gateway_access_public.jsonl --out /data/shared/genebench/repo/ops/reports/public
++cd $GB/repo && ulimit -n 8192 && ops/public_gateway.sh run -- env GENEBENCH_CHANNEL=public PYTHONDONTWRITEBYTECODE=1 $PY ops/run_controls.py --answer-root /data/shared/genebench/reference/tasks/public/v1.0-smoke-public --gateway-log /data/shared/genebench/logs/gateway_access_public.jsonl --out /data/shared/genebench/repo/ops/reports/m6_public/x1_rerun
+ ```
+ 
+ > 三样缺一不可：`--answer-root`、`--gateway-log`、**`GENEBENCH_CHANNEL`**。只换前两样而不换通道，跑出来的是「题集与日志是公开的、读的表是私有的」——报告头会照实打印通道，但数字看起来都对。本脚本对这一种组合**拒绝启动**。

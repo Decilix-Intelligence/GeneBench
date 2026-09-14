@@ -1,0 +1,80 @@
+{
+  "card": "1.1-followup-code-alias",
+  "generated_at_utc": "2026-09-01T02:35:01+00:00",
+  "n_pairs": 5,
+  "by_status": {
+    "auto_inferred_pending_confirmation": 5
+  },
+  "allowed_uses": [
+    "reconciliation",
+    "adaptation_track"
+  ],
+  "forbidden_uses": [
+    "universe_pit",
+    "task_generation",
+    "scoring"
+  ],
+  "caveat": "全部为自动推断，未经公告确认。**不进 universe_pit 本体**——宇宙表继续用湖的当前码口径（M1 签字裁定）。",
+  "pairs": [
+    {
+      "universe": "csi1000",
+      "code_a": "001872.SZ",
+      "code_b": "000022.SZ",
+      "day_set_jaccard": 0.9761,
+      "span_start": "2015-05-29",
+      "span_end": "2018-12-27",
+      "n_disagreement_td": 877,
+      "status": "auto_inferred_pending_confirmation",
+      "evidence": "",
+      "note": "对账 §4.10 自动推断；判据仅 Jaccard>=0.5 + 一源独有，无公告佐证"
+    },
+    {
+      "universe": "csi1000",
+      "code_a": "001914.SZ",
+      "code_b": "000043.SZ",
+      "day_set_jaccard": 0.9813,
+      "span_start": "2015-05-29",
+      "span_end": "2019-12-30",
+      "n_disagreement_td": 1121,
+      "status": "auto_inferred_pending_confirmation",
+      "evidence": "",
+      "note": "对账 §4.10 自动推断；判据仅 Jaccard>=0.5 + 一源独有，无公告佐证"
+    },
+    {
+      "universe": "csi1000",
+      "code_a": "302132.SZ",
+      "code_b": "300114.SZ",
+      "day_set_jaccard": 0.8843,
+      "span_start": "2015-05-29",
+      "span_end": "2023-12-28",
+      "n_disagreement_td": 2091,
+      "status": "auto_inferred_pending_confirmation",
+      "evidence": "",
+      "note": "对账 §4.10 自动推断；判据仅 Jaccard>=0.5 + 一源独有，无公告佐证"
+    },
+    {
+      "universe": "csi1000",
+      "code_a": "601360.SH",
+      "code_b": "601313.SH",
+      "day_set_jaccard": 1.0,
+      "span_start": "2015-05-29",
+      "span_end": "2016-06-29",
+      "n_disagreement_td": 266,
+      "status": "auto_inferred_pending_confirmation",
+      "evidence": "",
+      "note": "对账 §4.10 自动推断；判据仅 Jaccard>=0.5 + 一源独有，无公告佐证"
+    },
+    {
+      "universe": "csi500",
+      "code_a": "001872.SZ",
+      "code_b": "000022.SZ",
+      "day_set_jaccard": 0.9431,
+      "span_start": "2009-01-23",
+      "span_end": "2010-07-29",
+      "n_disagreement_td": 369,
+      "status": "auto_inferred_pending_confirmation",
+      "evidence": "",
+      "note": "对账 §4.10 自动推断；判据仅 Jaccard>=0.5 + 一源独有，无公告佐证"
+    }
+  ]
+}

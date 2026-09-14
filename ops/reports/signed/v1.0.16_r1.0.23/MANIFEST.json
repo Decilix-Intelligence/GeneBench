@@ -1,0 +1,194 @@
+{
+ "label": "v1.0.16 / p1.0.0 / r1.0.23 最终卡收口",
+ "channel": "private",
+ "set_version": "1.0.16",
+ "set_root": "d9ebd5412ac4cc7e4569ae41887bff5fd0a40ec59e78baad34ccf5086550fc63",
+ "reference_version": "r1.0.23",
+ "reference_root": "dddabe440163b36ef678dee314b29604de3292470dd88fc07aa5162dc9d7cfb2",
+ "git_head": "9c32a8339ddeabdf5f5144333f456f918e792211",
+ "scope": "**私有通道**（任务集轴 `1.0.x`）。主表（`m6_all`）= Codex 统一基座 · M6-lite 两次 pass（**混轴**，见 `v1_0_readiness.md` §4）；另含 `m6` 的三控与破坏样本、oracle 与实例层 O1 矩阵、跨版本探针、适配赛道那一套。私有通道的夹具与标定**不公开**，这份包是内部签字用的完整记录。",
+ "counterpart": "public_vp1.0.0_r1.0.23",
+ "tables": {
+  "release": [
+   "m6_all/table_main.csv",
+   "m6_all/table_main.tex",
+   "m6_all/metrics_agent.csv",
+   "m6_all/metrics_agent.md",
+   "m6_all/metrics_stage.csv",
+   "m6_all/metrics_stage.md"
+  ],
+  "internal_diagnostic": [
+   "m6_all/table_a.csv",
+   "m6_all/table_a.tex",
+   "m6_all/table_b.csv"
+  ],
+  "why": "发布表 = ⑩ 的固定十九列（主表）+ ⑫ 的两张全量指标表，就这三种（⑥-b）。诊断表带 `effect` 等聚合/归一列，⑪ 明写它们**不进发布表** —— 归档它们是为了留证据，不是为了给人引用；每份 `table_a.csv` 旁边还有一份 `table_a.NOTE.md` 写着同一句话。**卡 H**：一份包里只列本通道的表，两条通道的主表不再躺在同一个平目录里。"
+ },
+ "files": {
+  "known_limits_v1.md": "4666e0da079fa324f0629c7d7dc1768302f0c416b547183ba30a6d13d238d818",
+  "report_spec_v1.md": "27e3a416ca49b2e4b11b3d023a29bc9cde5d22f9be4174e89fdd7008445a087d",
+  "rehearsal_v1.md": "daf9656c471465723f0e80e82ab73618084f5c4a6552a926b05a9e18362c1817",
+  "rehearsal_v2.md": "c184c48f1574b0af2530cf2c928da72347f8f6c56f256f31ec510828c0efe408",
+  "push_instructions.md": "80deb02d2fad2829be39b0b84de0defad9f4930364a8f60cfd0e8b796e27a84d",
+  "v1_0_readiness.md": "eb36681bcd4cfb9a5acdd9154826bd3ba8de7f292a2e3ee912bfe19deba6d2b4",
+  "validator_validation_v1.md": "ebb6ffb2709ec9e58e6aa593871f762ed293132568e3ce6503acf3fd7f515725",
+  "m6_all/table_main.csv": "a1f16272359b9a2c009481a06b313e4b608902dc81eb4345fee0cb3362ab8df6",
+  "m6_all/table_main.tex": "faaf0052e5fceb7c44682fc4295a42c8652da86cea189e5dfac0d1f622b2c2ba",
+  "m6_all/table_a.csv": "a77de6fd3ce6f5f84354adcb9d897bb2a9602be4af5527566c9a235f3b6cb2d8",
+  "m6_all/table_b.csv": "7ecae01aa23a9e6886dc27eccb1fe50715754482a660e1b8666ffdd3ce35236a",
+  "m6_all/table_a.tex": "417c3bf251b279f6bbc3b28cc045611b920a6121456064f624778dfae3ecdb21",
+  "m6_all/summary.md": "5a209a09140b149d9abbd077361b3cb8b7de4d41e04b63c2c5b8422b36b32f78",
+  "m6_all/metrics_agent.csv": "46e9563485cb57b5bf150fa8a8089bb4c93e579f9d8b490de2672b403fb8b838",
+  "m6_all/metrics_agent.md": "1a3ceb63afcfae6a6b2c7704fd74b835bfb8d62c91ad89b98f8cd3ee90aa83a7",
+  "m6_all/metrics_stage.csv": "a38ad5ec76731b6dc7238c30c15aeb93b260df27652b7c295b9f08f67bd075df",
+  "m6_all/metrics_stage.md": "3f07b101b99ed001fddb357e29a24323ae364d67407805d6b05173db72d56b86",
+  "m6/controls.md": "378a5498c87fe933428c00958bc6af542fab9c150c607ad7e59e8a1a1640a317",
+  "m6/mutations.md": "62d2136403c9db22419abac740bc9ef075e941d1c5a4fc2feddf3796538bba01",
+  "probe_matrix_oracle.md": "8ad9001da6af3a8367b8b25304de34f598b20ba5afcb076977d0a34a65d2d827",
+  "probe_run_oracle.cumulative.json": "4acb8c6aae33c22b169ecfc32a12da8975e7f3aa1380f5d5dbceb13038a3ea63",
+  "crossver_probe_a1.md": "5b86acc5b2ee24c3dd9c5c44a865a16ea490b0f75a3bd2c20ceb1bb26cfcbf7f",
+  "a1_m4_report.md": "c81e4f772fb331f7e22dccd9ced17a93368f6148be890f888dd127494df92edb",
+  "probe_matrix_instances.md": "c03ce6f4ce6934f9824bad235f3725bfa781b89f640fa8102356ee31b7f5a6b8",
+  "probe_run_instances.cumulative.json": "c7468c3af3dec3287d6d6bba4a62c6d8ce633cdac0f73977e3ea66bbca74eb91",
+  "adapt/table.csv": "8c8a665c6535a0c4229bddcfd01fff008e40ccddad10862c4652ca1fe45f682b",
+  "adapt/table.tex": "1e6bbb6915929eb8a8bd9eaa775ba7ca83eb68d85a347f7616cbe5790d490b54",
+  "adapt/summary.md": "cddfe3bf2651513c48cac67df8b229eacaedcf17b68a224ec1717ddabcef8509",
+  "adapt/oracle_matrix.md": "d6cd77121c538deca7a6947ff54d9fc8d127c2243ae514716e22c9fb92379c97",
+  "adapt/records.json": "d4ba466e2aed67f42ea83c59bf2d76f77e43378c320562aced60c4b61ca8e089",
+  "RELEASE_MANIFEST.json": "314740fdcfe39c1d45858700f6616888f2ff1e6e14e94549796dbe0793c9dd02",
+  "VERSIONS.md": "daa60754ef04367349362295afc2a07d35f225e65c2e27a0f5bdb9eb9fe72bb7",
+  "genequant/MANIFEST.json": "b5da18d6111e1b1ef78a83d2f39534673900104a1cb9bf9996747acbe4e56365"
+ },
+ "declared_but_missing": [],
+ "axis_mentions": {
+  "known_limits_v1.md": [
+   "1.0.14",
+   "1.0.15",
+   "1.0.16",
+   "p1.0.0",
+   "r1.0.21",
+   "r1.0.22",
+   "r1.0.23"
+  ],
+  "report_spec_v1.md": [
+   "1.0.14"
+  ],
+  "rehearsal_v1.md": [
+   "1.0.13",
+   "r1.0.16",
+   "r1.0.20"
+  ],
+  "rehearsal_v2.md": [
+   "1.0.15",
+   "r1.0.22"
+  ],
+  "v1_0_readiness.md": [
+   "1.0.16",
+   "1.0.4",
+   "1.0.7",
+   "1.0.9",
+   "r1.0.14",
+   "r1.0.22",
+   "r1.0.23",
+   "r1.0.8"
+  ],
+  "m6_all/table_main.tex": [
+   "1.0.7",
+   "1.0.9",
+   "r1.0.14",
+   "r1.0.8"
+  ],
+  "m6_all/table_a.csv": [
+   "1.0.7",
+   "1.0.9",
+   "r1.0.14",
+   "r1.0.8"
+  ],
+  "m6_all/table_b.csv": [
+   "1.0.7",
+   "1.0.9",
+   "r1.0.14",
+   "r1.0.8"
+  ],
+  "m6_all/table_a.tex": [
+   "1.0.7",
+   "1.0.9",
+   "r1.0.14",
+   "r1.0.8"
+  ],
+  "m6_all/summary.md": [
+   "1.0.7",
+   "1.0.9",
+   "r1.0.14",
+   "r1.0.8"
+  ],
+  "m6_all/metrics_agent.md": [
+   "1.0.7",
+   "1.0.9",
+   "r1.0.14",
+   "r1.0.8"
+  ],
+  "m6_all/metrics_stage.md": [
+   "1.0.7",
+   "1.0.9",
+   "r1.0.14",
+   "r1.0.8"
+  ],
+  "a1_m4_report.md": [
+   "r1.0.7",
+   "r1.0.8"
+  ],
+  "adapt/table.csv": [
+   "1.0.16",
+   "r1.0.23"
+  ],
+  "adapt/table.tex": [
+   "1.0.16",
+   "r1.0.23"
+  ],
+  "adapt/summary.md": [
+   "r1.0.21",
+   "r1.0.22"
+  ],
+  "RELEASE_MANIFEST.json": [
+   "1.0.16",
+   "p1.0.0",
+   "r1.0.23"
+  ],
+  "VERSIONS.md": [
+   "1.0.1",
+   "1.0.15",
+   "1.0.16",
+   "1.0.3",
+   "1.0.4",
+   "1.0.5",
+   "1.0.6",
+   "1.0.7",
+   "1.0.9",
+   "p1.0.0",
+   "r1.0.0",
+   "r1.0.22",
+   "r1.0.23"
+  ]
+ },
+ "mentions_other_axes": [
+  "RELEASE_MANIFEST.json",
+  "VERSIONS.md",
+  "a1_m4_report.md",
+  "adapt/summary.md",
+  "known_limits_v1.md",
+  "m6_all/metrics_agent.md",
+  "m6_all/metrics_stage.md",
+  "m6_all/summary.md",
+  "m6_all/table_a.csv",
+  "m6_all/table_a.tex",
+  "m6_all/table_b.csv",
+  "m6_all/table_main.tex",
+  "rehearsal_v1.md",
+  "rehearsal_v2.md",
+  "report_spec_v1.md",
+  "v1_0_readiness.md"
+ ],
+ "axis_mentions_note": "逐件登记正文里提到的版本轴。**这是事实登记不是判据** —— `VERSIONS.md` / `CHANGELOG` 本来就列历次版本。但一份**生成的报告**出现在 `mentions_other_axes` 里，多半是重冻之后没有重跑它的生成器，于是它带着上一版的轴被签进了这一版的包。",
+ "note": "签字签的是这一版。报告是生成的，仓库里的那几份会被下一次跑批覆盖 —— 要引用「签过字的那份」就引用这里。文件 0400，改过即与 MANIFEST 的 sha 对不上。"
+}

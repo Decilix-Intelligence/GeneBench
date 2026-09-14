@@ -1,0 +1,69 @@
+{
+ "kind": "artifact",
+ "artifact": {
+  "schema_version": "1.0",
+  "artifact_id": "S5-art-1",
+  "stage": "S5",
+  "task_id": "T-sample",
+  "config_id": "cfg-sample",
+  "arm": "strict",
+  "seed": 0,
+  "as_of": "2026-07-31",
+  "produced_at": "2026-09-01T12:00:00.000+00:00",
+  "provenance": [],
+  "declarations": [
+   "value_semantics"
+  ],
+  "payload": {
+   "signals": [
+    {
+     "date": "2026-07-31",
+     "symbol": "600519.SH",
+     "value": 0.82
+    },
+    {
+     "date": "2026-07-31",
+     "symbol": "000001.SZ",
+     "value": -0.31
+    },
+    {
+     "date": "2026-07-31",
+     "symbol": "300750.SZ",
+     "value": null
+    },
+    {
+     "date": "2026-07-31",
+     "symbol": "601318.SH",
+     "value": "flat"
+    }
+   ],
+   "coverage": {
+    "n_valued": 2,
+    "n_null": 1,
+    "n_flat": 1
+   }
+  }
+ },
+ "task": {
+  "task_id": "T-sample",
+  "stage": "S5",
+  "declared": {
+   "value_semantics": "score",
+   "signal_frequency": "daily",
+   "direction": "higher_is_long",
+   "universe_ref": "csi300@2026-07-31",
+   "missing_policy": "keep_null",
+   "input_factors": [
+    "gtja_191.001"
+   ]
+  },
+  "underdetermined": []
+ },
+ "gateway_log": null,
+ "tradability": {
+  "2026-07-31|600519.SH": "trade",
+  "2026-07-31|000001.SZ": "trade",
+  "2026-07-31|300750.SZ": "no_data",
+  "2026-07-31|601318.SH": "trade"
+ }
+}

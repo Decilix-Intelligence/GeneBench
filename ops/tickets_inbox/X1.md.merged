@@ -1,0 +1,71 @@
+# 票据收件箱 · X1（18 个公开通道 run 续跑 + 单机双容器形态端到端）
+
+> 2026-09-10。**不要直接改 `ops/tickets.md`**（契约 C）；这里的编号先写 `N-?`，由收口卡并进去。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **公开 provider 的 `files.sha256` 漏了它自己两个元数据文件**（W1 已提，本卡拿到决定性新证据） | **待裁定（仍挡着 18 个 run）** | 见下 §1。**新证据：W1 列的方向 ② 对 `MANIFEST.sha256` 在数学上不成立**（循环自指），所以这不是「两条路选一条」，是「一条路 + 一次删证据」。 |
+| N-? | 形态① 的「容器打不到本机宿主端口」**已被那条 ufw 规则解掉** | **已验（本卡实测）** | 用户 2026-09-10 放行 `172.31.240.0/22 → 18080` 之后，容器 → `192.168.1.219:18080` = **200**（对照：容器 → `192.168.1.48:18080` = 200）。手册 §1.3 那张「三种全部超时」的表已按「放行前/放行后」改写。复现脚本 `$GB/scratch/X1/x1_probe3.sh`。 |
+| N-? | **f02 的 PyPI 出网今天约 20 KB/s**，形态① 的数据面 venv 装不出来 | **环境事实，登记不修** | `pip install pandas==2.2.3`（12.7 MB）**900 s 没下完**（rc=124）；`duckdb==1.4.3`（20.5 MB）跑了 20 分钟仍在下。f01 侧同样慢。绕法：从**本机已有镜像**里把 cp312 的 `site-packages` 拷出来当运行库（`$SN/imgpkgs`，见 §2）。**代价是版本漂移**：pandas 2.3.3 / numpy 2.5.2 / pyarrow 25.0.1，与 f01 数据面的 2.2.3 / 1.26.4 / 20.0.0 不是同一套。 |
+| N-? | f02 上有**残留的 compose 网络**占着 `172.31.240.0/24` | **登记不修** | `gb-s2-cor-01-hint-cfg-codex-deepseek-r02_gb_task` 还在，害我第一次探针建网直接失败（`Pool overlaps`）。与 W1 记的「杀跑批不会杀掉对面的容器」同族。收尾要 `docker network rm`。 |
+| N-? | `m6_public` 清单里显式写死的 `max_tokens: 3000000` 已清掉（N-388） | **已做** | 18 行的 `budget_override` 全部变成 `{}`，**清单没有重建**（逐行读、只动这一个键、其余字节原样写回），备份 `$GB/runs_in/m6_public/jobs.jsonl.x1bak-20260910T131040`。清掉之后 S1–S3/S5/S6/S8 走默认档 100 次 / **6 M**，S4 走 150 次 / 9 M，S7 走 300 次 / 18 M。 |
+| N-? | `ops/test_c41.py:366` 的 `len(REG.CONFIGS) == 3` | **已被别人改掉，本卡跳过** | 契约里点名要改的那条，现场已经是「内置三条仍在 + `config_id` 互异 + `harness` 名互异」。幂等规则：已有人改过就跳过。 |
+
+---
+
+## 1. 挡着 18 个 run 的那一件（新证据：只剩一条路 + 一次删证据）
+
+现场（2026-09-10 12:5x，f01）：
+
+```
+root sha:        561348660a3175b17b906e2b4413e956959d7df4362939b0a85c67cf816c3a92
+expect(public):  561348660a3175b1                      ← W1 的按通道钉子，对上了
+check_provider_pin -> 2
+   P2 树里有而清单里没有：MANIFEST.sha256 —— 多出来的文件也是改动
+   P2 树里有而清单里没有：build_info.json —— 多出来的文件也是改动
+```
+
+`ops/run_joblist.py --check-plane` **退 0**（网关 18081 可达、f02 上的 provider 根一致）——
+它只核根 hash，核不到这一层；**红是在真跑的注入期才发生的**，18 个 run 会一起红在 P2。
+
+### 为什么方向 ②（把这两个文件收进 `files.sha256`）对 `MANIFEST.sha256` 不成立
+
+`MANIFEST.sha256` 里**有一行记的就是 `files.sha256` 的 sha256**（实测）：
+
+```
+561348660a3175b17b906e2b4413e956959d7df4362939b0a85c67cf816c3a92  2987248  files.sha256
+600f0f6b6be332933ed731c987e0fec9806813125d34bd529e964e0b92a4f31d    49850  manifest.json
+```
+
+于是：把 `MANIFEST.sha256` 写进 `files.sha256` → `files.sha256` 的内容变了 → 它的 sha256 变了 →
+`MANIFEST.sha256` 里那一行过期 → 要重出 `MANIFEST.sha256` → 它的 sha256 变了 →
+`files.sha256` 里刚加的那一行又过期。**这是一个没有不动点的循环**，不是「多跑一遍就好」。
+
+`build_info.json` 没有这个问题（谁也没记它），但一个能收、一个收不了，**方向 ② 只能退化成
+「把 `MANIFEST.sha256` 从 provider 树里删掉」** —— 那是删证据，与 W1 明确没有采纳的第三条同族。
+
+### 所以要用户裁的是这一条（二选一）
+
+* **①（W1 与本卡都倾向）**：`genetask/pin.py::PROVIDER_META_FILES` 加
+  `MANIFEST.sha256` / `build_info.json`。语义本来就对：`snapshots/public/tables.py::_stamp`
+  写这两个文件时**明确把它们自己排除在清单之外**（`if not p.is_file() or p.name in ("MANIFEST.sha256","build_info.json")`），
+  它们就是「清单不含自己」那一类。代价：`pin.py` 在 `ops/freeze_v10.py::CODE_FILES` 里 →
+  **要推任务集版本**（与 N-384 并成一次 v1.0.14，别推两次）；且要先解掉用户 2026-09-10
+  「`genetask/pin.py` 一个字不动」那条。
+* **②′**：把 `MANIFEST.sha256` 从公开 provider 树里删掉，再把 `build_info.json` 收进 `files.sha256`。
+  不动冻结根，但根 sha 会变（`ops/HANDOFF.md:557`、`ops/reports/public/release_forms.md:118`、
+  `ops/reports/public/qlib_provider_public.md`、v1.0.13 签字包里两处、
+  `runner/inject.py::PUBLIC_PROVIDER_SHA256_ROOT` 全要跟着改，已签字那份作废），
+  **并且少了一份逐文件校验表**。
+
+**这条不解，公开通道的 18 个 run 一个都跑不了。**执行面另外两件前置现在都齐了：
+18081 通（W1 实测 200）、公开 provider 在 f02（根现算一致）。
+
+---
+
+## 2. 形态① 走到哪一步（本卡的另一半）
+
+见 `ops/reports/public/single_node_form1.md`。一句话：**手册 §1.3 那个「不试就不知道」的点已经解掉了**
+（容器 → 宿主 LAN 网关 = 200），出集与推送两步在单机落点上**真跑过并全绿**（含推送守门对
+`genebench-answer-plane-scan.timer` 的 `enabled + active` 核查），
+**卡住的是「在 f02 上装出一个数据面 Python 环境」** —— 不是设计问题，是今天的 PyPI 出网速度。

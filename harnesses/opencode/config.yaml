@@ -1,0 +1,17 @@
+# 被测配置（数据驱动，W-0）。**enabled: true —— 这是一条正式配置，不是「模型待换」。**
+#
+# opencode 说的就是 OpenAI 兼容协议（POST <baseURL>/chat/completions），而 DeepSeek 正是
+# 一个 OpenAI 兼容端点 —— 所以这条链路上没有协议缺口，不像 gemini-cli（上游不说 Gemini 协议、
+# 真跑到 404）那样要挂着等一个够得着的端点。经边车指到 https://api.deepseek.com，
+# 模型仍是 deepseek-chat，于是 assert_registry_sane 的「所有已启用配置同一模型」成立，
+# 主表上暴露的是 harness 差异而不是模型差异（v1.0 的实验设计：一个模型 × 多种 harness）。
+#
+# base_url 的 host 必须与 runner/c41/egress_proxy.py::MODEL_API_ALLOW 同源。
+# api.deepseek.com 已在表内，**本卡没有动那个共享文件**。
+config_id: cfg-opencode-deepseek
+harness: opencode
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: 通用 CLI harness（opencode-ai 1.18.26，OpenAI 兼容自定义 provider），经边车指到 DeepSeek
+enabled: true

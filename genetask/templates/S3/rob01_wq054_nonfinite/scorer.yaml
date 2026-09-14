@@ -1,0 +1,5 @@
+# scorer.yaml —— 本题的结算配置（数据面私有，含 gold_token）
+task_id: <<task_id>>
+gold_token: <<gold_token>>
+validator: reference.artifact_schema.validate
+taskspec: taskspec.json

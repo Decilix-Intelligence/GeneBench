@@ -1,0 +1,34 @@
+# 卡 P2（文档与纪律）收件箱 —— 2026-09-13
+
+> 编号先写 `N-?` 的规矩本轮按「盘上实际最大号 = N-781」取到 **N-782 起**。
+> 本卡可改路径：`ops/HANDOFF.md`、`README.md`、`docs/OPERATOR_MANUAL.md`、`harnesses/README.md`、
+> `ops/reports/{publish_report,push_result,push_instructions}.md`、`ops/release/**`、
+> `$GB/scratch/G2/mk_tree_g2.sh`、本文件。其余一律没碰。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| **N-782** | ⚠ `ops/test_docs_consistency.py` 的 fact `manifest_check_nonzero_is_not_damage` **本卡落地之后必红**，判据要翻面 | **待修（路径不在本卡：`ops/*.py` 归卡 P1）；补丁已写好可直接跑** | 用户裁定 ② 要的是「修根因，不写文档教人忽略非零」，并点名删掉 README §2.1 / README §5 / 手册 §0.0 三处「`--check` 在干净 clone 上非零是环境差异」。本卡把那三处删了 → 那条 fact 的 `require` 是 `非零 ≠ 发布件损坏`（两处都要出现），于是当场红。**这不是回归，是状态真的变了**：根因修完就不该再有那句话。**改法**（两个方向都有牙）：fact 改名 `manifest_check_is_machine_independent`，`require` 换成 `刻意不取决于跑它的机器`（本卡已在 README §2.1 与手册 §0.0 两处写下这一串，逐字相同）、`forbid` 换成 `非零 ≠ 发布件损坏`（不许再写回去）。**现成的幂等补丁**：`$GB/scratch/P2/p2_fact_patch_for_P1.py`，`env/bin/python` 直接跑，跑完 `pytest ops/test_docs_consistency.py -q` 应为 10 绿。 出处：本卡。 |
+| **N-783** | `ops/HANDOFF.md` §19.7.4 写「一旦传上并回填 `download_url`，要跟着改口的有**三处**」，本卡之后是**五处** | **待修（归传附件那张卡）** | 原列三处：`README.md` §5、`README.md` §2.1a、手册 §1.4(a)。本卡新增两处也会变成假话：`ops/reports/publish_report.md` §一「第三件附件」那张表（下载地址那一格现在写「还没有」）、以及 §三 末尾那条新 BLOCKED（含门认的子串 `附件清单为空`）。**回填 `download_url` 之后 `ops/test_e.py::test_附件还没上传时_报告必须把它记成blocked` 会翻到另一面 —— 那时 `附件清单为空` 这个子串必须从 `publish_report.md` 里消失**，与 2026-09-13 卡 F 按 N-739 做的是同一件事、方向相反。 出处：本卡。 |
+| **N-784** | `ops/reports/known_limits_v1.md:857–863` 仍把 N-736 那条手工纪律记成「登记不修的操作纪律」 | **待修（路径归卡 P3）** | 用户裁定 ①（N-748 采纳）把「每次 force-push 之后手工 `PATCH` `target_commitish`」**整条删除**。本卡已改 `ops/HANDOFF.md` §19.6.5 ②、`ops/reports/push_result.md` §8.2 / §8.3 三处；`ops/tickets.md` 的 N-736 与本条归卡 P3。改法：那一格标成「**2026-09-13 作废**（裁定 ①）：`target_commitish` 写分支名 `main`，不再有这条纪律」，原文可留证。 出处：本卡。 |
+| **N-785** | `ops/reports/release_upload_report.md:85` 仍写「`target_commitish` 每轮 force-push 后 `PATCH` 到当轮新 commit（回 200）」 | **待修（路径不在本卡）** | 同 N-784，是同一条作废纪律的第四处落点。它在一张表格的单元格里，改法是加一句「2026-09-13 起写分支名 `main`，本格是当轮留证」。**不挡外部用户**（那份报告是内部留证），所以排在 N-784 之后。 出处：本卡。 |
+| **N-786** | `frozen/` 到底要不要落位，两处口径不一致 | **已按保守方向写进 README，待与 D2 报告统一** | `ops/reports/mac_gap_closeout.md` §4 末尾把 `frozen/` 列进「`tables/` `tradability/` `universe/` `frozen/` → 同名落 `$GB/snapshots/public_v1/`」。实查：provider 包里 `frozen/` 装的是**仓库相对路径**（`frozen/factor_library/compiled/{qlib_native,qlib_panel,blocked}.jsonl` 与 `frozen/reference/factorlib_pinned/*.py`），这六件**仓库里本来就有**（2026-09-10 卡 W2 提交 `8428252` 收进来的，`RELEASE_MANIFEST` 的 `frozen_artifacts_missing` 因此 `satisfied=true`），而发布方自己的 `$GB/snapshots/public_v1/` 下**没有** `frozen/` 这个目录。所以本卡在 README §2.1a 按「**不用落位**，是给你对一遍用的随包副本」写。2026-09-13 macOS 外部验收也只落位了五项（`qlib_provider` / `tables` / `tradability` / `universe` / `gold_factors`）而网关正常。**要么 D2 报告跟着改口，要么给出「落位 `frozen/` 有什么用」的出处。** 出处：本卡。 |
+
+## 本卡做了什么（给下一张卡的索引）
+
+1. **裁定 ①**（`target_commitish` 写 `main`、N-736 纪律整条删）：`ops/HANDOFF.md` §19.6.5 ② 与该节命令块
+   （`r2_patch_release.py` → `w_patch_release.py` / `w_remote_content.py`，并说明 `PATCH` 那一步已不再是每轮动作）、
+   `ops/reports/push_result.md` §8.2 与 §8.3。**剩下两处见 N-784 / N-785。**
+2. **裁定 ②** 的文档一半：删掉 README §2.1、README §5、手册 §0.0 三处「忽略非零」，
+   改写成「清单刻意不取决于跑它的机器，根因已修」。**门要跟着翻面，见 N-782。**
+3. **裁定 ③**：`ops/HANDOFF.md` 新增 **§19.8**（临时解包 / cleanroom 一律落 `$GB` 之外 ——
+   为什么、确切命令、与 N-726 同形两周内第二次、已清掉的现场、以及卡 D2 在 f02 留下的证据什么时候可以清）。
+   现场：`$GB/scratch/B2/cleanroom/`（246 MB）**整棵移到** `/home/ljn/genebench_scratch/B2/cleanroom/`，
+   一个字节没删（理由写在 §19.8.4）。
+4. **N-779 的文档一半**：`ops/reports/publish_report.md` §一 加第三件附件那张表（`42,046,516` / `49e9b250d398a1ce…` /
+   状态「已登记，未上传」）、§三 末尾加一条含子串 `附件清单为空` 的现状说明。**`ops/test_pack_release.py` 那一半归卡 P1。**
+5. **N-771**：README §2.1a 补「③ 落位」一段 —— 三件附件各自解到哪，**`provider/` 要改名成 `qlib_provider/`**，
+   `docs/` `selfbuild/` `frozen/` 不用落位。
+6. **N-756**：`harnesses/README.md` §2 与 §3.2 两处「`docker.io` 被墙」改成**按机器现判**的写法
+   （外部机器上 `docker build` 实测 69 秒构出基座）。
+7. **N-759**：`$GB/scratch/G2/mk_tree_g2.sh` 生成的 `EXCLUDED.txt` 新增「## ⑤ 不是剔除，但也不在这棵树里」一节。
+8. **D2 的那次更强实证**：README §2.3 与手册 §0.3 两处一起加（干净树 + 三个附件 → 十九列表，唯一例外是两条软链）。

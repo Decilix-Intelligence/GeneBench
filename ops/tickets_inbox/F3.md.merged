@@ -1,0 +1,69 @@
+# 卡 F3 收件箱 —— ⑨ DATA_LICENSE granted + ⑩ LICENSE 版权行与 CITATION
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `DATA_LICENSE` 状态 `pending_license_text` → **`granted`**（裁定 ⑨） | 已做 | 授权摘要写进新增的 §2.0（**研究用途 / 允许再分发派生日线数据 / 署名 baostock**）；许可方**正文**未到，§2.1 留一处醒目占位「⚠ 正式文本待替换」，并写明收到后要做的三件事 |
+| N-? | `ops/terms/baostock/permission/` **保持不存在** | 已做（刻意） | 「目录非空的唯一含义是正文到了」。**不许**往里放占位/说明文件去让 `ops/test_env.py` 变绿 —— 那正是那道锁要拦的事，也正是裁定 ⑨ 说的「不许伪装成已入库」 |
+| N-? | `RELEASE_MANIFEST.json`：`data_license_text` 闭合、**`releasable` → true** | 已做 | 五条 blocker 全 `satisfied`，`missing` 0 件。重跑 `$PY ops/mk_release_manifest.py` |
+| N-? | 清单许可段：**授权**与**正文**拆成两个字段 | 已做 | 旧实现 `text_in_repo = (state == "granted")` —— 状态一翻它就跟着说「正文在库」，而它是清单里唯一回答「有没有文件可查」的字段。换成 `official_text_in_repo`（**现算目录**，今天 `false`）+ `grant_summary` + `official_text_dir` |
+| N-? | `LICENSE` 版权行 → **`Copyright 2026 Decilix Intelligence`**（裁定 ⑩） | 已做 | 只填 §A「怎么把许可套到本仓库」那一处实例；Apache-2.0 正文与附录里的 `Copyright [yyyy] [name of copyright owner]` 模板行**逐字未动** |
+| N-? | `CITATION.cff`：`repository-code`（GeneBench）+ **新增 `repository`（GeneQuant）**（裁定 ⑩） | 已做 | `authors` **维持 `<待用户填>`**，没有代填。版权人 ≠ 作者，已在 LICENSE 与 CITATION 头部各写一句防止后来的人拿版权行去填 authors |
+| N-? | `genequant/LICENSE` 副本与 `genequant/MANIFEST.json` 重出 | 已做 | 改本体 LICENSE 的**规定动作**：`$PY ops/test_genequant_subtree.py --rebuild` → `$PY ops/mk_release_manifest.py`（顺序不能反） |
+
+---
+
+## ⚠ 本卡翻的是**全仓库状态**，六处「状态锁」会跟着变红 —— 它们不在本卡路径内
+
+`releasable` 从 `false` 翻成 `true`、`DATA_LICENSE` 从 pending 翻成 `granted`、
+`LICENSE` 的版权行从占位翻成真值 —— 这三件事各自被一批**写死当时现状**的断言钉着。
+**那些红不是回归**，是「被钉住的现状变了」。逐条给出建议改法（都是一行判据的翻面，
+与 2026-09-11 卡 Z 把 `repository-code` 那条从「必须是占位符」翻成「必须是真地址」是同一类动作）：
+
+| 文件:行 | 现在写死的 | 为什么红 | 建议改法 |
+| --- | --- | --- | --- |
+| `ops/test_env.py:974` `test_license_state_matches_whether_the_text_exists` | `granted ⇒ permission/ 非空` | 裁定 ⑨ 把**授权**与**正文**拆开了，这道锁是两态模型下写的 | 改成分别判两件事：状态 `granted` 时**要么**正文在库，**要么** `DATA_LICENSE` 里有醒目的「正式文本待替换」占位（缺了占位才判红）；反向（正文在库却还写 pending）原样保留 |
+| `ops/test_B.py:110-111` `test_版权人没有被代填` | `"<待用户填" in lic`、`"Copyright <待用户填" in lic` | 裁定 ⑩ 给了版权人 | 与该测试正文里 `repository-code` 那段注释同一处理：翻成「必须是 `Copyright 2026 Decilix Intelligence`」。**`authors` 仍不许代填那一条原样保留**（`CITATION.cff` 里的 `<待用户填>` 还在，本卡一个字没动）|
+| `ops/test_B.py:141` | `MANIFEST["releasable"] is False` | 最后一条 blocker 闭合 | 翻成 `is True` + `open_ == []`；该测试的用意（「闭合的是代码许可这一条」）用 `"code_license_undecided" not in open_` 保住 |
+| `ops/test_B.py:172` `test_README里未闭合的条数与清单一致` | 行内 `cn = {1:"一",…,5:"五"}[n]` | `n` 现在是 **0**，直接 `KeyError: 0` | 给那张行内表加 `0: "零"`（`ops/test_readme.py:155` 的 `_CN` 已经有 `0: "零"`，两处对齐即可），再按下一行改 README |
+| `ops/test_V2.py:294-295` | `open_ == ["data_license_text"]`、报告里「未闭合 **1 条**」 | 同上 | 断言改成 `set(open_) <= {"data_license_text"}`（即「只可能剩这一条」），报告那句由收口卡按新现状改 |
+| `ops/test_W2.py:136` | `m["releasable"] is False` | 同上 | 同 test_B:141 |
+| `ops/test_wrapup.py:173` | `rm["releasable"] is False and "releasable=false" in t` | 同上 | 报告 `ops/reports/wrapup_v2_report.md` 的措辞要跟着改；断言随报告翻面 |
+| `README.md` §5（line 349 一带） | 「未闭合的**一**条」、`releasable = false` | 同上 | 改成「未闭合的**零**条」+ `releasable = true`，旧结论按本仓库既有写法**划掉保留**（`~~…~~`）。`ops/test_readme.py:167-181` 与 `ops/test_B.py:169-174` 钉着这两处措辞 |
+
+### 本卡改动实际跑出来的红，逐条点名（2026-09-12 实跑）
+
+```
+ops/test_env.py::test_license_state_matches_whether_the_text_exists
+ops/test_B.py::test_版权人没有被代填
+ops/test_B.py::test_发布清单里代码许可那条blocker已闭合而releasable仍是false
+ops/test_B.py::test_README里未闭合的条数与清单一致
+ops/test_V2.py::test_报告里的blocker与发布清单一致
+ops/test_W2.py::test_the_remaining_blockers_are_the_users_decisions_not_ours
+ops/test_wrapup.py::test_报告里的blocker与发布清单一致
+ops/test_readme.py::test_the_release_status_section_says_what_the_manifest_says
+ops/test_readme.py::test_the_number_of_open_blockers_matches_the_manifest
+```
+
+同一轮里还有 **3 条红不是本卡的**，别记到这张表上：
+`ops/test_env.py::test_no_api_key_material_in_run_dirs`（run 目录）、
+`ops/test_V2.py::test_主表表头只有一种_且与十九列口径逐字相等`（裁定 ⑥，卡 F2）、
+`ops/test_wrapup.py::test_两条未达成没有被写成达成`（m6_public 已经有跑过的行了，卡 F1 的 18 个公开 run）。
+
+### 另一条：`VERSIONS.md` 正文停在旧轴（**不是本卡改的，但挡 `--check`**）
+
+卡 F1 把轴推到 **1.0.16 / r1.0.23** 之后，`VERSIONS.md` 的正文仍写着 1.0.15 / r1.0.22
+与两个旧根前缀，`$PY ops/mk_release_manifest.py --check` 因此退 1（它先查这一条）。
+**落盘的 `RELEASE_MANIFEST.json` 本身是对的**（本卡重跑过，axes 已是 1.0.16 / r1.0.23）；
+要改的是 `VERSIONS.md` 的正文，属推轴那一卡 / 收口卡。
+
+**为什么本卡没有替它们改**：并发施工规则「只许创建/修改任务书列给你的路径」。
+上面七处分属别的卡的文件与共享文件（README.md），留给**收口卡**一次改完 ——
+它们是纯粹的一行翻面，没有需要判断的地方，改法已逐条写死在上表里。
+
+## 另一处同类隐患（不在本卡路径，**登记不修**）
+
+`ops/release/pack_public_provider.py:366` 里还留着
+`"text_in_repo": state == "granted"` —— 与本卡刚从发布清单里拿掉的是同一个假字段，
+而它写进的是**公开包自己的 `MANIFEST.json`**，也就是外部用户下载后读到的那一份。
+今天它会对外宣称「许可正文在库」，而正文并不在。
+建议按本卡对 `ops/mk_release_manifest.py` 的改法同步：现算目录，别从状态推。

@@ -1,0 +1,128 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.20, pytest-9.1.1, pluggy-1.6.0 -- /data/shared/genebench/env/bin/python
+rootdir: /data/shared/genebench/repo
+plugins: anyio-4.14.2
+collecting ... collected 39 items
+
+ops/test_env.py::test_data_stack_importable[duckdb] 
+    [env] duckdb     1.4.3                <- /data/shared/genebench/env/lib/python3.10/site-packages/duckdb/__init__.py
+
+ops/test_env.py::test_data_stack_importable[duckdb] PASSED               [  2%]
+ops/test_env.py::test_data_stack_importable[pandas] 
+    [env] pandas     2.2.3                <- /data/shared/genebench/env/lib/python3.10/site-packages/pandas/__init__.py
+
+ops/test_env.py::test_data_stack_importable[pandas] PASSED               [  5%]
+ops/test_env.py::test_data_stack_importable[pyarrow] 
+    [env] pyarrow    20.0.0               <- /data/shared/genebench/env/lib/python3.10/site-packages/pyarrow/__init__.py
+
+ops/test_env.py::test_data_stack_importable[pyarrow] PASSED              [  7%]
+ops/test_env.py::test_data_stack_importable[qlib] 
+    [env] qlib       0.9.8.dev32          <- /data/shared/genebench/env/lib/python3.10/site-packages/qlib/__init__.py
+
+ops/test_env.py::test_data_stack_importable[qlib] PASSED                 [ 10%]
+ops/test_env.py::test_gateway_stack_importable[fastapi] 
+    [env] fastapi    0.141.1              <- /data/shared/genebench/env/lib/python3.10/site-packages/fastapi/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[fastapi] PASSED           [ 12%]
+ops/test_env.py::test_gateway_stack_importable[uvicorn] 
+    [env] uvicorn    0.52.1               <- /data/shared/genebench/env/lib/python3.10/site-packages/uvicorn/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[uvicorn] PASSED           [ 15%]
+ops/test_env.py::test_gateway_stack_importable[pydantic] 
+    [env] pydantic   2.13.4               <- /data/shared/genebench/env/lib/python3.10/site-packages/pydantic/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[pydantic] PASSED          [ 17%]
+ops/test_env.py::test_gateway_stack_importable[httpx] 
+    [env] httpx      0.28.1               <- /data/shared/genebench/env/lib/python3.10/site-packages/httpx/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[httpx] PASSED             [ 20%]
+ops/test_env.py::test_gateway_stack_importable[pytest] 
+    [env] pytest     9.1.1                <- /data/shared/genebench/env/lib/python3.10/site-packages/pytest/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[pytest] PASSED            [ 23%]
+ops/test_env.py::test_running_interpreter_is_genebench_env 
+    [env] python     = /data/shared/genebench/env/bin/python3.10
+    [env] cfg.PYTHON = /data/shared/genebench/env/bin/python  (exists=True)
+
+ops/test_env.py::test_running_interpreter_is_genebench_env PASSED        [ 25%]
+ops/test_env.py::test_data_partition_has_headroom 
+    [env] /data: total=2750G used=75G free=2535G
+
+ops/test_env.py::test_data_partition_has_headroom PASSED                 [ 28%]
+ops/test_env.py::test_genebench_root_lives_on_data 
+    [env] st_dev: root=2049 /data=2049 home=64512
+
+ops/test_env.py::test_genebench_root_lives_on_data PASSED                [ 30%]
+ops/test_env.py::test_gateway_port_is_free 
+    [env] bind ok  192.168.1.48:18080 (已释放)
+
+ops/test_env.py::test_gateway_port_is_free PASSED                        [ 33%]
+ops/test_env.py::test_genebench_root_exists_and_is_dir 
+    [env] GENEBENCH_ROOT = /data/shared/genebench
+
+ops/test_env.py::test_genebench_root_exists_and_is_dir PASSED            [ 35%]
+ops/test_env.py::test_genebench_root_mode_is_0700 
+    [env] mode = 0o700 (要求 0o700)
+
+ops/test_env.py::test_genebench_root_mode_is_0700 PASSED                 [ 38%]
+ops/test_env.py::test_genebench_root_is_writable 
+    [env] write probe ok -> .gb_write_probe_m7hoqh2o.tmp
+
+ops/test_env.py::test_genebench_root_is_writable PASSED                  [ 41%]
+ops/test_env.py::test_subdirs_exist[REPO] 
+    [env] REPO       /data/shared/genebench/repo  exists=True
+
+ops/test_env.py::test_subdirs_exist[REPO] PASSED                         [ 43%]
+ops/test_env.py::test_subdirs_exist[ENV] 
+    [env] ENV        /data/shared/genebench/env  exists=True
+
+ops/test_env.py::test_subdirs_exist[ENV] PASSED                          [ 46%]
+ops/test_env.py::test_subdirs_exist[SNAPSHOTS] 
+    [env] SNAPSHOTS  /data/shared/genebench/snapshots  exists=True
+
+ops/test_env.py::test_subdirs_exist[SNAPSHOTS] PASSED                    [ 48%]
+ops/test_env.py::test_subdirs_exist[RESULTS] 
+    [env] RESULTS    /data/shared/genebench/results  exists=True
+
+ops/test_env.py::test_subdirs_exist[RESULTS] PASSED                      [ 51%]
+ops/test_env.py::test_subdirs_exist[WHEELS] 
+    [env] WHEELS     /data/shared/genebench/wheels  exists=True
+
+ops/test_env.py::test_subdirs_exist[WHEELS] PASSED                       [ 53%]
+ops/test_env.py::test_subdirs_exist[OPS] 
+    [env] OPS        /data/shared/genebench/repo/ops  exists=True
+
+ops/test_env.py::test_subdirs_exist[OPS] PASSED                          [ 56%]
+ops/test_env.py::test_config_importable_and_paths_derive_from_root 
+    [env] genebench_config <- /data/shared/genebench/repo/genebench_config.py
+
+ops/test_env.py::test_config_importable_and_paths_derive_from_root PASSED [ 58%]
+ops/test_env.py::test_wildcard_bind_0_0_0_0_raises PASSED                [ 61%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[0.0.0.0] PASSED   [ 64%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[] PASSED          [ 66%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[::] PASSED        [ 69%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[*] PASSED         [ 71%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[[::]] PASSED      [ 74%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[  0.0.0.0  ] PASSED [ 76%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[::0] PASSED       [ 79%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[0] PASSED         [ 82%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[None] PASSED      [ 84%]
+ops/test_env.py::test_non_wildcard_bind_passes[192.168.1.48] PASSED      [ 87%]
+ops/test_env.py::test_non_wildcard_bind_passes[127.0.0.1] PASSED         [ 89%]
+ops/test_env.py::test_non_wildcard_bind_passes[localhost] PASSED         [ 92%]
+ops/test_env.py::test_catalog_opens_read_only 
+    [env] catalog  /home/ljn/projects/data/market_lake/catalog/market.duckdb  access_mode=read_only  views=150
+    [env] catalog  size=536576 mtime_moved_during_test=False  (外部 ETL 在写,非本测试所为)
+
+ops/test_env.py::test_catalog_opens_read_only PASSED                     [ 94%]
+ops/test_env.py::test_every_duckdb_connect_in_repo_is_read_only 
+    [env] 扫了 11 个 .py,可写 duckdb 连接 0 处
+
+ops/test_env.py::test_every_duckdb_connect_in_repo_is_read_only PASSED   [ 97%]
+ops/test_env.py::test_gold_and_qlib_release_are_readable 
+    [env] gold datasets = 147  <- /home/ljn/projects/data/market_lake/gold
+    [env] qlib release  <- /home/ljn/projects/data/qlib/releases/2026-08-26
+
+ops/test_env.py::test_gold_and_qlib_release_are_readable PASSED          [100%]
+
+============================== 39 passed in 0.57s ==============================

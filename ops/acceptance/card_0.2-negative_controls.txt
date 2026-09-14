@@ -1,0 +1,28 @@
+负例对照(源 repo:/data/shared/genebench/repo,不被修改)
+
+OK   nc1_writable_connect               应当报红  实际 exit=1
+       把只读连接改成可写连接
+       2 failed, 125 deselected in 0.14s
+OK   nc2_write_api_call                 应当报红  实际 exit=1
+       往 lake.py 里加一处写文件调用
+       1 failed, 126 deselected in 0.11s
+OK   nc3_write_sql_literal              应当报红  实际 exit=1
+       往 lake.py 里加一条写语义 SQL 字面量
+       1 failed, 126 deselected in 0.12s
+OK   nc4_stale_table                    应当报红  实际 exit=1
+       把 daily 的 max_date 改到冻结线之前
+       2 failed, 17 passed, 108 deselected in 0.13s
+OK   nc5_papered_over_dateless          应当报红  实际 exit=1
+       把无日期列的表 freeze_line_ok 粉饰成 true
+       1 failed, 3 passed, 123 deselected in 0.18s
+OK   nc6_missing_table                  应当报红  实际 exit=1
+       从 baseline 里删掉一张清单内的表
+       1 failed, 125 deselected in 0.11s
+OK   nc7_bypass_lake                    应当报红  实际 exit=1
+       新增一个绕过 lake.py 直连湖的模块
+       1 failed, 126 deselected in 0.12s
+OK   nc8_docstring_is_not_a_violation   应当仍绿  实际 exit=0
+       只在 docstring 里谈写操作 —— 必须仍然绿(反向对照)
+       2 passed, 125 deselected in 0.10s
+
+负例对照:8 例,不符合预期 0 例

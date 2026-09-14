@@ -1,0 +1,89 @@
+# 卡 Efin（交付终核，只读）收件箱
+
+**本卡只读**：除本文件外一个字节都没改，没提交、没推树、没碰 Release、没写 known_limits。
+取号从盘上实际最大号 **N-866** 之后起（HEAD + 工作树 + 收件箱三处一起查的）。
+
+复核的树：公开 `refs/heads/main` = `453eddf2e50eb0ff1f8a400429518456cc56b683`，
+tag 对象 `8df27b2a…`，`tag^{}` == main（无悬空），2,239 件；GeneQuant `6ce7664e…` 同值。
+Release id 387775425 / `target_commitish` 是字符串 `'main'` / 三件 asset 全 `uploaded`。
+`mk_release_manifest --check` rc=0；`freeze_v10 --check-all` rc=0，
+public 根现算 = `3e5ab441a991c4115a6c0fb988715f583e22ee303f582f1302fd3197fb183538`。
+
+## 裁定 ③ 那道门：本卡自己重跑了一遍，**七步只走到第五步**
+
+在 `GENEBENCH_ROOT=/home/ljn/genebench_scratch/Efin/gb`（临时目录）且 **`/data` 真不可达**
+的条件下跑的。卡 B9 那一轮因为 `apparmor_restrict_unprivileged_userns=1` 只能**断言**、
+不能**遮蔽**；本卡换了条路子：写了一个 `LD_PRELOAD` 垫片
+（`/home/ljn/genebench_scratch/Efin/datablock.c`，83 行 C）把 `open/openat/fopen/access/
+opendir/chdir/realpath/mkdir/unlink/execve` 与**整个 stat 族**（含 `__xstat` 兼容入口，
+一律落到 `SYS_newfstatat` 裸系统调用）对任何 `/data` 开头的路径返 `ENOENT`。
+实测 `os.path.exists('/data')` == **False**、`open()` 抛 `FileNotFoundError` ——
+这是**真拦**，不是断言。非 `/data` 路径逐条验过不受影响。
+
+| 步 | 结果 |
+| --- | --- |
+| ① clone | 绿：`453eddf2…` / 2,239 件 |
+| ② 三件附件 | 绿：README §2.1a 的 `sumc()` 函数照抄可用，4 组校验和全 OK，落位命令逐条跑通 |
+| ③ 起网关 | 绿：`selfcheck_public` 第 6 项 1 秒起来，`/healthz` 200、`channel=public`、绑显式地址 |
+| ④ 出集 | 绿：`joblist gen` → 8 个 job；`--dry` 把 8 个 job 六段全渲染出来 |
+| ⑤ 本地落位 | 绿：`runner.placement --place-exec --with-launch-data` 同步 5 棵（含 harnesses/integrations），`parity_bytes=385` |
+| ⑥ 一个 job | **跳过 —— 不是绿**。本机没有 docker、没有 key；而且**就算有也过不去**，见 N-874 |
+| ⑦ 出表 | 绿（**空表**）：`mk_tables --table main` 出 24 列表头，0 行 —— 命令通，但没有读数 |
+
+**`/data` 那一半是干净的**：整条 §2.4 走下来，垫片记录的 `/data` 访问 **0 次**，
+渲染出来的六段命令里 `/data` 字符串 **0 条**，`gateway_lock` 在临时根下 rc=0（N-838 确已消解）。
+
+**我自己独立 grep 了一遍**（不复用 `ops/test_A9.py` 的文件清单）：从入口自己建传递闭包
+（77 个文件），`/data` 命中 70 行 / 22 个文件。逐条看下来，落在 §2.4 单机路径上、
+且**真参与取值**的只剩下面登记的几条；其余是注释、docstring、双机专用文件
+（`runner/placement_dual.py` 是**刻意**的隔离，成立）。
+
+## 新登记
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| **N-867** | README §2.4 ③④ 仍教两个 `push_*_to_f02.sh`，单机新入口一个字没有 | 待裁 | `runner.placement` / `GENEBENCH_TOPOLOGY` / `--topology` / `--place-exec` 在 `README.md` 与 `docs/OPERATOR_MANUAL.md` 里 grep 命中**各 0 次**，只在 `ops/HANDOFF.md` 里有。外部单机用户照 README:561 敲的还是 rc=127（N-840）。= N-848，本轮仍开着 |
+| **N-868** | README:705-706 **主动禁止**单机用户做那件对的事 | 待裁 | 原文「把 bundle 送上执行面**只有一条路**……**不要绕过这两个脚本直接 `cp`**」。而单机形态的全部设计就是本地落位，`ops/run_joblist.py:207` 自己的报错文案写着「单机形态就在本机 cp」。这不是"没更新"，是**反向指路** |
+| **N-869** | README §2.3 ① 那条唯一要 root 的命令**端口给错了通道** | 待裁 | 写的是 `port 18080`，那是**私有**端口（`genebench_config.py:564`）；单机用户被 §2.4 ⓪ 强制走 public，公开实例是 **18081**（`genebench_config.py:654`，注释还写明"刻意与 GATEWAY_PORT 不同"）。`ops/run_joblist.py:201` 的报错文案自己就说「18080 放行、18081 没放」。失败形态极难认 |
+| **N-870** | README §2.3 ④ 让单机用户配一个**用不上**的东西 | 待裁 | 教人 `export GENEBENCH_F02=<你>@127.0.0.1` 并打通免密 ssh 到本机。而单机路径**一条 ssh 都不发**——`--dry` 的表头逐字打着「**单机：整条路径不发 ssh**」，结算那条是 `--remote-host local` |
+| **N-871** | §2.3 状态框把**已经发出去的东西**说成"排进施工" | 待裁 | 原文「**已经排进施工**（用户 2026-09-14 裁定 ①②）」。而 `runner/placement.py` **就在这棵树里**且实测可用。成因那一段（N-843）改对了、也明确拦住了读者去补基座与夹具；但这一句让读者以为新路还没有，于是不会去找它。与 N-867 是同一个洞的两面 |
+| **N-872** | 手册 §1.3 给 Mac 的那条唯一网络办法，**代码不收** | 待裁 | §1.3(1)：「Mac 上容器打宿主的规范写法是 `host.docker.internal`」。而 `runner/c41/runner_core.gateway_addr()`（:93-97）对 `GENEBENCH_GATEWAY_ADDR` 只收 `IPv4:端口`，主机名**当场抛** ValueError（"不收主机名"），`ops/run_joblist.py:367` 又在 public 下**必然**导出这个变量。手册那句已经很克制（"不替你断言 Mac 上容器一定打得通网关"），但它点名的值代码会拒 |
+| **N-873** | `ops/run_joblist.py:194-214` 的拒绝文案：单机也说 f01/f02，还带发布方 IP，末段**已过期** | 待裁 | ① 文案在 `--topology single` 下照样说「**f02** 打不到公开网关」「**f01** 起了吗」；② :201 把 `sudo ufw allow from **192.168.1.219** …` 渲染给用户 —— 那是发布方 f02 的 LAN 地址，外部用户会照着给一个陌生 IP 开口；③ :208-211 说 `pin.PROVIDER_SHA256_ROOT` 写死私有那份、要把 `expect` 按通道传 —— **那件事已经做完了**（`runner/inject.py:635` `expect=provider_pin_expect(channel)`，`PUBLIC_PROVIDER_SHA256_ROOT` 在 :532）。报错文案在教人做一件已经做完的事 |
+| **N-874** | 真跑前那一步 provider 上执行面，README / 手册**零处** | 待裁 | 本卡实测：真跑被拒的第 ② 条就是它。只在拒绝文案与 `ops/HANDOFF.md` §19.10 里有。这是「⑥ 一个 job」**就算有 docker 和 key 也走不到**的直接原因 = N-855 / N-860，从发布树上再确认一次 |
+| **N-875** | **GitHub Release 页面的正文还停在"两个附件"** | 待裁 | 匿名 GET 到的 `body` 里：小节标题「## 两个附件」、表里只有 2 件、「下载与校验（照抄）」只有 2 条 `curl`，且用的是 `sha256sum -c`、「两行都要 OK」——**没有 macOS 的 `shasum` 替代**（裁定 ④ 只改到了 README）。而 README §2.1a 说第三件「**缺了它公开冻结根核不绿、题也跑不起来**」。Release 页是外部用户最先看到的那一屏，且**不在树里**，任何树内的门都管不到它 |
+| **N-876** | `ops/export_bundle.py:247` 打给用户看的"下一步"是双机的 | 待裁 | 手工出集时打印「下一步：`ops/push_bundle_to_f02.sh` … `/data/genebench_runner/<run>/runner/tasks` …」。`ops/test_A9.py:484` **明知**地豁免了它（理由："一句提示文案，不参与取值"）——作为**字面量**判据这成立，但它是用户会照着敲的文案 |
+| **N-877** | `ops/mk_tables.py:295` 把发布方路径写进回填报告 | 待裁 | `write_backfill_report` 的「怎么用」块里 `PY=/data/shared/genebench/env/bin/python; cd /data/shared/genebench/repo`。入口是 `ops/results_db.py:723`（`ingest --report`）。= N-850，再确认一次 |
+| **N-878** | `--check-plane` 只活在 `--help` 和报错文案里 | 待裁 | README / `docs/OPERATOR_MANUAL.md` 里 0 处，只有 `ops/HANDOFF.md`。而拒绝文案第一句就让用户"只探用 `--check-plane`" |
+| **N-879** | 「零次」这个判据的**措辞**与实现不是同一句话 | 登记不修 | 用户裁定 ③ 写的是「`/data` 字面量出现**零次**」；`ops/test_A9.py` 实现的是「**未豁免的**零次」＋一个逐字闭集 `DATA_LITERAL_EXEMPT` ＋一条防死条目的门。实现**更可用**（闭集 + 每条写理由 + 漂移即红），本卡不建议改实现；只建议别让后来人把"零次"读成字面意思 |
+
+## 本卡跑过的门（逐条红绿）
+
+| 门 | 结果 |
+| --- | --- |
+| `ops/selfcheck_public.py`（落位**前**） | 绿 2 / 红 1 / 跳过 2 / 登记在案 1，rc=1（红的那条是本机真没 docker） |
+| `ops/selfcheck_public.py`（落位**后**） | **绿 5 / 红 1 / 跳过 0 / 登记在案 0**，rc=1（同上）。第 5 项从"登记在案"转绿 = 第三件附件确实闭上了那个缺件 |
+| `ops/mk_release_manifest.py --check` | **rc=0**，`releasable=True` |
+| `ops/freeze_v10.py --check-all`（不带 `--write`） | **rc=0**，三条轴逐条一致 |
+| 手册点名给外部用户的四个（`test_harness_contract` / `test_p2_contract` / `test_integrations_readme` / `test_operator_manual`） | **351 passed, 1 skipped** |
+| `ops/test_Y.py` | **32 passed**；`pytest ops/ --collect-only` 数得到 **33** 项 → **确在常规套件里**（裁定"保留"成立） |
+| `ops/test_readme.py` / `test_docs_consistency.py` / `test_release_manifest.py` | **251 passed, 2 skipped** |
+| `ops/test_A9.py` / `ops/test_single_machine.py` | **39 passed, 2 skipped, 3 xfailed** |
+| `ops/test_env.py`（README 明写不是给外部跑的） | 6 failed / 57 passed / 1 skipped —— 与 README 记的 macOS 那次（10 failed / 52 passed / 2 skipped）不同机器不同数，不算矛盾 |
+
+**一条要记下来的**：上面那三条文档门 **251 passed 全绿**，却没拦住 N-867/N-868。
+`ops/test_readme.py` 与 `ops/test_docs_consistency.py` 里
+`placement` / `topology` / `single` / `push_exec` 的 grep 命中 **0**——
+**这两道门对单机路径没有任何断言**。要让这类漏下次自己显形，门里得有一条
+「README §2.4 里每一条命令，在 `--topology single` 下都得是真入口」。
+
+## 两遍扫描
+
+* `w_scan_stale`（跑在克隆树上）：(a) 11 / (b) 285 / (c) 37 —— 与卡 D9 同值，树没动过。
+  逐条看下来 **(a) 没有真错**（11 条全是上游 commit / npm shasum / jsonl 里的表达式数据，
+  是**钉住的第三方标识**，不是会随重打树失效的终值）。
+* **本卡把扫描扩到了"会打印给用户看的 `.py`"**（`w_scan_stale` 自己只扫 `.md`）：
+  按 AST 取 `print` / `raise` / `argparse help|description|epilog` 里的字符串常量，
+  21 处命中 / 14 个文件。判下来真正够得上"会误导外部用户"的是 N-876 与 N-877；
+  发布方 IP 那 2 处是 `runner_core.py:96` 的**格式举例**（"例 192.168.1.48:18081"），
+  判为无害。**扫描器有一处盲区**：它只看字符串常量，`ops/run_joblist.py:201`
+  那条是 **f-string**，靠人工看才发现（N-873）——下次谁接这把扫描器，把 `JoinedStr` 也收进去。

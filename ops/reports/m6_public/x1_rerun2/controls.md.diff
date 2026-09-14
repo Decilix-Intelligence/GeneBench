@@ -1,0 +1,25 @@
+--- /data/shared/genebench/repo/ops/reports/public/controls.md	2026-09-08 03:15:26.188242811 +0000
++++ /data/shared/genebench/repo/ops/reports/m6_public/x1_rerun2/controls.md	2026-09-11 08:39:09.489665155 +0000
+@@ -7,14 +7,14 @@
+ 复现这一跑（**照抄整条**；`GB=/data/shared/genebench`、`PY=$GB/env/bin/python`）：
+ 
+ ```bash
+-cd $GB/repo && ulimit -n 8192 && ops/public_gateway.sh run -- env GENEBENCH_CHANNEL=public PYTHONDONTWRITEBYTECODE=1 $PY ops/run_controls.py --answer-root /data/shared/genebench/reference/tasks/public/v1.0-smoke-public --gateway-log /data/shared/genebench/logs/gateway_access_public.jsonl --out /data/shared/genebench/repo/ops/reports/public
++cd $GB/repo && ulimit -n 8192 && ops/public_gateway.sh run -- env GENEBENCH_CHANNEL=public PYTHONDONTWRITEBYTECODE=1 $PY ops/run_controls.py --answer-root /data/shared/genebench/reference/tasks/public/v1.0-smoke-public --gateway-log /data/shared/genebench/logs/gateway_access_public.jsonl --out /data/shared/genebench/repo/ops/reports/m6_public/x1_rerun2
+ ```
+ 
+ > 三样缺一不可：`--answer-root`、`--gateway-log`、**`GENEBENCH_CHANNEL`**。只换前两样而不换通道，跑出来的是「题集与日志是公开的、读的表是私有的」——报告头会照实打印通道，但数字看起来都对。本脚本对这一种组合**拒绝启动**。
+ 
+ | 题 | 桩 | 判定 | 依据 | 效果分 |
+ | --- | --- | --- | --- | --- |
+-| s1-cor-01 | oracle | ✅ | validity=valid；violation 族 无；finding 0 条 | effect=100.0（出数） |
++| s1-cor-01 | oracle | ❌ | validity=invalid；violation 族 ['fetch_clock']；finding 601 条 | effect=None（出数） |
+ | s1-cor-01 | null | ✅ | run_status=malformed，桶=malformed → SR 记 0 | effect=None |
+ | s1-cor-01 | filler | · | silent_completion=未命中；gate_failed=['underdetermined']；validity=invalid | effect=None |
+ | s2-cor-01 | oracle | ✅ | validity=valid；violation 族 无；finding 0 条 | effect=75.0（出数） |
+@@ -42,4 +42,4 @@
+ | s8-cor-01 | null | ✅ | run_status=malformed，桶=malformed → SR 记 0 | effect=None |
+ | s8-cor-01 | filler | · | silent_completion=未命中；gate_failed=['underdetermined']；validity=invalid | effect=None |
+ 
+-**三条判据全过**：① oracle 每族零 finding；② null 产物 SR 记 0；③ filler 在 s7-rob-02 上命中 silent_completion 且 effect 为 null。
++**三条判据**未全过****：① oracle 每族零 finding；② null 产物 SR 记 0；③ filler 在 s7-rob-02 上命中 silent_completion 且 effect 为 null。

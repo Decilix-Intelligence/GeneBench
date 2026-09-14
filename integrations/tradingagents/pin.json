@@ -1,0 +1,17 @@
+{
+  "paper_url": "https://arxiv.org/abs/2412.20138",
+  "repo_url": "https://github.com/TauricResearch/TradingAgents",
+  "commit": "2448d0a12576f9b2ddcd5980a0630833423d1e1b",
+  "commit_ref": "tag v0.4.0",
+  "dist": null,
+  "dist_repo_url": null,
+  "dist_note": "**不从 PyPI 装。** PyPI 上的 `tradingagents` 属于 Mai0313/tradingagents，不是文献里那个 TauricResearch/TradingAgents —— 两者同名、是两个项目（N-51）。所以 dist / dist_repo_url 留空，钉的是 git commit 与源码压缩包的字节摘要。",
+  "source_tarball": "https://codeload.github.com/TauricResearch/TradingAgents/tar.gz/2448d0a12576f9b2ddcd5980a0630833423d1e1b",
+  "source_sha256": "f4f81e7538992b094a0610d38c919cc2777344bf4ebee55d740818fc323db94d",
+  "license": "Apache-2.0",
+  "version_declared": "0.4.0",
+  "runnable_check": "python3 -c \"import tradingagents, tradingagents.dataflows.interface as i; print(len(i.VENDOR_METHODS), len(i.TOOLS_CATEGORIES))\"",
+  "runnable_check_result": "11 6",
+  "retrieved_at": "2026-09-07T08:24:00+00:00",
+  "note": "codeload 的 tar.gz 在 f02 构建网里不可达（实测 curl 超时），源码在本地 Mac 下载后经 f01 两跳 scp 到 f02 的构建上下文；sha256 与 runner/c42/upstream_pins.py::PINS['tradingagents'].dist_sha256 逐字相同（独立复核）。requires-python >=3.10，实际装在基座的 3.12 上。"
+}

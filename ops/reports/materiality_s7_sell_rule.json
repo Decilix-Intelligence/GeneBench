@@ -1,0 +1,234 @@
+{
+ "harness": "ops/screen_runner.py",
+ "patch": "P-SELL",
+ "impls": {
+  "B1": {
+   "src": "/data/shared/genebench/snapshots/v1/epsilon/impl_v2_b1.py",
+   "src_sha256": "01dd4ed17db5708cf3a60e32b85b960e4ca22a6e3e7d6270f3559347bf260c54",
+   "patch": "P-SELL",
+   "patched_sha256": "1a2bdce32e47e672e250c3d8e34e1eb10d37b5c763f593a11d139cd963efad4e",
+   "anchors": [
+    "INPUT = HERE / \"bt_input_csi300_v2.parquet\"",
+    "            (hold > 0) & (~is_target[t]) & sella"
+   ]
+  },
+  "B2": {
+   "src": "/data/shared/genebench/snapshots/v1/epsilon/impl_v2_b2.py",
+   "src_sha256": "83a8134750746b2f64ce180eb21b1b8f57aeaefa8e590aaddb65d417bb0f982a",
+   "patch": "P-SELL",
+   "patched_sha256": "0dd4a45a976eda240691eceaca66bd3863e55793bc18dc6cf92bda993061d76f",
+   "anchors": [
+    "INPUT = os.path.join(BASE, \"bt_input_csi300_v2.p",
+    "                cand = held[~np.isin(held, tgt)]"
+   ]
+  },
+  "B3": {
+   "src": "/data/shared/genebench/snapshots/v1/epsilon/impl_v2_b3.py",
+   "src_sha256": "c97dfe5b113e592488d5d8e6f0a5a901d39a48734fc7041562ac98ed04ce55dd",
+   "patch": "P-SELL",
+   "patched_sha256": "48431ac7b920098cbb383e49d630e37b972f33b74e229d29641a3010cd8c454a",
+   "anchors": [
+    "INPUT = os.path.join(HERE, \"bt_input_csi300_v2.p",
+    "            cand = held & ~target_mask[t] & can_"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "impl": "B1",
+   "freq": "daily",
+   "env": {
+    "GB_SELL_RULE": "dropped_from_target"
+   },
+   "wall_s": 1.25,
+   "out_sha256": "3df0fb869778ab132596e8c93628155f7c337521a460b82217ee6897f418df4f",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B1",
+   "freq": "daily",
+   "env": {
+    "GB_SELL_RULE": "worst_n_drop"
+   },
+   "wall_s": 1.25,
+   "out_sha256": "cd6d21e023cb9424d6f06d949338842a4d7eb015b9c405ab15606f677bc55218",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B2",
+   "freq": "daily",
+   "env": {
+    "GB_SELL_RULE": "dropped_from_target"
+   },
+   "wall_s": 1.43,
+   "out_sha256": "3acf8cddaa857025c485dc89d8ff6c8d754f398fb72866563aa0b2d9d0c59a86",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B2",
+   "freq": "daily",
+   "env": {
+    "GB_SELL_RULE": "worst_n_drop"
+   },
+   "wall_s": 1.37,
+   "out_sha256": "a2a2c7245d305aaa233d0fa6f61c5ddf66fd0548274011c8bd08baddc225800f",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B3",
+   "freq": "daily",
+   "env": {
+    "GB_SELL_RULE": "dropped_from_target"
+   },
+   "wall_s": 0.72,
+   "out_sha256": "a9801a7e7c3faa4a340dc925af421a2398a108509b43fa36208735f732965602",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B3",
+   "freq": "daily",
+   "env": {
+    "GB_SELL_RULE": "worst_n_drop"
+   },
+   "wall_s": 0.73,
+   "out_sha256": "3996f63eb3c92a1d960707d8ddd03f1122a344b3c674da7f1209420c93846b45",
+   "stderr_tail": ""
+  }
+ ],
+ "gates": {},
+ "screen": {
+  "field": "sell_rule",
+  "values": [
+   "dropped_from_target",
+   "worst_n_drop"
+  ],
+  "by_impl": {
+   "B1": "material",
+   "B2": "material",
+   "B3": "material"
+  },
+  "diffs": [
+   {
+    "impl": "B1",
+    "metric": "ann_return_gross",
+    "why": "0.004460 vs ε=0.002372",
+    "a": 0.05534877102065461,
+    "b": 0.05559674387676128
+   },
+   {
+    "impl": "B1",
+    "metric": "ann_vol_net",
+    "why": "0.000139 vs ε=0.000075",
+    "a": 0.23205557579081026,
+    "b": 0.23202329010719414
+   },
+   {
+    "impl": "B1",
+    "metric": "total_cost",
+    "why": "0.002803 vs ε=0.001008",
+    "a": 0.45565434421839224,
+    "b": 0.45693496198682504
+   },
+   {
+    "impl": "B1",
+    "metric": "turnover_one_way_mean",
+    "why": "0.003466 vs ε=0.000014",
+    "a": 0.10356093428258474,
+    "b": 0.10392111339611473
+   },
+   {
+    "impl": "B1",
+    "metric": "turnover_two_way_mean",
+    "why": "0.003457 vs ε=0.000014",
+    "a": 0.20746423074273754,
+    "b": 0.20818388574772562
+   },
+   {
+    "impl": "B2",
+    "metric": "ann_return_gross",
+    "why": "0.003780 vs ε=0.002372",
+    "a": 0.05543641860012283,
+    "b": 0.05564677668272355
+   },
+   {
+    "impl": "B2",
+    "metric": "ann_vol_net",
+    "why": "0.000158 vs ε=0.000075",
+    "a": 0.23206710730171393,
+    "b": 0.23203045564470828
+   },
+   {
+    "impl": "B2",
+    "metric": "max_drawdown_net",
+    "why": "0.000212 vs ε=0.000176",
+    "a": -0.5290574251835549,
+    "b": -0.5291696463463288
+   },
+   {
+    "impl": "B2",
+    "metric": "total_cost",
+    "why": "0.002632 vs ε=0.001008",
+    "a": 0.4553480048156921,
+    "b": 0.45654983035402624
+   },
+   {
+    "impl": "B2",
+    "metric": "turnover_one_way_mean",
+    "why": "0.003446 vs ε=0.000014",
+    "a": 0.10356189873834307,
+    "b": 0.10391999585350124
+   },
+   {
+    "impl": "B2",
+    "metric": "turnover_two_way_mean",
+    "why": "0.003437 vs ε=0.000014",
+    "a": 0.20746615121656997,
+    "b": 0.20818161967360024
+   },
+   {
+    "impl": "B3",
+    "metric": "ann_return_gross",
+    "why": "0.003780 vs ε=0.002372",
+    "a": 0.055436418600122606,
+    "b": 0.05564677668272311
+   },
+   {
+    "impl": "B3",
+    "metric": "ann_vol_net",
+    "why": "0.000158 vs ε=0.000075",
+    "a": 0.23206710730171398,
+    "b": 0.2320304556447083
+   },
+   {
+    "impl": "B3",
+    "metric": "max_drawdown_net",
+    "why": "0.000212 vs ε=0.000176",
+    "a": -0.5290574251835536,
+    "b": -0.5291696463463283
+   },
+   {
+    "impl": "B3",
+    "metric": "total_cost",
+    "why": "0.002632 vs ε=0.001008",
+    "a": 0.4553480048156921,
+    "b": 0.45654983035402624
+   },
+   {
+    "impl": "B3",
+    "metric": "turnover_one_way_mean",
+    "why": "0.003446 vs ε=0.000014",
+    "a": 0.10356189873834307,
+    "b": 0.10391999585350124
+   },
+   {
+    "impl": "B3",
+    "metric": "turnover_two_way_mean",
+    "why": "0.003437 vs ε=0.000014",
+    "a": 0.20746615121656997,
+    "b": 0.20818161967360024
+   }
+  ],
+  "cross_impl_divergence": [],
+  "verdict": "material"
+ }
+}

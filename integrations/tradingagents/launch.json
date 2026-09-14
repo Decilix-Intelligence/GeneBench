@@ -1,0 +1,8 @@
+{
+  "harness": "tradingagents",
+  "paradigm": "P2",
+  "image": "gb-tradingagents-u:r1",
+  "command": ["sh", "-c", "export HOME=/tmp/h XDG_CACHE_HOME=/tmp/h/.cache; mkdir -p $$HOME /tmp/ta && cd /task && exec python3 /opt/tradingagents_glue/run.py"],
+  "env_required": ["GENEBENCH_GATEWAY", "OPENAI_BASE_URL", "OPENAI_API_KEY"],
+  "notes": "TauricResearch/TradingAgents v0.4.0（commit 2448d0a1）接成 P2 被测方：原生 vendor 表整表换成经网关的实现，LLM 经边车（langchain-openai + openai_compatible provider），产物经 emit。落盘全在 /tmp（不进 /task，P8 文件集封闭）。命令里的 $$ 是两个美元号（N-101）。"
+}

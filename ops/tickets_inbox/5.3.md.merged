@@ -1,0 +1,9 @@
+# 卡 5.3 票据收件箱（作业清单运行器）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **默认预算档的 `max_tokens=600_000` 与它自己写的换算规则矛盾** | 待裁定 | `runner/registry.py` 的 `BUDGET_TIERS` 注释把 tokens 定义成「档位调用数 × 每次 prompt 量级（取 60k/次）」，据此 S4=150×60k=9M、S7=300×60k=18M。**默认档按同一条规则应当是 100×60k=6M，实际写的是 600k**（= 10 次调用的量）。三条同向实测：`ops/reports/a4/records.json` 里 s2-cor-01 的 strict/doc/hint 三臂全部在第 19–24 次调用撞 **token** 闸（`budget_exceeded`），`ops/reports/v1demo/` 本卡这一批同样如此；`ops/HANDOFF.md` 14.4 §3 早就写着「接入验证一律 3M」。后果不是一条显眼的错误，是 **agent 做到一半自己放弃、分数照出**（`BUDGET_TIERS` 自己的注释：「它长得像结论」）。**建议：把默认档 `max_tokens` 抬到 6,000,000**（只往上抬，`assert_registry_sane` 的「档位只能往上抬」判据不受影响）。这是预算裁定，不在本卡授权路径（本卡对 registry 只许加 `RUNNER_CONCURRENCY`）。 |
+| N-? | `run_id` 不含 batch，重跑同一个 `job_id` 无路可走 | 登记 | `runner/inject.py` 见到已存在的 run dir 直接抛（F9：不覆盖遥测），而 `run_id` = `<task>.<arm>.<config>.rNN` 不带 batch。于是 `--retry-status failed` 只在「上一轮根本没建出 run dir」时才走得通；真要重跑一次已经落过盘的 run，只能换 batch 或换 seed。运行器把这件事写进了 docstring，但**正解是给 run_id 加批次前缀**（卡 5.4 也记了同一条）。 |
+| N-? | 结算/入库是 batch 粒度，续跑会把整批重新拉一遍 | 登记 | `ops/score_runs.py` 的 `--batch` 是整批 rsync + 整批重算，`results_db.backfill_batch` 也是整批。续跑第二次时前面已 done 的 run 会被重新结算一次（结果一致 → `ingest` 判重跳过，不出错，只是慢）。题量上到几十道之后值得做成增量。 |
+| N-? | `ops/reports/<batch>/table_*.csv` 有两条生成路径 | 登记（与 5.4 同一条） | `ops/score_runs.py` 自己出一份，`ops/mk_tables.py` 从库出一份，本卡的 `--tables` 会用后者覆盖前者。5.4 核过 14 批逐字节相同，但两条路并存迟早会漂。收口卡把 `score_runs` 的出表换成 `mk_tables.write_table`。 |
+| N-? | 适配赛道表（`--tables adaptation`）在本批出不来 | 登记 | 库里适配赛道一条记录都没有（`ops/reports/adapt/records.json` 是空的，真跑被红线 B2 闸住 —— 5.4 的 `v11_deferred` 已记）。通路是通的：`ops/run_joblist.py --tables a,b,adaptation` 会调 `mk_tables --table adaptation`，零记录时它出一张空表。本批只出了 a / b 两张。 |

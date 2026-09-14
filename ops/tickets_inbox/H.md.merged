@@ -1,0 +1,11 @@
+# 卡 H（签字包两份 + 发布清单终核）票据收件箱
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **签字包按通道各出一份** | **已做** | `ops/archive_signoff.py` 新增 `--channel private\|public\|both`（默认 `both` = **各出一份，不是出一份混的**）。私有 `ops/reports/signed/v1.0.16_r1.0.23/`（33 件），公开 `ops/reports/signed/public_vp1.0.0_r1.0.23/`（27 件），共有 8 件两份都收且逐字节相同。`MANIFEST.json` 多两个字段：`channel` 与 `counterpart`（另一份包的目录名），包内 README 第一行写通道、正文指得到另一份。判据 `ops/test_h.py`（25 条）。 |
+| N-? | 归档清单劈成三组 | **已做** | `SHARED_ITEMS`（跨通道口径件：已知限制 / 报告规格 / 两份演练 / 投放说明）+ `PRIVATE_ITEMS`（`m6_all` 的表、`m6` 三控与破坏样本、oracle 与实例层 O1、跨版本探针、适配赛道）+ `PUBLIC_ITEMS`（`m6_public` 的表与报告、公开侧 O1、公开包自足性两件）。`ITEMS = 三组之和`**保持不变** —— `ops/test_V2.py` / `test_wrapup.py` / `test_V2rt.py` 问的「这一件在不在归档清单里」是个与通道无关的问题。按通道取用 `items_for(channel)`。 |
+| N-? | 公开包新收三件 | **已做** | `m6_public/summary.md`（红队最终轮之后它顶部落着四行通道口径：通道 / 标定 / 网关日志 / 题集根 —— 没有它，包里那张公开主表读不出「用哪套面算的」）、`m6_public/g1_public_provider_rerun.md`（N-611 闭合证据：18 个 run 跑在**真公开 provider** 上，`features` 下 `bj*` 0 个）、`g2_public_tree_scoring.md`（公开树能跑结算：断链 0、树内 320 passed）。三件本轮之前都没进过任何签字包。 |
+| N-? | 私有包沿用历史目录名 | **已做（并说明）** | 私有仍是 `v<任务集>_<参考面>`，**没有**加 `private_` 前缀：`ops/test_wrapup.py:47` / `ops/test_V2.py:60` / `ops/test_V2rt.py:281` 三处都按这个式子**现算**路径，改名等于把三份测试一起改红，而它们问的「当前轴上有没有签过字的包」不该因为命名体例变了就没了答案。通道写在 `MANIFEST.channel` 与包内 README 第一行；公开那份用 `public_` 前缀且它的 `set_version` 本身带 `p`（`public_vp1.0.0_r1.0.23`），一眼看得出。**代价如实记：光看私有那个目录名看不出通道。** |
+| N-? | 两处 `declared_but_missing` 判据按通道核 | **已做（定点改别人的测试文件）** | `ops/test_wrapup.py:128` 与 `ops/test_V2.py:243` 原本按**两条通道的并集**核 `set(files) \| set(declared_but_missing) == set(ITEMS) \| set(ROOT_ITEMS)`。签字包按通道出两份之后，公开那十九件在私有包里既不在 `files` 也不该记进缺件（它们不是「缺了」，是**不属于这条通道**），这条判据恒红。按 `ops/test_c41.py:366` / `ops/test_c65.py` 的先例做幂等定点替换：`AS.ITEMS` → `AS.items_for("private")`，各一行，其余判据一个字没动。补丁脚本 `$GB/scratch/H/patch_tests_h.py`（已改过会跳过）。 |
+| N-? | **发布清单终核** | **已做** | 五条 blocker **全部 `satisfied=true`**、`missing=[]`、`releasable=true`、`ops/mk_release_manifest.py --check` **退 0**。逐条证据路径见 `RELEASE_MANIFEST.json` 的 `blockers[].evidence`（`ops/test_h.py::test_每条blocker都留了证据路径_且路径真的存在` 逐条核过路径真的在盘上）。 |
+| N-? | 各批主表口径统一 | **已核（红队最终轮已做，本卡只复核）** | 21 个批的 `table_main.csv` 表头**全部**是换列之后的 `Cell%`（⑥-c），0 个还停在 `Align`。`ops/test_h.py::test_各批主表的表头都是换列之后的口径` 盯住这件事。`table_a` / `table_b` 照旧归档但不在任何一份包的 `tables.release` 里（⑥-b / ⑪）。 |

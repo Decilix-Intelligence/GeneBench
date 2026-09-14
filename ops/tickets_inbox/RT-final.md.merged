@@ -1,0 +1,14 @@
+# 最终卡 · 红队最终轮修复（RT-final，2026-09-12）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **公开通道结算读私有标定 / 私有网关日志 / 私有题集根**（红队最终轮 block 1） | **已做** | `scorer/l3.load_calibration()` 的默认值 → `cfg.calibration_path()`；`ops/score_runs.py` 的 `--gateway-log` / `--ref-tasks` 默认值 → `cfg.gateway_access_log()` / `ref_tasks_for_channel()`，标定**显式**读出来传进 `score_run`，并加与 `ops/run_controls` 同样的混通道拦截。`m6_public` 重结算：主表与 Table A 逐字节相同，变的是 3 条记录的 4 个诊断值（s5 两臂 `tau`、s4/s7 `max_band_ratio`）；旧 18 行标 `superseded`，新 18 行入库。证据 `ops/reports/m6_public/summary.md`、`ops/test_rtfinal.py`（13 条） |
+| N-? | **VERSIONS.md 陈一版且缺公开轴**（block 2） | **已做** | 轴表与 §4 历史表重出（1.0.16 / p1.0.0 / r1.0.23，三条根现算）；新增 §1.1a「公开通道的任务集轴」；§4 那条「REVISIONS 只有 6 条」的历史遗留注按裁定 ⑦ 的现状改写 |
+| N-? | **21 个批里 20 个的主表表头还是 `Align`**（block 3） | **已做** | 按各批 `table_main.axes.json` 记的筛选重出 21 张 × 3 格式 + 84 件指标表；筛选补 `superseded=None`；各批的 caption 与 `\label` 从 HEAD 取回（重出时一度全变成 `tab:main`，`ops/test_V2.py::test_各批的latex_label互异` 当场抓到） |
+| N-? | **要发的这一版没有签字包**（block 4） | **已做** | `ops/reports/signed/v1.0.16_r1.0.23/`（49 件）；旧包 `v1.0.15_r1.0.22/` 保留并加 `SUPERSEDED_NOTE.md`（它的 `m6_public__*` 几件是 N-611 作废的污染读数、表头还是 `Align`） |
+| N-? | **发布清单没在本轮改动之后重跑**（major 5） | **已做** | `ops/mk_release_manifest.py` 重出 + `--check` 退 0；`public_channel_zero_runs` 的 `status_now` 由「8 / 18」变成「18 / 18」；5 个手写件的 sha 重新对上；`releasable=true`（裁定 ⑨ 之后 blocker 五条全闭） |
+| N-? | **`axes` 段没有公开轴**（major 6） | **已做** | 加 `public_set_version` / `public_set_root`（源 `ops/manifests/v1.0-smoke-public.json`）；`versions_doc_drift` 认得 VERSIONS.md 里新增的公开轴行（否则它会拿公开根去比私有根）；`_BOLD_VERSION` 正则补 `p` 前缀；`ops/test_release_manifest.py` 加两条断言 |
+| N-? | **版本锁自检只锁一条轴**（major 7） | **已做** | `ops/freeze_v10.py --check-all`：三条轴各重建 → 比根 → 逐段报差异；手册形态① 的自检步改成调用它；无开关那条分支的成功文案自己写明「只核了私有任务集轴」 |
+| N-? | 两份收尾报告（v1 / v2）的轴与 blocker 停在当天 | **已做** | 正文一个字没动，各加一段「现值更新」；`ops/test_wrapup.py` / `ops/test_V2.py` 的相关断言由「钉死那一天」改成「正文留历史 + 现值必须在报告里写明」——判据没放宽，多拦了一件事（报告不写现值就红） |
+| N-? | `ops/reports/v1_0_readiness.md` 的版本轴陈值（N-572 的私有那一半） | **已做** | `$PY ops/readiness_report.py --batch m6,m6b` 重出，现在写 1.0.16 / `d9ebd5412ac4cc7e…` 与 r1.0.23 / `dddabe440163b36e…` |
+| N-? | 三条 minor + 手册一处命令 | **登记不修** | `report_spec_v1.md` 的 `—` vs `unobservable` 优先级、两条通道 provider 钉子长度不对称（8 位 vs 16 位）、`mk_tables` 照抄 `--out` 缺失；逐条见 `ops/reports/known_limits_v1.md` 最后一节。`scores/` 里混着两批跨轴读数那一条已按「留证据、不删」挪目录处理 |

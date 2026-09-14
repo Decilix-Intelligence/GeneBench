@@ -1,0 +1,38 @@
+# 卡 1.2-fix2 验收:负控
+# 2026-08-31T15:45:31Z
+
+=== A. 全历史独立复算(不分年,按 code 顺序走)===
+[PASS] 全历史 rows — 产物 15,073,606 vs 独立复算 15,073,606
+[PASS] 全历史 suspend — 产物 472,920 vs 独立复算 472,920
+[PASS] 全历史 no_data — 产物 18,709 vs 独立复算 18,709
+[PASS] 全历史 suspend_d_S — 产物 450,823 vs 独立复算 450,823
+[PASS] 全历史 carried_after_S — 产物 22,097 vs 独立复算 22,097
+
+=== B. 负控:把判定逐条退化,看断言会不会红 ===
+[PASS] B1 去掉顺延会改变结论 — 正确 ['suspend', 'suspend', 'suspend'] vs 退化 ['suspend', 'no_data', 'no_data']
+[PASS] B2 哨兵 up=100000/down=0.01 被识别(旧阈值也能罩住) — 旧阈值 up>=100000.0 能罩住它
+[PASS] B2 哨兵 up=1000000/down=0.01 被识别(旧阈值也能罩住) — 旧阈值 up>=100000.0 能罩住它
+[PASS] B2 哨兵 up=999999.999/down=0.01 被识别(旧阈值也能罩住) — 旧阈值 up>=100000.0 能罩住它
+[PASS] B2 哨兵 up=99999.999/down=0.01 被识别(**旧阈值漏掉**(751 行)) — 旧阈值 up>=100000.0 **不能**罩住它
+[PASS] B2 哨兵 up=99999.99/down=0 被识别(**旧阈值漏掉**(267 行)) — 旧阈值 up>=100000.0 **不能**罩住它
+[PASS] B2 哨兵 up=0/down=0 被识别(**旧阈值漏掉**(28 行);up_limit=0 连「大于阈值」都不是) — 旧阈值 up>=100000.0 **不能**罩住它
+[PASS] B2b 旧阈值确实漏掉一族哨兵 — 旧阈值漏掉 [(99999.999, 0.01), (99999.99, 0.0), (0.0, 0.0)]
+[PASS] B2c 正常价格不被误判成哨兵
+[PASS] B2d 88888.9/0.02 -> no_price_limit=True(没见过的编码,band≈1.0,旧阈值罩不住)
+[PASS] B2d 4321/0.03 -> no_price_limit=True(量级像价格但带宽荒谬,两个旧阈值都罩不住)
+[PASS] B2d 12.5/10.5 -> no_price_limit=False(正常 ±8.7% 带,不许误判)
+[PASS] B2d 6.21/2.41 -> no_price_limit=False(真实上界:新股首日 ±44% 档(601975.SH@2019-01-08))
+[PASS] B3 用 high 才看得见炸板
+[PASS] B4 盘中停牌不许判 suspend
+[PASS] B5 洞会切断顺延
+[PASS] B6 carry_in 生效
+
+=== C. 篡改产物 -> 验收测试必须红 ===
+[PASS] C1 篡改 status 后自洽检查变红 — ============ short test summary info ============================
+FAILED ops/test_tradability.py::test_status_is_reproducible_from_its_own_row
+1 failed in 4.47s
+[PASS] C2 还原后恢复绿 —                                                         [100%]
+1 passed in 4.46s
+
+============================================================
+负控 PASS(全部)

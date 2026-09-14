@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s3-cor-01",
+  "probe": "factor_degeneracy",
+  "name": "常数输出不报警",
+  "why": "因子退化必须报警而非静默通过",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "degeneracy_unreported"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:degeneracy_unreported [factor_degeneracy] @$.payload.degeneracy — 常数输出没有报警 —— 因子退化必须报警而非静默通过"
+ ]
+}

@@ -1,0 +1,1 @@
+slots: [quantiles, tie_handling, weighting, rebalance_timing, holding_periods, ic_method, annualization, uncertainty_method]

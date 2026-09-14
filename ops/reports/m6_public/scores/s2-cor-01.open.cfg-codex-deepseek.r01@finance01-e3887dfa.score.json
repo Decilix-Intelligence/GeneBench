@@ -1,0 +1,111 @@
+{
+ "scorer_output": {
+  "schema_version": "1.0",
+  "validity": "invalid",
+  "gate_failed": [
+   "lookahead"
+  ],
+  "unobservable": [],
+  "correctness": {
+   "n_cells": 166800,
+   "n_gold_rows": 41700,
+   "n_rows_missing": 2228,
+   "Align": 1.0,
+   "Adj": 1.0,
+   "Cal": 0.9772727272727273,
+   "CellAgree": 0.9465707434052758,
+   "Decl": 1.0,
+   "Set": 1.0
+  },
+  "effect": null
+ },
+ "record": {
+  "task_id": "s2-cor-01",
+  "stage": "S2",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "open",
+  "seq": 1,
+  "run_id": "s2-cor-01.open.cfg-codex-deepseek.r01@finance01-e3887dfa",
+  "set_version": "p1.0.0",
+  "reference_version": "r1.0.23",
+  "runner_version": "a22b0bf33fa61061a153e029b9f8d045661625c46321a023243bbbf74d8b775d",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "violation",
+  "sr_bucket": "scorable",
+  "validity": "invalid",
+  "malformed": false,
+  "gate_failed": [
+   "lookahead"
+  ],
+  "unobservable": [],
+  "probe_states": {
+   "adjust_fingerprint": "clean",
+   "attribution_conservation": "clean",
+   "calendar": "clean",
+   "declared_reads": "clean",
+   "factor_degeneracy": "clean",
+   "fetch_clock": "clean",
+   "input_ablation": "clean",
+   "ledger_conservation": "clean",
+   "lookahead": "violation",
+   "nonfinite_propagation": "clean",
+   "optimizer_failure": "clean",
+   "pit_universe": "clean",
+   "source_status": "clean",
+   "underdetermined": "clean",
+   "unsupported_operator": "clean",
+   "warmup_boundary": "clean"
+  },
+  "findings": [
+   "violation:lookahead_attempt [lookahead] @$gateway_log — 2 次请求**显式**越过 as-of 边界被拒（{'universe_asof_after_asof': 2}）—— 例：GET /universe params={'as_of': '2026-07-31', 'date': '2026-08-03'} as_of=2026-07-31。被拒 ≠ 没发生：挡住它的是网关，不是被测方的克制"
+  ],
+  "l3_kind": "align",
+  "l3_pass": false,
+  "l3_score": 0.9809608676695009,
+  "effect": null,
+  "effect_withheld_reason": null,
+  "anchor": null,
+  "correctness": {
+   "n_cells": 166800,
+   "n_gold_rows": 41700,
+   "n_rows_missing": 2228,
+   "Align": 1.0,
+   "Adj": 1.0,
+   "Cal": 0.9772727272727273,
+   "CellAgree": 0.9465707434052758,
+   "Decl": 1.0,
+   "Set": 1.0
+  },
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "",
+  "steps": 42,
+  "tokens_prompt": 1738067,
+  "tokens_completion": 49351,
+  "cost_usd": 0.8298928,
+  "cost_model": "deepseek-chat",
+  "latency_s": 291.515,
+  "validator_rejections": null,
+  "overreach": {
+   "denied": 6,
+   "total": 310,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "adjustment_mode_not_in_v1": 3,
+    "universe_asof_after_asof": 2,
+    "open_range_would_cross_asof": 1
+   },
+   "malformed_requests": 67,
+   "malformed_reasons": {
+    "unclassified": 50,
+    "asof_missing": 5,
+    "param_malformed": 12
+   }
+  },
+  "unbounded_requests": 1,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": []
+ }
+}

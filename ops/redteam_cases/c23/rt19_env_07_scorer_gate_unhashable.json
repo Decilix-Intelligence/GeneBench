@@ -1,0 +1,21 @@
+{
+ "kind": "scorer",
+ "artifact": {
+  "schema_version": "1.0",
+  "task_id": "T-sample",
+  "config_id": "cfg-sample",
+  "arm": "strict",
+  "seed": 0,
+  "stage": "S7",
+  "validity": "invalid",
+  "gate_failed": [
+   [
+    "underdetermined"
+   ]
+  ],
+  "correctness": {
+   "exec": 1.0
+  },
+  "effect": null
+ }
+}

@@ -1,0 +1,2655 @@
+{
+  "returns": {
+    "method": "卡 2.1a 的口径：逐票取两条通道都有收盘价的交易日，在那条序列上求 close-to-close 收益率，比 |r_public − r_private|。收益率是归一化不变量 —— 两条 provider 各自以冻结线重定基，价格水平本就相同，但收益率即使重定基口径变了也不动。",
+    "calendar_identical": true,
+    "calendar_days": 4269,
+    "coverage": {
+      "codes_public": 3575,
+      "codes_private": 5817,
+      "codes_common": 3575,
+      "codes_only_private": 2242,
+      "codes_only_public": 0,
+      "codes_only_private_bse": 336,
+      "codes_only_private_by_board": {
+        "bse": 336,
+        "chinext": 756,
+        "main": 811,
+        "other": 3,
+        "star": 336
+      },
+      "note": "公开通道只建了 v1 三宇宙的并集（N-68 裁定），所以「只在私有」不等于「公开源没有」—— 但其中北交所那一档是**真缺口**：baostock 不服务北交所。"
+    },
+    "missing_days": {
+      "public_short_of_private": 5,
+      "private_short_of_public": 0,
+      "codes_with_day_gap": 5
+    },
+    "price_level": {
+      "what": "同一批日子上**复权收盘价**的相对差 |c_pub − c_priv| / max(|c_pub|,|c_priv|)。两条 provider 都以冻结线重定基（factor=1），所以价位本身就该可比。",
+      "cells": 10948502,
+      "agree_at_1e-6": 1869441,
+      "agree_rate": 0.17074856450681564,
+      "quantiles": {
+        "n": 10948502,
+        "min": 0.0,
+        "p10": 0.0,
+        "p50": 3.5373248465475626e-05,
+        "p90": 0.00024313696194440133,
+        "p99": 0.000722856196225621,
+        "p999": 0.4941577911376953,
+        "max": 0.9480888247489929
+      }
+    },
+    "attribution": {
+      "over": 52482,
+      "raw_quote_step": 12,
+      "adjustment_step": 52424,
+      "neither": 46,
+      "rule": {
+        "decomposition": "Δlog(1+r) = Δlog(原始收盘之比) + Δlog(factor 之比)",
+        "raw_quote_step": "**源报价**在这两天里走了不同的台阶（小数位 / 历史修订 / 停牌填值）。",
+        "adjustment_step": "**复权因子**在这两天里走了不同的台阶 —— 除权除息的处理不同。",
+        "neither": "两项都在 1e-6 之内，收益率却差更多。**这一类要逐条看**（一般是浮点相消）。"
+      }
+    },
+    "level_scale": {
+      "what": "同一票上「公开复权价 / 私有复权价」这个比值。两条通道各自以冻结线重定基，但**归一化常数不一定相同** —— 比值只要是常数，收益率就不受影响。`within_code_spread` = 该票全历史上这个比值的 max/min − 1：接近 0 说明差异纯粹是一个常数，收益率级的一致率才是有意义的判据。",
+      "codes": 3575,
+      "constant_ratio_spread_threshold": 0.001,
+      "codes_constant_ratio": 3517,
+      "codes_drifting_ratio": 58,
+      "median_ratio": {
+        "n": 3575,
+        "min": 0.05191299135830392,
+        "p10": 0.9999207623899545,
+        "p50": 1.0,
+        "p90": 1.0000687830938106,
+        "p99": 1.0003464594644351,
+        "p999": 1.0089234618627503,
+        "max": 1.202140823639208
+      },
+      "within_code_spread": {
+        "n": 3575,
+        "min": 0.0,
+        "p10": 7.918728876785686e-05,
+        "p50": 0.00032900612608011137,
+        "p90": 0.0007178608320183688,
+        "p99": 0.02720393744667072,
+        "p999": 2.0001270936599687,
+        "max": 5.233256201941112
+      },
+      "worst_by_spread": [
+        {
+          "code": "001914.SZ",
+          "median_ratio": 0.5418254214071747,
+          "within_code_spread": 5.233256201941112
+        },
+        {
+          "code": "302132.SZ",
+          "median_ratio": 0.2570822506464613,
+          "within_code_spread": 4.976000846707202
+        },
+        {
+          "code": "001872.SZ",
+          "median_ratio": 0.3711224292535703,
+          "within_code_spread": 2.52730683818142
+        },
+        {
+          "code": "000670.SZ",
+          "median_ratio": 1.0,
+          "within_code_spread": 2.000297597327561
+        },
+        {
+          "code": "000587.SZ",
+          "median_ratio": 1.0,
+          "within_code_spread": 2.000000552610501
+        },
+        {
+          "code": "000981.SZ",
+          "median_ratio": 1.0,
+          "within_code_spread": 1.1664108426117075
+        },
+        {
+          "code": "000536.SZ",
+          "median_ratio": 1.0,
+          "within_code_spread": 0.540255061633363
+        },
+        {
+          "code": "600610.SH",
+          "median_ratio": 1.0,
+          "within_code_spread": 0.5399948338095073
+        },
+        {
+          "code": "600871.SH",
+          "median_ratio": 1.0,
+          "within_code_spread": 0.5004568444168771
+        },
+        {
+          "code": "600688.SH",
+          "median_ratio": 1.0000796446734252,
+          "within_code_spread": 0.5002879591801477
+        }
+      ],
+      "worst_by_median": [
+        {
+          "code": "600087.SH",
+          "median_ratio": 0.05191299135830392,
+          "within_code_spread": 5.2827271872502024e-05
+        },
+        {
+          "code": "600069.SH",
+          "median_ratio": 0.10293079632047117,
+          "within_code_spread": 3.1333968505631304e-05
+        },
+        {
+          "code": "302132.SZ",
+          "median_ratio": 0.2570822506464613,
+          "within_code_spread": 4.976000846707202
+        },
+        {
+          "code": "001872.SZ",
+          "median_ratio": 0.3711224292535703,
+          "within_code_spread": 2.52730683818142
+        },
+        {
+          "code": "001914.SZ",
+          "median_ratio": 0.5418254214071747,
+          "within_code_spread": 5.233256201941112
+        },
+        {
+          "code": "600321.SH",
+          "median_ratio": 0.7692675374479945,
+          "within_code_spread": 0.30013878901048874
+        },
+        {
+          "code": "002713.SZ",
+          "median_ratio": 0.7772661207546822,
+          "within_code_spread": 0.28684012295514205
+        },
+        {
+          "code": "000001.SZ",
+          "median_ratio": 1.202140823639208,
+          "within_code_spread": 0.20217332072376482
+        },
+        {
+          "code": "600837.SH",
+          "median_ratio": 0.8645111932839841,
+          "within_code_spread": 0.1567731714588021
+        },
+        {
+          "code": "600633.SH",
+          "median_ratio": 0.8690120744261149,
+          "within_code_spread": 0.15090569420181077
+        }
+      ]
+    },
+    "full": {
+      "codes": 3575,
+      "return_pairs": 10944927,
+      "agree_at_1e-6": 10892445,
+      "agree_rate": 0.9952049017777825,
+      "pairs_over_material": 123,
+      "codes_over_material": 59,
+      "frac_within": {
+        "1e-06": 0.9952049017777825,
+        "0.0001": 0.9985301866334969,
+        "0.001": 0.9999887619168223
+      },
+      "dev_quantiles": {
+        "n": 10944927,
+        "min": 0.0,
+        "p10": 0.0,
+        "p50": 2.5789862689862275e-08,
+        "p90": 8.002901950021624e-08,
+        "p99": 1.4094760501848215e-07,
+        "p999": 0.00015320366909150028,
+        "max": 4.963830947875977
+      },
+      "codes_all_agree": 52,
+      "worst_codes": [
+        {
+          "code": "001914.SZ",
+          "board": "main",
+          "pairs": 4147,
+          "max_abs_dev": 4.963830947875977
+        },
+        {
+          "code": "302132.SZ",
+          "board": "chinext",
+          "pairs": 3775,
+          "max_abs_dev": 4.683765888214111
+        },
+        {
+          "code": "001872.SZ",
+          "board": "main",
+          "pairs": 3975,
+          "max_abs_dev": 2.53875732421875
+        },
+        {
+          "code": "000587.SZ",
+          "board": "main",
+          "pairs": 2840,
+          "max_abs_dev": 1.5270441770553589
+        },
+        {
+          "code": "000670.SZ",
+          "board": "main",
+          "pairs": 2350,
+          "max_abs_dev": 0.950711727142334
+        },
+        {
+          "code": "000536.SZ",
+          "board": "main",
+          "pairs": 4038,
+          "max_abs_dev": 0.8683603405952454
+        },
+        {
+          "code": "000981.SZ",
+          "board": "main",
+          "pairs": 3302,
+          "max_abs_dev": 0.8202570080757141
+        },
+        {
+          "code": "000750.SZ",
+          "board": "main",
+          "pairs": 3587,
+          "max_abs_dev": 0.5958997011184692
+        },
+        {
+          "code": "600610.SH",
+          "board": "main",
+          "pairs": 3501,
+          "max_abs_dev": 0.4507947564125061
+        },
+        {
+          "code": "600751.SH",
+          "board": "main",
+          "pairs": 3808,
+          "max_abs_dev": 0.3871016204357147
+        },
+        {
+          "code": "000011.SZ",
+          "board": "main",
+          "pairs": 4210,
+          "max_abs_dev": 0.3771255612373352
+        },
+        {
+          "code": "600321.SH",
+          "board": "main",
+          "pairs": 3610,
+          "max_abs_dev": 0.2900528907775879
+        },
+        {
+          "code": "600871.SH",
+          "board": "main",
+          "pairs": 4098,
+          "max_abs_dev": 0.2865660786628723
+        },
+        {
+          "code": "600688.SH",
+          "board": "main",
+          "pairs": 4214,
+          "max_abs_dev": 0.2836757004261017
+        },
+        {
+          "code": "002713.SZ",
+          "board": "main",
+          "pairs": 2987,
+          "max_abs_dev": 0.2339525818824768
+        }
+      ]
+    },
+    "stratified": {
+      "codes": 200,
+      "return_pairs": 620129,
+      "agree_at_1e-6": 617147,
+      "agree_rate": 0.9951913230956785,
+      "pairs_over_material": 0,
+      "codes_over_material": 0,
+      "frac_within": {
+        "1e-06": 0.9951913230956785,
+        "0.0001": 0.9985680398755743,
+        "0.001": 1.0
+      },
+      "dev_quantiles": {
+        "n": 620129,
+        "min": 0.0,
+        "p10": 0.0,
+        "p50": 2.5607503673086285e-08,
+        "p90": 7.996750213123961e-08,
+        "p99": 1.4061699346257228e-07,
+        "p999": 0.00014329690323216956,
+        "max": 0.0008480297401547432
+      },
+      "codes_all_agree": 2,
+      "worst_codes": [
+        {
+          "code": "002882.SZ",
+          "board": "main",
+          "pairs": 2195,
+          "max_abs_dev": 0.0008480297401547432
+        },
+        {
+          "code": "002321.SZ",
+          "board": "main",
+          "pairs": 3967,
+          "max_abs_dev": 0.0008471483015455306
+        },
+        {
+          "code": "002103.SZ",
+          "board": "main",
+          "pairs": 3943,
+          "max_abs_dev": 0.0007913163281045854
+        },
+        {
+          "code": "002668.SZ",
+          "board": "main",
+          "pairs": 3246,
+          "max_abs_dev": 0.0007705262978561223
+        },
+        {
+          "code": "605296.SH",
+          "board": "main",
+          "pairs": 1255,
+          "max_abs_dev": 0.0007613837369717658
+        },
+        {
+          "code": "300350.SZ",
+          "board": "chinext",
+          "pairs": 3193,
+          "max_abs_dev": 0.0007426673546433449
+        },
+        {
+          "code": "002563.SZ",
+          "board": "main",
+          "pairs": 3721,
+          "max_abs_dev": 0.0007285938481800258
+        },
+        {
+          "code": "601899.SH",
+          "board": "main",
+          "pairs": 4225,
+          "max_abs_dev": 0.0007188442978076637
+        },
+        {
+          "code": "601799.SH",
+          "board": "main",
+          "pairs": 3709,
+          "max_abs_dev": 0.0007045057136565447
+        },
+        {
+          "code": "601669.SH",
+          "board": "main",
+          "pairs": 3476,
+          "max_abs_dev": 0.0007008749525994062
+        },
+        {
+          "code": "002594.SZ",
+          "board": "main",
+          "pairs": 3652,
+          "max_abs_dev": 0.0006909353542141616
+        },
+        {
+          "code": "603843.SH",
+          "board": "main",
+          "pairs": 2281,
+          "max_abs_dev": 0.0006744201527908444
+        },
+        {
+          "code": "603323.SH",
+          "board": "main",
+          "pairs": 2348,
+          "max_abs_dev": 0.000673936097882688
+        },
+        {
+          "code": "603195.SH",
+          "board": "main",
+          "pairs": 1574,
+          "max_abs_dev": 0.0006659463979303837
+        },
+        {
+          "code": "002965.SZ",
+          "board": "main",
+          "pairs": 1641,
+          "max_abs_dev": 0.0006575474399141967
+        }
+      ],
+      "stratum_sizes": {
+        "chinext": 38,
+        "main": 146,
+        "star": 16
+      }
+    }
+  },
+  "calibration": {
+    "sources": {
+      "public": "/data/shared/genebench/snapshots/public_v1/calibration.json",
+      "private": "/data/shared/genebench/snapshots/v1/calibration.json",
+      "public_sha256": "cf45c2dfad8493b62cbbdb2e1e2fb5b61cb82be79a230ec38e649719bca275e0",
+      "private_sha256": "6920dd1fb6804aff820bc312c252a8016cfa01b08990d991d4335454b26f8161",
+      "public_built_at": "2026-09-07T11:03:01+00:00",
+      "private_built_at": "2026-09-01T10:11:06+00:00"
+    },
+    "tau": {
+      "public": {
+        "value": 0.9839810664562939,
+        "universe": "csi300",
+        "start": "2015-05-29",
+        "end": "2026-07-31",
+        "comparable_factors": 159,
+        "factors_used": 141,
+        "cells_used": 379950,
+        "excluded_operator_conflict": [
+          "gtja_191.005",
+          "gtja_191.044",
+          "gtja_191.085",
+          "gtja_191.117",
+          "worldquant_101.004",
+          "worldquant_101.026",
+          "worldquant_101.029",
+          "worldquant_101.035",
+          "worldquant_101.038",
+          "worldquant_101.052",
+          "worldquant_101.066",
+          "worldquant_101.073",
+          "worldquant_101.084"
+        ],
+        "degenerate_cells_removed": 16986
+      },
+      "private": {
+        "value": 0.9840059556217291,
+        "universe": "csi300",
+        "start": "2015-05-29",
+        "end": "2026-07-31",
+        "comparable_factors": 159,
+        "factors_used": 141,
+        "cells_used": 379950,
+        "excluded_operator_conflict": [
+          "gtja_191.005",
+          "gtja_191.044",
+          "gtja_191.085",
+          "gtja_191.117",
+          "worldquant_101.004",
+          "worldquant_101.026",
+          "worldquant_101.029",
+          "worldquant_101.035",
+          "worldquant_101.038",
+          "worldquant_101.052",
+          "worldquant_101.066",
+          "worldquant_101.073",
+          "worldquant_101.084"
+        ],
+        "degenerate_cells_removed": 16987
+      },
+      "delta_abs": 2.4889165435193483e-05,
+      "delta_rel": 2.529371422296692e-05,
+      "same_factors_used": true,
+      "same_cells_used": true,
+      "same_operator_conflicts": true
+    },
+    "epsilon_by_frequency": {
+      "daily": {
+        "public": {
+          "calibrated": [
+            "ann_return_gross",
+            "ann_return_net",
+            "ann_vol_net",
+            "max_drawdown_net",
+            "sharpe_net",
+            "total_cost",
+            "turnover_one_way_mean",
+            "turnover_two_way_mean",
+            "win_rate_net"
+          ],
+          "implausible": [],
+          "no_freedom": [],
+          "n_calibrated": 9,
+          "n_implausible": 0,
+          "n_no_freedom": 0,
+          "usable": true,
+          "epsilon": {
+            "ann_return_gross": 0.00512451349304595,
+            "ann_return_net": 0.00027571768075396186,
+            "ann_vol_net": 9.667188085405075e-05,
+            "max_drawdown_net": 3.745596156599482e-05,
+            "sharpe_net": 0.009340599143368175,
+            "total_cost": 2.850604135317977e-06,
+            "turnover_one_way_mean": 1.6500131604170237e-05,
+            "turnover_two_way_mean": 1.665389023460425e-05,
+            "win_rate_net": 0.0016519823788545898
+          },
+          "tolerance_kind": {
+            "ann_return_gross": "relative",
+            "ann_return_net": "absolute",
+            "ann_vol_net": "relative",
+            "max_drawdown_net": "relative",
+            "sharpe_net": "relative",
+            "total_cost": "relative",
+            "turnover_one_way_mean": "relative",
+            "turnover_two_way_mean": "relative",
+            "win_rate_net": "relative"
+          },
+          "status": {
+            "ann_return_gross": "calibrated",
+            "ann_return_net": "calibrated",
+            "ann_vol_net": "calibrated",
+            "max_drawdown_net": "calibrated",
+            "sharpe_net": "calibrated",
+            "total_cost": "calibrated",
+            "turnover_one_way_mean": "calibrated",
+            "turnover_two_way_mean": "calibrated",
+            "win_rate_net": "calibrated"
+          }
+        },
+        "private": {
+          "calibrated": [
+            "ann_return_gross",
+            "ann_return_net",
+            "ann_vol_net",
+            "max_drawdown_net",
+            "sharpe_net",
+            "total_cost",
+            "turnover_one_way_mean",
+            "turnover_two_way_mean"
+          ],
+          "implausible": [],
+          "no_freedom": [
+            "win_rate_net"
+          ],
+          "n_calibrated": 8,
+          "n_implausible": 0,
+          "n_no_freedom": 1,
+          "usable": true,
+          "epsilon": {
+            "ann_return_gross": 0.0023715703958198733,
+            "ann_return_net": 0.00012405026030160027,
+            "ann_vol_net": 7.453562271987931e-05,
+            "max_drawdown_net": 0.00017609593643301493,
+            "sharpe_net": 0.004387188894937694,
+            "total_cost": 0.0010084598333818802,
+            "turnover_one_way_mean": 1.3969265290944861e-05,
+            "turnover_two_way_mean": 1.3885208414764633e-05,
+            "win_rate_net": null
+          },
+          "tolerance_kind": {
+            "ann_return_gross": "relative",
+            "ann_return_net": "absolute",
+            "ann_vol_net": "relative",
+            "max_drawdown_net": "relative",
+            "sharpe_net": "relative",
+            "total_cost": "relative",
+            "turnover_one_way_mean": "relative",
+            "turnover_two_way_mean": "relative",
+            "win_rate_net": "relative"
+          },
+          "status": {
+            "ann_return_gross": "calibrated",
+            "ann_return_net": "calibrated",
+            "ann_vol_net": "calibrated",
+            "max_drawdown_net": "calibrated",
+            "sharpe_net": "calibrated",
+            "total_cost": "calibrated",
+            "turnover_one_way_mean": "calibrated",
+            "turnover_two_way_mean": "calibrated",
+            "win_rate_net": "no_implementation_freedom"
+          }
+        },
+        "same_usable": true,
+        "calibrated_only_public": [
+          "win_rate_net"
+        ],
+        "calibrated_only_private": [],
+        "same_implausible": true,
+        "epsilon_rel_delta": {
+          "ann_return_gross": 1.160810196517215,
+          "ann_return_net": 1.2226287964540858,
+          "ann_vol_net": 0.2969889742165862,
+          "max_drawdown_net": 0.7872979790181435,
+          "sharpe_net": 1.1290624513902607,
+          "total_cost": 0.99717330919789,
+          "turnover_one_way_mean": 0.181173902887071,
+          "turnover_two_way_mean": 0.199397930310904,
+          "win_rate_net": null
+        }
+      },
+      "weekly": {
+        "public": {
+          "calibrated": [
+            "ann_return_net",
+            "ann_vol_net",
+            "max_drawdown_net",
+            "sharpe_net",
+            "total_cost",
+            "turnover_one_way_mean",
+            "turnover_two_way_mean",
+            "win_rate_net"
+          ],
+          "implausible": [
+            "ann_return_gross"
+          ],
+          "no_freedom": [],
+          "n_calibrated": 8,
+          "n_implausible": 1,
+          "n_no_freedom": 0,
+          "usable": false,
+          "epsilon": {
+            "ann_return_gross": null,
+            "ann_return_net": 0.0069766492170696415,
+            "ann_vol_net": 0.003888847884489023,
+            "max_drawdown_net": 0.00046950104327605027,
+            "sharpe_net": 0.06017099702491173,
+            "total_cost": 0.04780569040330898,
+            "turnover_one_way_mean": 0.0013049101494909089,
+            "turnover_two_way_mean": 0.0012676910543021269,
+            "win_rate_net": 0.004985153454864051
+          },
+          "tolerance_kind": {
+            "ann_return_gross": "relative",
+            "ann_return_net": "absolute",
+            "ann_vol_net": "relative",
+            "max_drawdown_net": "relative",
+            "sharpe_net": "relative",
+            "total_cost": "relative",
+            "turnover_one_way_mean": "relative",
+            "turnover_two_way_mean": "relative",
+            "win_rate_net": "relative"
+          },
+          "status": {
+            "ann_return_gross": "implausible_stop_and_report",
+            "ann_return_net": "calibrated",
+            "ann_vol_net": "calibrated",
+            "max_drawdown_net": "calibrated",
+            "sharpe_net": "calibrated",
+            "total_cost": "calibrated",
+            "turnover_one_way_mean": "calibrated",
+            "turnover_two_way_mean": "calibrated",
+            "win_rate_net": "calibrated"
+          }
+        },
+        "private": {
+          "calibrated": [
+            "ann_return_net",
+            "ann_vol_net",
+            "max_drawdown_net",
+            "sharpe_net",
+            "total_cost",
+            "turnover_one_way_mean",
+            "turnover_two_way_mean",
+            "win_rate_net"
+          ],
+          "implausible": [
+            "ann_return_gross"
+          ],
+          "no_freedom": [],
+          "n_calibrated": 8,
+          "n_implausible": 1,
+          "n_no_freedom": 0,
+          "usable": false,
+          "epsilon": {
+            "ann_return_gross": null,
+            "ann_return_net": 0.0070928402811061275,
+            "ann_vol_net": 0.003924518281038826,
+            "max_drawdown_net": 0.0007163909958620219,
+            "sharpe_net": 0.06157873887713959,
+            "total_cost": 0.04817354832129197,
+            "turnover_one_way_mean": 0.0013313608069351842,
+            "turnover_two_way_mean": 0.0012955968949081018,
+            "win_rate_net": 3.6427395345062914e-06
+          },
+          "tolerance_kind": {
+            "ann_return_gross": "relative",
+            "ann_return_net": "absolute",
+            "ann_vol_net": "relative",
+            "max_drawdown_net": "relative",
+            "sharpe_net": "relative",
+            "total_cost": "relative",
+            "turnover_one_way_mean": "relative",
+            "turnover_two_way_mean": "relative",
+            "win_rate_net": "relative"
+          },
+          "status": {
+            "ann_return_gross": "implausible_stop_and_report",
+            "ann_return_net": "calibrated",
+            "ann_vol_net": "calibrated",
+            "max_drawdown_net": "calibrated",
+            "sharpe_net": "calibrated",
+            "total_cost": "calibrated",
+            "turnover_one_way_mean": "calibrated",
+            "turnover_two_way_mean": "calibrated",
+            "win_rate_net": "calibrated"
+          }
+        },
+        "same_usable": true,
+        "calibrated_only_public": [],
+        "calibrated_only_private": [],
+        "same_implausible": true,
+        "epsilon_rel_delta": {
+          "ann_return_gross": null,
+          "ann_return_net": 0.016381457840802537,
+          "ann_vol_net": 0.009089114636602278,
+          "max_drawdown_net": 0.3446301726460044,
+          "sharpe_net": 0.02286084252288041,
+          "total_cost": 0.00763609762622364,
+          "turnover_one_way_mean": 0.019867384788925278,
+          "turnover_two_way_mean": 0.021538983858057453,
+          "win_rate_net": 1367.5176795215746
+        }
+      },
+      "monthly": {
+        "public": {
+          "calibrated": [
+            "ann_return_net",
+            "ann_vol_net",
+            "max_drawdown_net",
+            "turnover_one_way_mean",
+            "turnover_two_way_mean",
+            "win_rate_net"
+          ],
+          "implausible": [
+            "ann_return_gross",
+            "sharpe_net",
+            "total_cost"
+          ],
+          "no_freedom": [],
+          "n_calibrated": 6,
+          "n_implausible": 3,
+          "n_no_freedom": 0,
+          "usable": false,
+          "epsilon": {
+            "ann_return_gross": null,
+            "ann_return_net": 0.016471283088627664,
+            "ann_vol_net": 0.02774292692385428,
+            "max_drawdown_net": 0.027820713463370214,
+            "sharpe_net": null,
+            "total_cost": null,
+            "turnover_one_way_mean": 0.018142061323975837,
+            "turnover_two_way_mean": 0.01809904633555597,
+            "win_rate_net": 0.01235687814591517
+          },
+          "tolerance_kind": {
+            "ann_return_gross": "relative",
+            "ann_return_net": "absolute",
+            "ann_vol_net": "relative",
+            "max_drawdown_net": "relative",
+            "sharpe_net": "relative",
+            "total_cost": "relative",
+            "turnover_one_way_mean": "relative",
+            "turnover_two_way_mean": "relative",
+            "win_rate_net": "relative"
+          },
+          "status": {
+            "ann_return_gross": "implausible_stop_and_report",
+            "ann_return_net": "calibrated",
+            "ann_vol_net": "calibrated",
+            "max_drawdown_net": "calibrated",
+            "sharpe_net": "implausible_stop_and_report",
+            "total_cost": "implausible_stop_and_report",
+            "turnover_one_way_mean": "calibrated",
+            "turnover_two_way_mean": "calibrated",
+            "win_rate_net": "calibrated"
+          }
+        },
+        "private": {
+          "calibrated": [
+            "ann_return_net",
+            "ann_vol_net",
+            "max_drawdown_net",
+            "turnover_one_way_mean",
+            "turnover_two_way_mean",
+            "win_rate_net"
+          ],
+          "implausible": [
+            "ann_return_gross",
+            "sharpe_net",
+            "total_cost"
+          ],
+          "no_freedom": [],
+          "n_calibrated": 6,
+          "n_implausible": 3,
+          "n_no_freedom": 0,
+          "usable": false,
+          "epsilon": {
+            "ann_return_gross": null,
+            "ann_return_net": 0.016540533050920514,
+            "ann_vol_net": 0.027765344953689708,
+            "max_drawdown_net": 0.027779008031820276,
+            "sharpe_net": null,
+            "total_cost": null,
+            "turnover_one_way_mean": 0.01806641176495549,
+            "turnover_two_way_mean": 0.01802621501333322,
+            "win_rate_net": 0.01235687814591517
+          },
+          "tolerance_kind": {
+            "ann_return_gross": "relative",
+            "ann_return_net": "absolute",
+            "ann_vol_net": "relative",
+            "max_drawdown_net": "relative",
+            "sharpe_net": "relative",
+            "total_cost": "relative",
+            "turnover_one_way_mean": "relative",
+            "turnover_two_way_mean": "relative",
+            "win_rate_net": "relative"
+          },
+          "status": {
+            "ann_return_gross": "implausible_stop_and_report",
+            "ann_return_net": "calibrated",
+            "ann_vol_net": "calibrated",
+            "max_drawdown_net": "calibrated",
+            "sharpe_net": "implausible_stop_and_report",
+            "total_cost": "implausible_stop_and_report",
+            "turnover_one_way_mean": "calibrated",
+            "turnover_two_way_mean": "calibrated",
+            "win_rate_net": "calibrated"
+          }
+        },
+        "same_usable": true,
+        "calibrated_only_public": [],
+        "calibrated_only_private": [],
+        "same_implausible": true,
+        "epsilon_rel_delta": {
+          "ann_return_gross": null,
+          "ann_return_net": 0.004186682622601214,
+          "ann_vol_net": 0.0008074104561935183,
+          "max_drawdown_net": 0.0015013290432172727,
+          "sharpe_net": null,
+          "total_cost": null,
+          "turnover_one_way_mean": 0.004187304042692636,
+          "turnover_two_way_mean": 0.00404030031644897,
+          "win_rate_net": 0.0
+        }
+      }
+    },
+    "ic_family": {
+      "public": {
+        "usable": false,
+        "usable_metrics": [
+          "coverage",
+          "icir",
+          "mean",
+          "std"
+        ],
+        "calibrated": [
+          "coverage",
+          "icir",
+          "mean",
+          "std"
+        ],
+        "implausible": [
+          "positive_ratio"
+        ],
+        "no_freedom": [],
+        "no_pair": [
+          "ci_high",
+          "ci_low"
+        ],
+        "sample_coverage": {
+          "csi1000|2026-01-05..2026-06-30": {
+            "n_factors": 792,
+            "n_rows": 2376
+          },
+          "csi300|2026-01-05..2026-06-30": {
+            "n_factors": 792,
+            "n_rows": 2376
+          },
+          "csi500|2026-01-05..2026-06-30": {
+            "n_factors": 792,
+            "n_rows": 2376
+          }
+        },
+        "band_rule": "ε = 分歧分布的 P90 × 1.5。2.2b 是「全对最大差 × 1.5」，那里样本面只有 3 个数；这里样本面是 N 因子 × M 宇宙的分布，取最大 = 让带被最病态的因子绑架。P90 是 τ 的 P10 的镜像（同样允许 10% 的尾巴落在带外）。每条带同时报 P50/P95/P99/max 与 epsilon_if_max_rule。",
+        "bands": {
+          "1": {
+            "ci_high": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "ci_low": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "coverage": {
+              "epsilon": 0.025435636196768266,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            },
+            "icir": {
+              "epsilon": 1.2265399218135855,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "mean": {
+              "epsilon": 0.012838503686825629,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "positive_ratio": {
+              "epsilon": null,
+              "status": "implausible_stop_and_report",
+              "tolerance_kind": "relative"
+            },
+            "std": {
+              "epsilon": 0.025583592526387287,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            }
+          },
+          "20": {
+            "ci_high": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "ci_low": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "coverage": {
+              "epsilon": 0.025440426365105986,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            },
+            "icir": {
+              "epsilon": 0.5730034338352292,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "mean": {
+              "epsilon": 0.006742554802373308,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "positive_ratio": {
+              "epsilon": null,
+              "status": "implausible_stop_and_report",
+              "tolerance_kind": "relative"
+            },
+            "std": {
+              "epsilon": 0.03821831146992763,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            }
+          },
+          "5": {
+            "ci_high": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "ci_low": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "coverage": {
+              "epsilon": 0.025396270230706106,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            },
+            "icir": {
+              "epsilon": 0.33038478713238917,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "mean": {
+              "epsilon": 0.0029338162458059703,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "positive_ratio": {
+              "epsilon": null,
+              "status": "implausible_stop_and_report",
+              "tolerance_kind": "relative"
+            },
+            "std": {
+              "epsilon": 0.03609693579217515,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            }
+          }
+        }
+      },
+      "private": {
+        "usable": false,
+        "usable_metrics": [
+          "coverage",
+          "icir",
+          "mean",
+          "std"
+        ],
+        "calibrated": [
+          "coverage",
+          "icir",
+          "mean",
+          "std"
+        ],
+        "implausible": [
+          "positive_ratio"
+        ],
+        "no_freedom": [],
+        "no_pair": [
+          "ci_high",
+          "ci_low"
+        ],
+        "sample_coverage": {
+          "csi1000|2026-01-05..2026-06-30": {
+            "n_factors": 792,
+            "n_rows": 2376
+          },
+          "csi300|2026-01-05..2026-06-30": {
+            "n_factors": 792,
+            "n_rows": 2376
+          },
+          "csi500|2026-01-05..2026-06-30": {
+            "n_factors": 792,
+            "n_rows": 2376
+          }
+        },
+        "band_rule": "ε = 分歧分布的 P90 × 1.5。2.2b 是「全对最大差 × 1.5」，那里样本面只有 3 个数；这里样本面是 N 因子 × M 宇宙的分布，取最大 = 让带被最病态的因子绑架。P90 是 τ 的 P10 的镜像（同样允许 10% 的尾巴落在带外）。每条带同时报 P50/P95/P99/max 与 epsilon_if_max_rule。",
+        "bands": {
+          "1": {
+            "ci_high": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "ci_low": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "coverage": {
+              "epsilon": 0.025435636196768266,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            },
+            "icir": {
+              "epsilon": 1.226370754645666,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "mean": {
+              "epsilon": 0.0128374744906527,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "positive_ratio": {
+              "epsilon": null,
+              "status": "implausible_stop_and_report",
+              "tolerance_kind": "relative"
+            },
+            "std": {
+              "epsilon": 0.02559146020698687,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            }
+          },
+          "20": {
+            "ci_high": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "ci_low": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "coverage": {
+              "epsilon": 0.025440426365105986,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            },
+            "icir": {
+              "epsilon": 0.5729499898472904,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "mean": {
+              "epsilon": 0.006742106611907312,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "positive_ratio": {
+              "epsilon": null,
+              "status": "implausible_stop_and_report",
+              "tolerance_kind": "relative"
+            },
+            "std": {
+              "epsilon": 0.03824296134780587,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            }
+          },
+          "5": {
+            "ci_high": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "ci_low": {
+              "epsilon": null,
+              "status": "no_pair_in_qlib_path",
+              "tolerance_kind": "relative"
+            },
+            "coverage": {
+              "epsilon": 0.025396270230706106,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            },
+            "icir": {
+              "epsilon": 0.3304374370784736,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "mean": {
+              "epsilon": 0.002938276237074108,
+              "status": "calibrated",
+              "tolerance_kind": "absolute"
+            },
+            "positive_ratio": {
+              "epsilon": null,
+              "status": "implausible_stop_and_report",
+              "tolerance_kind": "relative"
+            },
+            "std": {
+              "epsilon": 0.03612394676913754,
+              "status": "calibrated",
+              "tolerance_kind": "relative"
+            }
+          }
+        }
+      },
+      "same_usable_metrics": true,
+      "same_unusable_split": true,
+      "band_rel_delta": {
+        "1": {
+          "ci_high": null,
+          "ci_low": null,
+          "coverage": 0.0,
+          "icir": 0.00013794129326613798,
+          "mean": 8.017123412222505e-05,
+          "positive_ratio": null,
+          "std": 0.0003074338289393055
+        },
+        "20": {
+          "ci_high": null,
+          "ci_low": null,
+          "coverage": 0.0,
+          "icir": 9.327862620797454e-05,
+          "mean": 6.647632435904145e-05,
+          "positive_ratio": null,
+          "std": 0.0006445598617236308
+        },
+        "5": {
+          "ci_high": null,
+          "ci_low": null,
+          "coverage": 0.0,
+          "icir": 0.0001593340831775826,
+          "mean": 0.0015178937949614656,
+          "positive_ratio": null,
+          "std": 0.0007477305050585074
+        }
+      }
+    },
+    "ready_for_scoring": {
+      "public": false,
+      "private": false,
+      "note": "两条通道都写着 false，理由同一条老问题：`ready_for_scoring = epsilon.usable`，而后者要求三个频率全 usable，weekly/monthly 按 2.2b 纪律永远不会 usable。改它等于改判据口径，要签字（卡 1.2 / 1.1-b 都提过）。"
+    }
+  },
+  "gold": {
+    "method": "三宇宙各抽 30 个因子（种子 20260907，从两条通道都有的因子里取），固定日期窗 20260105..20260630（与 IC-ε 判据窗同窗），逐格算对称相对差；超阈的格子逐个归因到 provider 侧的源差异。",
+    "threshold": 0.001,
+    "differs_floor": 1e-06,
+    "lookback_trading_days": 250,
+    "attribution_rule": {
+      "same_day_source_diff": "该 (票, 日) 的 provider 8 个字段里至少一个两通道不同",
+      "source_diff_within_lookback": "该票在 [t-250, t] 内某一天有 provider 格差异 —— 因子有滚动窗口，源差会往后传",
+      "cross_sectional_same_day": "本票的输入没变，但**同截面别的票**在这一天变了。792 条因子里大量用截面算子（rank / scale / 截面回归），一只票的报价变了会改整个截面的名次 —— 只看本票的输入解释不了这种格。**这是弱归因**：在这个样本上它几乎总是成立，所以它有信息量的方向是反的 —— 只有当它**不**成立时，才是真的归不掉。",
+      "unattributed": "上面三条都不成立。**这一类要逐条看** —— 它意味着两条通道的输入相同而输出不同，那不是数据源差异。"
+    },
+    "by_universe": {
+      "csi300": {
+        "factors_sampled": [
+          "gtja_191.105",
+          "gtja_191.108",
+          "gtja_191.159",
+          "gtja_191.189",
+          "local_core_v1.liquidity_20",
+          "qlib_alpha158.IMXD30",
+          "qlib_alpha158.KUP2",
+          "qlib_alpha158.ROC10",
+          "qlib_alpha158.RSV60",
+          "qlib_alpha158.STD30",
+          "qlib_alpha158.VSUMD10",
+          "qlib_alpha158.VSUMN20",
+          "qlib_alpha158.WVMA5",
+          "qlib_alpha360.CLOSE13",
+          "qlib_alpha360.CLOSE20",
+          "qlib_alpha360.CLOSE34",
+          "qlib_alpha360.CLOSE45",
+          "qlib_alpha360.CLOSE57",
+          "qlib_alpha360.HIGH51",
+          "qlib_alpha360.LOW23",
+          "qlib_alpha360.LOW29",
+          "qlib_alpha360.OPEN18",
+          "qlib_alpha360.OPEN19",
+          "qlib_alpha360.OPEN57",
+          "qlib_alpha360.VOLUME13",
+          "qlib_alpha360.VWAP33",
+          "qlib_alpha360.VWAP34",
+          "qlib_alpha360.VWAP49",
+          "worldquant_101.020",
+          "worldquant_101.096"
+        ],
+        "window": {
+          "start": "20260105",
+          "end": "20260630"
+        },
+        "cells_both": 1039219,
+        "cells_only_public": 34,
+        "cells_only_private": 28,
+        "cells_exact_equal": 599436,
+        "cells_nan_mismatch": 0,
+        "cells_differ_at_floor": 134519,
+        "cells_over_threshold": 1626,
+        "attribution": {
+          "same_day_source_diff": 1060,
+          "source_diff_within_lookback": 419,
+          "cross_sectional_same_day": 147,
+          "unattributed": 0
+        },
+        "per_factor": [
+          {
+            "factor": "gtja_191.105",
+            "cells": 34148,
+            "exact_equal": 4293,
+            "differs_at_floor": 563,
+            "over_threshold": 525,
+            "max_rel": 1.9999999999995983,
+            "p90_rel": 2.139751793539939e-11,
+            "attribution": {
+              "same_day_source_diff": 386,
+              "source_diff_within_lookback": 86,
+              "cross_sectional_same_day": 53,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.IMXD30",
+            "cells": 34800,
+            "exact_equal": 34797,
+            "differs_at_floor": 3,
+            "over_threshold": 3,
+            "max_rel": 1.2857142948374458,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 0,
+              "source_diff_within_lookback": 3,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "worldquant_101.096",
+            "cells": 34765,
+            "exact_equal": 34698,
+            "differs_at_floor": 67,
+            "over_threshold": 67,
+            "max_rel": 0.8461538461538461,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 48,
+              "source_diff_within_lookback": 8,
+              "cross_sectional_same_day": 11,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "worldquant_101.020",
+            "cells": 34742,
+            "exact_equal": 33958,
+            "differs_at_floor": 784,
+            "over_threshold": 783,
+            "max_rel": 0.22310679643205447,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 472,
+              "source_diff_within_lookback": 233,
+              "cross_sectional_same_day": 78,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.RSV60",
+            "cells": 34765,
+            "exact_equal": 8163,
+            "differs_at_floor": 11729,
+            "over_threshold": 110,
+            "max_rel": 0.018784290353405765,
+            "p90_rel": 1.9659993881366268e-05,
+            "attribution": {
+              "same_day_source_diff": 64,
+              "source_diff_within_lookback": 46,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.VSUMD10",
+            "cells": 34793,
+            "exact_equal": 12699,
+            "differs_at_floor": 3069,
+            "over_threshold": 18,
+            "max_rel": 0.011436937770260563,
+            "p90_rel": 8.134270385433046e-07,
+            "attribution": {
+              "same_day_source_diff": 4,
+              "source_diff_within_lookback": 14,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "gtja_191.108",
+            "cells": 32649,
+            "exact_equal": 32551,
+            "differs_at_floor": 98,
+            "over_threshold": 74,
+            "max_rel": 0.009597685643158526,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 46,
+              "source_diff_within_lookback": 23,
+              "cross_sectional_same_day": 5,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "gtja_191.189",
+            "cells": 34784,
+            "exact_equal": 8445,
+            "differs_at_floor": 23036,
+            "over_threshold": 13,
+            "max_rel": 0.005268643345986054,
+            "p90_rel": 2.4511482447553654e-05,
+            "attribution": {
+              "same_day_source_diff": 13,
+              "source_diff_within_lookback": 0,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.WVMA5",
+            "cells": 34766,
+            "exact_equal": 10151,
+            "differs_at_floor": 16305,
+            "over_threshold": 24,
+            "max_rel": 0.005186429006320874,
+            "p90_rel": 6.389520027539932e-06,
+            "attribution": {
+              "same_day_source_diff": 19,
+              "source_diff_within_lookback": 5,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.KUP2",
+            "cells": 34765,
+            "exact_equal": 14978,
+            "differs_at_floor": 17808,
+            "over_threshold": 9,
+            "max_rel": 0.0030988240801067754,
+            "p90_rel": 1.5853160999105068e-05,
+            "attribution": {
+              "same_day_source_diff": 8,
+              "source_diff_within_lookback": 1,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "gtja_191.159",
+            "cells": 34760,
+            "exact_equal": 9141,
+            "differs_at_floor": 3995,
+            "over_threshold": 0,
+            "max_rel": 0.0006928898103474134,
+            "p90_rel": 1.0889062838598925e-06
+          },
+          {
+            "factor": "qlib_alpha158.STD30",
+            "cells": 34765,
+            "exact_equal": 11362,
+            "differs_at_floor": 4067,
+            "over_threshold": 0,
+            "max_rel": 0.0006870074076212815,
+            "p90_rel": 1.6474892498401e-06
+          },
+          {
+            "factor": "qlib_alpha360.VWAP49",
+            "cells": 34690,
+            "exact_equal": 18932,
+            "differs_at_floor": 4613,
+            "over_threshold": 0,
+            "max_rel": 4.6233926223893463e-05,
+            "p90_rel": 3.003620323457109e-06
+          },
+          {
+            "factor": "qlib_alpha360.HIGH51",
+            "cells": 34690,
+            "exact_equal": 18830,
+            "differs_at_floor": 4786,
+            "over_threshold": 0,
+            "max_rel": 4.623391787132553e-05,
+            "p90_rel": 3.306427173203458e-06
+          },
+          {
+            "factor": "qlib_alpha360.LOW23",
+            "cells": 34694,
+            "exact_equal": 20466,
+            "differs_at_floor": 2610,
+            "over_threshold": 0,
+            "max_rel": 4.62091113221611e-05,
+            "p90_rel": 1.3458867332567283e-07
+          },
+          {
+            "factor": "qlib_alpha360.OPEN57",
+            "cells": 34690,
+            "exact_equal": 18417,
+            "differs_at_floor": 5377,
+            "over_threshold": 0,
+            "max_rel": 4.619320908500662e-05,
+            "p90_rel": 4.161626768041508e-06
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE34",
+            "cells": 34680,
+            "exact_equal": 19727,
+            "differs_at_floor": 3481,
+            "over_threshold": 0,
+            "max_rel": 4.6158635137700565e-05,
+            "p90_rel": 1.0226106755731953e-06
+          },
+          {
+            "factor": "qlib_alpha360.VOLUME13",
+            "cells": 34714,
+            "exact_equal": 20893,
+            "differs_at_floor": 1599,
+            "over_threshold": 0,
+            "max_rel": 4.6152849545228864e-05,
+            "p90_rel": 1.1336101874752855e-07
+          },
+          {
+            "factor": "qlib_alpha158.ROC10",
+            "cells": 34720,
+            "exact_equal": 22053,
+            "differs_at_floor": 1258,
+            "over_threshold": 0,
+            "max_rel": 4.6152415009916604e-05,
+            "p90_rel": 1.1731901002928997e-07
+          },
+          {
+            "factor": "qlib_alpha360.VWAP33",
+            "cells": 34680,
+            "exact_equal": 19823,
+            "differs_at_floor": 3420,
+            "over_threshold": 0,
+            "max_rel": 4.614136903989624e-05,
+            "p90_rel": 9.378723877309069e-07
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE45",
+            "cells": 34687,
+            "exact_equal": 19015,
+            "differs_at_floor": 4304,
+            "over_threshold": 0,
+            "max_rel": 4.613768691865438e-05,
+            "p90_rel": 2.5312658142818304e-06
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE57",
+            "cells": 34690,
+            "exact_equal": 18152,
+            "differs_at_floor": 5382,
+            "over_threshold": 0,
+            "max_rel": 4.613584943686947e-05,
+            "p90_rel": 4.153043739545176e-06
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE20",
+            "cells": 34700,
+            "exact_equal": 20899,
+            "differs_at_floor": 2322,
+            "over_threshold": 0,
+            "max_rel": 4.6108910633650835e-05,
+            "p90_rel": 1.2281458509306823e-07
+          },
+          {
+            "factor": "qlib_alpha360.OPEN19",
+            "cells": 34702,
+            "exact_equal": 20867,
+            "differs_at_floor": 2227,
+            "over_threshold": 0,
+            "max_rel": 4.610566198587061e-05,
+            "p90_rel": 1.2134717109126965e-07
+          },
+          {
+            "factor": "qlib_alpha360.VWAP34",
+            "cells": 34680,
+            "exact_equal": 19771,
+            "differs_at_floor": 3484,
+            "over_threshold": 0,
+            "max_rel": 4.6100105073447036e-05,
+            "p90_rel": 1.01631930385818e-06
+          },
+          {
+            "factor": "qlib_alpha360.OPEN18",
+            "cells": 34704,
+            "exact_equal": 21094,
+            "differs_at_floor": 2126,
+            "over_threshold": 0,
+            "max_rel": 4.6092173200686945e-05,
+            "p90_rel": 1.197214867764782e-07
+          },
+          {
+            "factor": "qlib_alpha360.LOW29",
+            "cells": 34682,
+            "exact_equal": 20011,
+            "differs_at_floor": 3097,
+            "over_threshold": 0,
+            "max_rel": 4.607432072091089e-05,
+            "p90_rel": 5.579190625337954e-07
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE13",
+            "cells": 34714,
+            "exact_equal": 21691,
+            "differs_at_floor": 1599,
+            "over_threshold": 0,
+            "max_rel": 4.603306798978184e-05,
+            "p90_rel": 1.179369603621434e-07
+          },
+          {
+            "factor": "qlib_alpha158.VSUMN20",
+            "cells": 34800,
+            "exact_equal": 28769,
+            "differs_at_floor": 1310,
+            "over_threshold": 0,
+            "max_rel": 1.9635854922894072e-05,
+            "p90_rel": 9.55194076589856e-08
+          },
+          {
+            "factor": "local_core_v1.liquidity_20",
+            "cells": 34800,
+            "exact_equal": 34790,
+            "differs_at_floor": 0,
+            "over_threshold": 0,
+            "max_rel": 1.0219842089131944e-07,
+            "p90_rel": 0.0
+          }
+        ],
+        "rel_quantiles": {
+          "n": 1039219,
+          "min": 0.0,
+          "p10": 0.0,
+          "p50": 0.0,
+          "p90": 2.3064437249685477e-06,
+          "p99": 3.584149262877584e-05,
+          "p999": 0.004021715756261412,
+          "max": 1.9999999999995983
+        },
+        "frac_within": {
+          "1e-09": 0.6046742794348449,
+          "1e-06": 0.8705576014295351,
+          "0.001": 0.9984353634796901,
+          "0.01": 0.9994168697839435
+        },
+        "over_threshold_rate": 0.0015646365203099636,
+        "differ_at_floor_rate": 0.12944239857046494,
+        "unattributed_examples": []
+      },
+      "csi500": {
+        "factors_sampled": [
+          "gtja_191.105",
+          "gtja_191.108",
+          "gtja_191.159",
+          "gtja_191.189",
+          "local_core_v1.liquidity_20",
+          "qlib_alpha158.IMXD30",
+          "qlib_alpha158.KUP2",
+          "qlib_alpha158.ROC10",
+          "qlib_alpha158.RSV60",
+          "qlib_alpha158.STD30",
+          "qlib_alpha158.VSUMD10",
+          "qlib_alpha158.VSUMN20",
+          "qlib_alpha158.WVMA5",
+          "qlib_alpha360.CLOSE13",
+          "qlib_alpha360.CLOSE20",
+          "qlib_alpha360.CLOSE34",
+          "qlib_alpha360.CLOSE45",
+          "qlib_alpha360.CLOSE57",
+          "qlib_alpha360.HIGH51",
+          "qlib_alpha360.LOW23",
+          "qlib_alpha360.LOW29",
+          "qlib_alpha360.OPEN18",
+          "qlib_alpha360.OPEN19",
+          "qlib_alpha360.OPEN57",
+          "qlib_alpha360.VOLUME13",
+          "qlib_alpha360.VWAP33",
+          "qlib_alpha360.VWAP34",
+          "qlib_alpha360.VWAP49",
+          "worldquant_101.020",
+          "worldquant_101.096"
+        ],
+        "window": {
+          "start": "20260105",
+          "end": "20260630"
+        },
+        "cells_both": 1729372,
+        "cells_only_public": 16,
+        "cells_only_private": 23,
+        "cells_exact_equal": 1015644,
+        "cells_nan_mismatch": 0,
+        "cells_differ_at_floor": 209133,
+        "cells_over_threshold": 3805,
+        "attribution": {
+          "same_day_source_diff": 2108,
+          "source_diff_within_lookback": 1153,
+          "cross_sectional_same_day": 544,
+          "unattributed": 0
+        },
+        "per_factor": [
+          {
+            "factor": "gtja_191.105",
+            "cells": 57064,
+            "exact_equal": 9514,
+            "differs_at_floor": 1336,
+            "over_threshold": 1224,
+            "max_rel": 1.983209877019272,
+            "p90_rel": 1.4143483036282392e-11,
+            "attribution": {
+              "same_day_source_diff": 936,
+              "source_diff_within_lookback": 162,
+              "cross_sectional_same_day": 126,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.IMXD30",
+            "cells": 58000,
+            "exact_equal": 57995,
+            "differs_at_floor": 5,
+            "over_threshold": 5,
+            "max_rel": 1.7692307851018283,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 4,
+              "source_diff_within_lookback": 1,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "worldquant_101.096",
+            "cells": 57936,
+            "exact_equal": 57778,
+            "differs_at_floor": 158,
+            "over_threshold": 158,
+            "max_rel": 0.875,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 120,
+              "source_diff_within_lookback": 13,
+              "cross_sectional_same_day": 25,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "worldquant_101.020",
+            "cells": 57876,
+            "exact_equal": 55694,
+            "differs_at_floor": 2182,
+            "over_threshold": 2177,
+            "max_rel": 0.33474576956377017,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 988,
+              "source_diff_within_lookback": 806,
+              "cross_sectional_same_day": 383,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.VSUMD10",
+            "cells": 57991,
+            "exact_equal": 22203,
+            "differs_at_floor": 5250,
+            "over_threshold": 54,
+            "max_rel": 0.11270207355289333,
+            "p90_rel": 8.390903537656568e-07,
+            "attribution": {
+              "same_day_source_diff": 4,
+              "source_diff_within_lookback": 50,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.RSV60",
+            "cells": 57936,
+            "exact_equal": 16119,
+            "differs_at_floor": 14648,
+            "over_threshold": 65,
+            "max_rel": 0.03339001089692625,
+            "p90_rel": 8.145648027323211e-06,
+            "attribution": {
+              "same_day_source_diff": 6,
+              "source_diff_within_lookback": 59,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "gtja_191.108",
+            "cells": 51125,
+            "exact_equal": 50963,
+            "differs_at_floor": 162,
+            "over_threshold": 100,
+            "max_rel": 0.009025962892922007,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 50,
+              "source_diff_within_lookback": 40,
+              "cross_sectional_same_day": 10,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.WVMA5",
+            "cells": 57947,
+            "exact_equal": 18150,
+            "differs_at_floor": 24210,
+            "over_threshold": 22,
+            "max_rel": 0.0019482070210867224,
+            "p90_rel": 5.0206117041184744e-06,
+            "attribution": {
+              "same_day_source_diff": 0,
+              "source_diff_within_lookback": 22,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "gtja_191.189",
+            "cells": 57973,
+            "exact_equal": 14870,
+            "differs_at_floor": 38553,
+            "over_threshold": 0,
+            "max_rel": 0.0009435708458351628,
+            "p90_rel": 2.4822573835306777e-05
+          },
+          {
+            "factor": "qlib_alpha158.KUP2",
+            "cells": 57936,
+            "exact_equal": 24496,
+            "differs_at_floor": 28733,
+            "over_threshold": 0,
+            "max_rel": 0.0007985611834878907,
+            "p90_rel": 1.2099633267864185e-05
+          },
+          {
+            "factor": "qlib_alpha158.STD30",
+            "cells": 57936,
+            "exact_equal": 21845,
+            "differs_at_floor": 5886,
+            "over_threshold": 0,
+            "max_rel": 0.0007781169481390767,
+            "p90_rel": 1.0599953992933001e-06
+          },
+          {
+            "factor": "gtja_191.159",
+            "cells": 57930,
+            "exact_equal": 16742,
+            "differs_at_floor": 4246,
+            "over_threshold": 0,
+            "max_rel": 0.00022351500203989424,
+            "p90_rel": 8.228824428902813e-07
+          },
+          {
+            "factor": "qlib_alpha360.HIGH51",
+            "cells": 57852,
+            "exact_equal": 32469,
+            "differs_at_floor": 6813,
+            "over_threshold": 0,
+            "max_rel": 0.00022255998732803806,
+            "p90_rel": 2.257119700143106e-06
+          },
+          {
+            "factor": "qlib_alpha360.VWAP49",
+            "cells": 57852,
+            "exact_equal": 32733,
+            "differs_at_floor": 6652,
+            "over_threshold": 0,
+            "max_rel": 0.00022253039845142165,
+            "p90_rel": 2.0214418151824856e-06
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE57",
+            "cells": 57853,
+            "exact_equal": 32131,
+            "differs_at_floor": 7354,
+            "over_threshold": 0,
+            "max_rel": 0.00022252738311295985,
+            "p90_rel": 2.826992447008711e-06
+          },
+          {
+            "factor": "qlib_alpha360.OPEN57",
+            "cells": 57853,
+            "exact_equal": 32113,
+            "differs_at_floor": 7346,
+            "over_threshold": 0,
+            "max_rel": 0.00022251882134021158,
+            "p90_rel": 2.831056076485853e-06
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE45",
+            "cells": 57852,
+            "exact_equal": 32931,
+            "differs_at_floor": 6378,
+            "over_threshold": 0,
+            "max_rel": 0.0002224342073402162,
+            "p90_rel": 1.8245031505292923e-06
+          },
+          {
+            "factor": "qlib_alpha360.LOW23",
+            "cells": 57858,
+            "exact_equal": 33909,
+            "differs_at_floor": 4581,
+            "over_threshold": 0,
+            "max_rel": 4.549470478523898e-05,
+            "p90_rel": 1.3209062997850468e-07
+          },
+          {
+            "factor": "qlib_alpha360.OPEN18",
+            "cells": 57863,
+            "exact_equal": 35046,
+            "differs_at_floor": 3875,
+            "over_threshold": 0,
+            "max_rel": 4.547258817367542e-05,
+            "p90_rel": 1.197086392898055e-07
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE13",
+            "cells": 57868,
+            "exact_equal": 36106,
+            "differs_at_floor": 2997,
+            "over_threshold": 0,
+            "max_rel": 4.545306970552904e-05,
+            "p90_rel": 1.1764125288703822e-07
+          },
+          {
+            "factor": "qlib_alpha360.VOLUME13",
+            "cells": 57868,
+            "exact_equal": 35668,
+            "differs_at_floor": 2997,
+            "over_threshold": 0,
+            "max_rel": 4.543514122212793e-05,
+            "p90_rel": 1.1319916275724522e-07
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE20",
+            "cells": 57861,
+            "exact_equal": 34878,
+            "differs_at_floor": 4174,
+            "over_threshold": 0,
+            "max_rel": 4.542825242189371e-05,
+            "p90_rel": 1.2245870631193808e-07
+          },
+          {
+            "factor": "qlib_alpha360.OPEN19",
+            "cells": 57862,
+            "exact_equal": 34837,
+            "differs_at_floor": 4032,
+            "over_threshold": 0,
+            "max_rel": 4.542825242189371e-05,
+            "p90_rel": 1.214162594996409e-07
+          },
+          {
+            "factor": "qlib_alpha360.VWAP34",
+            "cells": 57852,
+            "exact_equal": 33215,
+            "differs_at_floor": 5590,
+            "over_threshold": 0,
+            "max_rel": 4.539725099294746e-05,
+            "p90_rel": 7.655892697926723e-07
+          },
+          {
+            "factor": "qlib_alpha360.LOW29",
+            "cells": 57852,
+            "exact_equal": 33674,
+            "differs_at_floor": 5195,
+            "over_threshold": 0,
+            "max_rel": 4.5385650121014647e-05,
+            "p90_rel": 2.3651614245486411e-07
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE34",
+            "cells": 57852,
+            "exact_equal": 33400,
+            "differs_at_floor": 5587,
+            "over_threshold": 0,
+            "max_rel": 4.5379430235693053e-05,
+            "p90_rel": 7.535807665563502e-07
+          },
+          {
+            "factor": "qlib_alpha158.ROC10",
+            "cells": 57872,
+            "exact_equal": 36867,
+            "differs_at_floor": 2397,
+            "over_threshold": 0,
+            "max_rel": 4.5376152536754685e-05,
+            "p90_rel": 1.1693227794818353e-07
+          },
+          {
+            "factor": "qlib_alpha360.VWAP33",
+            "cells": 57852,
+            "exact_equal": 33427,
+            "differs_at_floor": 5508,
+            "over_threshold": 0,
+            "max_rel": 4.535599195601448e-05,
+            "p90_rel": 6.680126487928433e-07
+          },
+          {
+            "factor": "qlib_alpha158.VSUMN20",
+            "cells": 58000,
+            "exact_equal": 47898,
+            "differs_at_floor": 2288,
+            "over_threshold": 0,
+            "max_rel": 2.1810481719512908e-05,
+            "p90_rel": 1.0272137056723039e-07
+          },
+          {
+            "factor": "local_core_v1.liquidity_20",
+            "cells": 58000,
+            "exact_equal": 57973,
+            "differs_at_floor": 0,
+            "over_threshold": 0,
+            "max_rel": 1.0573350504454553e-07,
+            "p90_rel": 0.0
+          }
+        ],
+        "rel_quantiles": {
+          "n": 1729372,
+          "min": 0.0,
+          "p10": 0.0,
+          "p50": 0.0,
+          "p90": 1.8831041527106154e-06,
+          "p99": 3.550477444767959e-05,
+          "p999": 0.004975144049997035,
+          "max": 1.983209877019272
+        },
+        "frac_within": {
+          "1e-09": 0.6139708518467976,
+          "1e-06": 0.8790699745341083,
+          "0.001": 0.9977997793418651,
+          "0.01": 0.9993269232993248
+        },
+        "over_threshold_rate": 0.0022002206581348605,
+        "differ_at_floor_rate": 0.12093002546589167,
+        "unattributed_examples": []
+      },
+      "csi1000": {
+        "factors_sampled": [
+          "gtja_191.105",
+          "gtja_191.108",
+          "gtja_191.159",
+          "gtja_191.189",
+          "local_core_v1.liquidity_20",
+          "qlib_alpha158.IMXD30",
+          "qlib_alpha158.KUP2",
+          "qlib_alpha158.ROC10",
+          "qlib_alpha158.RSV60",
+          "qlib_alpha158.STD30",
+          "qlib_alpha158.VSUMD10",
+          "qlib_alpha158.VSUMN20",
+          "qlib_alpha158.WVMA5",
+          "qlib_alpha360.CLOSE13",
+          "qlib_alpha360.CLOSE20",
+          "qlib_alpha360.CLOSE34",
+          "qlib_alpha360.CLOSE45",
+          "qlib_alpha360.CLOSE57",
+          "qlib_alpha360.HIGH51",
+          "qlib_alpha360.LOW23",
+          "qlib_alpha360.LOW29",
+          "qlib_alpha360.OPEN18",
+          "qlib_alpha360.OPEN19",
+          "qlib_alpha360.OPEN57",
+          "qlib_alpha360.VOLUME13",
+          "qlib_alpha360.VWAP33",
+          "qlib_alpha360.VWAP34",
+          "qlib_alpha360.VWAP49",
+          "worldquant_101.020",
+          "worldquant_101.096"
+        ],
+        "window": {
+          "start": "20260105",
+          "end": "20260630"
+        },
+        "cells_both": 3458761,
+        "cells_only_public": 2,
+        "cells_only_private": 2,
+        "cells_exact_equal": 2112380,
+        "cells_nan_mismatch": 0,
+        "cells_differ_at_floor": 408506,
+        "cells_over_threshold": 13410,
+        "attribution": {
+          "same_day_source_diff": 7809,
+          "source_diff_within_lookback": 3703,
+          "cross_sectional_same_day": 1898,
+          "unattributed": 0
+        },
+        "per_factor": [
+          {
+            "factor": "gtja_191.105",
+            "cells": 114509,
+            "exact_equal": 13257,
+            "differs_at_floor": 6896,
+            "over_threshold": 5856,
+            "max_rel": 1.999999999994253,
+            "p90_rel": 2.5614530755555225e-11,
+            "attribution": {
+              "same_day_source_diff": 4330,
+              "source_diff_within_lookback": 885,
+              "cross_sectional_same_day": 641,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "worldquant_101.096",
+            "cells": 115866,
+            "exact_equal": 115584,
+            "differs_at_floor": 282,
+            "over_threshold": 282,
+            "max_rel": 0.9,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 190,
+              "source_diff_within_lookback": 73,
+              "cross_sectional_same_day": 19,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "worldquant_101.020",
+            "cells": 115733,
+            "exact_equal": 107308,
+            "differs_at_floor": 8425,
+            "over_threshold": 6658,
+            "max_rel": 0.3636363553942228,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 3119,
+              "source_diff_within_lookback": 2331,
+              "cross_sectional_same_day": 1208,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.IMXD30",
+            "cells": 116000,
+            "exact_equal": 115985,
+            "differs_at_floor": 15,
+            "over_threshold": 15,
+            "max_rel": 0.2500000279396758,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 0,
+              "source_diff_within_lookback": 15,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.VSUMD10",
+            "cells": 115979,
+            "exact_equal": 49344,
+            "differs_at_floor": 10308,
+            "over_threshold": 120,
+            "max_rel": 0.10914314424896383,
+            "p90_rel": 8.021258669367873e-07,
+            "attribution": {
+              "same_day_source_diff": 6,
+              "source_diff_within_lookback": 114,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.RSV60",
+            "cells": 115866,
+            "exact_equal": 37624,
+            "differs_at_floor": 26311,
+            "over_threshold": 83,
+            "max_rel": 0.020921131497801563,
+            "p90_rel": 6.841201548076073e-06,
+            "attribution": {
+              "same_day_source_diff": 12,
+              "source_diff_within_lookback": 71,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.WVMA5",
+            "cells": 115894,
+            "exact_equal": 41980,
+            "differs_at_floor": 44410,
+            "over_threshold": 83,
+            "max_rel": 0.0063376795622302196,
+            "p90_rel": 4.7174072370342445e-06,
+            "attribution": {
+              "same_day_source_diff": 12,
+              "source_diff_within_lookback": 71,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "gtja_191.108",
+            "cells": 101485,
+            "exact_equal": 100832,
+            "differs_at_floor": 653,
+            "over_threshold": 280,
+            "max_rel": 0.005670734351779062,
+            "p90_rel": 0.0,
+            "attribution": {
+              "same_day_source_diff": 118,
+              "source_diff_within_lookback": 132,
+              "cross_sectional_same_day": 30,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.KUP2",
+            "cells": 115866,
+            "exact_equal": 53425,
+            "differs_at_floor": 53145,
+            "over_threshold": 3,
+            "max_rel": 0.003070182303514832,
+            "p90_rel": 1.0926363105635894e-05,
+            "attribution": {
+              "same_day_source_diff": 3,
+              "source_diff_within_lookback": 0,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "gtja_191.189",
+            "cells": 115954,
+            "exact_equal": 35721,
+            "differs_at_floor": 73850,
+            "over_threshold": 18,
+            "max_rel": 0.001832059584419134,
+            "p90_rel": 2.7102856535857133e-05,
+            "attribution": {
+              "same_day_source_diff": 7,
+              "source_diff_within_lookback": 11,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "qlib_alpha158.STD30",
+            "cells": 115866,
+            "exact_equal": 48296,
+            "differs_at_floor": 11230,
+            "over_threshold": 12,
+            "max_rel": 0.0010885733509843193,
+            "p90_rel": 8.589438866443639e-07,
+            "attribution": {
+              "same_day_source_diff": 12,
+              "source_diff_within_lookback": 0,
+              "cross_sectional_same_day": 0,
+              "unattributed": 0
+            }
+          },
+          {
+            "factor": "gtja_191.159",
+            "cells": 115855,
+            "exact_equal": 38409,
+            "differs_at_floor": 8012,
+            "over_threshold": 0,
+            "max_rel": 0.00022281893547046355,
+            "p90_rel": 8.037244475985271e-07
+          },
+          {
+            "factor": "qlib_alpha360.HIGH51",
+            "cells": 115727,
+            "exact_equal": 69555,
+            "differs_at_floor": 12716,
+            "over_threshold": 0,
+            "max_rel": 4.7890264333068736e-05,
+            "p90_rel": 1.963876166173917e-06
+          },
+          {
+            "factor": "qlib_alpha158.ROC10",
+            "cells": 115752,
+            "exact_equal": 76408,
+            "differs_at_floor": 5123,
+            "over_threshold": 0,
+            "max_rel": 4.7884093132280944e-05,
+            "p90_rel": 1.1629517259298934e-07
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE13",
+            "cells": 115752,
+            "exact_equal": 74923,
+            "differs_at_floor": 6336,
+            "over_threshold": 0,
+            "max_rel": 4.787786887625987e-05,
+            "p90_rel": 1.1712311888558758e-07
+          },
+          {
+            "factor": "qlib_alpha360.LOW29",
+            "cells": 115743,
+            "exact_equal": 70561,
+            "differs_at_floor": 10376,
+            "over_threshold": 0,
+            "max_rel": 4.786970538456528e-05,
+            "p90_rel": 1.565119719082806e-07
+          },
+          {
+            "factor": "qlib_alpha360.VWAP34",
+            "cells": 115742,
+            "exact_equal": 69979,
+            "differs_at_floor": 10991,
+            "over_threshold": 0,
+            "max_rel": 4.7862310699122284e-05,
+            "p90_rel": 3.9297929648329297e-07
+          },
+          {
+            "factor": "qlib_alpha360.VWAP49",
+            "cells": 115726,
+            "exact_equal": 68938,
+            "differs_at_floor": 12506,
+            "over_threshold": 0,
+            "max_rel": 4.7861817225380197e-05,
+            "p90_rel": 1.7677439061449318e-06
+          },
+          {
+            "factor": "qlib_alpha360.OPEN18",
+            "cells": 115753,
+            "exact_equal": 73111,
+            "differs_at_floor": 8046,
+            "over_threshold": 0,
+            "max_rel": 4.786109682638818e-05,
+            "p90_rel": 1.188740883736285e-07
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE20",
+            "cells": 115754,
+            "exact_equal": 72565,
+            "differs_at_floor": 8625,
+            "over_threshold": 0,
+            "max_rel": 4.785718202747306e-05,
+            "p90_rel": 1.2138357590242492e-07
+          },
+          {
+            "factor": "qlib_alpha360.VOLUME13",
+            "cells": 115752,
+            "exact_equal": 73409,
+            "differs_at_floor": 6335,
+            "over_threshold": 0,
+            "max_rel": 4.785214345954456e-05,
+            "p90_rel": 1.1170986481676557e-07
+          },
+          {
+            "factor": "qlib_alpha360.LOW23",
+            "cells": 115749,
+            "exact_equal": 71543,
+            "differs_at_floor": 9367,
+            "over_threshold": 0,
+            "max_rel": 4.785094272593667e-05,
+            "p90_rel": 1.2760542690974946e-07
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE57",
+            "cells": 115734,
+            "exact_equal": 68796,
+            "differs_at_floor": 13444,
+            "over_threshold": 0,
+            "max_rel": 4.7849881589628876e-05,
+            "p90_rel": 2.414678044013136e-06
+          },
+          {
+            "factor": "qlib_alpha360.VWAP33",
+            "cells": 115743,
+            "exact_equal": 70180,
+            "differs_at_floor": 10874,
+            "over_threshold": 0,
+            "max_rel": 4.78479824965645e-05,
+            "p90_rel": 2.470585356278528e-07
+          },
+          {
+            "factor": "qlib_alpha360.OPEN19",
+            "cells": 115754,
+            "exact_equal": 72730,
+            "differs_at_floor": 8339,
+            "over_threshold": 0,
+            "max_rel": 4.784313984802607e-05,
+            "p90_rel": 1.1983289401004321e-07
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE45",
+            "cells": 115735,
+            "exact_equal": 69819,
+            "differs_at_floor": 12112,
+            "over_threshold": 0,
+            "max_rel": 4.7835243568170514e-05,
+            "p90_rel": 1.4719950350378619e-06
+          },
+          {
+            "factor": "qlib_alpha360.CLOSE34",
+            "cells": 115742,
+            "exact_equal": 70423,
+            "differs_at_floor": 10997,
+            "over_threshold": 0,
+            "max_rel": 4.783411088839254e-05,
+            "p90_rel": 3.905397543902021e-07
+          },
+          {
+            "factor": "qlib_alpha360.OPEN57",
+            "cells": 115734,
+            "exact_equal": 69005,
+            "differs_at_floor": 13449,
+            "over_threshold": 0,
+            "max_rel": 4.781583168989677e-05,
+            "p90_rel": 2.4162303402252762e-06
+          },
+          {
+            "factor": "qlib_alpha158.VSUMN20",
+            "cells": 115998,
+            "exact_equal": 96771,
+            "differs_at_floor": 5333,
+            "over_threshold": 0,
+            "max_rel": 2.921702405467815e-05,
+            "p90_rel": 9.980739797912977e-08
+          },
+          {
+            "factor": "local_core_v1.liquidity_20",
+            "cells": 115998,
+            "exact_equal": 115899,
+            "differs_at_floor": 0,
+            "over_threshold": 0,
+            "max_rel": 1.1035571398712325e-07,
+            "p90_rel": 0.0
+          }
+        ],
+        "rel_quantiles": {
+          "n": 3458761,
+          "min": 0.0,
+          "p10": 0.0,
+          "p50": 0.0,
+          "p90": 1.9258692911030692e-06,
+          "p99": 4.49012406951457e-05,
+          "p999": 0.012053449570140637,
+          "max": 1.999999999994253
+        },
+        "frac_within": {
+          "1e-09": 0.6379998502353877,
+          "1e-06": 0.881892388632808,
+          "0.001": 0.9961228890923657,
+          "0.01": 0.9989088578250997
+        },
+        "over_threshold_rate": 0.0038771109076342655,
+        "differ_at_floor_rate": 0.11810761136719189,
+        "unattributed_examples": []
+      }
+    }
+  },
+  "rows": {
+    "window": {
+      "start": "20090105",
+      "end": "20260731"
+    },
+    "codes": 3575,
+    "rows_in_both": 10948502,
+    "rows_only_public": 0,
+    "rows_only_private": 5,
+    "by_field": {
+      "open": {
+        "comparable": 10948502,
+        "agree": 10948500,
+        "agree_rate": 0.9999998173266078,
+        "disagree": 2,
+        "max_rel": 0.03284671532846726,
+        "criterion": "到分相等"
+      },
+      "high": {
+        "comparable": 10948502,
+        "agree": 10948500,
+        "agree_rate": 0.9999998173266078,
+        "disagree": 2,
+        "max_rel": 0.04339440694310505,
+        "criterion": "到分相等"
+      },
+      "low": {
+        "comparable": 10948502,
+        "agree": 10948501,
+        "agree_rate": 0.9999999086633039,
+        "disagree": 1,
+        "max_rel": 0.012244897959183593,
+        "criterion": "到分相等"
+      },
+      "close": {
+        "comparable": 10948502,
+        "agree": 10948492,
+        "agree_rate": 0.9999990866330389,
+        "disagree": 10,
+        "max_rel": 0.010967098703888279,
+        "criterion": "到分相等"
+      },
+      "volume": {
+        "comparable": 10948502,
+        "agree": 10948470,
+        "agree_rate": 0.9999970772257246,
+        "disagree": 32,
+        "max_rel": 0.02675787491686748,
+        "criterion": "相对差 <= 1e-6"
+      },
+      "amount": {
+        "comparable": 10948502,
+        "agree": 10948044,
+        "agree_rate": 0.999958167793183,
+        "disagree": 458,
+        "max_rel": 0.46872299952680974,
+        "criterion": "相对差 <= 1e-6"
+      }
+    },
+    "seconds": 5.248024940490723,
+    "note": "行域取公开通道建了的那 3,575 只（N-68），因此「只在私有」不含公开通道压根没建的票。停牌那一类差异（公开有行 / 私有缺行）已被卡 1.1-a 的建集吸收进 suspend_d，所以这里的「只在公开」应当是 0。"
+  },
+  "limits": {
+    "window": {
+      "start": "20260101",
+      "end": "20260731"
+    },
+    "rows_compared": 466773,
+    "agree": 466769,
+    "agree_rate": 0.9999914305240449,
+    "disagree": 4,
+    "disagreements": [
+      {
+        "ts_code": "600636.SH",
+        "trade_date": "20260601",
+        "public": [
+          4.96,
+          4.06
+        ],
+        "private": [
+          99999.999,
+          0.01
+        ],
+        "public_basis": "主板 10%"
+      },
+      {
+        "ts_code": "600696.SH",
+        "trade_date": "20260601",
+        "public": [
+          1.44,
+          1.18
+        ],
+        "private": [
+          99999.999,
+          0.01
+        ],
+        "public_basis": "主板 10%"
+      },
+      {
+        "ts_code": "600193.SH",
+        "trade_date": "20260608",
+        "public": [
+          2.39,
+          1.95
+        ],
+        "private": [
+          99999.999,
+          0.01
+        ],
+        "public_basis": "主板 10%"
+      },
+      {
+        "ts_code": "600608.SH",
+        "trade_date": "20260608",
+        "public": [
+          2.28,
+          1.86
+        ],
+        "private": [
+          99999.999,
+          0.01
+        ],
+        "public_basis": "主板 10%"
+      }
+    ],
+    "rules": {
+      "st_5pct_last_day": "20260703",
+      "no_limit_trading_days": {
+        "main": 5,
+        "chinext": 5,
+        "star": 5,
+        "bse": 1
+      },
+      "s_share_pct": 0.05,
+      "delisting_first_day_free": true,
+      "oracle_no_limit_sentinel": {
+        "SH": [
+          99999.999,
+          0.01
+        ],
+        "SZ": [
+          999999.999,
+          0.01
+        ],
+        "BJ": [
+          99999.99,
+          0.0
+        ]
+      },
+      "chinext_20pct_from": "20200824",
+      "star_20pct_from": "20190722"
+    },
+    "known_gap": "退市整理期首日无涨跌幅限制这条**在公开通道推不出来** —— 判据是私有表 `namechange.change_reason = '退市整理期'`。公开通道的 stk_limit 因此在这些行上按板块正常幅度推，是**已知误差**，不是没查出来的错。"
+  },
+  "units": {
+    "criterion": "`low*(1-1e-06) <= vwap <= high*(1+1e-06)`。`vwap = amount / volume`，落带 = 单位自洽。**这不是查文档得来的结论** —— 换一个单位（×1000 或 ÷1000）落带率会掉到 0。",
+    "cells": 10948502,
+    "in_band": 10947817,
+    "in_band_rate": 0.9999374343631667,
+    "median_vwap_over_close": 0.9999954452963972,
+    "verdict": "baostock 的 `amount` 单位是**元**、`volume` 是**股** —— 不是 tushare 的千元 / 手，建 provider 时不需要换算。"
+  },
+  "frozen": {
+    "what": "PUBLIC_FROZEN_ARTIFACTS（N-58⑥）：gold 的**定义面**。τ 标定于此实现对。",
+    "declared": [
+      "factor_library/compiled/qlib_native.jsonl",
+      "factor_library/compiled/qlib_panel.jsonl",
+      "factor_library/compiled/blocked.jsonl",
+      "reference/factorlib_pinned/formula.py",
+      "reference/factorlib_pinned/qlib_loader.py",
+      "reference/factorlib_pinned/qlib_ops.py"
+    ],
+    "present": {
+      "factor_library/compiled/qlib_native.jsonl": {
+        "sha256": "f0ea97c6bd5b1a8c41736b31a68756d1543d9e11c26ee3d1f8cf42727b2a4698",
+        "bytes": 552199
+      },
+      "factor_library/compiled/qlib_panel.jsonl": {
+        "sha256": "cbf4ba183edfaabb30211decb57297c391b888ff1e6fc5fd77cc62720f882384",
+        "bytes": 165036
+      },
+      "factor_library/compiled/blocked.jsonl": {
+        "sha256": "955f7a66c4e7a63d727fce9cb3b6fa6f22ca1b725d7db4e864bbbe76cb2bb5cc",
+        "bytes": 27539
+      },
+      "reference/factorlib_pinned/formula.py": {
+        "sha256": "3eaf99b7dc829e824cc37cea4a414858ffc34dec9b317ab807df960bf9cb17a4",
+        "bytes": 11431
+      },
+      "reference/factorlib_pinned/qlib_loader.py": {
+        "sha256": "bbad13f3b7152df1566b5719290baa6426f717e79227c7009a51c9208224cf96",
+        "bytes": 19019
+      },
+      "reference/factorlib_pinned/qlib_ops.py": {
+        "sha256": "f3d16a7925c5778cf3760516ac62671958fdef675e26fb90983077aca8c7ced2",
+        "bytes": 4897
+      }
+    },
+    "missing": [],
+    "blocks_release": false,
+    "note": "缺件挡发布：少了它们，拿到包的人复现不了 τ —— 而 τ 恰恰标定在「两个实现有多一致」上。卡 1.4 的打包器已把缺件记进 MANIFEST.json 的 `missing_declared_artifacts`（不静默丢）。"
+  },
+  "run": {
+    "card": "1.3",
+    "built_at": "2026-09-11T01:33:40+00:00",
+    "code_head": "69e56983ec5c0cbb919d6a92a5f0eecbf1d586d0",
+    "seconds": 39.728825092315674,
+    "parts_run": [
+      "returns",
+      "calibration",
+      "gold",
+      "rows",
+      "limits",
+      "units",
+      "frozen"
+    ],
+    "limit_codes": null,
+    "partial": false,
+    "public_root": "/data/shared/genebench/snapshots/public_v1",
+    "private_root": "/data/shared/genebench/snapshots/v1",
+    "freeze_date": "2026-07-31"
+  },
+  "tolerances": {
+    "provider_cell_rel": 1e-06,
+    "return_abs": 1e-06,
+    "gold_cell_rel": 0.001,
+    "why": "provider 的 .day.bin 是 float32（qlib 格式），单侧相对精度约 1.2e-7、两侧往返约 2.4e-7。三个容差都定在噪声地板之上一个数量级，同时远在最小的一类真实源差异（亚元取整，相对 1e-6~1e-5）之下。"
+  },
+  "sampling": {
+    "seed": 20260907,
+    "gold_factors_per_universe": 30,
+    "gold_window": {
+      "start": "20260105",
+      "end": "20260630"
+    },
+    "gold_lookback_trading_days": 250,
+    "stratified_n": 200
+  }
+}

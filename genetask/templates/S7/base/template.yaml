@@ -1,0 +1,1 @@
+slots: [rebalance_frequency, first_rebalance_day, adjust, calendar_id, cost_model, fill_price, settlement, share_accounting, initial_capital, lot_size, strategy, delisting_policy, tradability_policy, benchmark, risk_free_rate, sell_rule]

@@ -1,0 +1,30 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.20, pytest-9.1.1, pluggy-1.6.0 -- /data/shared/genebench/env/bin/python
+cachedir: .pytest_cache
+rootdir: /data/shared/genebench/repo
+plugins: anyio-4.14.2
+collecting ... collected 21 items
+
+ops/test_universe_source_b.py::test_parquet_schema_exact PASSED          [  4%]
+ops/test_universe_source_b.py::test_output_permissions PASSED            [  9%]
+ops/test_universe_source_b.py::test_output_path_comes_from_shared_config PASSED [ 14%]
+ops/test_universe_source_b.py::test_universe_qlib_covers_cfg_universes PASSED [ 19%]
+ops/test_universe_source_b.py::test_no_absolute_path_literals_in_module PASSED [ 23%]
+ops/test_universe_source_b.py::test_every_source_line_accounted_for PASSED [ 28%]
+ops/test_universe_source_b.py::test_no_silent_drops PASSED               [ 33%]
+ops/test_universe_source_b.py::test_prefix_enumeration_is_complete PASSED [ 38%]
+ops/test_universe_source_b.py::test_symbol_anomaly_is_reported_not_dropped PASSED [ 42%]
+ops/test_universe_source_b.py::test_normalize_code_rules PASSED          [ 47%]
+ops/test_universe_source_b.py::test_row_counts_match_summary PASSED      [ 52%]
+ops/test_universe_source_b.py::test_in_date_is_always_a_trading_day PASSED [ 57%]
+ops/test_universe_source_b.py::test_out_date_is_calendar_not_trading_for_index_files PASSED [ 61%]
+ops/test_universe_source_b.py::test_segments_never_overlap PASSED        [ 66%]
+ops/test_universe_source_b.py::test_closed_interval_beats_half_open_on_lake PASSED [ 71%]
+ops/test_universe_source_b.py::test_named_case_boundary PASSED           [ 76%]
+ops/test_universe_source_b.py::test_freeze_line_respected PASSED         [ 80%]
+ops/test_universe_source_b.py::test_intervals_are_well_formed PASSED     [ 85%]
+ops/test_universe_source_b.py::test_censoring_sentinel_is_unambiguous PASSED [ 90%]
+ops/test_universe_source_b.py::test_all_vs_csi_semantics_are_flagged PASSED [ 95%]
+ops/test_universe_source_b.py::test_hazards_are_recorded PASSED          [100%]
+
+============================== 21 passed in 1.43s ==============================

@@ -1,0 +1,29 @@
+# 卡 Y1 收件箱（⑭ 从零演练 / ⑯ 包体与最低配置 / ⑱ secrets 手册）
+
+> **文件名为什么不是 `Y1.md`**：更早一轮有另一张也叫 Y1 的卡，它的收件箱已经并进票据并改名
+> `Y1.md.merged`，而 `ops/test_wrt.py` 里的 `_inbox("Y1")` **两个名字都认、`Y1.md` 优先**。
+> 本卡若占用 `Y1.md`，就会把那条按内容判的断言（「47 改成 34」）变红 ——
+> 红的原因与本卡无关，那是最坏的一种红。
+
+
+
+编号先写 N-?，并入 `ops/tickets.md` 时由收口卡统一发号。
+本卡把**文档能修的**当场修了（逐条见 `ops/reports/rehearsal_v2.md` §0 的 findings 表）；
+下面这些是**文档修不了的**，或落点不在本卡路径里的。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `ops/run_f02_a1.py` 的 `--provider-root` 在**真跑路径上被静默忽略** | 待裁定（**建议当挡发布**） | 模块常量 `PROVIDER` 写死私有 provider 绝对路径；`main()` 里 `global RUN_ROOT, RESULTS` 只把这两个按参数改写（第 184–188 行），**唯独 provider 没有**。`--dry` 走另一条路（第 109 行）**用**了参数 —— 所以干跑与真跑用的是两棵不同的 provider 树。后果：**公开通道的真跑喂进容器的是私有 provider**，而 P2 照样绿（跑批不设 `GENEBENCH_CHANNEL` 时期望值也是私有的，两头一致）。证据：`/data/genebench_runner/m6_public/runs/runs/s1-cor-01.strict.…/work/provider/features/` 下有 `bj*`（北交所）代码，而公开 provider 只有沪深（`sh6*`/`sz*`）。**这影响 X1 那 8 个公开 run 的读数归属**。两条出路：① 让 `main()` 也 `global PROVIDER` 并按参数改写（一行）；② 按 `GENEBENCH_CHANNEL` 选默认 provider。**任一条都要重跑受影响的 run**。 |
+| N-? | `vendor/` 不在仓库里，发布包里没有 h11 | 待裁定 | `runner/inject.py::h11_source_dir()` 先找 exec 树的 `vendor/h11`，找不到才用运行环境里的。`vendor/` 是 f02 上手工放的（`ops/run_f02_container_tests.sh` 从网关环境复制），`git ls-files vendor` 为空。外部运行者解包后真跑会 `ModuleNotFoundError: No module named 'h11'`（本卡实测撞到）。绕法（已写进手册 §1.2）：`pip install` 顺带装的 h11 + `PYTHONPATH`。要不要把 `vendor/h11` 收进仓库是一次裁定：收进去 = 仓库里多一份第三方源码；不收 = 发布包对「执行面也要一个 python 环境」有隐含依赖。 |
+| N-? | 发布包里两份测试文件带**合成** gold 串，落在执行面扫描根里会被当场删掉 | 登记 | `ops/test_answer_plane_guard.py`、`ops/test_inject.py`。不是泄漏（串是合成的），但形态 ① 下答案面与执行面同机，扫描根一旦覆盖到包就会删掉它们并让 unit 进 failed + 置闩。手册 §1.3 已写明「放在扫描根之外」。根治是把测试里的串改成运行时合成（`"GBC-G-" + "0"*16` 那种拼接，扫描器按设计不命中 —— `ops/test_env.py` 里对 key 形态就是这么处理的）。 |
+| N-? | 那条 `ufw allow … to any port 18080` 把端口写死，与手册 §1.4 (c)「端口显式错开」冲突 | 登记 | 两条一起照做，容器就打不到网关。手册 §1.3 已加告示（单机形态就绑 18080）。真要错开端口得让机器主人再放行一条 —— 这是**机器主人**的动作，不是运行者能自己做的。 |
+| N-? | `genebench_config.py::GATEWAY_HOST` 没有环境变量入口 | 登记不修 | `GATEWAY_PORT` 有（`GENEBENCH_GATEWAY_PORT`），`GATEWAY_HOST` 没有，形态 ① 只能改常量（手册 §1.3 本来就是这么写的）。**但 `ops/run_joblist.py::gateway_addr()` 读的正是这个常量且没有覆盖入口** —— 于是在跨机 fleet 上没法用清单方式演练形态 ①（本卡因此走 §5.6 单题方式）。要补就补一个 `GENEBENCH_GATEWAY_HOST`，两处同源。 |
+| N-? | `harnesses/build.sh` 没有 `--no-cache` 透传 | 登记不修 | 缓存命中时它 **0.2 秒**打印「构建完成」，digest 与旧镜像相同 —— 「这一步要哪些外网、离线能不能建」在有缓存的机器上量不出来。本卡另跑 `docker build --no-cache` 量了一次：**41.4 秒**，要 `registry.npmjs.org`；`docker.io` 不需要（基座必须本机已有，脚本自己核这一条）。 |
+| N-? | `ops/freeze_v10.py` 两个 `*_ref()` 的根键名不一致 | 登记不修 | `frozen_ref()` 是 `root`，`reference_ref()` 是 `reference_root`。照手册 §8.1 抄命令不受影响（那条命令把返回值丢掉），但凡是自己取键的人会踩一次（本卡踩了）。 |
+| N-? | ⑮ 的 `genebench export` / `genebench merge` 在**走演练那一刻**不存在 | **已闭（不是本卡修的）** | 演练第 7 步「导出结果」在今天的包里只有 `ops/results_db.py query` 与 `ops/mk_tables.py`。本卡用这两条走完了第 7 步，但**导出的结果包里没有机器标识、也没有四轴一致性校验**（那正是 ⑮ 要加的两件）。 |
+| N-? | `ops/test_6rt.py::test_零run的批不渲染逐run叙述` 现红 | 不是本卡的 | 它渲染 `m6_public` 的就绪报告并断言里面有「**0 个 run**」。X1 把那个批跑出 8 个 run 之后这条必红。**不是回归，是 X1 的确定性下游**：要么把断言改成用一个**真的没有 run 的批**（更有判别力），要么参数化。落点 `ops/test_6rt.py` 不在本卡路径。 |
+| N-? | `ops/test_wrt.py::test_rebudget只动没跑过的行` 现红 | 不是本卡的 | `KeyError: 's1-cor-01.strict.cfg.r01'`。裁定 ⑮ 给 `run_id` 加了机器标识之后，`ops/joblist.py::make_job` 算出来的 `job_id` 末尾多了一段，而这条测试还按**没有机器标识**的老形状去查字典。**是 ⑮ 的确定性下游**，不是回归；改法是让断言按 `make_job` 现算的 `job_id` 取，而不是手抄一个字符串。 |
+| N-? | `ops/test_wrapup.py` 五条现红 | 不是本卡的 | 签字包 `ops/reports/signed/v1.0.14_r1.0.21/` 是**重冻之前**那一版；卡 A 把轴推到 1.0.15 / r1.0.22 之后，「签字包是这一版的」「逐件 sha 对得上」「清单声明了却不存在的件」三条必红。另两条：`test_八个收件箱都改名merged了_原名一个不留`（A.md / B.md / C.md / X1.md / X2.md 都还在，**本卡之前就红**）与 `test_两条未达成没有被写成达成`（X1 跑出 run 之后 `public_channel_zero_runs` 已闭，报告要跟着改）。**全部是重冻与 X1 的确定性下游**，落点在收口卡。 |
+| N-? | `ops/test_W2.py:125` 与 `ops/test_6rt.py::test_零run的批不渲染逐run叙述` 现红 | 不是本卡的 | 前者是卡 B 已登记的那条（写死的「三条用户决定项必须还开着」名单，`code_license_undecided` 闭了之后必红；今天 `public_channel_zero_runs` 也闭了，**同一条会第二次撞**）。后者是 X1 把 `m6_public` 跑出 8 个 run 之后必红。两条都在别的卡的路径里。 |
+| N-? | 手册 §9 的并发档位与 §5.5 的「并发固定是 1」自相矛盾 | 待裁定 | §9（卡 B 写的）给 S7 1 / S4 ≤2 / 其余 ≤3；§5.5 写「这套系统里**没有 >1 的合法值**」。本卡按 §9 并发 2 实测，**两条都炸**：`runner/c41/subnets.py::allocate()` 在两个进程同时分配时有 TOCTOU 竞态（`invalid pool request: Pool overlaps`），以及一个失败 run 的清理把另一个 run 的 `run_root` 拿走（`[P0] run_root 不可写`）。**在 allocate() 加进程间锁之前，§9 那张表不该被当成可用的并发档位。** |
+| N-? | f02 上有两张 4 小时前的残留 docker 网占着注入器的分配池 | 登记 | `gb-s2-cor-01-open-cfg-codex-deepseek-r01_gb_{task,egress}`（X1 那个 1800 秒超时的 run 留下的孤儿容器，至今还 Up）与 `gb-s2-cor-01-hint-cfg-codex-deepseek-r02_gb_task`。池子是 `172.31.240.0/20` 切 16 个 `/24`，孤儿一多就逼近上限。**本卡没有清理别人的容器。** 建议给跑批加一条「起批前 `docker network prune` 只清没有容器挂着的网」，或者给超时路径补一个 `down -v`。 |

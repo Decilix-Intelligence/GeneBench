@@ -1,0 +1,15 @@
+# 收件箱：W3（参数轮换扩实例）2026-09-10
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | 实例层落地：40 基点 → 130 实例（每阶段 15–17），窗口 × 宇宙 × 因子池 | 已做 | `genetask/params/v1.0-instances.yaml` + `ops/mk_instances.py` + `ops/test_instances.py`；130 建 0 红。设计与判据见 `ops/reports/instances_design.md`。 |
+| N-? | 冻结清单加 `instances` 段（模板与实例两层） | 已做 | `ops/freeze_v10.py::build_instances_section()`；`--write --with-instances` 写入、`--instances-dry` 只看漂移。**本卡不推版本**。 |
+| N-? | `instances_fingerprint` 要不要进 `ROOT_FIELDS` | 待定（Y1） | 收 = 实例也享受「改了就作废通行证」的保护，代价是实例表一动全部 bundle 重出；不收 = 记录在案但不受根保护。本卡按保守方向做（**不动根**）。 |
+| N-? | 「40 模板」口径 = 参数表 40 **行**，模板目录只有 39 个 | 已记 | `S1/source_status` 被 `s1-rob-01`（规定题）与 `s1-rob-02`（探针题）两行复用。实例 id 里若不带 `base_task_id`，这两行的基准实例 id 逐字节相同 —— 实测撞过。出表与报告的口径要按「行」写。 |
+| N-? | 六道挂起探针题：**一道都放不出**，六道全部 `inconclusive` | 已判 | 同一个结构性原因：筛查 harness 是三份冻结的 **S7 回测引擎**，S1–S5/S8 的探针字段没有进入它的入口。逐题缺什么见 `ops/reports/instances_design.md` §9。照 `materiality_screen.md` 的判据：「跑不起来 / 量不到」都不是「没差别」，不许翻锁。本卡因此**不写任何 `DIVERGENCE_EVIDENCE` 条目正文**。 |
+| N-? | 六层 harness 缺口（取数 / 对齐 / 因子求值 / IC / 信号 / 撮合） | 未做 | 六道挂起题分属六层，各要一套自己那一层的独立实现比较。**不是一件事，是六件事** —— 别按「补一个 screen」估工。`s8-rob-02` 与 N-383 的 Slip 判据同一条线：Slip 纳入 S8 判据后它才有量得到的可能。 |
+| N-? | phrasebook 缺 `universe[csi1000]` / `universe_ref[csi1000@2026-07-31]` | 未做 | 补它会改 `genetask/phrasebook.yaml`（在冻结根 `CODE_FILES` 里）→ 40 道出集题重签。因此 S1/S2/S5 的宇宙轴只有 csi300/csi500。 |
+| N-? | phrasebook 缺 `input_factors` 的其它单因子措辞 | 未做 | 只有 `gtja_191.001` 与三因子组合两个键，S5 的因子轴因此不可用。同上，补它要重签。 |
+| N-? | S3 的因子轴结构上不存在 | 已记 | S3 的因子公式写在 `INSTRUCTION.*.md` 与 `solve.py` 里 —— 换因子 = 换模板 = 人工重写题面。要扩 S3 只能新增模板，那是另一张卡。 |
+| N-? | 实例的 oracle / gold 没跑 | 未做（本卡范围外） | 本卡只到「题面可渲染、夹具可导出、清单可写入」。130 个实例的 gold 要跑多少、跑不跑得动（S7 单实例是全史回测），没有估过。 |
+| N-? | 实例夹具只物化了 4 个（`s4-cor-01` 的四个实例） | 部分 | 其余 126 个的 `inputs[].sha256` 仍是 `null`，清单里 `fixtures` 是空 dict —— 这是**如实记录**，不是缺陷。`s4-eco-01` 那一支的夹具要跑 `build_pool`（扫 793 个因子面板），成本单独估。 |

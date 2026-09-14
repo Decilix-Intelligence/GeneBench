@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\caption{Table A — i\_alphaagent（接入/harness 验证，不是实验数据）　脚注（N-348，2026-09-10 用户裁定）：适配赛道 v1.0-adapt 的题源是**出集规定题的 oracle 产物**（探针题不入），这些产物随适配 bundle 进入执行面。**跑过适配赛道的被测方，主赛道这些题算「可能已见过答案」**；口径与逐题清单见 ops/specs/fairness\_protocol.md §7 与 ops/reports/known\_limits\_v1.md。}
+\label{tab:a-i_alphaagent}
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+config\_id & arm & SR & pass@1 & pass\^{}3 & ProgressRate & Steps & \$ & Latency & Recov & 越权率 \\
+\midrule
+\multicolumn{11}{l}{\textit{参照臂（baseline）}} \\
+cfg-alphaagent-deepseek & open & 1.000 & 0.000 & --- & 1.000 & 3.000 & 0.013 & 24.387 & --- & 0.000 \\
+\midrule
+\multicolumn{11}{l}{\textit{协议臂（protocol）—— 与参照臂的差异是投放的工件}} \\
+cfg-alphaagent-deepseek & strict & 1.000 & 0.000 & --- & 1.000 & 3.000 & 0.016 & 43.521 & --- & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% set_version = 1.0.11
+% reference_version = r1.0.19
+% protocol_version = geneprotocol_v1@d6fbcaa08302（裸臂在协议轴上记 `geneprotocol_v1@none` —— 它们不投放协议工件，与协议臂并排不算混轴）
+% channel = private
+% 记录数 2；筛选 batch=i_alphaagent

@@ -1,0 +1,17 @@
+# 卡 1.1-a 待登记事项（公开通道数据面）
+
+编号先写 N-?，由阶段收口代理统一编号并入 `ops/tickets.md`。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **公开通道数据面建成**：`$SNAPSHOTS/public_v1/{tables,tradability,qlib_provider}` | 完成 | 3,575 只（v1 三宇宙并集）× 2009-01-05..2026-07-31。表 6 张（daily 10,948,502 / adj_factor 11,327,557 / stk_limit 11,327,557 / suspend_d 379,055 / trade_cal 6,417 / stock_basic 5,552）；tradability 18 个年分区共 11,327,560 行；provider 28,600 个 bin（3,575 × 8 字段），`files.sha256` 根 `561348660a3175b1…`。一条命令 `ops/build_public_channel.py`，可续跑，不含拉数 **5.3 分钟** |
+| N-? | **网关通道开关** `GENEBENCH_CHANNEL=private\|public` | 完成 | 默认 private，**私有通道数据端点逐字节不变**（5 票 × 7 端点 sha256 全同，证据 `scratch/1.1a/{baseline_private,after_private}`）。public 读 `public_v1` 的表、日志写 `logs/gateway_access_public.jsonl`、端口默认 18081；绑定地址规则一个字没改（仍走 `assert_no_wildcard_bind`）。`/healthz` **新增两个字段** `channel` / `tables_dir`（这是唯一一处私有回包的变化，刻意为之：两个实例外观一样时「对着公开网关核私有数字」不会被发现） |
+| N-? | 公开通道 **`/fundamentals` 拒绝并记账** | 完成 | 403 + `reason=dataset_not_exposed_in_v1` + `extra.channel=public`。理由是**源侧做不到 PIT**（baostock 季频财务无 `f_ann_date`），不是「暂时没建」 |
+| N-? | 公开通道的 **`all` 宇宙 ≠ 私有的 `all`** | 登记 | 公开 `instruments/all.txt` 3,575 行、私有 5,813 行，丢掉的 2,238 个码逐一记在 provider manifest 的 `instruments.dropped_codes`。三个基准宇宙（csi300/500/1000）的 instruments 与私有**逐行相同**。全市场留 v1.1（N-68 裁定不变） |
+| N-? | **退市整理期首日无限制**这条规则在公开通道**推不出来** | 登记不修 | 判据 `namechange.change_reason` 是私有表。2026-01..07 并集码内实测**分歧 4 行**（`600193.SH`/`600608.SH`@20260608、`600636.SH`/`600696.SH`@20260601），占 8.6e-6。不用名字近似：命名规则两个交易所相反（深/北后缀「退」、沪前缀「退市」），按名字判会整个漏掉沪市 |
+| N-? | 公开 `adj_factor` 与私有**不同基准**，绝对值不可跨通道比 | 登记 | 只有比值 `adj(t)/adj(t₀)` 有意义（provider 用的就是比值）。5 票样本比值跨度 ≤ 9.3e-6。`/adj` 的回包因此**不是**跨通道逐值可比的端点 |
+| N-? | baostock **会话会掉**，症状看起来像数据问题 | 已修 | 实测连拉 2,012 只后剩下每一只都失败。`fetch_adj.RELOGIN_AFTER=5`：连续失败到阈值就重登，重登后仍失败才算真失败。第一版会把 1,500 只全记成失败清单 |
+| N-? | **网关启动守门会扫 `$GB/scratch`**，别的代理留下的 0644 文件挡住起网关 | 登记 | 今天三次被挡（`scratch/1.2/*.py`、我自己 scp 上去的脚本）。`ops/guard_modes.py` 给的修法是 `--harden`；我只做了 `chmod -R go-rwx /data/shared/genebench/scratch`（**只剥组/其它位，不改内容**）。多代理并行时这会反复发生，建议在 HANDOFF 里写一句「scp 到 scratch 之后先 chmod 600」 |
+| N-? | `ops/run_oracles.py` 的网关地址**写死私有端口** | 待办（不在 1.1-a 的路径里） | `GATEWAY_URL = f"http://{cfg.GATEWAY_HOST}:{cfg.GATEWAY_PORT}"`（第 44 行）。要让 oracle 打公开网关，把它改成读 `cfg.gateway_port()` 或允许 `GENEBENCH_GATEWAY_URL` 覆盖即可。`reference/gateway_client.py` **不用改**（`base_url` 由调用方给，`reference/oracle_io.py` 已声明 `GENEBENCH_GATEWAY_URL` 是唯一允许的环境变量） |
+| N-? | 公开通道的 gold / τ / ε **没有重算** | 登记 | 本卡只到数据面（卡 2.5 §5 的重建链之前）。重建链的输入现在齐了：public provider + public tables |
+| N-? | 公开发布包（两种形态）**没打** | 登记 | 卡 2.5 §9。构建脚本形态的原料已齐（`ops/build_public_channel.py` + 每个目录的 `MANIFEST.sha256`/`build_info.json`） |

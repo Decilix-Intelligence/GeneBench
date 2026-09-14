@@ -1,0 +1,78 @@
+# 公开树的剔除清单（v1.0.16，卡 G2）
+# 源：/data/shared/genebench/repo @ ba2c7eae085e26c31d3191213e5dd0f80ac85fd7
+#
+# **口径变了**：v1.0.15 及以前这棵树是「剔掉答案面」的；本版起**带全部答案面** ——
+# reference/（含每道题的 solve.py）、scorer/、genetask/templates、genetask/params、
+# ε/τ 标定代码都在树里。理由：不带答案面外部用户算不出分（上一版剔完之后 65 个模块
+# import 断链，结算/出表/出集/oracle/控制组/适配赛道六条链路全断）。
+# 红线 2 随之改写为**容器边界**：答案面永不挂进 agent 容器（见 README §4 ①）。
+#
+# 因此这里只剔四类：① 私有通道数据 ② 凭据 ③ 记忆探针钥匙 ④ scratch 与 run 目录。
+#
+# 另有一堆**不是剔除、但也不在这棵树里**的东西（公开题集实例与标定物料），见 ⑤。
+
+## ① 私有通道数据
+（git 树里本来就没有数据文件：$GB/snapshots/v1、私有 gold 全量、私有 provider
+  都在仓库之外，git archive 取不到。snapshots/ 目录里是**代码**，不是快照数据。）
+
+## ② 凭据（.env / secrets / key 形态）
+（0 件 —— git 树里本来就没有凭据文件）
+
+## ③ 记忆探针钥匙
+reference/memory_probe_answers/  (1 个文件)
+  —— 真正的钥匙在仓库之外（$GB/reference/memory_probe_answers/），git 树里只有一份 README；
+     整棵剔掉是照裁定的字面执行：这个目录名本身就是「钥匙在哪」的路标。
+
+## ④ scratch 与 run 目录
+（0 件 —— git 树里本来就没有 scratch/ 与 run 目录）
+
+## ⑤ 不是剔除，但也不在这棵树里：**公开题集实例与公开标定物料**
+
+这两堆**不是被剔掉的** —— 它们从来就不在这棵树的射程里。本树是 `git archive HEAD` 打的，
+取的是 git 索引里的东西；而公开题集实例是 `ops/mk_instances.py` **物化**出来的产物，
+按红线 6 落在 `$GENEBENCH_ROOT` 之下、**在仓库之外**（`git ls-files reference/tasks` 是空的）。
+公开通道的标定物料（`calibration.json` / `epsilon/`）同理。
+
+**它们在第三个 Release 附件 `genebench_public_runtime_v1.tar.gz` 里**：
+
+| 包内前缀 | 是什么 |
+| --- | --- |
+| reference/tasks/public/v1.0-smoke-public/ | 公开题集的物化实例（题面 / arms / work 夹具 / solution / gold / scorer.yaml） |
+| snapshots/public_v1/ | 公开通道 calibration.json（τ/ε/IC 族）+ epsilon/ 产物目录 |
+
+落位命令（与包内 README、仓库 README §2.1a 同源）：
+
+    tar -xzf genebench_public_runtime_v1.tar.gz --strip-components=1 -C "$GENEBENCH_ROOT"
+
+**只 clone 这棵树、不落位这一件**的机器上，`ops/freeze_v10.py --check-all` 的
+**公开任务集轴核不绿**（差异全部落在 `channel_fixtures/`），题也跑不起来 ——
+2026-09-13 的 macOS 外部验收撞的就是这一条。**那不是下载损坏，也不是这棵树少打了东西。**
+附件有几件、各自的字节数 / sha256 / 下载地址，以 `ops/release/attachments.json` 为准。
+
+## 这次**没有**剔除的东西（与上一版的实质差别）
+
+| 留下的 | 件数 |
+| --- | --- |
+| reference/ 公共层（.py） | 26 |
+| scorer/ | 6 |
+| genetask/templates/ | 329 |
+| genetask/params/ | 3 |
+| 参考实现 solve.py | 47 |
+| 评分口径 scorer.yaml | 47 |
+| tasks/ | 1 |
+
+**后果**：这棵树**跑得了结算与出表** —— 上一版那个「65 个模块 import 断链」的问题没有了。
+证据：ops/reports/g2_public_tree_scoring.md。
+
+**代价**：题面与参考解在公网上，有进入训练语料的风险。
+设计性限制，见 ops/reports/known_limits_v1.md「G2（2026-09-12）」，v1.1 以留出集处理。
+
+## 两道门在这棵树上分别是什么结果（**必读，不然会以为它坏了**）
+
+* **容器边界口径**（主口径，v1.0.16 起）：answer_plane_guard --mode container
+  判的是「挂进 agent 容器的路径集合 + run dir」。**这棵树不是挂载面** —— 它是仓库。
+  有意义的问题是「拿这棵树跑评测时，答案面有没有被挂进 /task」，
+  证据在 ../scan_genebench_container.txt（正例判绿 + 反例判红各一次）。
+* **树口径**（第二道）：answer_plane_guard.scan 对这棵树**必然大量命中** ——
+  因为答案面**本来就在里面，这是有意的**。上一版那个「0 命中」在新口径下
+  恰恰意味着「这棵树对外没用」。命中数记在 ../scan_genebench_tree.txt，**它不是红**。

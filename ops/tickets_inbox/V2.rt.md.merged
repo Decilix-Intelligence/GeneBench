@@ -1,0 +1,12 @@
+# 收尾卡 v2 红队修复（V2.rt）的票据
+
+> 本卡按任务书**只修 block 与 major**。下面三条是红队的 minor（登记不修），
+> 外加两条本卡改动的副作用登记。编号先写 `N-?`，由编排方并进 `ops/tickets.md` 时定号。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `SlipSelfConsistent` 在**现存 132 条记录上零覆盖** | 登记不修（红队 V2.rt finding 8，minor） | 它现在是 `gate`（裁定 ④），但库里 8 条 S8 记录是 2026-09-08 按 set 1.0.9 / ref r1.0.14 结算的，早于 N-383，那一版 scorer 不产这个量。于是阶段表上这一列每一行都空 / `unobservable` —— **一条进判据的指标在发布件上没有任何覆盖**。判据本身是对的：红队拿当前 scorer 对已存产物 `runs_in/m6b/s8-rob-01.strict.cfg-codex-deepseek.r01/work/artifact.json` 跑 `scorer.l3.compare_fill`，得 `SlipSelfConsistent=1.0`、重算 53.8834 bps、容差 21.2037 bps。**修法零真 API**：`$PY ops/score_runs.py --batch m6b` / `--batch m6_public` 重跑结算入库（产物还在）。没跑的话要在 `known_limits` 里明写「v1 的现存记录上无覆盖」 |
+| N-? | `run_id` 的**机器段**没有被任何真记录验到 | 登记不修（finding 9，minor） | `runner/inject.py:198` 的 `run_id()` 现在一定会拼 `@<machine_id>`，但 2026-09-11 落地的 `i_rehearsal_v2` 6 条 run 的 `run_id` 仍是 `s1-cor-01.open.cfg-codex-deepseek.r01`（无 `@` 段），`inject.json` 里也没有 `machine_id`。全库 `machine_of()` 返回 `None` 的是 132/132。export 时机器标识是**现场算的**，不是从记录来的 —— 两台机器真去合并时主键退回 `(batch, run_id)`，裁定 ⑮ 说的「天然不撞」在今天的数据上不成立。要查的是：那次演练走的是不是发布包里**旧版**的 `inject.py`；是的话重打一次包再演练，并加一条测试断言 `pack` 出来的 run 目录 `run_id` 含 `MACHINE_SEP`、`inject.json` 里落了 `machine_id` |
+| N-? | 主表 S2 那一对列（`Align` / `Adj`）读起来会失真 | 登记不修（finding 10，minor；**动列要用户裁定**） | `i_rehearsal_v2/s2-cor-01.strict.cfg-codex-deepseek.r02` 的 `correctness` 是 `{Align:1, Adj:1, Cal:1, Decl:1, Set:1, CellAgree:0, n_gold_rows:41700, n_rows_missing:41700}` —— 面板一行都没对上。它在主表 S2 那一对上贡献的是 **1 / 1**，因为裁定 ⑩ 给 S2 分的两列是 `Align`/`Adj`，而这道题真正的内容判据 `CellAgree`（§9.2 唯一的 S2 fidelity 项，闸门 ≥0.999）不在十九列里。`l3_pass=False` 确实把它落到了 `P@1` 上，**不是算错**；是列的选取让只读那一对的人看到满分。两条路：① 不动列（⑩ 是裁定），在 `ops/reports/report_spec_v1.md` 与主表脚注给 S2 那一对加一句「量的是字段映射与复权口径的**申报**，面板内容一致性看 `CellAgree`」；② 把 `Align` 换成 `CellAgree` —— 那是改裁定，要用户点头 |
+| N-? | 本卡改 `withheld_reason` **改到了已发表的表上的数** | 已做，需知会 | finding 1 的修法（诚实终止判在最前 + 有读数就返回 `None`）让全库四类计数从 `budget 30 / rejected 40 / unsettled 32 / honest_halt 0` 变成 `honest_halt 1 / budget 26 / rejected 40 / unsettled 32`：1 条真诚实终止归位，3 条**有读数**的 run 不再被算进「没有读数」。后者会把少数本该是 `unobservable` 的格子从 `—` 改回 `unobservable`。已重出 `ops/reports/m6_public/` 与 `ops/reports/m6_all/` 的表。**已发表过的 v1.0.14 签字包不动** —— 那一版签的是那一版 |
+| N-? | `ops/test_6rt.py::test_零run的批不渲染逐run叙述` 的样本批换了 | 已做，登记 | 立这条测试时 `m6_public` 恰好 0 个 run，于是拿它当「0 run 的批」的样本。卡 X1 把那一批跑到 8 个 run 之后，这条测试变成「断言一件已经不成立的事」而红（与本卡无关，进场时就红）。改成用一个**一定没有 run 的批名** `m6_zero_fixture`，断言一个字没放宽；配平的判别力在同文件的 `test_有run的批照旧渲染主表叙述` |

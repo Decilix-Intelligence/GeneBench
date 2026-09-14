@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s3-cor-01",
+  "probe": "declared_reads",
+  "name": "日志里多读了一个未声明的字段",
+  "why": "声明读取集 vs 实际读取集（.038 那类缺陷在提交侧的形态）",
+  "where": "log",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "undeclared_reads"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:undeclared_reads [declared_reads] @$.declarations.required_fields — 声明只读 ['open', 'volume']，网关日志显示还读了 ['amount'] —— 这是 .038 那类缺陷在提交侧的形态"
+ ]
+}

@@ -1,0 +1,77 @@
+{
+ "harness": "ops/screen_runner.py",
+ "patch": "P-FRD",
+ "impls": {
+  "B1": {
+   "src": "/data/shared/genebench/snapshots/v1/epsilon/impl_v2_b1.py",
+   "src_sha256": "01dd4ed17db5708cf3a60e32b85b960e4ca22a6e3e7d6270f3559347bf260c54",
+   "patch": "P-FRD",
+   "patched_sha256": "4a0c223f0e05296442fbdbf4b283c11281eff65f650b1327d046d388eb8bdd38",
+   "anchors": [
+    "HERE = Path(__file__).resolve().parent",
+    "    keep[0] = True                              "
+   ]
+  },
+  "B2": {
+   "src": "/data/shared/genebench/snapshots/v1/epsilon/impl_v2_b2.py",
+   "src_sha256": "83a8134750746b2f64ce180eb21b1b8f57aeaefa8e590aaddb65d417bb0f982a",
+   "patch": "P-FRD",
+   "patched_sha256": "deea113aa89ec80c7b1a1b128b9f21d68a7b500f6ab75804b6e74345041953c6",
+   "anchors": [
+    "INPUT = os.path.join(BASE, \"bt_input_csi300_v2.p",
+    "    mask[0] = True"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "impl": "B1",
+   "freq": "daily",
+   "env": {
+    "GB_FIRST_REBALANCE_DAY": "window_start"
+   },
+   "wall_s": 1.26,
+   "out_sha256": "3df0fb869778ab132596e8c93628155f7c337521a460b82217ee6897f418df4f",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B1",
+   "freq": "daily",
+   "env": {
+    "GB_FIRST_REBALANCE_DAY": "first_period_end"
+   },
+   "wall_s": 1.26,
+   "out_sha256": "3df0fb869778ab132596e8c93628155f7c337521a460b82217ee6897f418df4f",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B2",
+   "freq": "daily",
+   "env": {
+    "GB_FIRST_REBALANCE_DAY": "window_start"
+   },
+   "wall_s": 1.42,
+   "out_sha256": "3acf8cddaa857025c485dc89d8ff6c8d754f398fb72866563aa0b2d9d0c59a86",
+   "stderr_tail": ""
+  },
+  {
+   "impl": "B2",
+   "freq": "daily",
+   "env": {
+    "GB_FIRST_REBALANCE_DAY": "first_period_end"
+   },
+   "wall_s": 1.43,
+   "out_sha256": "3acf8cddaa857025c485dc89d8ff6c8d754f398fb72866563aa0b2d9d0c59a86",
+   "stderr_tail": ""
+  }
+ ],
+ "gates": {},
+ "screen": {
+  "field": "first_rebalance_day",
+  "by_impl": {
+   "B1": "immaterial",
+   "B2": "immaterial"
+  },
+  "verdict": "immaterial"
+ }
+}

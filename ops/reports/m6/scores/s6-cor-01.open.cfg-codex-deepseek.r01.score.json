@@ -1,0 +1,121 @@
+{
+ "scorer_output": {
+  "schema_version": "1.0",
+  "validity": "valid",
+  "gate_failed": [],
+  "unobservable": [],
+  "correctness": {
+   "Cons": 1.0,
+   "Feas": 1.0,
+   "WeightAgree": 1.0,
+   "n_days": 23,
+   "n_days_missing": 0
+  },
+  "effect": {
+   "score": 100.0,
+   "raw_metric": 1.0,
+   "anchor_floor": 0.0,
+   "anchor_ceiling": 1.0
+  },
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/v1.0-smoke/s6-cor-01/work",
+   "clamped": false,
+   "metric_kind": "cons"
+  }
+ },
+ "record": {
+  "task_id": "s6-cor-01",
+  "stage": "S6",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "open",
+  "seq": 1,
+  "run_id": "s6-cor-01.open.cfg-codex-deepseek.r01",
+  "set_version": "1.0.7",
+  "reference_version": "r1.0.8",
+  "runner_version": "df2067cc41d87b0783da1b7a929693e6b53276e3d171be43b08fe81a313b9ad9",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "ok",
+  "sr_bucket": "scorable",
+  "validity": "valid",
+  "malformed": false,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {
+   "adjust_fingerprint": "clean",
+   "attribution_conservation": "clean",
+   "calendar": "clean",
+   "declared_reads": "clean",
+   "factor_degeneracy": "clean",
+   "fetch_clock": "clean",
+   "input_ablation": "clean",
+   "ledger_conservation": "clean",
+   "lookahead": "clean",
+   "nonfinite_propagation": "clean",
+   "optimizer_failure": "clean",
+   "pit_universe": "clean",
+   "source_status": "clean",
+   "underdetermined": "clean",
+   "unsupported_operator": "clean",
+   "warmup_boundary": "clean"
+  },
+  "findings": [],
+  "l3_kind": "cons",
+  "l3_pass": true,
+  "l3_score": 1.0,
+  "effect": 100.0,
+  "effect_withheld_reason": null,
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/v1.0-smoke/s6-cor-01/work",
+   "clamped": false,
+   "metric_kind": "cons"
+  },
+  "correctness": {
+   "Cons": 1.0,
+   "Feas": 1.0,
+   "WeightAgree": 1.0,
+   "n_days": 23,
+   "n_days_missing": 0
+  },
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "TE 未出：规格 §3 的跟踪误差要收益率序列，S6 产物里没有（N-126）",
+  "steps": 33,
+  "tokens_prompt": 1431805,
+  "tokens_completion": 32546,
+  "cost_usd": 0.67295492,
+  "cost_model": "deepseek-chat",
+  "latency_s": 662.586,
+  "validator_rejections": null,
+  "overreach": {
+   "denied": 3,
+   "total": 343,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "open_range_would_cross_asof": 3
+   },
+   "malformed_requests": 33,
+   "malformed_reasons": {
+    "asof_missing": 6,
+    "unclassified": 22,
+    "param_malformed": 5
+   }
+  },
+  "unbounded_requests": 3,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": []
+ }
+}

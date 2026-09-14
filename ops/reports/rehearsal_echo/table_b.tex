@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{Table B — rehearsal\_echo（接入/harness 验证，不是实验数据）}
+\label{tab:b-rehearsal_echo}
+\begin{tabular}{llllrrrrrrrrr}
+\toprule
+config\_id & arm & arm\_kind & stage & n\_runs & n\_runs\_denom & invalid\_rate & honest\_halts & unobservable\_probes\_mean & set\_version & reference\_version & runner\_version & image\_digest \\
+\midrule
+\multicolumn{13}{l}{\textit{参照臂（baseline）}} \\
+cfg-echo-min-deepseek & open & baseline & S1 & 1 & 1 & 1.000 & 0 & 0.000 & 1.0.13 & r1.0.20 & 9089e489123a… & gb-echo-min-u@sha256:32e2ed7d847c… \\
+\midrule
+\multicolumn{13}{l}{\textit{协议臂（protocol）—— 与参照臂的差异是投放的工件}} \\
+cfg-echo-min-deepseek & strict & protocol & S1 & 1 & 1 & 1.000 & 0 & 0.000 & 1.0.13 & r1.0.20 & 9089e489123a… & gb-echo-min-u@sha256:32e2ed7d847c… \\
+\bottomrule
+\end{tabular}
+\end{table}

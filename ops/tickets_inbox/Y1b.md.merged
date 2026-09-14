@@ -1,0 +1,61 @@
+# 卡 Y1b 收件箱（实例层 oracle 跑批 + 实例层 O1 矩阵）
+
+> 不直接改 `ops/tickets.md`（并发施工规则 C）。编号先写 `N-?`，由编排方定号。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `gateway/sim_factory.py::task_dir` 跨出集 glob，实例集一出现就把**出集**的 S8 打挂 | 待裁定 | 它按 `reference/tasks/*/<task_id>` 找目录，找到两个就 `RuntimeError`（"在多个出集里都有…不猜"）。实例集的**基准实例沿用基点 task_id**（设计如此，见 `ops/mk_instances.py`），于是 `v1.0-instances/s8-cor-01` 一落盘，`v1.0-smoke/s8-cor-01` 的 oracle 当场 500（`/sim/log 返回 500：{}`）。**这不是只影响本卡**：任何人在实例目录存在期间跑出集 S8 的 gold 都会挂，而报错在网关侧、日志里看不出是目录撞号。本卡的临时处置是**删掉 4 个撞号的 S8 基准实例目录**（`s8-cor-01/eco-01/ops-01/rob-01`）并把它们排除出跑批 —— 代价是这 4 个实例本轮没有实例层结论（它们与出集那 4 道**是同一道题**，O1 结论见 `ops/reports/probe_matrix_oracle.md`）。两条解：① `task_dir` 收一个显式 `set_id`，由调用侧（`run_oracles` / 注入器）按题面所属出集传进去 —— 干净，但要动 `gateway/sim_factory.py` 与调用约定；② 实例集的基准实例也发新号（不再沿用基点 task_id）—— 只动 `ops/mk_instances.py`，但会让「基准实例 = 出集那道题」这个等式在 id 上看不出来，且已落盘的 130 个 id 全变。**倾向 ①**。两处都不在本卡路径，没动。 |
+| N-? | `reference/make_s7_signal.py` 按**已存在**的 `s7-*` 目录放夹具，而实例目录是跑批当场建的 | 已绕过 | 表现：15 道 S7 实例全 `FileNotFoundError: work/signal.parquet`。跑批的顺序是「建目录 → 立刻跑 solve.py」，中间没有插夹具的机会。本卡加了一步前置（`$GB/scratch/Y1b/prep_dirs.py`：只跑 `write_all` 建目录、不跑题），再 `make_s7_signal --set-id v1.0-instances`，15 个目录都拿到了同一份信号（sha `4597e07783b9e442…`，与出集那份同源）。**建议把这一步并进 `ops/mk_instances.py --fixtures`**（它现在只走 `make_fixtures.materialize`，不管 S7 的专用信号），否则下一个跑实例的人还要再踩一次。 |
+| N-? | S6 的 15 个实例仍然没有夹具（继承 Y1 的 `v11_deferred`） | 未解 | `reference/make_fixtures.py::s6_consumer_window(set_root)` 要先在实例集根里扫到「引用 `reference/signals/*` 的题」才算得出窗口并集，而那些题正是它要出夹具的题。本卡按路径边界没动 `make_fixtures.py`。后果：S6 的 15 个实例在矩阵里是 `缺夹具` 一类的 `n/a` —— **不是 `·`**。Y1 给的两条解仍然有效，倾向「让 `mk_instances --fixtures` 先落 `task.yaml`（sha 留 null）再回头补 sha」。 |
+| N-? | 六道欠定探针题的 **18 个实例**照出集同一条规矩不落盘 | 不修，登记 | `s1-rob-02 / s2-rob-02 / s3-rob-02 / s4-rob-02 / s5-rob-02 / s8-rob-02` 各 3 个实例（基准 + 2 变体），`packager.build_task` 的 E9c/E9d2 当场拒（「字段在该条件下既无 screen 实测记录、也无静态规则」）。**这是设计如此，不是缺陷** —— 出集挂起 6 题，实例层就该挂起对应的 18 个。矩阵里它们单独归一类「挂起的探针题实例（设计如此）」，不与「跑挂了」混在一个数里。分母因此是 **130 实例 / 可建 112**。 |
+| N-? | `ops/mk_instances.py --fixtures --stages S4` 覆盖共享数据卡（Y1 已记，本卡复现确认） | 已知 | 本卡没跑 `--fixtures`（只跑了 `write_all` 与 `make_s7_signal`），`ops/data_cards/` 一个字未动，`git status` 复核过。 |
+| N-? | `ops/merge_o1.py` 原来是 `100755`，本卡的补丁脚本 `chmod 0o600` 把可执行位抹了 | 已复原 | 提交 `467e865` 里出现了一行 `mode change 100755 => 100644`。它的用法是 `python ops/merge_o1.py …`（模块 docstring 写着），掉了 `+x` 不影响任何调用方，但那是本卡不该改的东西。已在收口提交里把 `u+x` 加回去（`700`，不给 go）。**给后续代理**：往 `$GB` 里写文件的补丁脚本，`chmod` 要按原模式来，别一律 `0600`。 |
+| N-? | `ops/gateway_lock.py` **轮询式拿锁对着背靠背的生产者会饿死** | 待裁定 | 它是 `LOCK_NB` + `time.sleep(poll)`，`poll` 默认 **5.0 秒**。Y2 的 adapt 真跑是背靠背的（一条跑完立刻起下一条，间隙一两秒），于是 5 秒一次的试探几乎永远落不进那个间隙 —— 本卡实测**连等 1711 秒一次都没拿到**，而同一把锁在 Y2 开跑之前是抢得到的。这不是「等得久」，是**饿死**，而且日志里长得和「对方在跑长任务」一模一样（都是每 30 秒一行「等网关锁」），分不出来。本卡的绕法是走 `gateway_lock()` 自己的 `poll` 参数把它收到 0.2 秒（`$GB/scratch/Y1b/gwlock_fast.py`，**同一把锁、同一条互斥保证、没改共享文件**），并在每块跑完让出 120 秒不去抢。**根治**：把 `LOCK_NB` 轮询换成**阻塞** `flock`（内核排队，先到先得），持有者记录照旧写。改的是共享文件 `ops/gateway_lock.py`，不在本卡路径，没动。 |
+| N-? | `ops/public_gateway.sh run -- <cmd>` **靠调用者自己设 `GENEBENCH_CHANNEL`，脚本本身不保证** | 已核，登记不修 | `do_start` 只把 `GENEBENCH_CHANNEL=public` 给了网关进程；`do_run` 里那条 `bash -c` 继承的是调用者的环境。不设的话客户端按 `private` 现算端口（`cfg.gateway_port()`），会**安静地打在生产网关 18080 上** —— 正是 `ops/run_oracles.py::gateway_url` 的 docstring 写的那种错：「数字照样出，只是来自另一份数据，没有一处会报错」。**本卡去核了历史，结论是此前没有打错地方**：`$GB/logs/gateway_access_public.jsonl` 里有 `config_id=oracle` 30580 条、`oracle_probe_view` 42103 条，最后一条 `2026-09-10T15:22:03Z` —— 时刻正对上 Y1 的公开 S8 gold 那一跑。所以调用者一直是设了的，只是**没有一处强制**。本卡的公开跑批显式 `export GENEBENCH_CHANNEL=public` + `GENEBENCH_GATEWAY_URL=…:18081`，不依赖约定。**建议**（不在本卡路径，没动）：`do_run` 里把这两个变量一并 export 给命令，或起来之后核一次 `/healthz` 的 channel 与客户端算出来的端口是不是同一个。 |
+| N-? | **S4-ECO 的参考解换个窗口就算出 NaN / 挑出一个叫 `'nan'` 的因子** | 待裁定，**本卡最值钱的一条** | 基点 `s4-eco-01`（窗口 `2026-01-05..2026-06-30`）零 finding；它的三个变体**全废**：`s4-eco-02`（窗口收到 `2026-01-05..2026-03-31` + 宇宙换 csi500）与 `s4-eco-04`（只收窗口到 Q1）产出的 `payload.ic_stats` **七个字段全是 NaN**（`mean/std/icir/positive_ratio/coverage/ci_low/ci_high`），被 L1 判 `malformed:s4_ic_stat_not_number`（红队 rt31）各 7 条；`s4-eco-03`（窗口换到 `2026-04-01..2026-06-30`）直接崩在 `reference/s4_oracle_common.py:44`：`ValueError: work/factor_pool.parquet 里没有 'nan' 的行` —— **挑因子那一步返回了 NaN，NaN 被当成 factor_id 去查表**。三个夹具都在（3.9 MB / 2.6 MB / 2.4 MB），不是缺件。**这正是实例层要找的东西**：出集那 40 行每行只有一个取值，`s4-eco-01` 一直是绿的，没人知道这道题的参考解**不耐窗口变化**。归因提醒：`(malformed)` 非零**不是探针缺陷**，产物是我们自己写的（矩阵抬头已按这条改写）。修在 `reference/s4_oracle_common.py` 与 S4-ECO 的 `solve.py`，都在参考轴冻结根里、不在本卡路径，**没动**；要改就要推 r1.0.22。 |
+| N-? | **S2-ROB 的参考解在 13 个月窗口上跑不完 600 秒** | 待裁定 | `s2-rob-04`（基点 `s2-rob-01`，窗口拉到 `2025-07-01..2026-07-31`）`subprocess` 超时 600 秒被杀，`rc=-1`。同基点的另外两个变体（窗口更短）都绿。**不是错，是不 scale** —— 但后果一样：这道题在这个取值上出不了 gold。两条解：① 把 `run_one` 的 600 秒放宽（要先量它到底要多久，别把「慢」和「挂」混成一个数）；② 认定 13 个月窗口超出 S2 的设计范围，把这个取值从 `genetask/params/v1.0-instances.yaml` 的候选里去掉（**要动实例参数表**）。**倾向 ①先量再说**。矩阵里它单独归「跑超时」一类，不与「崩了」混。 |
+| N-? | 归类器一刀切用「命中任一关键词」，把「参考解崩了」显示成「缺件」 | 本卡已修 | `s4-eco-03` 的 stderr 带 `work/` 就被归进「缺夹具」，而夹具在。已改成一类一类地说「全中」还是「任一中」，并补了 `ops/test_y1b.py::test_夹具在但参考解自己崩了_不许归成缺夹具` 钉住。**登记它是因为这正是本页要防的那种错，而它出现在防它的那段代码里。** |
+
+## 本卡的两条口径（请照抄，别再出现第三个数）
+
+* **40 模板 / 130 实例**。「模板」= 出集参数表的 40 行（模板**目录**只有 39 个 —— `S1/source_status` 被 `s1-rob-01` 与 `s1-rob-02` 两行复用，W3 的 CONFLICT，Y1 沿用）。「实例」= 同一行参数沿 window / universe / factor_pool 换取值的变体，**不是新题**。
+* **三控与破坏样本不按实例重跑**（本卡裁定，已写进矩阵页脚）。`ops/run_controls.py` 与 `ops/run_probe_mutations.py` 验的是**判据面**（探针会不会误伤诚实产物 / 破坏一处该族会不会响），被测对象是**校验器**；换窗口、换宇宙、换因子池不换掉校验器的任何一条分支。实例层要证的是「同一道题换了取值，参考解仍然零 finding」—— 那就是 O1 矩阵本身。
+
+
+## 没跑完怎么接着跑（照抄）
+
+实例层跑批是**可续跑**的：`--resume` 只跳过累积文件里**已经零 finding** 的题，
+有 finding 的与没产出的照跑（它们正是要重试的）。所以下面这条命令跑几次都行，
+每次只推进还没绿的那些。
+
+```sh
+GB=/data/shared/genebench; PY=$GB/env/bin/python; cd $GB/repo
+
+# 一次一块（8 道），私有通道：
+$PY $GB/scratch/Y1b/gwlock_block.py "接着跑:实例 oracle" \
+  flock $GB/locks/heavy.lock \
+  systemd-run --user --scope -q -p MemoryHigh=8G -p MemoryMax=12G \
+  $PY ops/run_oracles.py --instances --no-batch-lock --resume --stages S1,S2
+
+# 或者直接用本卡的驱动（按 $GB/scratch/Y1b/order.txt 分块、跑完让出 150 秒）：
+CHUNK=8 YIELD=150 bash $GB/scratch/Y1b/drive_priv.sh
+
+# 公开通道（网关起一次、跑多块、到死线收工、脚本自己停）：
+BUDGET_MIN=40 bash $GB/scratch/Y1b/pub_run.sh
+
+# 只想看当前覆盖率，不跑题（一个字节都不写进明细）：
+$PY ops/merge_o1.py --instances --render-only --matrix /tmp/x.md && head -12 /tmp/x.md
+```
+
+**四件必须知道的事**：
+
+1. **`order.txt` 是轮转序**（每阶段先基准后变体，阶段之间轮流）。这样中途停下时
+   八个阶段的覆盖是**均衡**的，而不是「S1 全跑完、S8 一个没跑」。
+   它比 `order.v1.txt` 少 4 行 —— 少掉的正是与出集撞号的 4 个 S8 基准实例。
+2. **不要把那 4 个 S8 基准实例加回去**（`s8-cor-01 / s8-eco-01 / s8-ops-01 / s8-rob-01`）。
+   它们一落盘，**出集**的 S8 oracle 就当场 500（收件箱第一条）。
+   要跑它们得先解掉 `gateway/sim_factory.py::task_dir` 的跨出集 glob。
+3. **网关锁走 `gwlock_block.py`**（阻塞式，内核排队）。用 `ops/gateway_lock.py` 的
+   轮询版在有背靠背生产者时会饿死 —— 实测连等 1711 秒一次没拿到。
+4. **S6 的 15 个实例现在跑一次废一次**（缺夹具），每次重试都白花一次建题时间。
+   要么先解夹具，要么跑的时候 `--stages` 里绕开 S6。

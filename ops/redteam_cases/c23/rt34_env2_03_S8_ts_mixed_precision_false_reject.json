@@ -1,0 +1,117 @@
+{
+  "kind": "artifact",
+  "artifact": {
+    "schema_version": "1.0",
+    "artifact_id": "S8-art-1",
+    "stage": "S8",
+    "task_id": "T-sample",
+    "config_id": "cfg-sample",
+    "arm": "strict",
+    "seed": 0,
+    "as_of": "2026-07-31",
+    "produced_at": "2026-09-01T12:00:00.000+00:00",
+    "provenance": [],
+    "declarations": {
+      "visible_state_fields": [
+        "cash",
+        "positions",
+        "nav"
+      ],
+      "permitted_operations": [
+        "order",
+        "cancel"
+      ],
+      "matching_frequency": "daily",
+      "calendar_id": "SSE",
+      "slippage_reference_price": "reference_close"
+    },
+    "payload": {
+      "events": [
+        {
+          "ts": "2026-09-01T12:00:00Z",
+          "type": "order",
+          "symbol": "600519.SH",
+          "qty": 100,
+          "order_id": "o-1",
+          "side": "buy"
+        },
+        {
+          "ts": "2026-09-01T12:00:00.500Z",
+          "type": "fill",
+          "symbol": "600519.SH",
+          "qty": 100,
+          "price": 1720.5,
+          "order_id": "o-1",
+          "side": "buy"
+        }
+      ],
+      "state_transitions": [
+        {
+          "from": "idle",
+          "to": "ordered",
+          "order_id": "o-1"
+        },
+        {
+          "from": "ordered",
+          "to": "filled",
+          "order_id": "o-1"
+        }
+      ],
+      "fills": {
+        "fill_rate": 1.0,
+        "slippage_bps": 2.1
+      },
+      "overreach": {
+        "denied_requests": 1
+      }
+    }
+  },
+  "task": {
+    "task_id": "T-sample",
+    "stage": "S8",
+    "declared": {
+      "visible_state_fields": [
+        "cash",
+        "positions",
+        "nav"
+      ],
+      "permitted_operations": [
+        "order",
+        "cancel"
+      ],
+      "matching_frequency": "daily",
+      "calendar_id": "SSE",
+      "slippage_reference_price": "reference_close"
+    },
+    "underdetermined": []
+  },
+  "gateway_log": [
+    {
+      "ts": "2026-09-01T12:00:00.000+00:00",
+      "task_id": "T-sample",
+      "config_id": "cfg-sample",
+      "method": "GET",
+      "path": "/bars",
+      "params": {},
+      "as_of": "2026-07-31",
+      "decision": "allow",
+      "reason": null,
+      "status": 200,
+      "rows": 8
+    },
+    {
+      "ts": "2026-09-01T12:00:01.000+00:00",
+      "task_id": "T-sample",
+      "config_id": "cfg-sample",
+      "method": "GET",
+      "path": "/bars",
+      "params": {},
+      "as_of": "2026-07-31",
+      "decision": "deny",
+      "reason": "asof_violation",
+      "status": 403,
+      "rows": null
+    }
+  ],
+  "tradability": null
+}

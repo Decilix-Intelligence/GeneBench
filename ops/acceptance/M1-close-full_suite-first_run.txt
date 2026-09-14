@@ -1,0 +1,3730 @@
+    [env] duckdb     1.4.3                <- /data/shared/genebench/env/lib/python3.10/site-packages/duckdb/__init__.py
+.    [env] pandas     2.2.3                <- /data/shared/genebench/env/lib/python3.10/site-packages/pandas/__init__.py
+.    [env] pyarrow    20.0.0               <- /data/shared/genebench/env/lib/python3.10/site-packages/pyarrow/__init__.py
+.    [env] qlib       0.9.8.dev32          <- /data/shared/genebench/env/lib/python3.10/site-packages/qlib/__init__.py
+.    [env] fastapi    0.141.1              <- /data/shared/genebench/env/lib/python3.10/site-packages/fastapi/__init__.py
+.    [env] uvicorn    0.52.1               <- /data/shared/genebench/env/lib/python3.10/site-packages/uvicorn/__init__.py
+.    [env] pydantic   2.13.4               <- /data/shared/genebench/env/lib/python3.10/site-packages/pydantic/__init__.py
+.    [env] httpx      0.28.1               <- /data/shared/genebench/env/lib/python3.10/site-packages/httpx/__init__.py
+.    [env] pytest     9.1.1                <- /data/shared/genebench/env/lib/python3.10/site-packages/pytest/__init__.py
+.    [env] python     = /data/shared/genebench/env/bin/python3.10
+    [env] cfg.PYTHON = /data/shared/genebench/env/bin/python  (exists=True)
+.    [env] /data: total=2750G used=75G free=2535G
+.    [env] st_dev: root=2049 /data=2049 home=64512
+.    [env] bind ok  192.168.1.48:18080 (已释放)
+.    [env] GENEBENCH_ROOT = /data/shared/genebench
+.    [env] mode = 0o700 (要求 0o700)
+.    [env] 目录权限审计:79 个目录 <- /data/shared/genebench (不下钻:/data/shared/genebench/env, /data/shared/genebench/repo/.git)
+.    [env] reference  /data/shared/genebench/repo/reference  mode=0o700
+.    [env] scorer     /data/shared/genebench/repo/scorer  mode=0o700
+.    [env] reference  文件权限审计:1 个文件
+.    [env] scorer     文件权限审计:1 个文件
+.    [env] write probe ok -> .gb_write_probe_lb_bts72.tmp
+.    [env] REPO       /data/shared/genebench/repo  exists=True
+.    [env] ENV        /data/shared/genebench/env  exists=True
+.    [env] LOGS       /data/shared/genebench/logs  exists=True
+.    [env] SNAPSHOTS  /data/shared/genebench/snapshots  exists=True
+.    [env] RESULTS    /data/shared/genebench/results  exists=True
+.    [env] WHEELS     /data/shared/genebench/wheels  exists=True
+.    [env] OPS        /data/shared/genebench/repo/ops  exists=True
+.    [env] genebench_config <- /data/shared/genebench/repo/genebench_config.py
+..    [env] create_dir 三级全 0700(umask=002 下)-> /data/shared/genebench/.gb_mkdir_probe_fn_qu3f6/a/b/c
+...............    [env] catalog  /home/ljn/projects/data/market_lake/catalog/market.duckdb  access_mode=read_only  views=150
+    [env] catalog  size=536576 mtime_moved_during_test=False  (外部 ETL 在写,非本测试所为)
+.    [env] 扫了 51 个 .py,可写 duckdb 连接 0 处
+.    [env] gold datasets = 147  <- /home/ljn/projects/data/market_lake/gold
+    [env] qlib release  <- /home/ljn/projects/data/qlib/releases/2026-08-26
+........................................................................ [ 23%]
+........................................................................ [ 37%]
+........................................................................ [ 52%]
+........................................................................ [ 66%]
+........................................................................ [ 80%]
+..........................F.........EEEEEE.EEEEEEEEEEEEEEE.EEEE..EEEE... [ 95%]
+.........................                                                [100%]
+==================================== ERRORS ====================================
+___ ERROR at setup of test_pit_reconstruction_matches_live_snapshots[csi300] ___
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+___ ERROR at setup of test_pit_reconstruction_matches_live_snapshots[csi500] ___
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+__ ERROR at setup of test_pit_reconstruction_matches_live_snapshots[csi1000] ___
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_universe_between_snapshots_is_last_observation_carried_forward[csi300] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_universe_between_snapshots_is_last_observation_carried_forward[csi500] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_universe_between_snapshots_is_last_observation_carried_forward[csi1000] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+___ ERROR at setup of test_out_date_is_previous_trading_day_of_next_snapshot ___
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_______________ ERROR at setup of test_out_date_is_a_trading_day _______________
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_censoring_flags_match_live_first_and_last_period[csi300] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_censoring_flags_match_live_first_and_last_period[csi500] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_censoring_flags_match_live_first_and_last_period[csi1000] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+______ ERROR at setup of test_uncertainty_windows_are_consistent[csi300] _______
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+______ ERROR at setup of test_uncertainty_windows_are_consistent[csi500] _______
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+______ ERROR at setup of test_uncertainty_windows_are_consistent[csi1000] ______
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_nominal_size_deviations_are_reported_not_hidden[csi300] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_nominal_size_deviations_are_reported_not_hidden[csi500] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_nominal_size_deviations_are_reported_not_hidden[csi1000] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_gap_suspect_flags_require_the_in_missing_in_shape[csi300] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_gap_suspect_flags_require_the_in_missing_in_shape[csi500] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_gap_suspect_flags_require_the_in_missing_in_shape[csi1000] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_________ ERROR at setup of test_gap_suspect_fires_on_a_synthetic_hole _________
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_universe_size_is_not_constant_and_the_exception_is_pinned[csi300] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_universe_size_is_not_constant_and_the_exception_is_pinned[csi500] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_ ERROR at setup of test_universe_size_is_not_constant_and_the_exception_is_pinned[csi1000] _
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+___________ ERROR at setup of test_freeze_line_filter_is_falsifiable ___________
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+__________ ERROR at setup of test_summary_date_coverage_matches_live ___________
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_________ ERROR at setup of test_summary_turnover_matches_live[csi300] _________
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+_________ ERROR at setup of test_summary_turnover_matches_live[csi500] _________
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+________ ERROR at setup of test_summary_turnover_matches_live[csi1000] _________
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.fixture(scope="module")
+    def live() -> dict[str, Any]:
+        """现场从只读 catalog 重算的真相,**不经过被测模块的任何计算函数**。
+    
+        Returns:
+            ``members``   {universe: {trade_date: frozenset(code)}}
+            ``dates``     {universe: [snapshot dates, 升序]}
+            ``cal``       冻结线以内的交易日升序列表
+            ``prev_td``   {trade_date: 前一个交易日}
+        """
+        lake.raise_open_file_limit()
+>       with lake.catalog() as con:
+
+ops/test_universe_source_a.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+=================================== FAILURES ===================================
+_______________ test_rebuild_is_byte_stable_except_the_timestamp _______________
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+>               conn = duckdb.connect(path, read_only=True)
+E               _duckdb.IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:282: IOException
+
+The above exception was the direct cause of the following exception:
+
+    def test_rebuild_is_byte_stable_except_the_timestamp():
+        """同样的输入必须得到同样的报告 —— 否则"重跑可复现"是空话。"""
+>       first = ur.build()
+
+ops/test_universe_reconcile.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+snapshots/universe_reconcile.py:967: in build
+    with lake.catalog() as con:
+../env/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+snapshots/lake.py:313: in catalog
+    conn = open_catalog(threads=threads, retries=retries, retry_wait=retry_wait)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+threads = 2, retries = 5, retry_wait = 1.0
+
+    def open_catalog(
+        *,
+        threads: int = DEFAULT_THREADS,
+        retries: int = DEFAULT_RETRIES,
+        retry_wait: float = DEFAULT_RETRY_WAIT,
+    ) -> duckdb.DuckDBPyConnection:
+        """打开 `cfg.CATALOG` 的**只读**连接,并把线程数收到 `threads`。
+    
+        调用方负责关闭。**推荐直接用 `catalog()` 上下文管理器**,
+        它保证连接一定被关掉(异常路径也是)。
+    
+        连接以只读模式打开:duckdb 引擎会把一切写语义顶回去(卡 0.1 实测
+        `CREATE`/`INSERT` 分别抛 InvalidInputException / CatalogException),
+        这是"不写湖"这条红线的**引擎级**防线,源码级防线见本模块的单测。
+    
+        Args:
+            threads: duckdb 线程数,默认 `DEFAULT_THREADS`。
+            retries: 打开失败的重试次数。湖是活的,外部 ETL 的瞬时 `.wal`
+                会让只读打开偶发失败 —— 重试即可,不是故障。
+            retry_wait: 重试间隔基数(秒),第 i 次等 ``retry_wait * i``。
+    
+        Returns:
+            已经 ``SET threads`` 的只读连接。
+    
+        Raises:
+            LakeError: 参数非法,或重试用尽仍打不开。
+        """
+        if threads < 1:
+            raise LakeError(f"threads 必须 >= 1,拿到 {threads}")
+        if retries < 1:
+            raise LakeError(f"retries 必须 >= 1,拿到 {retries}")
+    
+        path = str(cfg.CATALOG)
+        last: BaseException | None = None
+        for attempt in range(1, retries + 1):
+            try:
+                conn = duckdb.connect(path, read_only=True)
+            except Exception as exc:  # noqa: BLE001 - duckdb 抛的类型很杂
+                last = exc
+                if attempt < retries:
+                    time.sleep(retry_wait * attempt)
+                continue
+            conn.execute(f"SET threads={int(threads)}")
+            return conn
+>       raise LakeError(
+            f"打不开 catalog(只读,重试 {retries} 次):{path}\n"
+            f"最后一次错误:{type(last).__name__}: {last}"
+        ) from last
+E       snapshots.lake.LakeError: 打不开 catalog(只读,重试 5 次):/home/ljn/projects/data/market_lake/catalog/market.duckdb
+E       最后一次错误:IOException: IO Error: Could not set lock on file "/home/ljn/projects/data/market_lake/catalog/market.duckdb": Conflicting lock is held in /home/ljn/tools/miniconda3/envs/qlib_env/bin/python3.10 (PID 242817) by user ljn. See also https://duckdb.org/docs/stable/connect/concurrency
+
+snapshots/lake.py:290: LakeError
+=========================== short test summary info ============================
+FAILED ops/test_universe_reconcile.py::test_rebuild_is_byte_stable_except_the_timestamp
+ERROR ops/test_universe_source_a.py::test_pit_reconstruction_matches_live_snapshots[csi300]
+ERROR ops/test_universe_source_a.py::test_pit_reconstruction_matches_live_snapshots[csi500]
+ERROR ops/test_universe_source_a.py::test_pit_reconstruction_matches_live_snapshots[csi1000]
+ERROR ops/test_universe_source_a.py::test_universe_between_snapshots_is_last_observation_carried_forward[csi300]
+ERROR ops/test_universe_source_a.py::test_universe_between_snapshots_is_last_observation_carried_forward[csi500]
+ERROR ops/test_universe_source_a.py::test_universe_between_snapshots_is_last_observation_carried_forward[csi1000]
+ERROR ops/test_universe_source_a.py::test_out_date_is_previous_trading_day_of_next_snapshot
+ERROR ops/test_universe_source_a.py::test_out_date_is_a_trading_day - snapsho...
+ERROR ops/test_universe_source_a.py::test_censoring_flags_match_live_first_and_last_period[csi300]
+ERROR ops/test_universe_source_a.py::test_censoring_flags_match_live_first_and_last_period[csi500]
+ERROR ops/test_universe_source_a.py::test_censoring_flags_match_live_first_and_last_period[csi1000]
+ERROR ops/test_universe_source_a.py::test_uncertainty_windows_are_consistent[csi300]
+ERROR ops/test_universe_source_a.py::test_uncertainty_windows_are_consistent[csi500]
+ERROR ops/test_universe_source_a.py::test_uncertainty_windows_are_consistent[csi1000]
+ERROR ops/test_universe_source_a.py::test_nominal_size_deviations_are_reported_not_hidden[csi300]
+ERROR ops/test_universe_source_a.py::test_nominal_size_deviations_are_reported_not_hidden[csi500]
+ERROR ops/test_universe_source_a.py::test_nominal_size_deviations_are_reported_not_hidden[csi1000]
+ERROR ops/test_universe_source_a.py::test_gap_suspect_flags_require_the_in_missing_in_shape[csi300]
+ERROR ops/test_universe_source_a.py::test_gap_suspect_flags_require_the_in_missing_in_shape[csi500]
+ERROR ops/test_universe_source_a.py::test_gap_suspect_flags_require_the_in_missing_in_shape[csi1000]
+ERROR ops/test_universe_source_a.py::test_gap_suspect_fires_on_a_synthetic_hole
+ERROR ops/test_universe_source_a.py::test_universe_size_is_not_constant_and_the_exception_is_pinned[csi300]
+ERROR ops/test_universe_source_a.py::test_universe_size_is_not_constant_and_the_exception_is_pinned[csi500]
+ERROR ops/test_universe_source_a.py::test_universe_size_is_not_constant_and_the_exception_is_pinned[csi1000]
+ERROR ops/test_universe_source_a.py::test_freeze_line_filter_is_falsifiable
+ERROR ops/test_universe_source_a.py::test_summary_date_coverage_matches_live
+ERROR ops/test_universe_source_a.py::test_summary_turnover_matches_live[csi300]
+ERROR ops/test_universe_source_a.py::test_summary_turnover_matches_live[csi500]
+ERROR ops/test_universe_source_a.py::test_summary_turnover_matches_live[csi1000]
+1 failed, 474 passed, 29 errors in 156.86s (0:02:36)

@@ -1,0 +1,12 @@
+# 卡 B2 票据（缺件 ②③：公开题集夹具 + 标定物料）
+
+> 编号先写 `N-?`：取号时盘上最大是 N-747，卡 W 仍在续编，留给合表那一步定号。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `ops/run_controls.py:53` 写死发布方绝对路径，外部用户结算必炸 | **待修（不在卡 B2 可改路径）** | `PUBLIC_ANSWER_ROOT = Path("/data/shared/genebench/reference/tasks/public/v1.0-smoke-public")`，而 `ops/score_runs.py:49` 正是从这里 import。`ops/run_joblist.py:79` 用的是 `cfg.GENEBENCH_ROOT / …`。干净 clone 实测两者不等 → 外部即使把第三个附件正确落位，`score_runs` 仍去发布方路径找题集，每个 run 记「没有题目录」。在 f01 上两条路径碰巧都存在，所以内部跑不出来。修法：改成 `cfg.GENEBENCH_ROOT / "reference" / "tasks" / "public" / F.PUBLIC_SET_ID`（与 `run_joblist` 同源），`ops/test_c65.py:49` 的相等断言随之才有意义 |
+| N-? | 同一类写死：`run_controls.py:48/49/54`、`ops/validator_parity.py:40-41`、`ops/run_probe_mutations.py:46/382` | 待修 | `:48` 私有题集根、`:49`/`:54` 两条网关日志路径也都写死在 `/data/shared/genebench/…`。`:49`/`:54` 会让外部用户的四个依赖网关日志的探针族整片标 `unobservable`，而且**不报错** |
+| N-? | 重打公开树时要在 `EXCLUDED.txt` 里写明「题集与标定在第三个附件里」 | 待办（重打树那张卡） | `scratch/G2/mk_tree_g2.sh` 现在只说「树里本来就没有数据文件」，没说去哪拿。缺件 ② 的根因就是 `git archive HEAD` 取不到 `$GENEBENCH_ROOT` 下的物化产物 —— 不写这一句，下一个外部用户还是只能猜 |
+| N-? | `ops/data_cards/public_channel.md` 补一条指向 `public_runtime_v1.md` 的链接 | 待办 | 本卡没有改 `public_channel.md`（共享文件，避免与并发卡撞）。新数据卡是 `ops/data_cards/public_runtime_v1.md` |
+| N-? | `ops/test_public_chain.py:296` 断言读 `calibration.json` 里的发布方绝对路径 | 登记不修 | `assert str(cfg.SNAPSHOTS_PUBLIC) in d["provider"]["dir"]`。外部环境下 `calibration.json` 里记的是发布方路径，这条必红。评分链路**不读**这些路径，所以不挡发布；要修得先决定「标定文件里到底记不记绝对路径」 |
+| N-? | 第三个附件未上传 | 待办（上传那张卡） | `genebench_public_runtime_v1.tar.gz`，42,046,516 B，sha256 `49e9b250d398a1ceaad22da3de6d2cc87605a5dc036113bf4b19f04e2e00963f`，已登记进 `ops/release/attachments.json`，`download_url` 留空。README §2.1a 的下载清单也要随之加一件（卡 C 的范围） |

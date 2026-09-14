@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "genebench-client"
+version = "1.0.0"
+description = "GeneBench 取数垫片：yfinance / tushare / akshare 兼容层，全部经 as-of 数据网关"
+requires-python = ">=3.10"
+# 纯 Python。HTTP 走标准库 urllib —— 少一个依赖就少一次「运行期 pip install」的理由，
+# 而运行期装包被卡 4.1 §3.4 明令禁止（那会把包仓库放进出向白名单）。
+dependencies = ["pandas>=2.0", "numpy>=1.24"]
+
+[project.urls]
+Homepage = "https://example.invalid/genebench"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

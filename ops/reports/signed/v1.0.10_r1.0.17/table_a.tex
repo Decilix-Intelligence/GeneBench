@@ -1,0 +1,13 @@
+\begin{table}[t]
+\centering
+\caption{Table A — GeneBench v1.0 构造验收（M6-lite 两次 pass 合并；**不是实验数据**）}
+\label{tab:a-m6-all}
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+config\_id & arm & n\_tasks & SR & pass@1 & ProgressRate & effect & Steps & Latency & 越权率 & unsettled\_runs \\
+\midrule
+cfg-codex-deepseek & open & 12 & 0.500 & 0.333 & 0.500 & 100.000 & 42.714 & 755.078 & 0.021 & 0 \\
+cfg-codex-deepseek & strict & 12 & 0.542 & 0.250 & 0.542 & 100.000 & 41.067 & 582.746 & 0.045 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,58 @@
+========= sam_pit zip listings
+-- base_company.zip  (2,293,997 B)
+   entries=1
+    base_company.csv  raw=9,267,189  zip=2,293,831
+-- base_stock.zip  (2,367,125 B)
+   entries=1
+    base_stock.csv  raw=10,318,509  zip=2,366,963
+-- dict_industry.zip  (5,678 B)
+   entries=1
+    dict_industry.csv  raw=34,795  zip=5,510
+-- dict_product_ind.zip  (187,877 B)
+   entries=1
+    dict_product_ind.csv  raw=2,190,415  zip=187,687
+-- dict_product_rs.zip  (777,885 B)
+   entries=1
+    dict_product_rs.csv  raw=2,340,047  zip=777,713
+-- fin_secu_sam_period_pit.zip  (2,206,335 B)
+   entries=1
+    fin_secu_sam_period_pit.csv  raw=20,993,433  zip=2,206,147
+-- fin_secu_sam_product_calc_pit.zip  (93,447,548 B)
+   entries=1
+    fin_secu_sam_product_calc_pit.csv  raw=470,762,378  zip=93,447,348
+-- fin_secu_sam_product_pit.zip  (10,772,854 B)
+   entries=1
+    fin_secu_sam_product_pit.csv  raw=93,777,895  zip=10,772,664
+-- sam_release_notes_tree.zip  (28,437 B)
+   entries=1
+    sam_release_notes_tree.csv  raw=183,321  zip=28,251
+-- supply_chain_relation.zip  (3,537,586 B)
+   entries=1
+    supply_chain_relation.csv  raw=28,966,636  zip=3,537,402
+
+========= Smartag dictionary
+-- base_stock.pdf  (866,621 B)  [non-zip]
+-- base_stock.zip  (2,432,852 B)
+   entries=1
+    base_stock.csv  raw=10,416,501  zip=2,432,674
+-- concept_dictionary.zip  (78,800 B)
+   entries=1
+    concept_dictionary.csv  raw=189,803  zip=78,606
+-- concept_stock.zip  (778,796 B)
+   entries=1
+    concept_stock.csv  raw=6,773,643  zip=778,612
+-- dict_product_rs.zip  (779,289 B)
+   entries=1
+    dict_product_rs.csv  raw=2,341,931  zip=779,101
+-- dictionary.pdf  (866,630 B)  [non-zip]
+-- event_dictionary.zip  (50,249 B)
+   entries=1
+    event_dictionary.csv  raw=298,505  zip=50,059
+-- region_dictionary.zip  (77,785 B)
+   entries=1
+    region_dictionary.csv  raw=698,236  zip=77,593
+
+========= one news zip
+-- news_company_label_20080101-20090101.zip
+   entries=1
+    news_company_label_20080101-20090101.csv  raw=14,986,742  zip=3,692,814

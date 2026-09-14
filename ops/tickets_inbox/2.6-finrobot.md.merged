@@ -1,0 +1,58 @@
+# 卡 2.6-finrobot 的票据
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `emit.fetch()` 收不下 HTTP 404，而 404 正是垫片 NO_DATA 探针的正常回码 | 待裁定 | `emit.fetch` 的 `_HTTP_STATUS` 只映射 403/429，其余 4xx 一律 `EmitError: HTTP 404 落不进 [...]`。而 `genebench_client.nodata.trace()` 的留痕**就是**打一个白名单外的路径拿 404 —— 于是每个把 ledger 转成 `payload.fetches` 的接入方都得自己决定 404 算哪一档。本卡记成 `empty`（"这次取数返回了零行"，为什么空在 `params.api/kind` 里）。两个方向：① `emit.fetch` 把 404 也映射成 `empty`；② 给 `fetches[].status` 加一档 `no_such_source`（要动 artifact schema = 冻结根）。倾向 ①：404 的语义与 `empty` 一致，且不动题面。属卡 2.3 的路径，本卡没改。 |
+| N-? | `runner/c42/upstream_pins.py::PINS` 里没有 `finrobot` | 待裁定 | `PINS` 现在有 `rdagent_q` / `tradingagents` / `openhands` / `codex_cli`，`finmem` 与 `finrobot` 都不在。本卡的钉在 `integrations/finrobot/pin.json`（含 sdist sha256 与 commit，且两者互相印证）。要不要把 P2 接入统一登记进 `PINS`（那样 `ops/test_integration_*` 就能做"两处逐字一致"的判据，像 tradingagents 那张卡做的）是范式层的裁定，`runner/**` 不是本卡的路径。 |
+| N-? | 接入指南缺一节「被测方是 agent 框架时，工具签名是硬约束」 | 待裁定 | 见下面「指南 findings」第 3 条。两个方向：① 在 `integrations/README.md` §3 末尾加一小节；② 放进 `P2_CONTRACT.md`（那份是从代码读出来的规则，而这条是接入经验，不是网关规则）。倾向 ①。 |
+
+## 指南 findings（`integrations/README.md` 的第一个外部用户视角）
+
+按任务书要求：**只记，不改指南**。以下每条都是照着手册做、在这张卡上真撞到的。
+
+1. **§1② 的 Dockerfile 三行骨架装不上垫片。**
+   手册给的是
+   ```dockerfile
+   COPY genebench_client/ /opt/genebench_client/
+   RUN pip install --no-cache-dir --no-index --no-build-isolation /opt/genebench_client
+   ```
+   基座 `python:3.12-slim` **没有 setuptools**，而垫片的 build-backend 是
+   `setuptools.build_meta`，照抄的结果是 `BackendUnavailable: Cannot import 'setuptools.build_meta'`。
+   正路是先 `RUN pip install "setuptools>=61" wheel`（构建期出网是允许的），
+   垫片本身仍 `--no-index`。**卡 2.6-tradingagents 已经记过一次，本卡是第二次撞** ——
+   同一条手册句子连续绊倒两个接入者，值得直接补进 §1②。
+
+2. **§1⑥ 的构建段没说"上游源码放哪"。**
+   手册的 `scp -r integrations/<id> integrations/genebench_client …/build/<id>/` 之后就直接
+   `docker build -f <id>/Dockerfile .`，但凡上游要从 tarball 装（§1② 明写 GitHub 不保证可达、
+   要下 tarball 两跳 scp）就还差一句"tarball 放构建上下文顶层、在 Dockerfile 里 `COPY`"。
+   第一次照抄时会得到 `COPY failed: file not found`。
+
+3. **手册没有一节讲"被测方是 agent 框架时，工具函数的签名是硬约束"。**
+   §3 讲了怎么把数据层换成垫片，但没提：AutoGen / LangChain 这类框架**从函数签名生成
+   工具 JSON schema**，所以替换实现时
+   * 替身写成 `*args, **kwargs` → `TypeError: All parameters … must be annotated`；
+   * 接线模块写 `from __future__ import annotations` → `Annotated[str, "…"]` 到 pydantic
+     手里变成解析不了的 ForwardRef，`PydanticUserError`。
+   两者都炸在**组装 agent 的时候**，现场表现是"接线全对、agent 根本没起来"，
+   而错误信息里一个字都没提到"你换了实现"。本卡两个都撞了（见
+   `integrations/finrobot/README.md` §5.6）。修法一句话：`functools.wraps(上游函数)`。
+
+4. **§1⑧「把阶段覆盖写进 COVERAGE.md」只说 `$EDITOR`，没说这是共享文件。**
+   施工契约要求共享文件"在 flock 内读-改-提交一气呵成"，而手册这一步读起来像
+   "打开编辑器写一行"。第一个不看契约只看手册的接入者会直接改文件、直接提交。
+   建议 §1⑧ 给出与 §1① 同样具体的一条命令（`flock /data/shared/genebench/locks/git.lock -c '…'`）。
+
+5. **§1⑥ 的结算写 `$PY ops/score_runs.py --help` 为准，但真正跑得通的那一条在 W-0 的交接里。**
+   实测可用：`$PY ops/score_runs.py --batch i_finrobot --remote /data/genebench_runner/i_finrobot/runs/runs`
+   （注意 `run_f02_a1.py` 会在 `--run-root` 下再建一层 `runs/`，所以 `--remote` 要多一层）。
+   手册不写具体命令是为了不漂，但"多一层 runs"这一条踩过的人才知道，值得作为**注**留在 §1⑥。
+
+6. **§1⑤ 的预算段与真跑命令里的 `--max-tokens 3000000` 已经解释过了，好用。**
+   这条不是问题，是记一笔：手册专门写了"600,000 是默认值、3000000 是你要给的值，两个数不矛盾"，
+   本卡照做，没有再花时间去核对哪个是权威。
+
+7. **一处与实测不符的小地方**：§1② 的 `config.yaml` 例子写 `base_url: https://api.deepseek.com/v1`，
+   而已有的三个接入（`tradingagents` / `rdagent_q` / `finmem`）与本卡都写
+   `https://api.deepseek.com`（不带 `/v1`）。两种都能过三条判据，但例子与既有实践不一致，
+   照抄例子的人会得到一份与别人不同的配置。建议统一。

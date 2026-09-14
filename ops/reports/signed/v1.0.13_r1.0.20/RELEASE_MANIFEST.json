@@ -1,0 +1,328 @@
+{
+ "schema_version": 1,
+ "generated_by": "ops/mk_release_manifest.py",
+ "note": "`releasable` 是推导出来的：任何缺件、任何未闭合的 blocker、任何一份未定的许可 → false。手改这个字段会被 ops/test_release_manifest.py 当场抓到。",
+ "axes": {
+  "set_version": "1.0.13",
+  "set_root": "925a1adcdf82e6a06fdd647710b5439c43897e29e1a6ed1665fbb835a3f54620",
+  "reference_version": "r1.0.20",
+  "reference_root": "8c162988c2a7b5d20a6eccc59284c3d791fea56de1a912e5e2291b655baacfac",
+  "protocol_version": "geneprotocol_v1@<逐 run 反算，见 VERSIONS.md §1.3>",
+  "channels": [
+   "private",
+   "public"
+  ],
+  "comparable_iff": "四条轴全部相同"
+ },
+ "freeze_line": "2026-07-31",
+ "task_counts": {
+  "drafted": 40,
+  "released": 34,
+  "held": 6
+ },
+ "license": {
+  "data": {
+   "state": "pending_license_text",
+   "file": "DATA_LICENSE",
+   "text_in_repo": false
+  },
+  "code": {
+   "spdx": "<待定>",
+   "file": "LICENSE",
+   "decided": false
+  }
+ },
+ "blockers": [
+  {
+   "id": "data_license_text",
+   "what": "baostock 的书面再分发许可**原文未入库**",
+   "status_now": "DATA_LICENSE = `pending_license_text`",
+   "blocks": "形态 A（冻结包下载）：包只落 $GB/release/_staging_unpublished/，MANIFEST.license.publishable=false，外部用户拿不到包",
+   "closes_when": "原文放进 ops/terms/baostock/permission/，DATA_LICENSE 的「## 2. 许可原文」一节引用其文件名/日期/签署方，顶部状态改 granted",
+   "evidence": [
+    "DATA_LICENSE",
+    "ops/reports/public/release_forms.md",
+    "ops/terms/baostock/index.json"
+   ],
+   "satisfied": false
+  },
+  {
+   "id": "no_clone_url",
+   "what": "仓库**没有可 clone 的地址**（git remote 为空）",
+   "status_now": "git remote 为空",
+   "blocks": "形态 B（用户自建）：第一步是「拿一份完整仓库」，包里 README 的那行 git clone 是**占位符**",
+   "closes_when": "仓库推到一个外部用户能访问的地址，把该地址写进 README_TEMPLATE 并**重打一次包**（_staging_unpublished/ 里那份 README 是旧文本）",
+   "evidence": [
+    "ops/reports/public/release_forms.md"
+   ],
+   "satisfied": false
+  },
+  {
+   "id": "frozen_artifacts_missing",
+   "what": "PUBLIC_FROZEN_ARTIFACTS 声明的冻结件缺件",
+   "status_now": "缺 3 件：['factor_library/compiled/qlib_native.jsonl', 'factor_library/compiled/qlib_panel.jsonl', 'factor_library/compiled/blocked.jsonl']",
+   "blocks": "缺的是 gold 的**定义面**（「τ 标定于此实现对」）——少了它们，拿到包的人**复现不了 τ**",
+   "closes_when": "把 factor_library/compiled/ 三个 jsonl 补齐，或改 snapshots/public/manifest.py 的清单并说明为什么不需要",
+   "evidence": [
+    "snapshots/public/manifest.py",
+    "ops/reports/public/release_forms.md"
+   ],
+   "satisfied": false
+  },
+  {
+   "id": "code_license_undecided",
+   "what": "**代码许可未定** —— 这是用户的决定，不由施工方替他选",
+   "status_now": "SPDX-License-Identifier: <待定>",
+   "blocks": "整个仓库的对外分发：没有许可的代码，别人不知道能不能用",
+   "closes_when": "用户选定一个许可（建议 Apache-2.0 或 MIT，差别写在 LICENSE 里），把 SPDX 行与正文换成该许可的原文",
+   "evidence": [
+    "LICENSE"
+   ],
+   "satisfied": false
+  }
+ ],
+ "missing": [
+  "factor_library/compiled/blocked.jsonl",
+  "factor_library/compiled/qlib_native.jsonl",
+  "factor_library/compiled/qlib_panel.jsonl"
+ ],
+ "releasable": false,
+ "files": {
+  "CHANGELOG.md": {
+   "group": "入口与许可",
+   "sha256": "bd68d3254b79a2f665f52b8600d1959e574eeeb4972b0393975ee476c59b4772",
+   "bytes": 50918
+  },
+  "CITATION.cff": {
+   "group": "入口与许可",
+   "sha256": "380619a58c852425ababf6ec78e0e6d8c0dba7cf577b1eee80d2cbddce845c43",
+   "bytes": 2353
+  },
+  "DATA_LICENSE": {
+   "group": "入口与许可",
+   "sha256": "babf467a786d8c1648453a0f382b95431945dc1c7b54041be103c2a403523ff3",
+   "bytes": 7706
+  },
+  "LICENSE": {
+   "group": "入口与许可",
+   "sha256": "65cc2bac84970e9ed407fbde043e5d0cde0bb4afac7d2d7b9ee02debeef4cc29",
+   "bytes": 2974
+  },
+  "README.md": {
+   "group": "入口与许可",
+   "sha256": "390cef6c2b47415a9a662aca0b10fbcfd9edd2c574d3f2a96da0a6b104c67424",
+   "bytes": 25592
+  },
+  "VERSIONS.md": {
+   "group": "入口与许可",
+   "sha256": "c31216de154a9e6d8eef4c551498f224aa0556371780d47526ab237773031fec",
+   "bytes": 11126
+  },
+  "docs/OPERATOR_MANUAL.md": {
+   "group": "手册",
+   "sha256": "aa09ecdb2e5599a0a0a7dc591ee7871e2f6ed981f682003a286a5537e6518644",
+   "bytes": 61630
+  },
+  "factor_library/compiled/blocked.jsonl": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": null,
+   "bytes": null
+  },
+  "factor_library/compiled/qlib_native.jsonl": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": null,
+   "bytes": null
+  },
+  "factor_library/compiled/qlib_panel.jsonl": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": null,
+   "bytes": null
+  },
+  "harnesses/README.md": {
+   "group": "手册",
+   "sha256": "832832cce49f0893e683859e09b7a6f7e1e42472bee3a793d9d270034fb64541",
+   "bytes": 33348
+  },
+  "integrations/P2_CONTRACT.md": {
+   "group": "口径与协议",
+   "sha256": "c2991e1e30dc64a90683dcf4d4621d7e79bc4d406f4c91949c99896db1b3d3e5",
+   "bytes": 56298
+  },
+  "integrations/README.md": {
+   "group": "手册",
+   "sha256": "4eea23a319cff4839eac8e947eac5a0bddf0f6dbd021c7df5e9d4c9c2192a985",
+   "bytes": 61100
+  },
+  "ops/HANDOFF.md": {
+   "group": "内部交接（非面向外部运行者）",
+   "sha256": "57084a47b4ff628a4d6f1888c8776eb7e65e10d5898417aa392c6d91a0dd143d",
+   "bytes": 146420
+  },
+  "ops/data_cards/README.md": {
+   "group": "数据卡",
+   "sha256": "c9d983db1fdfca06cafe721d4eef956b8a27f674cf887a537989269c34314fe9",
+   "bytes": 8779
+  },
+  "ops/data_cards/fixture_s4_eco_pool_v1.md": {
+   "group": "数据卡",
+   "sha256": "40624706fcf00b726a56f7596ff60bbe58bd5b2f1ea5b77f007421236dd8ff8c",
+   "bytes": 1416
+  },
+  "ops/data_cards/fixture_s6_signals.md": {
+   "group": "数据卡",
+   "sha256": "523c4843b4ad9aa1e5c34c92f6fd016fdf185ea8bddfdd23fe301159b72d8e45",
+   "bytes": 1046
+  },
+  "ops/data_cards/gold_factors.md": {
+   "group": "数据卡",
+   "sha256": "791e663feda85b8dff5152cbcc4b3cda346bfce6d066b1bb2a1e46b341f07c45",
+   "bytes": 7035
+  },
+  "ops/data_cards/public_channel.md": {
+   "group": "数据卡",
+   "sha256": "c14fd2cff434299430d91a7ccef588e8585e17dff21263b89b5c0aa8b0697d18",
+   "bytes": 20924
+  },
+  "ops/data_cards/qlib_provider.md": {
+   "group": "数据卡",
+   "sha256": "40176750063612fc83476c069db8e1951b1b87f94c414f84792d7e4f60314d85",
+   "bytes": 8422
+  },
+  "ops/data_cards/s7_backtest_gold.md": {
+   "group": "数据卡",
+   "sha256": "45bac93dda4648f56f8f533e6386fdd5f6b74e1a6f93f90e42b15ad97bd9d052",
+   "bytes": 6503
+  },
+  "ops/data_cards/tradability.md": {
+   "group": "数据卡",
+   "sha256": "03af9706e1ac5a674b1d05e4166ed46ee9da04890e0c3202edabc01769b9a50f",
+   "bytes": 13763
+  },
+  "ops/data_cards/universe_pit.md": {
+   "group": "数据卡",
+   "sha256": "b88bb07e7de9b3e80e4a31a88c5997f0c1bcf6b99ab637fdc069e929517f21e6",
+   "bytes": 27441
+  },
+  "ops/manifests/v1.0-smoke.json": {
+   "group": "冻结清单",
+   "sha256": "2e43dbb9081b556b239f4628a9d8d1a2b7e7093c5eba98be8406ab8a3501d351",
+   "bytes": 47265
+  },
+  "ops/manifests/v1.0-smoke.reference.json": {
+   "group": "冻结清单",
+   "sha256": "501200b1be84d0c231d885683b235ea42431a620b6aebecd085c0be96893c791",
+   "bytes": 44492
+  },
+  "ops/reports/calibration_spec_v1.md": {
+   "group": "报告",
+   "sha256": "4b99aeb775b192e42fb50c9caf2bd30df966f2ddf765574a0a6159d571711ecc",
+   "bytes": 4353
+  },
+  "ops/reports/known_limits_v1.md": {
+   "group": "报告",
+   "sha256": "887e66583f551752bc09c924ebfe02dfc0a0a66d9cf6a824bc2d65963a3c124c",
+   "bytes": 14970
+  },
+  "ops/reports/public/release_forms.md": {
+   "group": "报告",
+   "sha256": "467d39f3461c19d08d886cfdc9881d5f378c0cc580ab8392e707fc1752688ba7",
+   "bytes": 21644
+  },
+  "ops/reports/v1_0_readiness.md": {
+   "group": "报告",
+   "sha256": "d189a3c95c972b58ae3aa5932b2112262b0fb1c9c13a8f9436f589aa9c4dec11",
+   "bytes": 20600
+  },
+  "ops/reports/validator_validation_v1.md": {
+   "group": "报告",
+   "sha256": "ebb6ffb2709ec9e58e6aa593871f762ed293132568e3ce6503acf3fd7f515725",
+   "bytes": 4073
+  },
+  "ops/specs/GeneBench指标对接决定_v1.md": {
+   "group": "口径与协议",
+   "sha256": "4585dd1ef5271a2fb5ac75f7959c447b432b2db8b2433e2800b5cf257a490df2",
+   "bytes": 14109
+  },
+  "ops/specs/GeneBench指标规格_v1.md": {
+   "group": "口径与协议",
+   "sha256": "29981e1351faa3ceeb7d24a19e08364e13eeb5f0690d4dc5b382e004ccbe7d79",
+   "bytes": 14084
+  },
+  "ops/specs/GeneBench秩相关与标定口径_v1.md": {
+   "group": "口径与协议",
+   "sha256": "d339f1776527266d9ac63ffede9f65ca1667e7edb6a034ab0974ac293e76d7e2",
+   "bytes": 4620
+  },
+  "ops/specs/artifact_schema/v1.0/S1.json": {
+   "group": "artifact schema",
+   "sha256": "4c8c374dd31cfdd2b9f5fbd91a30c4bf0e6fd7ab0f81a99c020fa804619f9a1e",
+   "bytes": 4658
+  },
+  "ops/specs/artifact_schema/v1.0/S2.json": {
+   "group": "artifact schema",
+   "sha256": "1b1be8fd780c37039ed1fa6da9ebea9c5afe58f0b4d2855ba48ded6c7ff1c9d8",
+   "bytes": 5156
+  },
+  "ops/specs/artifact_schema/v1.0/S3.json": {
+   "group": "artifact schema",
+   "sha256": "bfc7e08a370ee8d60539c03f100fa613a7e175d421c46be604bd5c6c8c97046f",
+   "bytes": 7052
+  },
+  "ops/specs/artifact_schema/v1.0/S4.json": {
+   "group": "artifact schema",
+   "sha256": "e0c43ca6a0783105d975c7e761791eec47e5827fe0ef0d8bf07faaab52a084e0",
+   "bytes": 5027
+  },
+  "ops/specs/artifact_schema/v1.0/S5.json": {
+   "group": "artifact schema",
+   "sha256": "2d2c7d47564154145ded37f5a9cfabacc88e9a77bb1c56f2af7a25953686af04",
+   "bytes": 5523
+  },
+  "ops/specs/artifact_schema/v1.0/S6.json": {
+   "group": "artifact schema",
+   "sha256": "2f90f299ac132966b8f8e70063238bda3562dd14fe02214d5865eb7aedc678ba",
+   "bytes": 4730
+  },
+  "ops/specs/artifact_schema/v1.0/S7.json": {
+   "group": "artifact schema",
+   "sha256": "9fb584b7a7bd6909a65bc432fcb8d00ad7734a7ad3618ab693597ebb63d7aec1",
+   "bytes": 9016
+  },
+  "ops/specs/artifact_schema/v1.0/S8.json": {
+   "group": "artifact schema",
+   "sha256": "516a245835d5dc4a4175962ba9312397a00fc682bc9500ad484decc11452eb39",
+   "bytes": 7184
+  },
+  "ops/specs/backtest_contract.md": {
+   "group": "口径与协议",
+   "sha256": "7cd6c853da378482b6889df20ac53151a41f134358b31f3831d7c2471806e3f5",
+   "bytes": 22985
+  },
+  "ops/specs/fairness_protocol.md": {
+   "group": "口径与协议",
+   "sha256": "8834588920487794dbd4211f637d355c02ec0523d51a8253cb571273cc0adf58",
+   "bytes": 39942
+  },
+  "ops/specs/metrics_as_implemented_v1.md": {
+   "group": "口径与协议",
+   "sha256": "5bfac31755104b1dd184969f3f96bb9b376f52ff629136f9819ead2730c26615",
+   "bytes": 22834
+  },
+  "reference/factorlib_pinned/formula.py": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": "3eaf99b7dc829e824cc37cea4a414858ffc34dec9b317ab807df960bf9cb17a4",
+   "bytes": 11431
+  },
+  "reference/factorlib_pinned/qlib_loader.py": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": "bbad13f3b7152df1566b5719290baa6426f717e79227c7009a51c9208224cf96",
+   "bytes": 19019
+  },
+  "reference/factorlib_pinned/qlib_ops.py": {
+   "group": "公开包冻结件（PUBLIC_FROZEN_ARTIFACTS）",
+   "sha256": "f3d16a7925c5778cf3760516ac62671958fdef675e26fb90983077aca8c7ced2",
+   "bytes": 4897
+  }
+ },
+ "generated_at": "2026-09-08T09:00:09Z"
+}

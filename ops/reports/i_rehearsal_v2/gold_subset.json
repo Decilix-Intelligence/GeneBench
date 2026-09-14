@@ -1,0 +1,487 @@
+{
+ "rule": {
+  "sources": [
+   "出集40行+130实例的 gold_args/declared/inputs[].origin",
+   "s4_eco_pool_v1 选中的 30 条（csi300，读夹具数据卡）"
+  ],
+  "limitation": "子集能复现夹具内容，不能重新推导池子的选取 —— build_pool() 的合格判定要扫全族每一条（gtja_191 186 条 / worldquant_101 82 条 / qlib_alpha158 158 条）。要重新推导得有全量 gold，走手册 §1.4 (b) 的重建链。"
+ },
+ "used": {
+  "csi300": [
+   "gtja_191.001",
+   "gtja_191.002",
+   "gtja_191.003",
+   "gtja_191.012",
+   "gtja_191.017",
+   "gtja_191.022",
+   "gtja_191.043",
+   "gtja_191.046",
+   "gtja_191.064",
+   "gtja_191.085",
+   "gtja_191.106",
+   "gtja_191.126",
+   "gtja_191.147",
+   "gtja_191.168",
+   "gtja_191.191",
+   "qlib_alpha158.BETA10",
+   "qlib_alpha158.CNTP30",
+   "qlib_alpha158.IMAX60",
+   "qlib_alpha158.KSFT2",
+   "qlib_alpha158.MIN60",
+   "qlib_alpha158.RESI10",
+   "qlib_alpha158.RSV5",
+   "qlib_alpha158.SUMP10",
+   "qlib_alpha158.VSUMD5",
+   "qlib_alpha158.WVMA60",
+   "worldquant_101.001",
+   "worldquant_101.006",
+   "worldquant_101.010",
+   "worldquant_101.019",
+   "worldquant_101.027",
+   "worldquant_101.036",
+   "worldquant_101.045",
+   "worldquant_101.054",
+   "worldquant_101.055",
+   "worldquant_101.071",
+   "worldquant_101.084",
+   "worldquant_101.101"
+  ],
+  "csi500": [
+   "gtja_191.001",
+   "gtja_191.002",
+   "gtja_191.003",
+   "gtja_191.017"
+  ]
+ },
+ "n_factors": 41,
+ "channels": {
+  "private": {
+   "root": "/data/shared/genebench/snapshots/v1/gold_factors",
+   "n_files": 41,
+   "bytes": 159350146,
+   "missing": [],
+   "full_bytes": 16007090394,
+   "files": [
+    {
+     "rel": "csi300/gtja_191.001.parquet",
+     "bytes": 6398918,
+     "sha256": "871246ac0090717111e0687c671f424bf6b5cbe56f3956aa2dc13f95a017e377"
+    },
+    {
+     "rel": "csi300/gtja_191.002.parquet",
+     "bytes": 4202683,
+     "sha256": "809f5cd53027137c3fddad8d8474eed139e3b2a6fcf302f892031771c05bff41"
+    },
+    {
+     "rel": "csi300/gtja_191.003.parquet",
+     "bytes": 3365714,
+     "sha256": "5987bca76cfb8d021b363d95a036f141238ddb35f6701a077f24238c71edcf91"
+    },
+    {
+     "rel": "csi300/gtja_191.012.parquet",
+     "bytes": 5733679,
+     "sha256": "c33762517143c9674962e68398312ef74e8b218a80482dc0c928fbf54a4ceccc"
+    },
+    {
+     "rel": "csi300/gtja_191.017.parquet",
+     "bytes": 6302011,
+     "sha256": "638ed08b2479f935194f8bbe6b7baee927cf242bb9df3ba7da86bfb2e6f6a82c"
+    },
+    {
+     "rel": "csi300/gtja_191.022.parquet",
+     "bytes": 4317134,
+     "sha256": "f9e9ac34f28babce2a2a560265409246ad4afbd2a178db47512b29f88e59d890"
+    },
+    {
+     "rel": "csi300/gtja_191.043.parquet",
+     "bytes": 4338315,
+     "sha256": "c1187b1169c379646420cb38c7aabf91d476f46f71462ba5343651825b4bbce8"
+    },
+    {
+     "rel": "csi300/gtja_191.046.parquet",
+     "bytes": 3221286,
+     "sha256": "a2e0c0f8c04c9b46377f609e63104fb9e4990249cf079bc84c2c6b442fee3047"
+    },
+    {
+     "rel": "csi300/gtja_191.064.parquet",
+     "bytes": 599113,
+     "sha256": "bc004c33d3df516de8fcc87f81d6e73cb1bcc8f7f9c6fce5447cc9b34063b539"
+    },
+    {
+     "rel": "csi300/gtja_191.085.parquet",
+     "bytes": 916519,
+     "sha256": "aa53b968b3f9ec229154bf8ed80d6607c2b15cd6c202bb45f930a521a19e1fc0"
+    },
+    {
+     "rel": "csi300/gtja_191.106.parquet",
+     "bytes": 3452501,
+     "sha256": "ab74b53a702b3f21fc052cc3caf22f36ebff5e11609b44475f2c1de48456a03f"
+    },
+    {
+     "rel": "csi300/gtja_191.126.parquet",
+     "bytes": 3602162,
+     "sha256": "dfb2f595162e79ccba83629d9d45d2938151dc9df6198501def5314277bfb362"
+    },
+    {
+     "rel": "csi300/gtja_191.147.parquet",
+     "bytes": 4372405,
+     "sha256": "6f3045c200de6f72b6f6579d7934605f156a7c0616f90036f6880db916742bf1"
+    },
+    {
+     "rel": "csi300/gtja_191.168.parquet",
+     "bytes": 3973763,
+     "sha256": "3288e6b1f507f3e8b4819adb2bb44d4a0e5005375500de3511cf7a8e379d237a"
+    },
+    {
+     "rel": "csi300/gtja_191.191.parquet",
+     "bytes": 4341105,
+     "sha256": "1e6c26812b5576f013bec183d56a76dccf91d0ccd60b72058b95f839689cb9cb"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.BETA10.parquet",
+     "bytes": 4340113,
+     "sha256": "6e7e871066abd0ecb85cb86272fcd94407b2fb7ef3a2b13e4869e566c73b49f6"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.CNTP30.parquet",
+     "bytes": 463440,
+     "sha256": "8ba41130c130e052eb0eccce3e58fe145f2f002cdb0c04e5b129fffeb6d32fa8"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.IMAX60.parquet",
+     "bytes": 648018,
+     "sha256": "b4dcc493c24adaaad32dbbd60288aa6209d288d58e938c8861ac8f894c8cf212"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.KSFT2.parquet",
+     "bytes": 3705295,
+     "sha256": "06ea6ae62a69f53584c0bd2a7b3ac98b7e0f05bc9d589c630b011c4f817aaec2"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.MIN60.parquet",
+     "bytes": 3313877,
+     "sha256": "ab403817bb2e9e7b767ca2ec1bcdfb94578f328294df243a2794a8254bf78fe5"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.RESI10.parquet",
+     "bytes": 4353587,
+     "sha256": "5c0960c69f236dfd895f1ec64916493acff013bd3ea6b7f4c965c6888cdb77a7"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.RSV5.parquet",
+     "bytes": 3679869,
+     "sha256": "01fddcebf7c0e92aea76b19ef72f9ca7034aa01e8ed705e46f76aada7cfae249"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.SUMP10.parquet",
+     "bytes": 3667629,
+     "sha256": "afe6edbf9c00217e8b06f9995220db02705287247c50aa24703d160943ea6200"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.VSUMD5.parquet",
+     "bytes": 4312806,
+     "sha256": "11abb20ed020cb122cbf3127e3e3c3ba3067345610639d923bbb455c42093bc1"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.WVMA60.parquet",
+     "bytes": 3868633,
+     "sha256": "7ca3732aa1c2d68cf813ea998aaa39579693c0fc063a6d02592b8a98a9af6164"
+    },
+    {
+     "rel": "csi300/worldquant_101.001.parquet",
+     "bytes": 1155769,
+     "sha256": "1d90e4c67ad45aba90ec8b78c3cef90bc8ad827fa28c52595211f427fb285ca6"
+    },
+    {
+     "rel": "csi300/worldquant_101.006.parquet",
+     "bytes": 4285412,
+     "sha256": "110aedbf524c4675d5ba93744f003d66de651b7d5a751feced376e4aa22d159a"
+    },
+    {
+     "rel": "csi300/worldquant_101.010.parquet",
+     "bytes": 3047786,
+     "sha256": "88ffe403cfa266336d8e662bdf7f15e031c7c9d02013c10c93e84f355c65d88b"
+    },
+    {
+     "rel": "csi300/worldquant_101.019.parquet",
+     "bytes": 1240339,
+     "sha256": "e282218f2053d259945ff86bf4e6d649800f8fe7e1f160fe49b2520edc137ae7"
+    },
+    {
+     "rel": "csi300/worldquant_101.027.parquet",
+     "bytes": 164077,
+     "sha256": "3293337da746244b59674c1764ac9b007ad81793186d613a21b814bf2f8d1ef8"
+    },
+    {
+     "rel": "csi300/worldquant_101.036.parquet",
+     "bytes": 3268735,
+     "sha256": "39c7f1331ece41e6543662f99a1303d766c4c156465fd4d19b2131270ae78c7d"
+    },
+    {
+     "rel": "csi300/worldquant_101.045.parquet",
+     "bytes": 4191769,
+     "sha256": "13fcbec5ad3a8a7acb68b6485c6fdc64d479e633ed115f6fa58c1c82e63fd6d8"
+    },
+    {
+     "rel": "csi300/worldquant_101.054.parquet",
+     "bytes": 3889453,
+     "sha256": "865f027614c264ba240f0bde6a66300cc17aeb1ee4e9ea87ab243033bb0b2f6e"
+    },
+    {
+     "rel": "csi300/worldquant_101.055.parquet",
+     "bytes": 4243953,
+     "sha256": "a973f37ca8939092c9845731c1a78ea253c476910c239a80ee31223b82ab2144"
+    },
+    {
+     "rel": "csi300/worldquant_101.071.parquet",
+     "bytes": 479228,
+     "sha256": "c9fefa0f1205a63a7480245c328e6e24811dc55338715f2f33490ae29fd006c7"
+    },
+    {
+     "rel": "csi300/worldquant_101.084.parquet",
+     "bytes": 3740766,
+     "sha256": "d4a23a4ddfb1aed6f760a8b1164991d4892e50c2ce5038b5409517b93684a8c7"
+    },
+    {
+     "rel": "csi300/worldquant_101.101.parquet",
+     "bytes": 4193148,
+     "sha256": "19c3b306a216a58313abb8349aa1bc0081fd3239769d6e3191a64a7b40d1b61d"
+    },
+    {
+     "rel": "csi500/gtja_191.001.parquet",
+     "bytes": 10689970,
+     "sha256": "d3e37c3b7161f43397d175f6c3fda0ff173c9fedb94fc81e55bb271a5241c738"
+    },
+    {
+     "rel": "csi500/gtja_191.002.parquet",
+     "bytes": 7022071,
+     "sha256": "752e5ef962f90b1b395db355ce2aa165c5e75034911b40df9e13564e52b27e90"
+    },
+    {
+     "rel": "csi500/gtja_191.003.parquet",
+     "bytes": 5743708,
+     "sha256": "a4ba604f5123062efc785c8b7d593afe37c1a9d2f5d231a885abba422f3eac08"
+    },
+    {
+     "rel": "csi500/gtja_191.017.parquet",
+     "bytes": 10503387,
+     "sha256": "97bd98b50a318cba00eccda6dcbed292451654a3e8fc56138216882a36d66598"
+    }
+   ]
+  },
+  "public": {
+   "root": "/data/shared/genebench/snapshots/public_v1/gold_factors",
+   "n_files": 41,
+   "bytes": 159357698,
+   "missing": [],
+   "full_bytes": 16001931863,
+   "files": [
+    {
+     "rel": "csi300/gtja_191.001.parquet",
+     "bytes": 6398866,
+     "sha256": "43dabc3f21f844ca9f68b543b26391cf19b8423120815c26c4bbdd61abdf4f83"
+    },
+    {
+     "rel": "csi300/gtja_191.002.parquet",
+     "bytes": 4203602,
+     "sha256": "ae00d90321ebe36fa44c2a30ec10608bf38ccd499bf408410677cdc933da0094"
+    },
+    {
+     "rel": "csi300/gtja_191.003.parquet",
+     "bytes": 3367372,
+     "sha256": "7da5ac5768be67b4b3b5072c8e47f8fd65a8cc633a2cc3c9afdb8a73ba8d1381"
+    },
+    {
+     "rel": "csi300/gtja_191.012.parquet",
+     "bytes": 5711260,
+     "sha256": "7260103b5a88ce1e372fd2f41f4c9b35220f98fc3aca3a65147625e1b224a96e"
+    },
+    {
+     "rel": "csi300/gtja_191.017.parquet",
+     "bytes": 6301332,
+     "sha256": "330a697a9cdd58c0273018692ca327ffb0e2367f6099f433d33518bc22d05a97"
+    },
+    {
+     "rel": "csi300/gtja_191.022.parquet",
+     "bytes": 4317581,
+     "sha256": "080bff2a84d90517a28d753f777dc7fda27de0363783384820395e00aa4a06cc"
+    },
+    {
+     "rel": "csi300/gtja_191.043.parquet",
+     "bytes": 4337999,
+     "sha256": "a380fed6899aae11eda176b5b49cb10666719df48923cd7f7d928b28f6496aa7"
+    },
+    {
+     "rel": "csi300/gtja_191.046.parquet",
+     "bytes": 3218430,
+     "sha256": "65edf6ff9fb1c1609bffd4a4ec36ac794ad43175c17f8c33da627ca29e69bbd0"
+    },
+    {
+     "rel": "csi300/gtja_191.064.parquet",
+     "bytes": 600811,
+     "sha256": "97205bab5a3a18af7fefbdee88a8ec7e8e6bad866550acdf92e926b7c469705b"
+    },
+    {
+     "rel": "csi300/gtja_191.085.parquet",
+     "bytes": 922197,
+     "sha256": "6679f6f234e100791c1e8c49319261d6c8d2edbe5d477893509b056cabc0ed0f"
+    },
+    {
+     "rel": "csi300/gtja_191.106.parquet",
+     "bytes": 3451817,
+     "sha256": "7ca0ddf56cf4eb4d40c3ba8a7f016f2715afc3bc90bc5ba26d42e24447613e87"
+    },
+    {
+     "rel": "csi300/gtja_191.126.parquet",
+     "bytes": 3613149,
+     "sha256": "715caa6b595356a88a8f4ea8f6403f3fe8fd3779a8c93ccdc6bd43280a00f1de"
+    },
+    {
+     "rel": "csi300/gtja_191.147.parquet",
+     "bytes": 4372295,
+     "sha256": "988c70a47df21c59b4260a6e37003a21519e97cf1c0a3fcba12c595a267a7cba"
+    },
+    {
+     "rel": "csi300/gtja_191.168.parquet",
+     "bytes": 3985819,
+     "sha256": "bd8e3d4c6cfa4b5bc805a348f168207a8f63ed819c539fe85244a8cba7cbefa6"
+    },
+    {
+     "rel": "csi300/gtja_191.191.parquet",
+     "bytes": 4341759,
+     "sha256": "93af9b240be47b7a76922955aa5df1c8fa25667eea0e9a30da799ee75b8c1178"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.BETA10.parquet",
+     "bytes": 4342178,
+     "sha256": "5eefdd48a9bedb96797095b8e0c008a8688e0a4a76b29d7548d6eee91fbd9c12"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.CNTP30.parquet",
+     "bytes": 463535,
+     "sha256": "cd3ed9dbe33d7895f7a9db28057443cc7e06906bcc7fd3ba2e8c78aead8cbf23"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.IMAX60.parquet",
+     "bytes": 648018,
+     "sha256": "539b3fbbe20b35951d41f527b135a707ab757cf9c946f4e61da7ed1fcd2abf82"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.KSFT2.parquet",
+     "bytes": 3707996,
+     "sha256": "6357f4016c12706bd3e805f6f8d61260eb9c55c34904e9c83a170f5e756dde20"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.MIN60.parquet",
+     "bytes": 3305745,
+     "sha256": "b44ac45426e1580654b87719288ffe32cfa2424751295083b1ae2574ad0f388c"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.RESI10.parquet",
+     "bytes": 4357921,
+     "sha256": "bac3fd51686a80d677b8c84b7488515d42acc5ff94848caeaa1070d82b73df03"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.RSV5.parquet",
+     "bytes": 3679526,
+     "sha256": "fe7a1d58f565280f43c6e17da0dff30ef63c32b0ca558bdc26ede5a87fef255d"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.SUMP10.parquet",
+     "bytes": 3661716,
+     "sha256": "6b9bee363798c20a21346f7057dd8d329160b781944c6cc1ecbe79893e15452f"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.VSUMD5.parquet",
+     "bytes": 4312473,
+     "sha256": "5ae4c54c8c3a17acb061f140ac02d5f666cee6c0c3eb6670216fa375b7278bfe"
+    },
+    {
+     "rel": "csi300/qlib_alpha158.WVMA60.parquet",
+     "bytes": 3879170,
+     "sha256": "042b5a660ada3a44a8c73f4eedde73bbd995d8526fdaa674285f92f125c0061b"
+    },
+    {
+     "rel": "csi300/worldquant_101.001.parquet",
+     "bytes": 1154398,
+     "sha256": "eb6b8bf88490921bdcc497fc6b2a2ae28ce4dd22ee73661ac4b64983794f333a"
+    },
+    {
+     "rel": "csi300/worldquant_101.006.parquet",
+     "bytes": 4286787,
+     "sha256": "d5a29b11e2064ede9ec749acdbcf31fbe9ebf51c97af570a1821c0d1cea0f0c7"
+    },
+    {
+     "rel": "csi300/worldquant_101.010.parquet",
+     "bytes": 3037350,
+     "sha256": "d09f6062dfc92612c820a36d1e4ac039f266831f6748c1262185226fbd79b693"
+    },
+    {
+     "rel": "csi300/worldquant_101.019.parquet",
+     "bytes": 1240974,
+     "sha256": "2ce29d9de285b9e95edb7169ec8b95531bc8d07658933a49814263bd500f537a"
+    },
+    {
+     "rel": "csi300/worldquant_101.027.parquet",
+     "bytes": 164066,
+     "sha256": "a66f5cc3baf893162cd418027304b39465459401df6e56feca75338c5aea1768"
+    },
+    {
+     "rel": "csi300/worldquant_101.036.parquet",
+     "bytes": 3271673,
+     "sha256": "2110fd2400322f2fee683cfb000b507fbb8da637de429a8adf136ae221bf209c"
+    },
+    {
+     "rel": "csi300/worldquant_101.045.parquet",
+     "bytes": 4195110,
+     "sha256": "da2e769abae6b18444774f4ed7950840a63f1b5ea362bd394f71d43b250e5839"
+    },
+    {
+     "rel": "csi300/worldquant_101.054.parquet",
+     "bytes": 3895324,
+     "sha256": "18f003af1027a075d6defe7ba65e1ea12946e73e37ad4f2cd30e08d1cbb46aa3"
+    },
+    {
+     "rel": "csi300/worldquant_101.055.parquet",
+     "bytes": 4241798,
+     "sha256": "613b909a29fb6c2a348134459f52f9e039e41b07b0cfed856d1a5d5e12dc3f28"
+    },
+    {
+     "rel": "csi300/worldquant_101.071.parquet",
+     "bytes": 479295,
+     "sha256": "a3c39adb3660a0d99bd74ef22c6c5009f31985e930ce8ceaa7847ba922d1a8ce"
+    },
+    {
+     "rel": "csi300/worldquant_101.084.parquet",
+     "bytes": 3737424,
+     "sha256": "671881dc891ec2447b68b3e36676e6e0067c7399ebf7ea68fc770b18585a1f65"
+    },
+    {
+     "rel": "csi300/worldquant_101.101.parquet",
+     "bytes": 4194898,
+     "sha256": "c57d067f3fe61aa4f4ee75955a20d7894363068cdec2ae52882a593679400b39"
+    },
+    {
+     "rel": "csi500/gtja_191.001.parquet",
+     "bytes": 10689841,
+     "sha256": "489097b0a1c3231d1896db65116240b4fc8af2e3f0f55e6c64da84c566badc32"
+    },
+    {
+     "rel": "csi500/gtja_191.002.parquet",
+     "bytes": 7025278,
+     "sha256": "9dc26117b3751e34e56481938be88fdf7ee3421e14f8b9d12a13751ad07c6750"
+    },
+    {
+     "rel": "csi500/gtja_191.003.parquet",
+     "bytes": 5739402,
+     "sha256": "2889a5b805a6bc65cbc58aff89cbd9d0407bf74a507a89d4cc1d2d0ce305f5eb"
+    },
+    {
+     "rel": "csi500/gtja_191.017.parquet",
+     "bytes": 10501513,
+     "sha256": "4f24b31a15f7ffa69d05c73967566173a9b9d6330b27bf98f31a51d87370d2ef"
+    }
+   ]
+  }
+ }
+}

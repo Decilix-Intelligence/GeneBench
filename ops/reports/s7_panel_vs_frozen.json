@@ -1,0 +1,50 @@
+{
+ "cells_new": 984960,
+ "cells_ref": 984960,
+ "only_new": 0,
+ "only_ref": 0,
+ "columns": {
+  "close": {
+   "nan_pattern_equal": true,
+   "nan_mismatch": 0,
+   "max_rel_diff": 0.0,
+   "n_over_tol": 0,
+   "bitwise_equal": true
+  },
+  "factor": {
+   "nan_pattern_equal": false,
+   "nan_mismatch": 2716,
+   "max_rel_diff": 0.0,
+   "n_over_tol": 0,
+   "bitwise_equal": true
+  },
+  "in_universe": {
+   "mismatch": 0,
+   "examples": []
+  },
+  "has_price": {
+   "mismatch": 0,
+   "examples": []
+  },
+  "is_delisted": {
+   "mismatch": 0,
+   "examples": []
+  }
+ },
+ "factor_only_where_priced": {
+  "new": 0,
+  "ref": 0
+ },
+ "factor_nan_diff_all_unpriced": true,
+ "factor_nan_diff_cells": 2716,
+ "wall_seconds": 86.5,
+ "gateway_requests": 1837,
+ "by_endpoint": {
+  "/universe": 1824,
+  "/bars": 6,
+  "/adj": 6,
+  "/calendar": 1
+ },
+ "denied_or_empty": [],
+ "ok": true
+}

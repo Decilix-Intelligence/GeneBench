@@ -1,0 +1,83 @@
+# --- python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+# `/build/` 是**仓库自己的**统一基座构建上下文（build/base/…，卡 A2）。上面那条
+# `build/` 不锚定，会连它一起 ignore —— 代价不是「少了一个目录」，是**以后在 build/ 下
+# 新建文件 git status 不提醒**，漏 add 的表现正好是「我这台构得出来、别人 clone 下来
+# 构不出来」（2026-09-13 Mac 外部验收卡住的正是基座那一件）。卡 A2 当时只能 `git add -f`。
+# 这一条必须**排在 `build/` 之后**（后面的规则赢），而且**锚定到仓库根** ——
+# 写成不锚定的 `!build/` 会把任何层级的 build/ 都放进来（与本文件下面那条警告同族）。
+!/build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.coverage
+.coverage.*
+htmlcov/
+
+# --- 虚拟环境 / 运行环境 ---
+# 正规位置是 $GENEBENCH_ROOT/env(仓库之外)。这里挡的是"不小心装到仓库里"。
+/env/
+venv/
+.venv/
+.conda/
+
+# --- 大产物(红线 6:只落 $GENEBENCH_ROOT,不进 git) ---
+# 注意:$GENEBENCH_ROOT/{snapshots,results,wheels} 在**仓库之外**,天然不入库。
+# 下面这几条用 `/` 前缀锚定到仓库根,只挡误落进来的同名目录。
+#
+# ⚠️ 千万不要写成不锚定的 `snapshots/` —— 那会连 `repo/snapshots/`
+#    这个 python 包一起 ignore 掉(git 的目录模式匹配任意层级)。
+/results/
+/wheels/
+/data/
+
+# 按扩展名兜底:任何层级的数据文件都不入库
+*.duckdb
+*.duckdb.wal
+*.parquet
+*.arrow
+*.feather
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.npy
+*.npz
+*.csv.gz
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.whl
+*.bin
+
+# --- 日志 / 临时 ---
+*.log
+logs/
+tmp/
+.tmp/
+*.tmp
+*.swp
+*.bak
+core.*
+
+# --- 编辑器 / 系统 ---
+.DS_Store
+.idea/
+.vscode/
+*~
+
+# --- 凭据:永不入库 ---
+.env
+.env.*
+*.pem
+*.key
+secrets/

@@ -1,0 +1,15 @@
+{
+  "harness": "Claude Code",
+  "paradigm": "P1",
+  "image": "gb-claude-code-u:r1",
+  "command": [
+    "sh",
+    "-c",
+    "export HOME=/task/.claude_home && export CLAUDE_CONFIG_DIR=/task/.claude_home/.claude && mkdir -p \"$$CLAUDE_CONFIG_DIR\" && printf '%s' '{\"hasCompletedOnboarding\":true,\"bypassPermissionsModeAccepted\":true,\"hasTrustDialogAccepted\":true,\"projects\":{\"/task\":{\"hasTrustDialogAccepted\":true,\"hasCompletedProjectOnboarding\":true,\"allowedTools\":[]}}}' > \"$$HOME/.claude.json\" && export ANTHROPIC_BASE_URL=\"$${OPENAI_BASE_URL%/v1}/anthropic\" && export ANTHROPIC_AUTH_TOKEN=\"$$OPENAI_API_KEY\" && export ANTHROPIC_MODEL=deepseek-chat && export ANTHROPIC_SMALL_FAST_MODEL=deepseek-chat && export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-chat && export ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-chat && export ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-chat && export CLAUDE_CODE_MAX_CONTEXT_TOKENS=128000 && export CLAUDE_CODE_MAX_OUTPUT_TOKENS=8000 && export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 && export DISABLE_AUTOUPDATER=1 DISABLE_TELEMETRY=1 DISABLE_ERROR_REPORTING=1 DISABLE_BUG_COMMAND=1 DISABLE_COST_WARNINGS=1 && cd /task && claude -p \"$$(cat /task/INSTRUCTION.md)\" --dangerously-skip-permissions --output-format text"
+  ],
+  "env_required": [
+    "OPENAI_BASE_URL",
+    "OPENAI_API_KEY"
+  ],
+  "notes": "Anthropic Messages API，不是 OpenAI 兼容 —— 所以 base URL 不能直接用 $OPENAI_BASE_URL，要把它尾巴上的 /v1 削掉再接 /anthropic（DeepSeek 的 anthropic 兼容路径）：$${OPENAI_BASE_URL%/v1}/anthropic。边车按原样转发 path，于是容器发的 /anthropic/v1/messages 到上游就是 api.deepseek.com/anthropic/v1/messages。**主机名一个字都没写死**，仍然只从 env_required 列的变量取。用 ANTHROPIC_AUTH_TOKEN（发 Authorization: Bearer）而不是 ANTHROPIC_API_KEY（发 x-api-key）：边车的 _replace_auth 只认 authorization 这一个头，也只有这条路会被 foreign_credential 检查覆盖。五个 ANTHROPIC_*_MODEL 都要指到 deepseek-chat —— 只设 ANTHROPIC_MODEL 时，Claude Code 的后台小模型调用仍会点名 haiku，上游回 model not found。CLAUDE_CODE_MAX_OUTPUT_TOKENS=8000：deepseek-chat 的输出上限比 Claude 小，不设的话首个请求就被上游按 max_tokens 超限拒掉。HOME 与 CLAUDE_CONFIG_DIR 指到 /task 下并 mkdir -p（容器以 uid 1000 跑、HOME 不可写）；预写 .claude.json 的 hasCompletedOnboarding/bypassPermissionsModeAccepted 是为了让 --dangerously-skip-permissions 在非交互下不去等任何确认。compose 解析期会吃一层 $，命令里一律写 $$（N-101）。CLAUDE_CODE_MAX_CONTEXT_TOKENS=128000：这一版的模型目录里没有 deepseek-chat，不设的话 Claude Code 按 200k 假设上下文窗口做 auto-compact（f02 冒烟实测抓到 [claude-code:unrecognized_model]），而 deepseek-chat 的真实窗口是 128k —— 按 200k 压缩等于把「还没满」当成「满了」，表现是无谓的中途压缩而不是报错。冒烟还证实了两件事：请求 path 是 /anthropic/v1/messages?beta=true（边车原样转发，DeepSeek 对这个查询串回 200），鉴权头只有 Authorization: Bearer <占位>、没有 x-api-key。"
+}

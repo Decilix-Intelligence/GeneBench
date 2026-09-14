@@ -1,0 +1,45 @@
+# 票据入库：卡 4.2-a（适配赛道最小版）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **适配 bundle 携带 v1.0-smoke 的 gold 内容，现在不推 f02** | 待裁定 | `work/input/broken.json` = 某道冒烟题的 gold 产物只破一处，内容上就是那道题的答案。`ops/push_guard` 判的是路径/文件名/gold 串形状，**看不见这一层**（30 个 bundle 全绿）。`ops/pack_adaptation.py` 自加落点闸：暂存根必须在 `$GENEBENCH_ROOT/staging/` 下。两个方向见 `ops/specs/adaptation_track.md` §7；**倾向：换题源（合成产物）**，被引用的 16 道题分别是 s1-ops-01 / s2-cor-01 / s2-rob-01 / s3-cor-01 / s3-eco-01 / s3-ops-01 / s4-cor-01 / s4-rob-01 / s5-cor-01 / s6-cor-01 / s6-eco-01 / s6-ops-01 / s7-cor-01 / s7-eco-01 / s8-eco-01 / s8-ops-01 |
+| N-? | 适配集没有金丝雀三串 | 待办 | `gold_token` / `x_token` / `control_token` 由 `genetask/packager` 的建题流程生成，`ops/pack_adaptation.py` 没走那条路 → `check_export` 的 C1 / G2 / G3 在 v1.0-adapt 上不适用。正式出集前要么接 packager 的金丝雀机制，要么给适配集定义等价判据 |
+| N-? | 适配 bundle 的镜像 digest 是占位 | 待办 | `FROM gb-cx-u:r1@sha256:000…0`（`genetask.bundle.IMAGE_DIGEST_PLACEHOLDER`）。真 digest 只有 f02 知道；推送前跑 `genetask.packager.pin_image_digest(bundle, <digest>, image="gb-cx-u:r1")` |
+| N-? | 仓库里没有独立的「§3.3 适配模块」原文 | 已登记 | 只有 `ops/specs/GeneBench指标规格_v1.md:17` 与 `GeneBench指标对接决定_v1.md:9` 两处引用。本卡按这两处原文定义最小适配模块并标 CONFLICT（`ops/specs/adaptation_track.md` §1）。原文补齐后 `ops/protocol/geneprotocol_v1_adapt/adaptation.md` 要重对一遍 |
+| N-? | `adapt` 臂还没进 `genetask/arms.yaml` | 待办 | 定义见下。本卡收口时 arms.yaml 是别人工作树里的**未提交**文件，按并发规则不动它 |
+| N-? | v1.0-adapt 的冻结引用会随 4.1 推版本失效 | 已知 | bundle 通行证里记的是 `ops/freeze_v10.frozen_ref()`；4.1 推 v1.0.12 之后 `push_guard.check_manifest` 会判「冻结引用已过期」。处理方式就是**重新导出**（`ops/pack_adaptation.py --pack`），不要改通行证 |
+
+## `adapt` 臂定义（等 `genetask/arms.yaml` 提交后追加到 `arms:` 列表末尾）
+
+```yaml
+  - id: adapt
+    kind: protocol
+    default: false
+    phrasebook_column: open
+    equivalence: e_rules
+    description: 适配臂。被动投放适配模块 geneprotocol_v1_adapt（单位表 / 字段映射 / 可接纳性条文）到 /task/adaptation/；题面只说「若存在」，不说里面有什么。
+    artifacts:
+      - manifest: ops/protocol/geneprotocol_v1_adapt/MANIFEST.json
+        mount: adaptation
+        per_task_rules: false
+```
+
+**CONFLICT（已按保守方向处理）**：本卡任务书写「用 4.1 的臂机制定义一个臂 adapt
+（kind=protocol，artifacts 指向这份 MANIFEST，**列 fallback open**）」；
+而 4.1 落地的 `genetask/arms.yaml` 头注写着
+「`fallback_column` …**只有 instruction_variant 臂可以有**：baseline / protocol 臂回退 =
+悄悄换了题面，不许」。两者冲突。按保守方向：**不给 `adapt` 臂设 `fallback_column`**，
+改用 `phrasebook_column: open`（适配题的题面本来就是通用一份自然语言，不走 strict 列的键值记法），
+这样既拿到了「回退到 open 列措辞」的效果，又没有破 4.1 那条禁令。
+
+## 照抄用的命令（f01）
+
+```bash
+cd /data/shared/genebench/repo
+PY=/data/shared/genebench/env/bin/python
+$PY ops/adaptation_track.py --check                    # 30 例自检（不落盘）
+$PY ops/adaptation_track.py --write                    # 落到 $GB/reference/adaptation/v1.0-adapt/
+$PY ops/adaptation_track.py --write-protocol-manifest  # 改了适配模块任何一件就跑
+$PY ops/pack_adaptation.py --pack --write-set-manifest # 30 个 bundle + ops/manifests/v1.0-adapt.json
+ulimit -n 8192; $PY -m pytest ops/test_adaptation_track.py -q
+```

@@ -1,0 +1,10 @@
+# 卡 G1（N-611）票据 inbox
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-611 | `ops/run_f02_a1.py` 的 `--provider-root` 在真跑路径上被静默忽略 | 已修（a233a96） | 真跑那条路径读模块常量 `PROVIDER`（写死私有 provider 绝对路径），`main()` 的 `global RUN_ROOT, RESULTS` 漏了它。改成 `provider_default(channel)` 从注入器钉子表现算 + `--provider-root` 给了真跑也生效 + 新增 `--channel`。 |
+| N-? | 通道没送到 f02（`ops/run_joblist.f02_run_cmd`） | 已修（a233a96） | 那条 ssh 命令此前一个字都没提通道，f02 上两头回落到 private：provider 默认与 P2 期望值都是私有那个，**两头一致所以全绿**。现在送 `export GENEBENCH_CHANNEL=<ch>` 与 `--channel <ch>` 两份。这是 N-611 能「静默」的真正原因，单修 `--provider-root` 不够。 |
+| N-? | 注入器新增 P7e：`work/provider` 的根 sha == 本通道期望值 | 已加（a233a96） | `runner.inject.check_work_provider()`，接在 `PA.place_for_arm` 之后。P2 查的是**调用方传进来的路径**，只要「传进来的」与「装进 work/ 的」是同一个错的东西就永远绿；P7e 站在 `work/` 这一侧（就是 compose 把 `<run_dir>/work` 挂成 `/task` 的那个目录），查的是**结果**。不一致时点名装进去的是哪条通道的树。`inject.json` 同时新增 `provider` 段（channel/expect/source_root/sha256_root/n_files）。 |
+| N-? | `job_id` 与 `run_id` 差一个 `@<机器标识>` 后缀 | 登记不修 | `m6_public` 的 `jobs.jsonl` 是裁定 ⑮（机器标识进 run_id）**之前**生成的，所以 18 行的 `job_id` 都没有 `@finance01-e3887dfa`。真跑每一条都打「[黄] run_id ≠ job_id：多半是 exec 树没同步」——**那条提示这次是误导**：exec 树是刚推的，两边同源，差的是清单陈旧。结算按 `run_id` 走，结果正确。修法：重生成清单（`ops/joblist.py gen`）会让 18 行全部变 `pending`，对已跑完的批次代价大于收益。**建议 v1.1 让 `run_one` 在「job_id + '@' + 机器标识 == run_id」时不打这条黄，或让 `joblist.gen` 直接把机器标识写进 job_id。** |
+| N-? | `ops/test_wrt.py::test_rebudget只动没跑过的行` 恒红 | 登记不修（不是 G1 造成的） | 同一个根因：`rebudget` 返回的字典键带 `@finance01-e3887dfa` 后缀，而断言用的是不带后缀的 `s1-cor-01.strict.cfg.r01`。本卡改动之前单跑它也红（已实测）。 |
+| N-? | `ops/test_c65.py::test_公开通道才给容器换网关地址` 的「两条命令逐字相同」 | 已定点改（a233a96） | 通道现在**必须**出现在 f02 那条命令里，原断言与 N-611 的修法直接冲突。改成放过通道那两段、并补一条反向判别（那两段必须在），以免断言变成恒绿。共享测试文件，幂等补丁。 |

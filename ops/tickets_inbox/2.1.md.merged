@@ -1,0 +1,21 @@
+# 票据收件箱 —— 卡 2.1（P2 接入契约）
+
+写给 `ops/tickets.md` 的维护者。编号先写 `N-?`，并入主表时改。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | 预算耗尽是 **429 `budget_exceeded`**，多处规划文写作「402」 | 待批（改文档，不改码）| `runner/c41/egress_proxy.py:889` 实测发的是 429；402 在整棵树里没有任何落点。P2 契约按实现写 429。凡在任务书/规划里写「402 预算」的地方要订正，否则被测方会照着 402 写重试分支，而那条分支永远不触发。|
+| N-? | 「请求须以 `end_date` 界定在 as_of 内」这条约定**不在** `ops/HANDOFF.md` | 待批（补引用）| 实际落点是 `reference/artifact_schema.py:1628` 的 `GATEWAY_FETCH_CONTRACT`，经 `json_schema()` 写进两臂共享的 `work/{stage}.json` 的 `x-gateway-fetch-contract` 键（`reference/artifact_schema.py:1666`）；文字说明在 `ops/reports/v1_0_readiness.md:128` 与 `ops/readiness_report.py:75`。HANDOFF §11b 只写了「越权率/422 单列」（`ops/HANDOFF.md:437`），没有这条。建议在 HANDOFF §11b 补一行指向真正的落点。|
+| N-? | `/limits` 不透出 `pre_close`，而 P2 作者拿不到「前收」的**私有通道**口径 | 登记不修 | `gateway/routers/market.py:274`：`stk_limit.pre_close` 全 NULL，不透出是对的。公开通道的替代是 `daily.pre_close`（`ops/tickets.md:2540` 的 N-59 ③），但私有通道的 `/bars` 服务集里没有 `pre_close`（15 列，`gateway/routers/market.py:51`）。被测方只能用前一交易日的 `close` 自算，两者在除权日不等。**契约已写明**，不挡发布；要不要把 `pre_close` 加进 `/bars` 服务集是 N-33 同族的裁定，须推任务集版本。|
+| N-? | 契约里的 `(文件:行)` 引用会随提交漂 | 登记不修 | `ops/test_p2_contract.py` 只核「文件存在」与「行号不超出文件长度」，不核行内容 —— 核内容会让任何一次无关提交把这张卡跑红（恒红）。文件路径是稳定的那一半，集合类断言（端点集、reason 集、列集、信封集、行情源表）才是真正的漂移守门。|
+| N-? | **`calendar_date_after_asof` 在当前实现下不可达** —— 显式再判是死代码 | **待批（gateway/ 是阶段一路径，本卡不改）** | `gateway/routers/market.py:243` 的 `guard_range` 已经用 `RANGE_END_AFTER_ASOF` 抛过 (`gateway/asof.py:214`)，第 246 行那句 `guard_target(hi, a, reason=CALENDAR_FUTURE)` 永远到不了 —— 而它的注释写着「让日志里这条路径可以单独聚合（卡 5.1 要按路径统计越权率）」，**那个目的没有达成**：`/calendar` 的越界在日志里与别的端点无从区分。2026-09-06 打生产网关实测：`/calendar?as_of=20260731&end_date=20261231` → 403 `range_end_after_asof`。**判定结果不受影响**（两个 reason 都在 `LOOKAHEAD_DENY_REASONS` 里），只影响按路径聚合。D-06「机制在、保护不在」同族。修法二选一：把 `/calendar` 的 `guard_range` 换成显式的 `require_end` + `guard_target(CALENDAR_FUTURE)`；或删掉 246 行并订正注释与卡 5.1 的聚合口径。**别默默删** —— 删之前要确认卡 5.1 没有在按 `calendar_date_after_asof` 分列。 |
+| N-? | 生产网关的 `/healthz` **没有** `channel` / `tables_dir` | 记录（阶段一在建）| `gateway/app.py:159` 已随 `0fc0ab8`（卡 1.1-a 公开通道）提交，**但生产网关服务未重启**，线上仍是旧版。P2 契约 §5.3 按实测写，并要求被测方用 `.get()` 取这两个字段。阶段一收口后重跑 `$GENEBENCH_ROOT/scratch/c21/probe.sh` 并订正契约 §5.3 与 §7。|
+| N-? | `/tradability` 的 N-10 口径缺陷已写进 P2 契约的面向外部文档 | 记录 | 「这天不是交易日」与「这天没这只票」无法区分（`gateway/routers/reference.py:142`）。P2 契约 §2.4 明写了这一条，被测方据此可以在产物里如实注明而不是猜。N-10 本身状态不变。|
+
+## 给后续代理的提醒
+
+* `integrations/P2_CONTRACT.md` 是**面向被测方**的文档，凡改网关端点/参数/错误码/服务列，
+  改完请同步这一份；`ops/test_p2_contract.py` 会在端点集、reason 集、`/bars` 列集、
+  信封必填集、行情源拒绝表、六张报表这六处上当场红。
+* 契约**没有**复制 artifact schema 正文（只给位置与摘要），所以 schema 改动不必动契约 ——
+  但 `ENVELOPE_REQUIRED` 与 `LOOKAHEAD_DENY_REASONS` 两处例外，它们在契约里是逐字抄的。

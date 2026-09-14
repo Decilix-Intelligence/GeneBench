@@ -1,0 +1,4 @@
+# 统一基座的**直接**依赖。版本取三个 harness 要求里最高的那一个（RD-Agent），
+# 见 build/base/Dockerfile 顶部与 N-62。改这里等于改所有 harness 的运行时数值栈。
+pandas==2.3.3
+pyarrow==25.0.1

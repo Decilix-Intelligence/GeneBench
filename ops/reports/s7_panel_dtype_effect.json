@@ -1,0 +1,83 @@
+{
+ "dtypes_live": {
+  "close": "float64",
+  "factor": "float64",
+  "signal": "float64"
+ },
+ "dtypes_frozen": {
+  "close": "float32",
+  "factor": "float32",
+  "signal": "float64"
+ },
+ "sell_rule": "worst_n_drop",
+ "budget_fraction": 0.3333333333333333,
+ "metrics": {
+  "ann_return_gross": {
+   "gateway_float64": 0.055653525089806255,
+   "frozen_float32": 0.05564677668272355,
+   "kind": "relative",
+   "delta": 0.00012127220092510586,
+   "epsilon": 0.0023715703958198733,
+   "fraction_of_epsilon": 0.051135821706519896
+  },
+  "ann_return_net": {
+   "gateway_float64": 0.0017371162772710225,
+   "frozen_float32": 0.0017309435880836777,
+   "kind": "absolute",
+   "delta": 6.172689187344815e-06,
+   "epsilon": 0.00012405026030160027,
+   "fraction_of_epsilon": 0.049759582707342265
+  },
+  "ann_vol_net": {
+   "gateway_float64": 0.23203022202562185,
+   "frozen_float32": 0.23203045564470828,
+   "kind": "relative",
+   "delta": 1.0068466477300623e-06,
+   "epsilon": 7.453562271987931e-05,
+   "fraction_of_epsilon": 0.013508261029950815
+  },
+  "max_drawdown_net": {
+   "gateway_float64": -0.529159718911438,
+   "frozen_float32": -0.5291696463463288,
+   "kind": "relative",
+   "delta": 1.8760401242503334e-05,
+   "epsilon": 0.00017609593643301493,
+   "fraction_of_epsilon": 0.10653511729181551
+  },
+  "sharpe_net": {
+   "gateway_float64": 0.1236387990265691,
+   "frozen_float32": 0.12361228528829364,
+   "kind": "relative",
+   "delta": 0.0002144911261338144,
+   "epsilon": 0.004387188894937694,
+   "fraction_of_epsilon": 0.048890333028813106
+  },
+  "total_cost": {
+   "gateway_float64": 0.45656012524479433,
+   "frozen_float32": 0.45654983035402624,
+   "kind": "relative",
+   "delta": 2.2549325579880622e-05,
+   "epsilon": 0.0010084598333818802,
+   "fraction_of_epsilon": 0.022360162332158765
+  },
+  "turnover_one_way_mean": {
+   "gateway_float64": 0.10392042241284519,
+   "frozen_float32": 0.10391999585350124,
+   "kind": "relative",
+   "delta": 4.1046897706319135e-06,
+   "epsilon": 1.3969265290944861e-05,
+   "fraction_of_epsilon": 0.29383719795862495
+  },
+  "turnover_two_way_mean": {
+   "gateway_float64": 0.20818259678323203,
+   "frozen_float32": 0.20818161967360024,
+   "kind": "relative",
+   "delta": 4.693544191465883e-06,
+   "epsilon": 1.3885208414764633e-05,
+   "fraction_of_epsilon": 0.3380247563641228
+  }
+ },
+ "worst_fraction_of_epsilon": 0.3380247563641228,
+ "worst_metric": "turnover_two_way_mean",
+ "ok": false
+}

@@ -1,0 +1,36 @@
+wrote /data/shared/genebench/repo/ops/lake_baseline.json
+wrote /data/shared/genebench/repo/ops/lake_baseline.md
+datasets=22 view_exists_all=True freeze_line_ok_all=True verdict=PASS
+frontier=20260831 freshness=STALLED_TABLES_PRESENT stalled=8 unknown=1
+  OK  alive   daily                rows=    14692767 cols=  14   trade_date max=  20260828 lag=    3 parts= 4289
+  OK  alive   adj_factor           rows=    15375204 cols=   6   trade_date max=  20260831 lag=    0 parts= 4290
+  OK  alive   daily_basic          rows=    14601970 cols=  22   trade_date max=  20260828 lag=    3 parts= 4289
+  OK  alive   stk_limit            rows=    15003310 cols=   8   trade_date max=  20260828 lag=    3 parts= 4289
+  OK  alive   suspend_d            rows=      482290 cols=   7   trade_date max=  20260828 lag=    3 parts= 4289
+  OK  STALLED trade_cal            rows=        6574 cols=   6     cal_date max=  20261231 lag=   26 parts=    1
+  OK  alive   index_weight         rows=      310798 cols=   6   trade_date max=  20260731 lag=   31 parts=  211
+  n/a  alive   stock_basic          rows=      111799 cols=  14            - max=         - lag=    0 parts=   19
+  OK  STALLED namechange           rows=       14156 cols=   9     ann_date max=  20260806 lag=   25 parts= 5875
+  OK  alive   stock_st             rows=      337687 cols=   9   trade_date max=  20260828 lag=    3 parts=  121
+  OK  alive   st_history           rows=        1227 cols=  12     pub_date max=  20260828 lag=    3 parts=   53
+  n/a  unknown index_member_all     rows=        7893 cols=  13            - max=         - lag= None parts=  338
+  OK  STALLED income               rows=      366326 cols=  89     ann_date max=  20260804 lag=   27 parts= 5854
+  OK  alive   income_vip           rows=      401367 cols=  89     ann_date max=  20260829 lag=    2 parts=   70
+  OK  STALLED balancesheet         rows=      412547 cols= 156     ann_date max=  20260804 lag=   27 parts= 5854
+  OK  alive   balancesheet_vip     rows=      348387 cols= 157     ann_date max=  20260828 lag=    3 parts=   70
+  OK  STALLED cashflow             rows=      376183 cols= 101     ann_date max=  20260804 lag=   27 parts= 5852
+  OK  alive   cashflow_vip         rows=      413399 cols= 102     ann_date max=  20260828 lag=    3 parts=   70
+  OK  alive   index_daily          rows=       46734 cols=  14   trade_date max=  20260828 lag=    3 parts= 4289
+  n/a  STALLED index_basic          rows=           8 cols=  16            - max=         - lag=   25 parts=    2
+  OK  STALLED dividend             rows=      177858 cols=  19     ann_date max=  20260801 lag=   30 parts= 5824
+  OK  STALLED limit_list_d         rows=      158546 cols=  21   trade_date max=  20260805 lag=   26 parts= 1597
+
+⛔ 停更(过了冻结线但已经不长了 —— 卡 1.3 别拿它判新鲜度):
+  trade_cal            latest_capture_partition(snapshot_date) 20260805 落后 26 天(容忍 12 天)
+  namechange           live max(ann_date)               20260806 落后 25 天(容忍 14 天)
+  income               live max(ann_date)               20260804 落后 27 天(容忍 14 天)
+  balancesheet         live max(ann_date)               20260804 落后 27 天(容忍 14 天)
+  cashflow             live max(ann_date)               20260804 落后 27 天(容忍 14 天)
+  index_basic          latest_capture_partition(snapshot_date) 20260806 落后 25 天(容忍 12 天)
+  dividend             live max(ann_date)               20260801 落后 30 天(容忍 14 天)
+  limit_list_d         live max(trade_date)             20260805 落后 26 天(容忍 12 天)

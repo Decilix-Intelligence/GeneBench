@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering
+\caption{Table B — a4（接入/harness 验证，不是实验数据）　脚注（N-348，2026-09-10 用户裁定）：适配赛道 v1.0-adapt 的题源是**出集规定题的 oracle 产物**（探针题不入），这些产物随适配 bundle 进入执行面。**跑过适配赛道的被测方，主赛道这些题算「可能已见过答案」**；口径与逐题清单见 ops/specs/fairness\_protocol.md §7 与 ops/reports/known\_limits\_v1.md。}
+\label{tab:b-a4}
+\begin{tabular}{llllrrrrrrrrrrrrrrrr}
+\toprule
+arm & arm\_kind & config\_id & image\_digest & n\_runs & reference\_version & runner\_version & set\_version & Adj & Align & Cal & CellAgree & honest\_halts & invalid\_rate & n\_cells & n\_gold\_rows & n\_rows\_missing & n\_runs\_denom & stage & unobservable\_probes\_mean \\
+\midrule
+\multicolumn{20}{l}{\textit{协议臂（protocol）—— 与参照臂的差异是投放的工件}} \\
+doc & protocol & cfg-codex-deepseek & gb-cx-u@sha256:961e3878b28f… & 2 & r1.0.19 & d5f43d81a8cd… & 1.0.12 & 1.000 & 1.000 & 1.000 & 1.000 & 0 & 0.000 & 166800.000 & 41700.000 & 0.000 & 2 & S2 & 0.000 \\
+strict & protocol & cfg-codex-deepseek & gb-cx-u@sha256:961e3878b28f… & 2 & r1.0.19 & d5f43d81a8cd… & 1.0.12 & 1.000 & 1.000 & 1.000 & 0.999 & 0 & 0.000 & 166800.000 & 41700.000 & 44.000 & 2 & S2 & 0.000 \\
+\midrule
+\multicolumn{20}{l}{\textit{指令变体臂（instruction\_variant）—— 差异在题面措辞，与工件层的干预不同轴，不与协议臂并排读（§6.6.3）；免掉的等价规则：E3 E4 E5 E6! E7 E8 E8b E10 E10b E11 E12 E12b E12c E13 E14 E15}} \\
+hint & instruction\_variant & cfg-codex-deepseek & gb-cx-u@sha256:961e3878b28f… & 2 & r1.0.19 & d5f43d81a8cd… & 1.0.12 & --- & --- & --- & --- & 0 & 0.000 & --- & --- & --- & 2 & S2 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% set_version = 1.0.12
+% reference_version = r1.0.19
+% protocol_version = geneprotocol_v1@d6fbcaa08302（裸臂在协议轴上记 `geneprotocol_v1@none` —— 它们不投放协议工件，与协议臂并排不算混轴）
+% channel = private
+% 记录数 6；筛选 batch=a4

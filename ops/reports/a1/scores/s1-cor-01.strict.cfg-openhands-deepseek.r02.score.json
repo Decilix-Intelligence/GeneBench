@@ -1,0 +1,62 @@
+{
+ "scorer_output": null,
+ "record": {
+  "task_id": "s1-cor-01",
+  "stage": "S1",
+  "config_id": "cfg-openhands-deepseek",
+  "arm": "strict",
+  "seq": 2,
+  "run_id": "s1-cor-01.strict.cfg-openhands-deepseek.r02",
+  "set_version": "1.0.7",
+  "reference_version": "r1.0.7",
+  "runner_version": "df2067cc41d87b0783da1b7a929693e6b53276e3d171be43b08fe81a313b9ad9",
+  "image_digest": "gb-oh-u@sha256:ccfae0c3fd9164fbd460396f99e8d1dc935eea79d00779755124d3884abf6f18",
+  "scorer_schema_version": "1.0",
+  "run_status": "no_artifact",
+  "sr_bucket": "unscorable_agent",
+  "validity": null,
+  "malformed": null,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {},
+  "findings": [],
+  "l3_kind": null,
+  "l3_pass": null,
+  "l3_score": null,
+  "effect": null,
+  "effect_withheld_reason": null,
+  "anchor": null,
+  "correctness": {},
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "",
+  "steps": 37,
+  "tokens_prompt": 1113224,
+  "tokens_completion": 33840,
+  "cost_usd": 0.53448736,
+  "cost_model": "deepseek-chat",
+  "latency_s": 238.314,
+  "validator_rejections": null,
+  "overreach": {
+   "denied": 2,
+   "total": 41,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "open_range_would_cross_asof": 2
+   },
+   "malformed_requests": 17,
+   "malformed_reasons": {
+    "asof_missing": 10,
+    "unclassified": 2,
+    "param_malformed": 5
+   }
+  },
+  "unbounded_requests": 2,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": [
+   "work/.oh_home/.bash_history",
+   "work/.oh_home/.openhands/profiles/.profiles.lock"
+  ]
+ }
+}

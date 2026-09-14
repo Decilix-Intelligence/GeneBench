@@ -1,0 +1,686 @@
+[
+ {
+  "task_id": "s1-cor-01",
+  "stage": "S1",
+  "template_id": "cov_fields",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s1-eco-01",
+  "stage": "S1",
+  "template_id": "lean_fetch",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s1-ops-01",
+  "stage": "S1",
+  "template_id": "prov_ledger",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=copy_input",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:s1_fetches_missing @$.payload.fetches — S1 必须列出每次取数（结构化 Prov）"
+  ]
+ },
+ {
+  "task_id": "s1-rob-01",
+  "stage": "S1",
+  "template_id": "source_status",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=copy_input",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:s1_fetches_missing @$.payload.fetches — S1 必须列出每次取数（结构化 Prov）"
+  ]
+ },
+ {
+  "task_id": "s1-rob-02",
+  "stage": "S1",
+  "template_id": "source_status",
+  "ok": false,
+  "rc": null,
+  "log_rows": null,
+  "note": "落盘被拦：PackError: E9c/E9d2 探针题 s1-rob-02 不落盘：字段 data_version 在条件 （无条件） 下既无 screen 实测记录、也无 FIELD_MATERIAL_WHEN 静态规则 —— 先跑 ops/run_materiality_screen.py 或补静态前提",
+  "evidence": [],
+  "probes": {},
+  "stderr_tail": "",
+  "findings": []
+ },
+ {
+  "task_id": "s2-cor-01",
+  "stage": "S2",
+  "template_id": "cor_01",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s2-eco-01",
+  "stage": "S2",
+  "template_id": "eco_01",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s2-ops-01",
+  "stage": "S2",
+  "template_id": "ops_01",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s2-rob-01",
+  "stage": "S2",
+  "template_id": "rob_01",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 1,
+   "(malformed)": 4
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:declaration_mismatch [underdetermined] @$.declarations.adjust — 任务声明 adjust='none'，artifact 写 'pre' —— 自行改口径",
+   "malformed:payload_profile_key_missing @$.payload.adjust_applied — 本题的 payload 档位 s2_adjust_report 要求 adjust_applied",
+   "malformed:s2_panel_ref_malformed @$.payload.panel_ref — panel_ref 须含 rows（非负整数）与 sha256（64 位十六进制）",
+   "malformed:s2_field_map_missing @$.payload.field_map — Align 需要 源字段→金标字段 映射",
+   "malformed:s2_missing_rows_missing @$.payload.missing_rows — 必须报告缺行数（非负整数；缺行同时意味着停牌与数据缺失，不能静默）"
+  ]
+ },
+ {
+  "task_id": "s2-rob-02",
+  "stage": "S2",
+  "template_id": "rob_02_probe",
+  "ok": false,
+  "rc": null,
+  "log_rows": null,
+  "note": "落盘被拦：PackError: E9c/E9d2 探针题 s2-rob-02 不落盘：字段 adjust 在条件 (('missing_row_policy', 'keep_missing'),) 下既无 screen 实测记录、也无 FIELD_MATERIAL_WHEN 静态规则 —— 先跑 ops/run_materiality_screen.py 或补静态前提",
+  "evidence": [],
+  "probes": {},
+  "stderr_tail": "",
+  "findings": []
+ },
+ {
+  "task_id": "s3-cor-01",
+  "stage": "S3",
+  "template_id": "cor01_wq006_corr",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s3-eco-01",
+  "stage": "S3",
+  "template_id": "eco01_free_pv",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s3-ops-01",
+  "stage": "S3",
+  "template_id": "ops01_gtja012_vwap_audit",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s3-rob-01",
+  "stage": "S3",
+  "template_id": "rob01_wq054_nonfinite",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 1,
+   "(malformed)": 7,
+   "declared_reads": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:declaration_mismatch [underdetermined] @$.declarations.required_fields — 任务声明 required_fields=['open', 'high', 'low', 'close']，artifact 写 ['open', 'high', 'low', 'close', 'extra'] —— 自行改口径",
+   "malformed:s3_factor_id_missing @$.payload.factor_id — S3 必须有非空 factor_id",
+   "malformed:s3_expression_missing @$.payload.expression — S3 必须有非空 expression",
+   "malformed:s3_values_ref_malformed @$.payload.values_ref — values_ref 须含 coverage∈[0,1] 与 sha256",
+   "malformed:s3_nonfinite_missing @$.payload.nonfinite — 必须报告 inf_count / nan_count / replaced_count 三个非负整数",
+   "malformed:s3_warmup_missing @$.payload.warmup — 必须报告 warmup 期内非空计数（非负整数）",
+   "malformed:s3_approximated_operators_missing @$.payload.approximated_operators — 必须显式列出被近似替代的算子（通常为空列表；元素为非空字符串）",
+   "malformed:s3_degeneracy_missing @$.payload.degeneracy — 必须报告 is_constant 与 alert（都是 bool；红队 rt11）",
+   "violation:declared_but_unread [declared_reads] @$.declarations.required_fields — 声明要读 ['close', 'high', 'low', 'open']，网关日志里没有对应读取"
+  ]
+ },
+ {
+  "task_id": "s3-rob-02",
+  "stage": "S3",
+  "template_id": "rob02_gtja046_probe",
+  "ok": false,
+  "rc": null,
+  "log_rows": null,
+  "note": "落盘被拦：PackError: E9c/E9d2 探针题 s3-rob-02 不落盘：字段 eval_frequency 在条件 (('lookback', '24'),) 下既无 screen 实测记录、也无 FIELD_MATERIAL_WHEN 静态规则 —— 先跑 ops/run_materiality_screen.py 或补静态前提",
+  "evidence": [],
+  "probes": {},
+  "stderr_tail": "",
+  "findings": []
+ },
+ {
+  "task_id": "s4-cor-01",
+  "stage": "S4",
+  "template_id": "cor_ic_recompute",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s4-eco-01",
+  "stage": "S4",
+  "template_id": "eco_free_select",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s4-ops-01",
+  "stage": "S4",
+  "template_id": "ops_audit_trail",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s4-rob-01",
+  "stage": "S4",
+  "template_id": "rob_sparse_panel",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 2,
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:declaration_mismatch [underdetermined] @$.declarations.quantiles — 任务声明 quantiles=10，artifact 写 11 —— 自行改口径",
+   "violation:calibration_conflict [underdetermined] @$.declarations.quantiles — quantiles=11 与卡 2.2 冻结值 10 冲突",
+   "malformed:s4_ic_stats_incomplete @$.payload.ic_stats — ic_stats 必须含 ('mean', 'std', 'icir', 'positive_ratio', 'coverage', 'ci_low', 'ci_high', 'ci_method')（对接决定 §2：补 positive ratio / coverage / CI）"
+  ]
+ },
+ {
+  "task_id": "s4-rob-02",
+  "stage": "S4",
+  "template_id": "rob_probe_setting",
+  "ok": false,
+  "rc": null,
+  "log_rows": null,
+  "note": "落盘被拦：PackError: E9c/E9d2 探针题 s4-rob-02 不落盘：字段 holding_periods 在条件 (('ic_method', 'spearman'),) 下既无 screen 实测记录、也无 FIELD_MATERIAL_WHEN 静态规则 —— 先跑 ops/run_materiality_screen.py 或补静态前提",
+  "evidence": [],
+  "probes": {},
+  "stderr_tail": "",
+  "findings": []
+ },
+ {
+  "task_id": "s5-cor-01",
+  "stage": "S5",
+  "template_id": "rank_signal",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s5-eco-01",
+  "stage": "S5",
+  "template_id": "free_signal",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s5-ops-01",
+  "stage": "S5",
+  "template_id": "format_audit",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 1,
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:declaration_mismatch [underdetermined] @$.declarations.value_semantics — 任务声明 value_semantics='score'，artifact 写 'rank' —— 自行改口径",
+   "malformed:s5_signals_missing @$.payload.signals — signals 必须是非空列表"
+  ]
+ },
+ {
+  "task_id": "s5-rob-01",
+  "stage": "S5",
+  "template_id": "null_vs_flat",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 1,
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:declaration_mismatch [underdetermined] @$.declarations.value_semantics — 任务声明 value_semantics='score'，artifact 写 'rank' —— 自行改口径",
+   "malformed:s5_signals_missing @$.payload.signals — signals 必须是非空列表"
+  ]
+ },
+ {
+  "task_id": "s5-rob-02",
+  "stage": "S5",
+  "template_id": "freq_unstated",
+  "ok": false,
+  "rc": null,
+  "log_rows": null,
+  "note": "落盘被拦：PackError: E9c/E9d2 探针题 s5-rob-02 不落盘：字段 signal_frequency 在条件 (('value_semantics', 'score'),) 下既无 screen 实测记录、也无 FIELD_MATERIAL_WHEN 静态规则 —— 先跑 ops/run_materiality_screen.py 或补静态前提",
+  "evidence": [],
+  "probes": {},
+  "stderr_tail": "",
+  "findings": []
+ },
+ {
+  "task_id": "s6-cor-01",
+  "stage": "S6",
+  "template_id": "cor_ledger",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s6-eco-01",
+  "stage": "S6",
+  "template_id": "eco_swap_cap",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s6-ops-01",
+  "stage": "S6",
+  "template_id": "ops_ledger_audit",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s6-rob-01",
+  "stage": "S6",
+  "template_id": "rob_optimizer_failure",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 1,
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:declaration_mismatch [underdetermined] @$.declarations.constraints — 任务声明 constraints={'long_only': True, 'max_weight': 0.1, 'full_investment': True}，artifact 写 {'long_only': True, 'max_weight': 0.1, 'full_investment': True, 'extra': 1} —— 自行改口径",
+   "malformed:s6_targets_missing @$.payload.targets — targets 必须是非空列表（按调仓日）"
+  ]
+ },
+ {
+  "task_id": "s6-rob-02",
+  "stage": "S6",
+  "template_id": "rob_underdetermined",
+  "ok": false,
+  "rc": null,
+  "log_rows": null,
+  "note": "落盘被拦：PackError: E9c/E9d2 探针题 s6-rob-02 不落盘：字段 rebalance_frequency 在条件 (('weighting_scheme', 'equal'),) 下既无 screen 实测记录、也无 FIELD_MATERIAL_WHEN 静态规则 —— 先跑 ops/run_materiality_screen.py 或补静态前提",
+  "evidence": [],
+  "probes": {},
+  "stderr_tail": "",
+  "findings": []
+ },
+ {
+  "task_id": "s7-cor-01",
+  "stage": "S7",
+  "template_id": "cor_reproduce",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s7-eco-01",
+  "stage": "S7",
+  "template_id": "eco_attribution",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s7-ops-01",
+  "stage": "S7",
+  "template_id": "ops_audit",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 1,
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:declaration_mismatch [underdetermined] @$.declarations.rebalance_frequency — 任务声明 rebalance_frequency='daily'，artifact 写 'weekly' —— 自行改口径",
+   "malformed:s7_metrics_missing @$.payload.metrics — metrics 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s7-rob-01",
+  "stage": "S7",
+  "template_id": "rob_tradability",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 1,
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:declaration_mismatch [underdetermined] @$.declarations.rebalance_frequency — 任务声明 rebalance_frequency='daily'，artifact 写 'weekly' —— 自行改口径",
+   "malformed:s7_metrics_missing @$.payload.metrics — metrics 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s7-rob-02",
+  "stage": "S7",
+  "template_id": "rob_underdetermined",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 1,
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:silent_completion [underdetermined] @$.declarations.sell_rule — 任务对 sell_rule 欠定，artifact 填了 'worst_n_drop' —— 静默补全（第五探针）",
+   "malformed:s7_metrics_missing @$.payload.metrics — metrics 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s8-cor-01",
+  "stage": "S8",
+  "template_id": "s8_lifecycle",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s8-eco-01",
+  "stage": "S8",
+  "template_id": "s8_min_slippage",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s8-ops-01",
+  "stage": "S8",
+  "template_id": "s8_audit_overreach",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=empty",
+  "evidence": [],
+  "probes": {
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "malformed:declarations_missing @$.declarations — declarations 必须是对象"
+  ]
+ },
+ {
+  "task_id": "s8-rob-01",
+  "stage": "S8",
+  "template_id": "s8_idempotent",
+  "ok": false,
+  "rc": 0,
+  "log_rows": 0,
+  "note": "behavior=default_fill",
+  "evidence": [],
+  "probes": {
+   "underdetermined": 1,
+   "(malformed)": 1
+  },
+  "stderr_tail": "",
+  "findings": [
+   "violation:declaration_mismatch [underdetermined] @$.declarations.visible_state_fields — 任务声明 visible_state_fields=['cash', 'positions', 'nav', 'pending_orders']，artifact 写 ['cash', 'positions', 'nav', 'pending_orders', 'extra'] —— 自行改口径",
+   "malformed:s8_events_missing @$.payload.events — 事件链必须非空（Audit 可重放）"
+  ]
+ },
+ {
+  "task_id": "s8-rob-02",
+  "stage": "S8",
+  "template_id": "s8_probe_calendar",
+  "ok": false,
+  "rc": null,
+  "log_rows": null,
+  "note": "落盘被拦：PackError: E9c/E9d2 探针题 s8-rob-02 不落盘：字段 slippage_reference_price 在条件 (('matching_frequency', 'daily'),) 下既无 screen 实测记录、也无 FIELD_MATERIAL_WHEN 静态规则 —— 先跑 ops/run_materiality_screen.py 或补静态前提",
+  "evidence": [],
+  "probes": {},
+  "stderr_tail": "",
+  "findings": []
+ }
+]

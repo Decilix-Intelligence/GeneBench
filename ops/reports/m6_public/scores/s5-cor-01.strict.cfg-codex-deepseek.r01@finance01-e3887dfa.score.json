@@ -1,0 +1,131 @@
+{
+ "scorer_output": {
+  "schema_version": "1.0",
+  "validity": "valid",
+  "gate_failed": [],
+  "unobservable": [],
+  "correctness": {
+   "fid_day_rate": 1.0,
+   "rho_p10": 0.9999999999999998,
+   "rho_median": 1.0,
+   "rho_mean": 1.0,
+   "n_days": 23,
+   "n_gold_days": 23,
+   "day_coverage": 1.0,
+   "tau": 0.9839810664562939,
+   "Decl": 1.0,
+   "Set": 1.0
+  },
+  "effect": {
+   "score": 100.0,
+   "raw_metric": 1.0,
+   "anchor_floor": 0.0,
+   "anchor_ceiling": 1.0
+  },
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/public/v1.0-smoke-public/s5-cor-01/work",
+   "clamped": false,
+   "metric_kind": "tau"
+  }
+ },
+ "record": {
+  "task_id": "s5-cor-01",
+  "stage": "S5",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "strict",
+  "seq": 1,
+  "run_id": "s5-cor-01.strict.cfg-codex-deepseek.r01@finance01-e3887dfa",
+  "set_version": "p1.0.0",
+  "reference_version": "r1.0.23",
+  "runner_version": "a22b0bf33fa61061a153e029b9f8d045661625c46321a023243bbbf74d8b775d",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "ok",
+  "sr_bucket": "scorable",
+  "validity": "valid",
+  "malformed": false,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {
+   "adjust_fingerprint": "clean",
+   "attribution_conservation": "clean",
+   "calendar": "clean",
+   "declared_reads": "clean",
+   "factor_degeneracy": "clean",
+   "fetch_clock": "clean",
+   "input_ablation": "clean",
+   "ledger_conservation": "clean",
+   "lookahead": "clean",
+   "nonfinite_propagation": "clean",
+   "optimizer_failure": "clean",
+   "pit_universe": "clean",
+   "source_status": "clean",
+   "underdetermined": "clean",
+   "unsupported_operator": "clean",
+   "warmup_boundary": "clean"
+  },
+  "findings": [],
+  "l3_kind": "tau",
+  "l3_pass": true,
+  "l3_score": 1.0,
+  "effect": 100.0,
+  "effect_withheld_reason": null,
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/public/v1.0-smoke-public/s5-cor-01/work",
+   "clamped": false,
+   "metric_kind": "tau"
+  },
+  "correctness": {
+   "fid_day_rate": 1.0,
+   "rho_p10": 0.9999999999999998,
+   "rho_median": 1.0,
+   "rho_mean": 1.0,
+   "n_days": 23,
+   "n_gold_days": 23,
+   "day_coverage": 1.0,
+   "tau": 0.9839810664562939,
+   "Decl": 1.0,
+   "Set": 1.0
+  },
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "",
+  "steps": 27,
+  "tokens_prompt": 911583,
+  "tokens_completion": 22686,
+  "cost_usd": 0.43104204,
+  "cost_model": "deepseek-chat",
+  "latency_s": 132.871,
+  "validator_rejections": 0,
+  "overreach": {
+   "denied": 1,
+   "total": 111,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "open_range_would_cross_asof": 1
+   },
+   "malformed_requests": 7,
+   "malformed_reasons": {
+    "asof_missing": 3,
+    "unclassified": 1,
+    "param_malformed": 3
+   }
+  },
+  "unbounded_requests": 1,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": []
+ }
+}

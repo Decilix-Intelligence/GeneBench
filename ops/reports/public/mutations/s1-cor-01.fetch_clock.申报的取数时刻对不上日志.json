@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s1-cor-01",
+  "probe": "fetch_clock",
+  "name": "申报的取数时刻对不上日志",
+  "why": "S1-COR-03：抓取时点以引擎时钟为准，不采信外部时间戳",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "fetch_clock_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:fetch_clock_mismatch [fetch_clock] @$.payload.fetches[0].fetched_at — fetched_at='2026-07-31T03:14:15.926+00:00' 不等于任何一条 /universe 网关日志的 ts —— 不采信外部时间戳"
+ ]
+}

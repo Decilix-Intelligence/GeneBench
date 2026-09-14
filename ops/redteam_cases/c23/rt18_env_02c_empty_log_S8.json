@@ -1,0 +1,82 @@
+{
+ "kind": "artifact",
+ "artifact": {
+  "schema_version": "1.0",
+  "artifact_id": "S8-art-1",
+  "stage": "S8",
+  "task_id": "T-sample",
+  "config_id": "cfg-sample",
+  "arm": "strict",
+  "seed": 0,
+  "as_of": "2026-07-31",
+  "produced_at": "2026-09-01T12:00:00.000+00:00",
+  "provenance": [],
+  "declarations": {
+   "visible_state_fields": [
+    "cash",
+    "positions",
+    "nav"
+   ],
+   "permitted_operations": [
+    "order",
+    "cancel"
+   ],
+   "matching_frequency": "daily",
+   "calendar_id": "SSE"
+  },
+  "payload": {
+   "events": [
+    {
+     "ts": "2026-09-01T12:00:00.000+00:00",
+     "type": "order",
+     "symbol": "600519.SH",
+     "qty": 100
+    },
+    {
+     "ts": "2026-09-01T12:00:01.000+00:00",
+     "type": "fill",
+     "symbol": "600519.SH",
+     "qty": 100,
+     "price": 1720.5
+    }
+   ],
+   "state_transitions": [
+    {
+     "from": "idle",
+     "to": "ordered"
+    },
+    {
+     "from": "ordered",
+     "to": "filled"
+    }
+   ],
+   "fills": {
+    "fill_rate": 1.0,
+    "slippage_bps": 2.1
+   },
+   "overreach": {
+    "denied_requests": 3
+   }
+  }
+ },
+ "task": {
+  "task_id": "T-sample",
+  "stage": "S8",
+  "declared": {
+   "visible_state_fields": [
+    "cash",
+    "positions",
+    "nav"
+   ],
+   "permitted_operations": [
+    "order",
+    "cancel"
+   ],
+   "matching_frequency": "daily",
+   "calendar_id": "SSE"
+  },
+  "underdetermined": []
+ },
+ "gateway_log": [],
+ "tradability": null
+}

@@ -1,0 +1,33 @@
+S8 契约常量搬家的逐字节比对（卡 A ⑧，用户裁定 2026-09-10）
+========================================================================
+搬家：reference/artifact_schema.py  →  genetask/s8_contract.py
+      （reference/artifact_schema.py 与 gateway/sim_engine.py 双双改成引用它）
+
+为什么要留这份比对：搬家**不是改协议**。三个常量决定 S8 的状态机与可交易性词汇，
+而 `$.payload.*.state` 的枚举与 `DECLARATION_MEMBER_ENUMS` 都从它们导出 ——
+值动一位，题面与校验器一起动。重冻记因里「值逐字节不变」那句话的证据就是这里的两行 sha。
+
+规范化口径：frozenset → 排序后的列表（tuple 成员转 list），
+            json.dumps(ensure_ascii=False, sort_keys=True, separators=(",", ":"))，
+            再取 sha256。脚本 = $GB/scratch/A/snap_consts.py（import 的是 reference.artifact_schema，
+            也就是**消费侧**看到的值，不是从新模块读回来自己比自己）。
+
+------------------------------------------------------------------------ 改前
+{"LEGAL_TRANSITIONS":[["cancelled","idle"],["filled","idle"],["idle","ordered"],["ordered","cancelled"],["ordered","filled"],["ordered","partial"],["partial","cancelled"],["partial","filled"]],"TRADABILITY_STATES":["no_data","suspend","trade"],"UNTRADABLE_STATES":["no_data","suspend"]}
+SHA256 315a9ba4fa860b7cb53b4c8f57c4606f8e1efedfcfd187191cebbe4a1f365dba
+
+------------------------------------------------------------------------ 改后
+{"LEGAL_TRANSITIONS":[["cancelled","idle"],["filled","idle"],["idle","ordered"],["ordered","cancelled"],["ordered","filled"],["ordered","partial"],["partial","cancelled"],["partial","filled"]],"TRADABILITY_STATES":["no_data","suspend","trade"],"UNTRADABLE_STATES":["no_data","suspend"]}
+SHA256 315a9ba4fa860b7cb53b4c8f57c4606f8e1efedfcfd187191cebbe4a1f365dba
+
+========================================================================
+结论：逐字节相同。
+
+红线 B2 那一半的证据（另一件事，不是值的比对）：
+  改前  python -c "import gateway.sim_engine; ..." → sys.modules 里 reference.* = ['reference', 'reference.artifact_schema']
+  改后  同一条命令                                  → []
+  由 ops/test_s8_contract.py::test_importing_the_engine_really_loads_no_reference_module
+  在**干净子进程**里每次重跑（AST 只看静态 import，抓不到惰性 import 与传递依赖）。
+
+这两行 sha 同时钉在 ops/test_s8_contract.py 的 FROZEN / FROZEN_SHA256 里 ——
+写死在测试里而不是从被测方读回来再比：从被测方读回来比的是它自己（F7）。

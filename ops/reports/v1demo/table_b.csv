@@ -1,0 +1,9 @@
+arm,arm_kind,config_id,image_digest,n_runs,reference_version,runner_version,set_version,Cov,PIT,Prov,day_coverage,fid_day_rate,honest_halts,invalid_rate,n_days,n_fetches,n_gold_days,n_non_data_requests,n_requests,n_runs_denom,pit_misses,rho_median,rho_p10,stage,tau,unobservable_probes_mean
+open,baseline,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.20,33ab773224a4…,1.0.13,1.0,0.4307692307692308,1.0,,,0,0.0,,4.0,,6.0,65.0,1,37.0,,,S1,,0.0
+open,baseline,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.20,33ab773224a4…,1.0.13,,,,,,0,0.0,,,,,,1,,,,S2,,0.0
+open,baseline,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.20,33ab773224a4…,1.0.13,,,,,,0,0.0,,,,,,1,,,,S3,,0.0
+open,baseline,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.20,33ab773224a4…,1.0.13,,,,,,0,0.0,,,,,,1,,,,S5,,0.0
+strict,protocol,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.20,33ab773224a4…,1.0.13,,,,,,0,0.0,,,,,,1,,,,S1,,0.0
+strict,protocol,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.20,33ab773224a4…,1.0.13,,,,,,0,0.0,,,,,,1,,,,S2,,0.0
+strict,protocol,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.20,33ab773224a4…,1.0.13,,,,,,0,0.0,,,,,,1,,,,S3,,0.0
+strict,protocol,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.20,33ab773224a4…,1.0.13,,,,1.0,1.0,0,0.0,23.0,,23.0,,,1,,1.0,0.9999999999999998,S5,0.9840059556217291,0.0

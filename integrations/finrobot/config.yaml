@@ -1,0 +1,14 @@
+# FinRobot 的被测配置。
+#
+# 三条判据都过：① base_url 是 https；② api_key_env 以 _API_KEY 结尾；
+# ③ host api.deepseek.com 不在 MARKET_DATA_HOSTS 里（行情/新闻源域名一律不得入表）。
+#
+# base_url 这一栏是**给边车用的上游地址**，不是容器里的地址：容器里的 FinRobot
+# 只从 OPENAI_BASE_URL 取地址（边车的反向代理），接线层里没有任何写死的主机名。
+config_id: cfg-finrobot-deepseek
+harness: finrobot
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: AI4Finance-Foundation/FinRobot 0.1.5，AutoGen 多智能体投研，Market_Analyst 的取数工具接网关 → S1
+enabled: true

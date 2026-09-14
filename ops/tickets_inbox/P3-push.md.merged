@@ -1,0 +1,39 @@
+# 卡 P3（合表与收绿）收件箱 —— 2026-09-13
+
+> **本文件在落盘时就已经并进 `ops/tickets.md`**（本轮「发布前最后一轮（2026-09-13）」一节），
+> 所以直接以 `.merged` 落名 —— 与卡 D2 的 `D2-macgap.md.merged` 同一个做法，
+> 也是本卡立的 N-792 口径（**一卡一名、不复用**）自己的第一次执行。
+>
+> 编号从 **N-792** 起。取号前查过盘面：`ops/tickets.md` 与 `ops/tickets_inbox/**` 里已用到 **N-791**（卡 P1）。
+>
+> 本卡可改路径：`RELEASE_MANIFEST.json`、`ops/tickets.md`、`ops/reports/known_limits_v1.md`、
+> `ops/tickets_inbox/**`（含改名）。**其余一个字没碰** —— 尤其没碰 `ops/*.py`（含
+> `ops/test_docs_consistency.py`，见 N-782）、没碰 README / 手册、没碰 `ops/reports/` 下别的报告。
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| **N-792** | 收件箱文件名**一卡一名、不复用**（口径） | **本卡已立** | 卡号可以在不同轮里复用，收件箱文件名不可以。两条后果都真发生过：**静默覆盖**（N-652：`mv V2.md V2.md.merged` 会把上一轮那份整个盖掉，文件还在、名字没变、只是内容成了另一张卡的）与**恒红**（N-781：`ops/test_V2.py::test_十个收件箱都改名merged了_原名一个不留` 要求 `V2.md` 不存在，而 2026-09-13 的终核卡又叫 `V2` 又新建了它）。**门是对的，撞的是卡号。** 做法与两条 `git` 坑（`git mv` 后不要同时 `add` 新旧路径；改名前先 `ls` 查同名 `.merged`）写进了 `ops/tickets.md` 本轮那一节的口径块。 |
+| **N-793** | `RELEASE_MANIFEST.blockers[no_clone_url].closes_when` 仍引用已删的 `_staging_unpublished/` | **登记不修** | 卡 V2 提的 minor。本卡重出清单时逐格核过：该 blocker `satisfied=true`，`closes_when` 记的是**历史判据**（当时靠什么关掉它），不是现行动作；重出时按原样重新生成。改它要改生成器里的常量文本，换不来任何外部可用性。 |
+| **N-794** | README `:443` 与 `docs/OPERATOR_MANUAL.md:161` 仍写「唯一的例外是结算与入库那两步先补了两条软链」 | **待改口（路径不在本卡）** | 那句是卡 D2 **当轮的实况**，不是假话；但 N-770 修完之后外部用户**不需要任何软链**，而那两段正是写给外部用户看的「你会遇到什么」。留着的代价：照做的人先去建两条没必要的软链，建完发现路径不存在再回来查。**改法**（原文留证不删，加一句）：「2026-09-13 起（N-770 已修）：`score_runs` 与 `results_db` 的 run 根同源，把 run 放在 `$GENEBENCH_ROOT/runs_in/<batch>/` 即可，**不需要软链**。」同一处还有 `ops/reports/mac_gap_closeout.md` §5.3 与 §6 两格。 |
+| **N-795** | `$GB/scratch/C2/extroot2/repo` 是**断链符号链接**，`ops/guard_modes.py` 报「红线 5 不合规（1 条）」 | **仍开着（不在本卡可改路径）** | 卡 P1 先报、本卡复核仍在（`2026-09-13T14:2xZ` 实跑 `ops/guard_modes.py`，输出「读不到模式 …/extroot2/repo」）。成因：卡 P2 的 `8ced42a` 按裁定③把 `$GB/scratch/C2/clone` 整棵移走，这条指过去的软链留下了。后果：`ops/test_env_guard.py` 相关条目红，而**网关单元的 `ExecStartPre` 就是这道门 —— 下一次网关起停会被它拒绝**（与 2026-09-05 的 N-125 逐字同形）。一行清掉：`rm -f /data/shared/genebench/scratch/C2/extroot2/repo`。顺带确认 `extroot2/reference`（指向答案面 `$GB/reference`）要不要一起清。 |
+| **N-796** | `ops/test_wrt.py::test_rebudget只动没跑过的行` 恒红（`KeyError`） | **登记不修（不是本轮带的）** | `job_id` 现在带机器后缀（`…r01@finance01-e3887dfa`），断言还按裸 `job_id` 取。卡 P1 在**没有本轮任何改动的 clone** 上复跑同一条同样红。归 joblist / 机器标识那条线。 |
+| **N-782 更新** | `ops/test_docs_consistency.py` 的 fact `manifest_check_nonzero_is_not_damage` **仍红** | **本卡也不能碰（`ops/*.py` 不在可改路径内）** | 本卡在落地任何东西**之前**跑基线就已经红（`3 failed`：这条 + `test_V2` 的 V2.md + `RELEASE_MANIFEST` 陈值）。后两条本卡修掉了，这一条**三张卡的可改路径都不含它**。补丁已写好：`$GB/scratch/P2/p2_fact_patch_for_P1.py`。 |
+
+## 本卡做了什么
+
+1. **核 P1/P2**（不采信转述）：`pytest ops/test_P1.py` → **20 passed**；
+   `ops/mk_release_manifest.py --check` → 退 **3**「内容已变、判据未变」，手写件差异正是
+   P1 的 `build/` 五件 + P2 的四份文档（**无 FATAL 漂移**，与 P1 声称的一致）；
+   `git log` 确认 `fa76fd9`（P1）与 `8ced42a`（P2）都在 `main` 上。
+   有 origin 的干净 clone 上 `--check` 退 0 的那条，本卡在**重出清单之后**亲自重跑了一遍（见证据）。
+2. **N-781 / Ⅴ**：`git mv ops/tickets_inbox/V2.md ops/tickets_inbox/V2-final.md.merged`
+   （改名前 `ls` 查过：`V2-final.md.merged` 不存在，不覆盖任何东西），并把卡 V2 那六条复核结论
+   并进 `ops/tickets.md` 的 §V2 表。**`ops/test_V2.py` 一个字没改 —— 门的口径没有放宽。**
+3. **票据并表**：`P1.md` → `P1-push.md.merged`、`P2.md` → `P2-push.md.merged`，
+   加本文件，并进 `ops/tickets.md` 新一节；N-792…N-796 接盘上最大号（N-791）往下。
+   既有号一律写成 `**N-xxx 更新**`（写成 `**N-xxx**` 会让同一个号在同一份文件里出现两次）。
+4. **`known_limits_v1.md` 加 P3 一节**：本轮修掉的三条真阻塞、arm64 逐层「实测 / 查实」表、
+   新登记不修的七条、还剩什么、逐类计数 **115 → 135**（两列各自逐类相加 == 各自合计，核过）。
+5. **重出 `RELEASE_MANIFEST.json`**：`--check` 退 0、`releasable=true`、未闭合 blocker 0、
+   发布件 **58** 件（`build/` 五件在内）、`release_attachments` `n=3` / 已传 2。
+6. **定向测试**：见本卡输出的 `evidence_paths`。

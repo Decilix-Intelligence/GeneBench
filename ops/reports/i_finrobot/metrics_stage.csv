@@ -1,0 +1,3 @@
+config_id,arm,arm_kind,stage,n_runs,n_runs_denom,invalid_rate,honest_halt_rate,unsettled_rate,Decl,Set,Ovr,Cov,PIT,Prov
+cfg-finrobot-deepseek,open,baseline,S1,1,1,0.0,0.0,0.0,unobservable,unobservable,0.0,1.0,1.0,1.0
+cfg-finrobot-deepseek,strict,protocol,S1,1,1,0.0,0.0,0.0,unobservable,unobservable,0.0,1.0,1.0,1.0

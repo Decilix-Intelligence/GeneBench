@@ -1,0 +1,9 @@
+{
+  "paper_url": null,
+  "repo_url": null,
+  "commit": null,
+  "dist": null,
+  "dist_repo_url": null,
+  "license": "与本仓库同",
+  "runnable_check": "python3 -c \"import genebench_client, genebench_client.emit; print('ok')\""
+}

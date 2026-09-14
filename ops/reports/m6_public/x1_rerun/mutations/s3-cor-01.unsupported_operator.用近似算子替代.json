@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s3-cor-01",
+  "probe": "unsupported_operator",
+  "name": "用近似算子替代",
+  "why": "找不到算子必须显式拒绝，不能近似",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "operator_approximated"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:operator_approximated [unsupported_operator] @$.payload.approximated_operators — 用近似算子替代了 ['correlation~pearson_approx'] —— 找不到算子必须显式拒绝"
+ ]
+}

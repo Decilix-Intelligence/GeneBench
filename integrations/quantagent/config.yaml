@@ -1,0 +1,13 @@
+# QuantAgent 接入的被测配置。
+#
+# ⚠ **这个上游自己不调模型**：它的 ADR-001 把 AICriticAgent 删掉了，
+# 定位是 MCP Server，LLM 推理由外部编排方提供（agents/committee.py 顶部原文）。
+# 所以 model / base_url / api_key_env 这三个键在本接入上**登记而不使用**，
+# 真跑的模型调用数是 0。键集是闭集，少一个多一个都当场红，所以照填。
+config_id: cfg-quantagent-deepseek
+harness: quantagent
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: QuantAgent（Aurora-73，MIT）的 A 股数据层接到网关；上游不调模型，本接入 0 次调用
+enabled: true

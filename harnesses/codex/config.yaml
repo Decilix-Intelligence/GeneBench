@@ -1,0 +1,14 @@
+# 被测配置（数据驱动，W-0）。**enabled: false —— 内置配置已覆盖。**
+#
+# `runner/registry.py::BUILTIN_CONFIGS` 里已经有一条一模一样的 `cfg-codex-deepseek`。
+# 这份留在这里只做两件事：① 给阶段二/三的代理一份**可照抄的模板**；
+# ② 万一有人把 enabled 翻成 true，`merge_configs` 会因为 config_id 与内置重名而**当场红**——
+# 那正是我们要的：同一条配置不许有两个来源，而"重复"要在 import 期就说出来，
+# 不是等到主表上出现两行一样的切片键。
+config_id: cfg-codex-deepseek
+harness: Codex CLI
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: CLI harness，经 base URL 方式指到 DeepSeek（内置配置已覆盖，本文件不生效）
+enabled: false

@@ -1,0 +1,1562 @@
+[
+ {
+  "src": "m6/s1-cor-01.open.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s1-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s1-cor-01.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s1-cor-01",
+  "validator": [
+   "payload_type"
+  ],
+  "scorer_malformed": [
+   "s1_status_enum"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s2-cor-01.open.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s2-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s2-cor-01.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s2-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s3-cor-01.open.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s3-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s3-cor-01.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s3-cor-01",
+  "validator": [
+   "payload_type"
+  ],
+  "scorer_malformed": [
+   "s3_degeneracy_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s4-cor-01.strict.cfg-codex-deepseek.r02",
+  "kind": "agent",
+  "task_id": "s4-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s5-cor-01.open.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s5-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s5-cor-01.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s5-cor-01",
+  "validator": [
+   "payload_type"
+  ],
+  "scorer_malformed": [
+   "s5_coverage_inconsistent",
+   "s5_signal_row_malformed"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s6-cor-01.open.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s6-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s6-cor-01.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s6-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6/s7-rob-02.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s7-rob-02",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6b/s8-cor-01.open.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s8-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6b/s8-cor-01.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s8-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6b/s8-eco-01.open.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s8-eco-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6b/s8-eco-01.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s8-eco-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6b/s8-ops-01.open.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s8-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6b/s8-ops-01.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s8-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6b/s8-rob-01.open.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s8-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "m6b/s8-rob-01.strict.cfg-codex-deepseek.r01",
+  "kind": "agent",
+  "task_id": "s8-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "a1/s1-cor-01.open.cfg-codex-deepseek.r04",
+  "kind": "agent",
+  "task_id": "s1-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "a1/s1-cor-01.open.cfg-openhands-deepseek.r02",
+  "kind": "agent",
+  "task_id": "s1-cor-01",
+  "validator": [
+   "payload_type"
+  ],
+  "scorer_malformed": [
+   "s1_status_enum"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "a1/s1-cor-01.strict.cfg-codex-deepseek.r03",
+  "kind": "agent",
+  "task_id": "s1-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-cor-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s1-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-cor-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s1-cor-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-cor-01/filler",
+  "kind": "filler",
+  "task_id": "s1-cor-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s1_fetches_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-eco-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s1-eco-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-eco-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s1-eco-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-eco-01/filler",
+  "kind": "filler",
+  "task_id": "s1-eco-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s1_fetches_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-ops-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s1-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-ops-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s1-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s1_fetches_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-ops-01/filler",
+  "kind": "filler",
+  "task_id": "s1-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s1_fetches_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-rob-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s1-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-rob-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s1-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s1_fetches_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s1-rob-01/filler",
+  "kind": "filler",
+  "task_id": "s1-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s1_fetches_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-cor-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s2-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-cor-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s2-cor-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-cor-01/filler",
+  "kind": "filler",
+  "task_id": "s2-cor-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "payload_profile_key_missing",
+   "s2_field_map_missing",
+   "s2_missing_rows_missing",
+   "s2_panel_ref_malformed"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-eco-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s2-eco-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-eco-01/filler",
+  "kind": "filler",
+  "task_id": "s2-eco-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "payload_profile_key_missing",
+   "s2_field_map_missing",
+   "s2_missing_rows_missing",
+   "s2_panel_ref_malformed"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-ops-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s2-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-ops-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s2-ops-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-ops-01/filler",
+  "kind": "filler",
+  "task_id": "s2-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "payload_profile_key_missing",
+   "s2_field_map_missing",
+   "s2_missing_rows_missing",
+   "s2_panel_ref_malformed"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-rob-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s2-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-rob-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s2-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "payload_profile_key_missing",
+   "s2_field_map_missing",
+   "s2_missing_rows_missing",
+   "s2_panel_ref_malformed"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s2-rob-01/filler",
+  "kind": "filler",
+  "task_id": "s2-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "payload_profile_key_missing",
+   "s2_field_map_missing",
+   "s2_missing_rows_missing",
+   "s2_panel_ref_malformed"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-cor-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s3-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-cor-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s3-cor-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-cor-01/filler",
+  "kind": "filler",
+  "task_id": "s3-cor-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s3_approximated_operators_missing",
+   "s3_degeneracy_missing",
+   "s3_expression_missing",
+   "s3_factor_id_missing",
+   "s3_nonfinite_missing",
+   "s3_values_ref_malformed",
+   "s3_warmup_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-eco-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s3-eco-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-eco-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s3-eco-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-eco-01/filler",
+  "kind": "filler",
+  "task_id": "s3-eco-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s3_approximated_operators_missing",
+   "s3_degeneracy_missing",
+   "s3_expression_missing",
+   "s3_factor_id_missing",
+   "s3_nonfinite_missing",
+   "s3_values_ref_malformed",
+   "s3_warmup_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-ops-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s3-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-ops-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s3-ops-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-ops-01/filler",
+  "kind": "filler",
+  "task_id": "s3-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s3_approximated_operators_missing",
+   "s3_degeneracy_missing",
+   "s3_expression_missing",
+   "s3_factor_id_missing",
+   "s3_nonfinite_missing",
+   "s3_values_ref_malformed",
+   "s3_warmup_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-rob-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s3-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-rob-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s3-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s3_approximated_operators_missing",
+   "s3_degeneracy_missing",
+   "s3_expression_missing",
+   "s3_factor_id_missing",
+   "s3_nonfinite_missing",
+   "s3_values_ref_malformed",
+   "s3_warmup_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s3-rob-01/filler",
+  "kind": "filler",
+  "task_id": "s3-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s3_approximated_operators_missing",
+   "s3_degeneracy_missing",
+   "s3_expression_missing",
+   "s3_factor_id_missing",
+   "s3_nonfinite_missing",
+   "s3_values_ref_malformed",
+   "s3_warmup_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-cor-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s4-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-cor-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s4-cor-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-cor-01/filler",
+  "kind": "filler",
+  "task_id": "s4-cor-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s4_ic_stats_incomplete"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-eco-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s4-eco-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-eco-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s4-eco-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-eco-01/filler",
+  "kind": "filler",
+  "task_id": "s4-eco-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "payload_profile_key_missing",
+   "s4_ic_stats_incomplete"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-ops-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s4-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-ops-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s4-ops-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-ops-01/filler",
+  "kind": "filler",
+  "task_id": "s4-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s4_ic_stats_incomplete"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-rob-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s4-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-rob-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s4-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s4_ic_stats_incomplete"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s4-rob-01/filler",
+  "kind": "filler",
+  "task_id": "s4-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s4_ic_stats_incomplete"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-cor-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s5-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-cor-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s5-cor-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-cor-01/filler",
+  "kind": "filler",
+  "task_id": "s5-cor-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s5_signals_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-eco-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s5-eco-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-eco-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s5-eco-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-eco-01/filler",
+  "kind": "filler",
+  "task_id": "s5-eco-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s5_signals_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-ops-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s5-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-ops-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s5-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s5_signals_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-ops-01/filler",
+  "kind": "filler",
+  "task_id": "s5-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s5_signals_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-rob-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s5-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-rob-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s5-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s5_signals_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s5-rob-01/filler",
+  "kind": "filler",
+  "task_id": "s5-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s5_signals_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-cor-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s6-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-cor-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s6-cor-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-cor-01/filler",
+  "kind": "filler",
+  "task_id": "s6-cor-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s6_targets_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-eco-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s6-eco-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-eco-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s6-eco-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-eco-01/filler",
+  "kind": "filler",
+  "task_id": "s6-eco-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s6_targets_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-ops-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s6-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-ops-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s6-ops-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-ops-01/filler",
+  "kind": "filler",
+  "task_id": "s6-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s6_targets_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-rob-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s6-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-rob-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s6-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s6_targets_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s6-rob-01/filler",
+  "kind": "filler",
+  "task_id": "s6-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s6_targets_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-cor-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s7-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-cor-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s7-cor-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-cor-01/filler",
+  "kind": "filler",
+  "task_id": "s7-cor-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s7_metrics_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-eco-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s7-eco-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-eco-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s7-eco-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-eco-01/filler",
+  "kind": "filler",
+  "task_id": "s7-eco-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s7_metrics_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-ops-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s7-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-ops-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s7-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s7_metrics_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-ops-01/filler",
+  "kind": "filler",
+  "task_id": "s7-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s7_metrics_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-rob-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s7-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-rob-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s7-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s7_metrics_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-rob-01/filler",
+  "kind": "filler",
+  "task_id": "s7-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s7_metrics_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-rob-02/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s7-rob-02",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-rob-02/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s7-rob-02",
+  "validator": [
+   "payload_key_missing",
+   "silent_completion"
+  ],
+  "scorer_malformed": [
+   "s7_metrics_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s7-rob-02/filler",
+  "kind": "filler",
+  "task_id": "s7-rob-02",
+  "validator": [
+   "payload_key_missing",
+   "silent_completion"
+  ],
+  "scorer_malformed": [
+   "s7_metrics_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-cor-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s8-cor-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-cor-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s8-cor-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-cor-01/filler",
+  "kind": "filler",
+  "task_id": "s8-cor-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s8_events_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-eco-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s8-eco-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-eco-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s8-eco-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-eco-01/filler",
+  "kind": "filler",
+  "task_id": "s8-eco-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s8_events_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-ops-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s8-ops-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-ops-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s8-ops-01",
+  "validator": [
+   "declarations_missing",
+   "envelope_missing"
+  ],
+  "scorer_malformed": [
+   "declarations_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-ops-01/filler",
+  "kind": "filler",
+  "task_id": "s8-ops-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s8_events_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-rob-01/solution/artifact.json",
+  "kind": "oracle",
+  "task_id": "s8-rob-01",
+  "validator": [],
+  "scorer_malformed": [],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-rob-01/solution/artifact.null.json",
+  "kind": "null",
+  "task_id": "s8-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s8_events_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ },
+ {
+  "src": "s8-rob-01/filler",
+  "kind": "filler",
+  "task_id": "s8-rob-01",
+  "validator": [
+   "payload_key_missing"
+  ],
+  "scorer_malformed": [
+   "s8_events_missing"
+  ],
+  "reverse_gap": [],
+  "validator_stricter": [],
+  "scope_candidates": []
+ }
+]

@@ -1,0 +1,7 @@
+config_id: cfg-stockagent-deepseek
+harness: stockagent
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: StockAgent 多智能体模拟市场，经边车驱动
+enabled: true

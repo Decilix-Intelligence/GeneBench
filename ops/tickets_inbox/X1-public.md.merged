@@ -1,0 +1,129 @@
+# 票据收件箱 · X1（公开通道 18 个 run --resume）
+
+> 2026-09-11。**不要直接改 `ops/tickets.md`**（契约 C）；编号先写 `N-?`，由收口卡并进去。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **公开通道声明了 `inputs[]` 的题一件都出不了集** —— `packager.export_task` 的夹具身份闸与公开链的防漏闸互为反面 | **待裁定（挡着 18 个 run 里的 10 个）** | 见下 §1。证据 `ops/reports/m6_public/x1_fixture_identity_block.json`：8 件夹具 / 5 道题，公开侧 **0/8** 与声明相同、私有侧 **8/8** 相同。**这不是回归**，是 N-278「登记不修」第一次真的被跑批踩到。 |
+| N-? | X1 上一轮记的 P2 阻塞（公开 provider 的 `files.sha256` 漏两个元数据文件）**已闭** | **已验（本卡实测）** | 卡 A 的裁定 ① 落地（`pin.PROVIDER_META_FILES` 收进 `MANIFEST.sha256` / `build_info.json`）。本卡把 exec 树推到 f02 之后，在 **f02 侧现算**：`p2_green=true`、`root_sha_now=561348660a3175b1…`。反向门也验了（往 provider 树里塞一个清单外文件 → P2 当场红，删掉又绿），门不是恒绿的。脚本 `$GB/scratch/X1/x1_p2_probe.py`。 |
+| N-? | `ops/run_joblist.py --check-plane` **核不到逐文件层** | 登记不修（已有绕法） | 它只比 provider 根 hash 与网关可达性，`check_provider_pin` 的逐文件分支它碰不到。本卡的做法是额外拿一个**真 bundle** 在 f02 上跑一次 `run_f02_a1.py --dry`（P0–P9 全走、不起容器、不调模型），这才是「P2 真的绿了」的证据。建议把这一步写进手册的公开通道跑批前置。 |
+| N-? | f02 的 exec 树在本卡之前**仍是重冻前的旧版** | **已修（本卡推的）** | 卡 A 提醒过。本卡跑了 `ops/push_exec_to_f02.sh --with-launch-data`，六个目录同步、落地扫描 0 命中、两侧 `command_for("Codex CLI")` 逐字节一致（384 字节）。**注意 `genetask/s8_contract.py` 不在该脚本的白名单里** —— 当前没有执行面模块 import 它（只有 `reference/` 与 `gateway/`），所以不补；哪天单机双容器形态要在 f02 起网关，得往 `GENETASK_FILES` 里加一行。 |
+
+---
+
+## 1. 挡着 10 个 run 的那一件
+
+两条判据在公开通道**同时成立，且互为反面**：
+
+* `genetask/packager.py::export_task`（**冻结根 `CODE_FILES`**）——
+  「夹具 `sha256` 与题面 `inputs[].sha256` **不符**就 `PackError`，不出集」（N-84：题面就是夹具的身份）；
+* 公开链的防漏闸（N-277 落地的那道）——
+  「任何一件夹具的 sha 与声明**相同**就停下」（相同 = 私有源漏进来了，正是 N-277 那次
+  `make_s7_signal.extract(source=SOURCE_PANEL)` 把私有面板路径烤进默认参数的表现）。
+
+公开夹具是从**公开 gold / 公开 ε 面板**切出来的，题面里那个 sha 是**私有行情下标定**的
+（`genetask/params/v1.0-smoke40.yaml`，同样在冻结根）。于是公开通道里：
+
+* 「不符」→ 第一条闸拒绝出集；
+* 「相同」→ 第二条闸判为污染。
+
+**没有第三种状态。** 实测（`ops/reports/m6_public/x1_fixture_identity_block.json`）：
+
+```
+n_fixture_rows                8      （5 道题）
+n_public_matches_declared     0      ← 公开侧一件都不相同 → 一件都出不了集
+n_private_matches_declared    8      ← 私有侧全相同 → 私有通道照常
+tasks_exportable   s1-cor-01 s2-cor-01 s3-cor-01 s8-cor-01   （这四题 inputs 为空）
+tasks_blocked      s4-cor-01 s5-cor-01 s6-cor-01 s7-cor-01 s7-rob-02   → 10 个 run
+```
+
+失败原文（`$GB/scratch/X1/full.log`）：
+
+```
+genetask.bundle.PackError: 夹具 work/factor_panel.parquet 的 sha256 与题面声明不符
+（034c4526ad20… ≠ c8ed955efdfb…）—— 不出集
+```
+
+N-278 早就写着这件事「登记不修（要自洽就得有公开任务集版本）」，并说
+「当前 `taskspec.json` 只有四键、不含 inputs，所以校验器不看这个 sha、**跑批不受影响**」——
+**最后半句今天被证伪了**：校验器确实不看，但**出集**看，而跑批必须先出集。
+上一轮 X1 卡在 P2 上没走到出集这一步，所以没人撞见。
+
+### 两个方向（要签字人裁）
+
+**A（不动冻结根）**：物化公开夹具之后，把**生成出来的**公开题目录
+`$GB/reference/tasks/public/v1.0-smoke-public/<task>/task.yaml` 的 `inputs[].sha256`
+改写成公开夹具的真值。`genetask/params` 一个字不动，两条闸都重新成立
+（出集闸比的是「我发的就是我声明的」，防漏闸比的是「公开值 ≠ 私有值」）。
+代价：两条通道的题面从此**多一个字段不同，而没有任何版本号说得出这件事** ——
+正是这个项目一再罚的那类错（「数字看起来都对，只是来自另一份数据」）。
+
+**B（推一个公开任务集版本）**：`export_task` 按通道走 —— 公开通道不拿冻结声明比对，
+而是**把真实 sha 写进导出的 X `task.yaml`**，并给公开通道一个自己的 `SET_VERSION_PUBLIC`
+（N-278 原话「真要自洽得有一个公开任务集版本，那是签字人的决定」）。
+代价：改 `genetask/packager.py` = 冻结根 = 推任务集版本 = **再作废一次所有已发通行证**。
+
+**我的倾向：B**，理由是 A 让「公开包里题面声明的输入 sha 与包里的文件对不上」这件事
+从「出集当场红」退化成「外部用户打开包才发现」，而 N-278 自己就说那是
+「外部用户第一个问的问题」。B 的那次重冻应当与别的待推项**合并成一次**。
+
+---
+
+## 2. 本卡跑到的数
+
+* 能出集的四题八个 run：见 `ops/reports/m6_public/x1_runs_summary.md`（逐 run 的
+  validity / sr_bucket / run_status / steps / tokens / $）。
+* 单 run 用量实测（用于外推）：`s1-cor-01` strict **29 次 / 350.0 s**、open **26 次 / 368.6 s**；
+  `s2-cor-01` strict **19 次 / 200.0 s**。按此外推 18 个 run 全跑约 **700–780 次**调用，
+  在 1500 次的闸内 —— **不是预算挡住的，是出集挡住的**。
+
+---
+
+## 3. 三控与破坏样本复跑：口径没变，配对漂了
+
+落点 `ops/reports/m6_public/x1_rerun2/`（**没有覆盖**已签字的 `ops/reports/public/` 那两份）。
+
+* 三控 21 行：**20 行与已签字那份逐字节相同**；差的是 `s1-cor-01 / oracle`
+  （`validity=invalid`、`gate_failed=['fetch_clock']`、**601 条 finding**）。
+* 破坏样本 19 条：**16 条相同**；差的三条全是 `s1-cor-01` 的
+  （`fetch_clock` / `source_status` / `lookahead`），判词是「基线不干净 —— 破坏实验无意义」。
+  也就是说 19 → **15/19**、覆盖 14 族 → **11 族**。
+
+**同一个根因，且与判据无关。** `ops/run_controls.py::oracle_window()` 的定义是
+「oracle 桩的时间窗 = 它**最近一次**真跑的那一段」，而
+`$GB/reference/tasks/public/v1.0-smoke-public/s1-cor-01/solution/artifact.json`
+是 **2026-09-07T15:41** 那次 oracle 的产物。公开网关日志里这道题的 oracle 块有三段：
+
+```
+2026-09-07T13:48:18 … 13:51:09   601 条   ← 产物命中 0/601
+2026-09-07T15:41:43 … 15:44:13   601 条   ← 产物命中 601/601   ← 产物就是这一次
+2026-09-10T22:57:28 … 22:59:54   601 条   ← 产物命中 0/601     ← oracle_window() 现在选这一段
+```
+
+取证 `ops/reports/m6_public/x1_rerun2/s1_oracle_window_drift.json`。
+即：2026-09-10 晚上有人在公开网关上又跑了一遍这道题的 oracle，**没有把产物写回答案面**，
+于是「存下来的答案」和「窗里那次请求」不再是同一次跑。
+**这三条差异不是我这一轮 8 个真跑造成的** —— 我的 run 走 `config_id=cfg-codex-deepseek`，
+而窗只取 `config_id=oracle` 的条目。
+
+复原（**答案面不在本卡路径，本卡没做**，命令留给答案面那张卡）：
+
+```bash
+GB=/data/shared/genebench; PY=$GB/env/bin/python; cd $GB/repo
+ops/public_gateway.sh start
+GENEBENCH_CHANNEL=public $PY ops/run_oracles.py --tasks s1-cor-01 \
+    --answer-root $GB/reference --set-name public/v1.0-smoke-public \
+    --out ops/reports/m6_public/x1_rerun2     # --out 同时决定矩阵落点，别用默认值（卡 A 的坑 2）
+ops/public_gateway.sh stop
+```
+
+**这是一处结构性脆弱，值得单独登记**：任何一次「在公开网关上重跑某题 oracle 而不回写产物」
+都会让三控在那道题上**恒红**，而红的样子（601 条 `fetch_clock_mismatch`）看起来像
+「校验器抓到了一个严重违规」。建议 `oracle_window()` 在选不中产物时**当场说出来**
+（比如比一次 `fetched_at` 的集合，对不上就报「产物与窗不是同一次跑」而不是逐条判 violation）。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **三控的 oracle 桩靠「产物与最近一次日志块是同一次跑」这个隐含前提**，前提破了红得像违规 | **待裁定** | 见上。两件事要分开：① `s1-cor-01` 的配对现在就是破的（重跑一次 oracle 即修）；② `oracle_window()` 不该把「配对破了」呈现成 601 条 `fetch_clock_mismatch`。 |
+| N-? | `ops/public_gateway.sh run` 连着用两次，第二次**起不来** | 已绕开，建议延长 | 第一次 `run` 的 `trap` 把网关停掉，第二次 `start` 在 180 s 内没听到 `/healthz`（实测起来用了 **182 s**，第一次只用 60 s），于是整步**静默没跑**（`rc=0`，产物不存在）。绕法：网关已在监听时直接拿 `ops/gateway_lock.py`，不走 `run` 子命令。建议把 `do_start` 的等待从 180 提到 300，并让「等超时」以非零码退出 —— 现在它 `die` 了但外层 `| tail` 把码吞了。 |
+| N-? | 公开批的就绪报告与验证验证器报告已按 1.0.15 / r1.0.22 重出 | **已做**（闭 N-572 的公开那一半） | `ops/reports/m6_public/v1_0_readiness_public.md` 现在写 `1.0.15 / 622f720c95cf2249…` 与 `r1.0.22 / c61b066734e3192f…`，§2 从「本批 0 个 run」变成 8 个 run 的逐 run 证据表。验证验证器报告只差一个耗时数（`65 passed in 1.05s` → `1.12s`），判定不变。**私有那一半（`ops/reports/v1_0_readiness.md`）不在本卡路径，仍是陈值。** |

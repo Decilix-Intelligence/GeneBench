@@ -1,0 +1,356 @@
+{
+ "set_id": "v1.0-smoke",
+ "reference_version": "r1.0.23",
+ "revisions": [
+  {
+   "version": "r1.0.0",
+   "at": "2026-09-05",
+   "ticket": "N-78",
+   "why": "**参考轴的起点。** 在此之前，答案面的每一次改动都被记在任务集轴上（v1.0.3 = S1 oracle 调用链修正；v1.0.4 的一半 = 统一 I/O 契约；v1.0.5 = 端点形状四层 + S7 主干抽取）—— 三次里有两次**题面一个字没动**。拆轴之后这些内容归本轴，任务集版本回到 1.0.4。",
+   "what": "`solve.py` 从 `TEMPLATE_FILES` 移入 `REFERENCE_TEMPLATE_FILES`；新增 `REFERENCE_MODULE_FILES`（`oracle_io` + 各阶段 `*_oracle_common`）；两条轴各自 manifest、各自根 hash、各自「喂真改动必红」测试。",
+   "scope": "39 个模板的 `solve.py` + 3 个参考模块。**任务集面（题面/schema/镜像/夹具）不动。**",
+   "gates": "两条轴的逐段红测试；`inject.json` 同时记两个版本，可比性要求**两者都相同**。"
+  },
+  {
+   "version": "r1.0.1",
+   "at": "2026-09-05",
+   "ticket": "N-82 / N-83",
+   "why": "S7 的 oracle 此前**不可能跑通**：`reference/gateway_client.py` 根本不存在，`fetch_panel` 是一句 `NotImplementedError`。这次把取数与拼面板做出来 —— 面板是 S7 gold 的全部输入，它错了 11 项指标会一起偏而没有一处报错。",
+   "what": "新增 `reference/gateway_client.py`（端点形状按实测收口：`/bars` 与 `/adj` 的**日期格式不同**、`code` 是重复参数可批量、分批按网关 `MAX_ROWS` 反算）；`fetch_panel` 按契约 §1 拼八列全格面板，三条口径都是对着冻结 ε 面板实测定的（`factor` 基准日 = `as_of` 见 N-80；`is_delisted` = 最后有价日之后 见 N-81；`factor` 在无价格的格上置空 见 N-82）；`run_engine` 在实现 B 缺位时**明说阻塞**，不 fallback 到实现 A。",
+   "scope": "1 个新参考模块 + `s7_oracle_common` + 5 个 S7 `solve.py`。**任务集面不动**（题面/schema/镜像/夹具都没碰）。",
+   "gates": "`ops/acceptance/s7_panel_vs_frozen.py` 全表 984,960 格对冻结 ε 面板：`close` 相对差 5.95e-08、三个布尔列各 0 格不一致、行集合两侧完全相同；`ops/acceptance/s7_panel_factor_immaterial.py` 双向证 `factor` 空值差无影响；`ops/test_gateway_client.py`(21) + `ops/test_s7_panel.py`(28，含验收门 11 段逐段必红)。"
+  },
+  {
+   "version": "r1.0.2",
+   "at": "2026-09-05",
+   "ticket": "N-83 / N-84 / N-90",
+   "why": "S7 收口：gold 引擎（裁定 N-83 = 实现 B2）与专用信号夹具（裁定 N-84）落地，外加实测出来的两处口径修正。此前 `run_engine` 调的 `backtest.run` / `config_from_declared` **两个符号都不存在**，S7 一道也跑不出产物。",
+   "what": "新增 `reference/b2_engine.py`（加载冻结的 `impl_v2_b2.py`，两层内存补丁：P-SELL 开关 + 只记录不改算术的逐日台账；`config_from_declared` 逐字段映射、映射不上即报错）与 `reference/make_s7_signal.py`（`s7_dedicated_signal_v1` = 冻结 ε 面板的 signal 列）；`reference/backtest.py` 再导出这两个符号；`fetch_panel` 的 `close`/`factor` 落 **float32**（N-90：dtype 差别吃掉 ε 的 33.8%，降成 float32 之后与冻结面板逐位相同）；修 `ops_audit` 的 `/calendar` 调用（`Client` 没有 `.get`、参数名也不对）与 `eco_attribution` 写成单边的判别力判据。",
+   "scope": "2 个新参考模块 + `s7_oracle_common` + `backtest` + 2 个 S7 `solve.py`。**任务集面不动**；信号夹具落进任务目录但 `task.yaml` 的 `inputs[].sha256` 留到夹具那次一起填、一起推任务集版本。",
+   "gates": "`ops/acceptance/s7_b2_wrapper_gate.py` 四门（包装与今天的 B2 逐位相同 11/11；台账补丁逐位中性；sell_rule 开关咬得动 8 项；上层 metrics 与 B2 逐位一致）；`s7_panel_vs_frozen` 收紧成逐位相等（984,960 格，max_rel_diff 0.0）；`ops/test_backtest_b2.py`(49，逐声明字段各一条必红)。S7 五题真跑 **4/5 零 finding**（s7-rob-02 见 N-93）。"
+  },
+  {
+   "version": "r1.0.3",
+   "at": "2026-09-05",
+   "ticket": "N-82",
+   "why": "定义 S7 gold **输入**的那份代码原来住在 `scratch/` 下 —— 不在仓库、不在冻结清单、没有测试。",
+   "what": "`scratch/export_input2.py` 收编成 `reference/make_epsilon_panel.py`，拆成「取数（qlib）」与「派生（纯函数）」两半，后者可测。",
+   "scope": "1 个新参考模块。**冻结面板的字节没有重建** —— 重建会引入 N-89 那类环境漂移，而且重建之后必须重标 ε。这次收编只是把记录放回受保护的地方。",
+   "gates": "`ops/test_epsilon_panel_builder.py`(15，四种形态各一条 + 多段成分区间 + 暖机)；外加已有的 `s7_panel_vs_frozen` —— 走网关的第二实现逐格对拍 984,960 格。"
+  },
+  {
+   "version": "r1.0.4",
+   "at": "2026-09-05",
+   "ticket": "N-87 / N-96",
+   "why": "S8 的四个 oracle **一行都跑不通**：端点路径全是占位（`/orders`、`/clock/advance`、`/state`），`reference_close` 必填没带，`client_order_id` 用 `uuid4`（gold 不可复现），而且全都拿 `task.as_of` 去请求 —— 而 S8 的 `as_of` 上界 = 当前 `sim_date`（契约 §3.1），拿冻结线那天去请求会被全面拒。",
+   "what": "新增 `reference/s8_oracle_common.py`（`Sim` 会话：`as_of` 跟着 `sim_date` 走；事件与迁移取自 `/sim/log` 而不是各次应答 —— 契约 §4 审计日志是权威）；四个模板按实测端点重写，`client_order_id` 改成确定性；gold 侧的副产物一律走新的 `oracle_io.write_private`（红线 5：原先 `write_text` 吃 umask 落成 0664，网关的 ExecStartPre 守门在重启时当场抓到）。",
+   "scope": "1 个新参考模块 + 4 个 S8 `solve.py` + 5 个 S7 `solve.py`（补写标准 artifact 路径） + `oracle_io` / `files_io`。**任务集面不动。**",
+   "gates": "`ops/test_s8_oracle_common.py`(16)。真跑：s8-cor-01 / s8-eco-01 / s8-ops-01 **三题零 finding**（s8-rob-01 被 N-86 挡死，连 `/sim/advance` 都 422）。另修 `run_oracles.Result.ok` —— 它原来「没有产物」也算「零 finding」。"
+  },
+  {
+   "version": "r1.0.5",
+   "at": "2026-09-05",
+   "ticket": "N-84 / N-99",
+   "why": "夹具生成器决定 agent 拿到的输入是什么，也就决定了 gold 在什么输入上算出来 —— 它必须在参考轴里，否则「参考版本相同」不再蕴含「gold 相同」。",
+   "what": "新增 `reference/make_fixtures.py`（按题面 `inputs[].origin` 物化 S4/S5 夹具，**认不出的 origin 一律报错、不猜**）；`make_s7_signal.py` 改成把 sha 写回 **params**（题面的源头）而不是生成出来的 `task.yaml` —— 后者每次 `build_task` 都会重建，写进去下一次就没了。",
+   "scope": "1 个新参考模块 + `make_s7_signal`。任务集面的对应改动是 v1.0.6。",
+   "gates": "24 个 `inputs[].sha256` 落到 params；两族无定义的 origin 被点名跳过（N-99），`sha256` 保持 null —— 不假装它们有。"
+  },
+  {
+   "version": "r1.0.6",
+   "at": "2026-09-05",
+   "ticket": "红线 5 / S5 gold",
+   "why": "① 24 个 S1–S6 模板的 artifact 用裸 `write_text`/`open(...,'w')` 落盘，吃 umask 落成 0664 ——网关的 ExecStartPre 守门（`ops/guard_modes.py`）在重启时当场拒起（S7/S8 那次已抓过同形态）。② S5 的 gold **6900 行全 null**：因子面板 code 是 `SH600000`，宇宙是 `600000.SH`，reindex 后全 NaN 而 rank 对 NaN 只是静默给 None；再加日历紧凑串 vs tradability ISO、rt07 要 ISO —— 三处格式各自为政。",
+   "what": "S1–S6 全部走 `oracle_io.write`（0600）；S5 五个模板统一内部键为紧凑串、输出行 ISO、因子 code 归一到网关形态，且对「全对不上」直接 SystemExit 而不是静默出全 null。",
+   "scope": "24 个 solve.py。任务集面不动。",
+   "gates": "s5-cor-01 真跑零 finding（6796 有值 / 104 null）；`guard_modes.py` 绿。"
+  },
+  {
+   "version": "r1.0.7",
+   "at": "2026-09-05",
+   "ticket": "S4 公共层 / S6 日历列 / A1 前置",
+   "why": "① S4 四个模板里三个还是桩（`ops_audit_trail` / `rob_sparse_panel` / `eco_free_select`），取数与 IC 机器只住在 cor 模板里；D-31 不许模板互相 import，所以收进参考公共层四题共用。② S6 五个模板读 `/calendar` 取 `r['date']`，网关给的是 `cal_date`（YYYYMMDD）——五题全 KeyError，S6 此前**从没真跑过**（它们一直被 N-99 挡在出集之外）。",
+   "what": "新增 `reference/s4_oracle_common.py`（build_inputs / load_factor_panel / forward_returns / ic_series / block_bootstrap_ci / summarize / ic_by_horizon / bh_fdr_select）；S4 四题接线（eco：训练段 BH-FDR q=0.10 选因子，无幸存者时取 |t| 最大并标 `no_fdr_survivor`；ops：FETCHES = 客户端请求台账，不手写；rob：valid 过滤后再 rank）；S6 五题 `cal_date` → ISO。",
+   "scope": "1 个新参考模块 + 9 个 solve.py。任务集面的对应改动是 v1.0.7（夹具 sha）。",
+   "gates": "S4 四题真跑零 finding（eco 选出 gtja_191.126 / no_fdr_survivor）；s6-cor-01 真跑；跨版本核 `ops/reports/crossver_probe_a1.md`：oracle 环境 vs 统一基座 17/18 键逐位相同（唯一不同是 parquet 字节流 sha，值相同）。"
+  },
+  {
+   "version": "r1.0.8",
+   "at": "2026-09-05",
+   "ticket": "N-102",
+   "why": "S6 五个模板的 `close_on` 逐 (标的, 日) 打网关：6 900 次 × 1.2 s ≈ 2 小时一题，40 题跑批与 M6-lite 都过不去。",
+   "what": "`close_on` 改按标的一次拉整窗再查表（同端点、同 as_of、同字段，切片里那一天的值与单日请求相同）；旧的单日实现留作 `_close_on_single_day` 对照。**数值不变**，只少打网关。",
+   "scope": "5 个 S6 solve.py。任务集面不动。",
+   "gates": "S6 四题（cor/eco/ops/rob-01）真跑零 finding，targets 23/13/3/23 天；s6-cor-01 从 >2 h 降到约 1 分钟。"
+  },
+  {
+   "version": "r1.0.9",
+   "at": "2026-09-05",
+   "ticket": "N-93 落地 / 效果分锚定",
+   "why": "① `s7-rob-02` 的 oracle 骨架断言欠定字段必须在 `ENGINE_FILL` 里，而本题实际欠定的是 `sell_rule` ——它**没有**等价取值（N-39 实测：三份 B 实现的 ann_return_gross 相对差 0.38–0.45% > ε）。于是这道题的 oracle **从来没跑出过产物**，而「没产物」在矩阵里显示成 `n/a`，与「跑出来是干净的」不是一回事。N-93 已把它的 `oracle.expected` 改成 `honest_halt`，骨架这一半没跟上。② 效果分的锚定归一（裁定 2026-09-05）落地，需要第三个**扣住理由**：两端锚点同分或某端算不出时归一化没有分母 —— 出 0 会把「无法归一」说成「零效果」。",
+   "what": "S7/rob_underdetermined 增加诚实终止路径（依赖 `sell_rule` 的 metrics / attribution / ledger_check为 null，n_days 与 rebalance_frequency 照出；自检仍是两步：validate 零 finding + 换成具体取值必命中`silent_completion`）；`artifact_schema.EFFECT_WITHHELD_REASONS` 加 `anchor_degenerate` 并在`validate_scorer_output` 里补对应分支。",
+   "scope": "1 个 solve.py + 校验器的扣住理由集（冻结件，改动记在这里）。",
+   "gates": "s7-rob-02 oracle 真跑零 finding（诚实终止产物）；`ops/test_scorer_*.py` 全绿。"
+  },
+  {
+   "version": "r1.0.10",
+   "at": "2026-09-05",
+   "ticket": "S8 二次 pass 的两处根因",
+   "why": "① **越权率两把尺**：契约 §6 写死「越权率 = **403 次数** / 请求总数，来源网关日志」，而 `_s8` 的交叉核按 `decision == \"deny\"` 数 —— 把 `/sim/advance` 走到窗口末的 **409 `window_exhausted`** 也算成越权。结果是**正确**的 oracle 产物（自报 0，它数的是 403）被判 `overreach_count_mismatch`：s8-cor-01 / s8-ops-01 两题。② **会话没有随运行重新开始**：`gateway_client` 的缺省 run_id 是常量 `f\"{config_id}.{task_id}\"`，而 S8 的模拟盘会话键是 `(run_id, task_id)`（N-88）—— 第二次跑同一道题复用了第一次的会话，`sim_date` 已在窗口末，`/sim/advance` 直接 409。真跑批里 run_id 由 runner 注入（每次不同），所以这条只咬**数据面直跑的 oracle**，而那正是 gold 的产出路径。",
+   "what": "`artifact_schema._s8` 的越权核改数 403；`gateway_client` 的缺省 run_id 带**进程标记**（import 时算一次 —— 逐请求算会让同一进程的 `/sim/log` 与 `/sim/state` 落到两个会话上）。",
+   "scope": "校验器 1 处 + 网关客户端 1 处。",
+   "gates": "S8 四题 oracle 真跑 **4/4 零 finding**（此前 0/4）；`ops/test_artifact_schema.py` 等 141 条全绿。"
+  },
+  {
+   "version": "r1.0.11",
+   "at": "2026-09-05",
+   "ticket": "N-124 / S5 三题的 ISO",
+   "why": "**同一族 bug 今晚第三次出现**：两路数据的日期写法不同（`/calendar` 给紧凑串 `20260105`，`/bars` 给 ISO `2026-01-05`），在 join / 输出上相遇，结果是**静默的空**或**格式非法**。① S2：`_normalize` 只归一列名不归一值 → `grid.merge(have, on=[code,date])` 一行都对不上 → gold 面板 41 700 行价格**全 NaN**，`missing_rows.count` 恰好 41 700，看着还像个正经数；**是 M6-lite 的真 agent 报 44（= 停牌格数）才把它顶出来**（N-124）。② S5 的另外三个模板（format_audit / free_signal / null_vs_flat）输出行的 `date` 是紧凑串，校验器逐行判 `s5_signal_row_malformed` —— r1.0.6 那次只修了 rank_signal 与内部键。",
+   "what": "五个 S2 模板的 `_normalize` 补日期值归一；`cor_01` 加**生产路径判据**：面板价格全空即 SystemExit（并打印两侧 date 样例）—— 判据放生产路径不放测试（D-33）。四个 S5 模板输出行统一 ISO。",
+   "scope": "9 个 solve.py。任务集面不动。",
+   "gates": "s2-cor-01 的 `missing_rows.count` 从 41 700 变成停牌格数量级；S5 四题真跑零 finding。"
+  },
+  {
+   "version": "r1.0.12",
+   "at": "2026-09-05",
+   "ticket": "S2 两题的 payload 档位键",
+   "why": "`s2-ops-01` / `s2-rob-01` 的档位是 `s2_adjust_report`，它要求 `payload.adjust_applied`（申报**实际**用的复权口径，`adjust_fingerprint` 探针据此判）。两个模板都没写这一项 —— 于是它们的 oracle 产物一直被判 `payload_profile_key_missing`。此前这两条红混在跑批的一堆红里（日期 bug、网关超时）没被分开看；日期 bug 修完之后它们单独露出来了。",
+   "what": "两个模板的 payload 补 `adjust_applied: decl[\"adjust\"]`（cor_01 一直有）。",
+   "scope": "2 个 solve.py。",
+   "gates": "s2-ops-01 / s2-rob-01 真跑 2/2 零 finding；整批 O1 矩阵在 33 道出集题上 33/33 零 finding。"
+  },
+  {
+   "version": "r1.0.13",
+   "at": "2026-09-05",
+   "ticket": "冻结清单漏了 S4 公共层",
+   "why": "`reference/s4_oracle_common.py` 是 r1.0.7 新收的公共层（S4 四题的取数 + IC 机器），却没进 `REFERENCE_FILES` —— 于是改它不会改参考根，「参考版本相同 ⇒ gold 相同」这条**不成立**。`test_reference_files_cover_the_whole_reference_plane` 抓到。",
+   "what": "清单补该模块；根重算。",
+   "scope": "冻结清单 1 行（代码未变）。",
+   "gates": "该测试转绿；参考根从 951ddfe0 变为本次新值（**内容未变，只是覆盖面变了** —— 与 1.0.4 那次同形）。"
+  },
+  {
+   "version": "r1.0.14",
+   "at": "2026-09-05",
+   "ticket": "取数层归一收进客户端（裁定 ③）",
+   "why": "同一族 bug 今晚出现三次（S5 / S6 / S2）：网关各端点的日期与代码写法不统一，两路数据在 join 或输出上相遇 → **静默出空**。三次都是在模板里各修一份，而模板各写一份 `_COL_ALIASES` 正是它会再来第四次的原因。",
+   "what": "`reference/gateway_client` 加 `iso_date` / `normalize_frame`（列名 + 日期值 + 代码写法）与 `assert_join_nonempty`（merge 完 `value_col` 全空即抛，并打印两侧键样例）；`Client.frame()` 走 `normalize_frame`；S2 五题的 `_normalize`、S5 四题的输出日期、S6 五题的 `trading_days` 全部改走公共层；S2 的合并加 `assert_join_nonempty`。",
+   "scope": "1 个参考模块 + 14 个 solve.py。",
+   "gates": "`assert_join_nonempty` 的判别力自测（紧凑 vs ISO 的 merge 当场抛）；S2 / S5 / S6 真跑零 finding。"
+  },
+  {
+   "version": "r1.0.15",
+   "at": "2026-09-06",
+   "ticket": "r1.0.14 的回归",
+   "why": "`Client.trading_days` 在 `frame()` 之后又按 `%Y%m%d` 解一次日期 —— 而 r1.0.14 刚把归一挪到 `frame()` 的边界上，于是它当场抛 `time data \"2026-07-30\" doesn't match format`。**`ops/test_gateway_client.py` 当场抓到** —— 归一挪位置这类改动，回归就藏在「谁还在自己解一遍」里。",
+   "what": "`trading_days` 直接用归一后的 ISO（字典序即时间序），并加一条判据：混进非 ISO 就抛，不静默排错。",
+   "scope": "1 个参考模块 1 处。",
+   "gates": "`test_calendar_column_is_cal_date_and_is_renamed` 转绿；S4/S7/S8 三题 oracle 真跑（它们走这条路径）。"
+  },
+  {
+   "version": "r1.0.16",
+   "at": "2026-09-06",
+   "ticket": "签字前三件之 ① / ②",
+   "why": "① `lookahead` 族**没有发出点** —— 网关早就在按 as-of 边界拒，`reason` 也早就落进 access_log，缺的只是把它接到闸门上；在那之前它在主表上永远 clean，而 clean 的原因是**没人检**。② S2 的 gold 面板落在题目录根（裸 `open`，吃 umask），结算侧找不到 → `align` 只算 Align/Adj/Cal 三项 →三项满分 = 天花板 → **effect 100 而 l3_pass=False** 的矛盾。「判不了」必须表现成判不了。",
+   "what": "① `artifact_schema` 加 `LOOKAHEAD_DENY_REASONS`（七个 as-of 边界 reason）与 `_lookahead`：日志切片里命中即 violation → 闸门；语法类的拒（`asof_missing` / `param_malformed`）**不算**；日志不可得时什么都不判（那是 unobservable）。② S2 的 oracle 把 `panel.csv` 落 `gold/`（走 `oracle_io.write_private`，0600；顺带让它收 bytes）；`scorer/l3.compare_align` 在 `gold/` 找面板，找不到就**整题未结算**（score=None → 效果分扣住），不拿其余三项凑分。",
+   "scope": "校验器 2 处 + oracle_io 1 处 + 1 个 solve.py；结算侧 `compare_align`。",
+   "gates": "七个 reason 逐个真跑必响且只响这一族；干净日志与语法类拒零误报；破坏样本从 13 族变 **14 族**；S2 四题 oracle 重跑后 `align` 的 CellAgree 算得出来。"
+  },
+  {
+   "version": "r1.0.17",
+   "at": "2026-09-06",
+   "ticket": "前视闸收窄 + 取数约定进两臂共享文件",
+   "why": "裁定 2026-09-06（第 2 种读法）：**显式越界是意图，开区间是不知道 API 约定**。第一版把 `open_range_would_cross_asof` 也算进闸门，结果 20 个有产物的 run 里 19 个当场 invalid，而 125 次命中里 99 次是这一类 —— 它判的是「会不会用这个 API」，而那条 API 约定**题面没写**。「判据要求的东西，题面必须说」：约定得先给出去，越界的**意图**才配进闸门。",
+   "what": "`LOOKAHEAD_DENY_REASONS` 收窄到六个**显式**越界 reason；新增 `UNBOUNDED_REQUEST_REASONS` 与 `count_unbounded_requests()`（遥测，进 Table A 的 `unbounded_requests` 列，不进闸门）；新增 `GATEWAY_FETCH_CONTRACT` 并由 `json_schema()` 落进 `work/{stage}.json` —— 那是 bundle 里**两臂都拿得到**的文件（`protocol/` 只给 strict 臂）。八个 schema 文件重生成。",
+   "scope": "校验器 3 处 + 八个落盘 schema。**任务集版本不动**（题面正文未改；实测冻结根一致）。",
+   "gates": "六个 reason 逐个必响且只响这一族；开区间不再进闸门（同一份日志上 gate 从 ['lookahead'] 变空）；两批 29 个 run 重结算后 lookahead 命中从 19 降到 6（`asof_beyond_freeze_line` 23 次 + `range_end_after_asof` 3 次），`unbounded_requests` 合计 165 次单列。"
+  },
+  {
+   "version": "r1.0.18",
+   "at": "2026-09-06",
+   "ticket": "N-129",
+   "why": "同上：规则数据要下到叶子，源头在 `reference/artifact_schema.PAYLOAD_SHAPE`（`json_schema()` 的唯一输入）。",
+   "what": "`PAYLOAD_SHAPE` 八个阶段补叶子级 spec。**评分器的判定逻辑一个字没改** ——这张表的唯一消费者是 `json_schema()`，也就是发出去的规则；修的是 validator 那一侧的可判性。",
+   "scope": "1 个参考模块 1 张表。",
+   "gates": "`test_json_schema_file_matches_generator` 八个阶段全绿；真语料一致性 0/0/0。"
+  },
+  {
+   "version": "r1.0.19",
+   "at": "2026-09-06",
+   "ticket": "卡 1.1-b / N-117 / N-68",
+   "why": "公开通道并列：重建链路径参数化 + `calibration.json` 加 `ic_family`（N-117），**私有通道数值不变**。\n① gold → 互检 → τ → ε → `calibration.json` 这条链原来把落点写死在 `snapshots/v1/` 上，公开通道要用**同一份代码**长出第二份产物 —— 复制一份「公开版链路」的表现是两条通道的口径慢慢漂开，而两边都照常算得出数。\n② `ic_family` 此前是卡 1.2 用 `ops/merge_ic_epsilon.py` **事后插进**已落盘的 `calibration.json` 的，于是「再跑一次 `calibration.build()` 就把它抹掉」—— 抹掉之后 S4 回到 `l3_pass=None` / `effect=None`，**没有任何一处会报错**。公开通道从零重建这条链正好会踩上它，所以收进 `build()`。",
+   "what": "`genebench_config` 加 `snapshot_root/gold_dir/crosscheck_dir/crosscheck_report/epsilon_dir/calibration_path/universe_dir/universe_pit_parquet` 八个通道函数（**只加不改**）；`reference/{factor_exec,calibration,epsilon,epsilon_dual,make_epsilon_panel}.py` 的落点改走这些函数，其中 `GOLD_DIR` / `OUT` / `EPS_DIR` 用 PEP 562 的模块级 `__getattr__` 按通道现算（这样 `factor_crosscheck` / `backtest` / `ic_epsilon` 这些下游一个字都不用改）；`factor_exec.init_qlib` 按通道取 provider，`_INITED` 从布尔改成**记住是哪个 provider**（只记布尔时同进程里切通道会静默沿用上一个）；`write_gold(root=)` / `calibration.build(out=)` 两个可选落点参数（不变性比对用）；`calibration._ic_family()` 用 `ops.merge_ic_epsilon.build_block`（**同一份代码**）把 `ic_epsilon_dual.json` 收进 `epsilon.ic_family`；`factor_exec` 加 `PanelStore` / `SpillPanelStore` 面板暂存面 —— `run()` 原来把 792 个面板同时压在内存里（csi1000 实测常驻约 22 GiB），2026-09-07 05:20Z 内核就是这么把公开 gold 收走的（`exit=137`，被杀前已退化到「一小时写一个 parquet」）；开了暂存之后峰值只剩几 GiB，**落盘产物逐字节不变**（暂存面只决定面板在被 `write_gold` 消费之前放在哪，用 pickle 原样进出，不做 dtype/index 转换）。",
+   "scope": "1 个配置模块 + 5 个参考模块（其中只有 `make_epsilon_panel.py` 在 `REFERENCE_MODULE_FILES` 里，所以参考根 hash 因它而变）。**题面正文 / 模板 / params / schema 一个字没动**，任务集版本不推。",
+   "gates": "私有 `calibration.json` 用新代码重建后**逐字节相同**（只有顶层 `built_at` 变；把它换回原值后 sha256 = `6920dd1f…` 与线上那份完全一致）；三宇宙 gold 各抽 3 个 parquet 的 sha256 不变；`ops/test_public_chain.py` 19 条，6 处变异逐条打红（含「`_INITED` 退回布尔」与「覆盖表漏一项」两处静默错误）；暂存面另加四条 —— 内存版与落盘版 `write_gold` 出来的 parquet 逐字节相同、帧的 dtype/index/NaN/inf 原样进出、`write_gold` 仍收普通 dict、`import ops.run_public_chain` 不再翻掉整个进程的通道。"
+  },
+  {
+   "version": "r1.0.20",
+   "at": "2026-09-07",
+   "ticket": "N-279 / N-103（卡 5.2）",
+   "why": "两个 oracle 此前**跑不出干净产物**，而两者都只在真跑时才现形。",
+   "what": "① `S2/eco_01/solve.py`：`/bars`、`/adj` 改按 code 批量取 + 按 `MAX_ROWS` 分批（网关不接受 `universe=`，且 300 只 × 约 1 840 个交易日 ≈ 55 万行 > 20 万行上限）；顺带补上与其余四道 S2 题同族的两处老问题 —— `get()` 没带身份头（网关日志切不出这一轮，表现是 `log=0`）与 payload 档位 `s2_adjust_report` 要求的 `adjust_applied` 一直没报。② `S6/rob_underdetermined/solve.py`：改成**诚实终止**。原实现出「窗口首个交易日建仓」一条，自己在 docstring 里留着 TODO 问这算不算与节奏无关；判据早就写着不算 —— `PAYLOAD_DEPENDS_ON[\"S6\"][\"targets\"]` 含 `rebalance_frequency`，真跑当场判 `computed_despite_unresolved`。而 N-103 的证据正说明三种节奏不数值等价，oracle 不得替 agent 挑一个。改法与 S7 `rob_underdetermined` 同形（N-93）：`payload.targets` 出 null，落 `gold/underdetermined_note.json`，并现场自证「换成一个具体取值必被判 silent_completion」。",
+   "scope": "2 个 `solve.py`。**任务集面的对应改动记在 1.0.13**。",
+   "gates": "s2-eco-01 私有 / 公开各一次真跑零 finding（网关日志 8 条 = 2 + 2×3 批，与新的「理论最少请求数」逐字对上）；s6-rob-02 私有 / 公开各一次真跑零 finding。"
+  },
+  {
+   "version": "r1.0.21",
+   "at": "2026-09-10",
+   "ticket": "N-383（卡 Y1）",
+   "why": "**滑点的符号在我们自己的三份实现里不一致，而 Slip 就要被纳入判据了。**\n`reference/s8_oracle_common.py::fill_metrics` 乘了一个 `sign = +1 买 / −1 卖`（docstring 写「买正卖负」），而另外两处都不翻符号：\n* `ops/specs/GeneBench指标规格_v1.md` §3：`Slip = 量加权(成交价 − 决策时点价) bps`\n* `gateway/sim_engine.py::slippage_bps`：`qty × (成交价 − 基准) / 基准 × 1e4`\n买单两者同号、**卖单相反**。这件事此前不影响任何分数（Slip 只报不判），而 N-127 已闭（v1.0.13 把符号约定写进了 S8 五题两臂题面），用户 2026-09-10 因此批了「Slip 纳入 S8 判据」—— 纳入之前必须先对齐，**以规格 §3 为准**。",
+   "what": "① 删掉 `fill_metrics` 里的 `sign`，docstring 改写并写明后果。\n② **重出 S8 四题的 gold**：`s8-cor-01` / `s8-eco-01` / `s8-ops-01` / `s8-rob-01`，私有与公开两条通道各跑一次 oracle。**只有 `s8-cor-01` 的数变了** —— 它是唯一一道既有买单又有卖单的题（lifecycle：建仓 + 清仓），`slippage_bps` 由 **−202.514311 → +53.483048**；另外三道全是买单，逐位不变（−160.492521 / +26.587586 / −149.031264），两条通道逐位一致。\n③ 判据侧（**不在本轴**，记在这里免得读的人找不到）：`scorer/l3.compare_fill` 把 Slip 从「只报不判」改成判 —— 判的是**自报与 agent 自己那条事件链的一致性**（重算 vs 自报），**不与 gold 比**（S8 题面没规定下哪些单，两轮不是同一个量的两次测量，同 N-114 的教训）。容差 = **一个最小价位**（A 股 0.01 元），逐单按该单的计价基准换成 bps 再量加权：`tol_bps(单) = 0.01 / 计价基准 × 10000`，`tol_bps = Σ 成交量 × tol_bps(单) / Σ 成交量`。换算式同时写进指标规格 §3 的脚注与 `scorer/l3.MIN_TICK_CNY` 的注释。",
+   "scope": "1 个参考模块（`reference/s8_oracle_common.py`）+ S8 四题两条通道的 gold。**任务集面的对应改动记在 1.0.14**（题面因 schema 收紧而重签，与本条无关）。",
+   "gates": "S8 四题私有 4/4 零 finding、公开 4/4 零 finding；`ops/test_s8_oracle_common.py` 的符号断言按新口径重写并新增一条「三处实现同号」的交叉断言（oracle 主干 / 网关引擎公式 / 评分器重算，同一笔卖单）。",
+   "consequence": "**旧 gold 与新 gold 在 `s8-cor-01` 上不可比**：符号约定变了，不是数值漂移。拿 v1.0.13 时期的 S8 结果与本次之后的比 Slip，要先看这一条。"
+  },
+  {
+   "version": "r1.0.22",
+   "at": "2026-09-10",
+   "ticket": "N-543 / N-518（卡 A，用户裁定 ②③）",
+   "why": "**两处参考解各有一个「看起来像值的非值」，而两处都没有任何东西会报错。**\n② **N-543**：`genetask/templates/S6/*/solve.py` 读上游信号 parquet 的 schema metadata 取 `artifact_id`，取不到时兜底成字面串 `\"TODO:signal-artifact-id-missing\"`。协议只要求 `artifact_id` 是**非空串**，于是这个 TODO 一路通过校验，进了五份 S6 gold，又随 `broken.json` 进了适配赛道四例（`adapt-l1-08` / `l2-07` / `l2-08` / `l3-06`）。适配臂 INSTRUCTION 规则 1 要求「源里没有的写成显式 `unresolved`」—— 被测方照做，oracle 却要求原样抄回那个 TODO 串，`scorer/adaptation.py::match_oracle` 于是在 `provenance` 上判不一致。**被罚的正是照规则做的那一方。**\n③ **N-518**：`S4/eco_free_select/solve.py` 的留出段是两个写死的日期 `2026-04-01..2026-06-30`，而窗口是实例层会换的取值。窗口一挪，这个划分就不再落在窗口里，**三种废法没有一种会报**：窗口挪到留出段之前（`s4-eco-02`/`04`）→ 留出段为空 → `ic_stats` 七个字段全 NaN，artifact 照写、照过 envelope 校验，直到结算时 7 条 `malformed:s4_ic_stat_not_number`；窗口挪到留出段之内（`s4-eco-03`）→ 训练段为空 → 所有候选 mean/std 皆 NaN → `t.abs().idxmax()` 返回 NaN → `\"nan\"` 被当成 factor_id 查因子池 → 崩在「池里没有 'nan' 的行」。**报错指着因子池，问题在那一行常量。**出集那 40 行每行只有一个取值，`s4-eco-01` 一直是绿的 —— 没人知道这道题的参考解不耐窗口变化。",
+   "what": "② 五个 S6 模板的兜底值改成协议的显式欠定标记 `artifact_schema.UNRESOLVED`（= `\"unresolved\"`），**import 而不是重抄那个字面串**。**重出 S6 五题 gold，私有 + 公开各一次**（`s6-{cor,eco,ops,rob-01,rob-02}-01`），两条通道 5/5 零 finding，`provenance` 现为 `[{\"stage\": \"S5\", \"artifact_id\": \"unresolved\"}]`。\n③ 两处修根因：\n  * `reference/s4_oracle_common.py`：新增 `S4SampleTooThin`；`bh_fdr_select` **先筛掉算不出 t 的候选**（mean/std 非有限、std=0、n < `MIN_TRAIN_DAYS`）而不是原来的 `fillna(0)`——把「算不出」当成「t=0」会让它挤进 BH 的分母 m，**一个算不出来的候选因此能改变别人是否显著**；一个都不剩就抛，不返回 NaN。`summarize` 与 `ic_by_horizon` 在「一个 IC 都算不出 / 日期集为空」时抛，不交一份全 NaN 的 `ic_stats`。\n  * `S4/eco_free_select/solve.py`：留出段**跟着窗口走**（`split_window`）——默认划分在窗口里切得出两段就用它（**出集那一行因此逐字节不变**），切不出来就按窗口自身的交易日位置对半分，并把 `holdout_rule=window_half` **如实写进 `payload.note`**（不许让回退的划分看起来像默认划分）；连对半分都切不出两段 10 天 → 抛 `S4SampleTooThin`，说清这道题在这个窗口取值上没有答案。`payload.holdout` 报实际用的那一段。",
+   "scope": "5 个 S6 `solve.py` + 1 个 S4 `solve.py` + 1 个参考模块（`reference/s4_oracle_common.py`）；S6 五题两条通道的 gold；S4-ECO 四个实例的 gold。**题面一个字没动**（那一半记在 1.0.15）。",
+   "gates": "S6 五题**私有 5/5、公开 5/5 零 finding**；S4-ECO 四实例（`s4-eco-01..04`）**4/4 零 finding** —— `s4-eco-03` 此前直接崩、`02`/`04` 各 7 条 malformed，实例矩阵由「零 finding 89/127、非零 2」变成「92/127、非零 0」。**基点 `s4-eco-01` 的 gold 在两棵树上都与 v1.0.14 逐字节相同**（`produced_at` 除外），证明 `split_window` 的默认分支没改动既有结果。",
+   "consequence": "**S6 五题的 gold 与 v1.0.14 不可比**（`provenance[0].artifact_id` 从 TODO 串变成 `unresolved`）。\n**单列一句：v1.0.14 签字包内的适配表偏低约 13 个百分点** —— `adapt-l1-08` / `l2-07` / `l2-08` / `l3-06` 四例因上述 TODO 串被判 `provenance` 不一致。改正后的预期：L1 first_pass 7→8、L2 7→9、L3 correct_flag 5→6、ALL `resolved_rate` 0.6333→0.7667、failed 11→7。**已在 v1.0.15 / r1.0.22 重算**（重出四例 oracle + 重算适配表是本次之后的独立一步）。\n**S4-ECO 三个实例的 gold 从「没有」或「全 NaN」变成「有」** —— 它们此前不可判，现在可判。"
+  },
+  {
+   "version": "r1.0.23",
+   "at": "2026-09-11",
+   "ticket": "N-578（卡 F1，用户裁定 ③）",
+   "why": "**S8 四道题的 gold 此前算不出来，这一版让它重新算得出来 —— 于是「我们算 gold 的方式」变了，**必须推参考号。根因是任务集侧的同号（见 `REVISIONS` 的 1.0.16 ②）：`gateway/sim_factory.task_dir` 找到两个候选目录就 `RuntimeError` 不猜，而 S8 的 oracle 全部要经模拟盘会话才出得了产物。**不要把这条读成「gold 的数值变了」** —— 会话的构造参数（日历 / 收盘价 / 可交易性 / 声明）一个都没改，改的是「按哪个出集的 `task.yaml` 构造」这件事此前是歧义、现在是显式参数。",
+   "what": "`build_engine(run_id, task_id, *, set_id)` 的 `set_id` 改成**必填无默认**，调用方（`gateway/routers/sim.py` 的工厂注册与两处物化路径）全部跟着传；会话键从 `(run_id, task_id)` 改成 `(run_id, task_id, set_id)`。冒烟集 S8 四题（s8-cor-01 / s8-eco-01 / s8-ops-01 / s8-rob-01）的 gold 重出。",
+   "scope": "**参考清单的字节没动**（40 个 `solve.py` 与 `REFERENCE_MODULE_FILES` 逐个 sha 相同）——变的是参考版本号本身，它在 `REFERENCE_ROOT_FIELDS` 里，所以参考根跟着变。**一处要照实说**：`gateway/sim_factory.py` 决定 S8 gold 的运行环境，却**不在** `REFERENCE_MODULE_FILES` 里（它住在网关侧，不在 `reference/` 下）——也就是说改它不会让参考根自己动，这一次是靠这条记因钉住的。已登记进 `ops/reports/known_limits_v1.md`。",
+   "gates": "`ops/test_f1.py::test_sim_factory_set_id_is_required` 与 `test_task_dir_no_longer_guesses_between_two_sets`；`ops/test_sim_factory.py` 全绿。"
+  }
+ ],
+ "reference_templates": {
+  "S1/cov_fields": {
+   "solve.py": "63396c6c01f3294ac2ba58fbf75a38a2d8ba490fe839bb8e1491c0f2fbcfb1ed"
+  },
+  "S1/source_status": {
+   "solve.py": "ab44148f1d390c4c3d25aff435fb8d1928735088e400ffdc5b46494cad9cd400"
+  },
+  "S1/lean_fetch": {
+   "solve.py": "b752a732cee079b22d17e22acb6987d5ffc32566a63b3fa0333b2a987e4ab664"
+  },
+  "S1/prov_ledger": {
+   "solve.py": "113cd890e5812e121099f91efdee209c865ba53369e401fc47d357c3287bd72d"
+  },
+  "S2/cor_01": {
+   "solve.py": "ed7c1134294ed6e6e35708ae4712fe0390603962167335ea7105d6e4a9e3d81b"
+  },
+  "S2/rob_01": {
+   "solve.py": "18c148df03ca6b5d18e2edc78a8553107c31623dfba0c62dcaffb2543f7d4aeb"
+  },
+  "S2/eco_01": {
+   "solve.py": "1d083c84c362f0520f098f391a28442b4deb209762d2ea1dfd5b3e65134152bf"
+  },
+  "S2/ops_01": {
+   "solve.py": "56a179e3725e3daed3ef627e9a03009ddb2189c93f1f7fccd2fa53d58b58ac04"
+  },
+  "S2/rob_02_probe": {
+   "solve.py": "efcc4a0ef61396097c9583e4652a02a5369f1e71791f89313d4970defef30c6a"
+  },
+  "S3/cor01_wq006_corr": {
+   "solve.py": "4f07e125ba6834fa56171eccd99f1f054ad6e9398e45eb70065a5435bd5c95c0"
+  },
+  "S3/rob01_wq054_nonfinite": {
+   "solve.py": "7e6e70d6a041823a200476db3b6577adfc132901c9415a71f89e8b1ae8e4edb9"
+  },
+  "S3/eco01_free_pv": {
+   "solve.py": "b18c1b9d4d2a35c3b58483225ba1e0080f44afa430bf763698b9202ef4e67f66"
+  },
+  "S3/ops01_gtja012_vwap_audit": {
+   "solve.py": "91ce7e02c515f0ba2b342579d1a4e15bf8d181521afab4b7062ea8c146e719ef"
+  },
+  "S3/rob02_gtja046_probe": {
+   "solve.py": "564c4f8340c15931240b3f304a61cca9574b4d8660e8fb4cd37053adc5bcd336"
+  },
+  "S4/cor_ic_recompute": {
+   "solve.py": "fe35f78112163a2959617c72ed4aa6037322a2a63139c7a33bf05983daeba39e"
+  },
+  "S4/rob_sparse_panel": {
+   "solve.py": "ba492900ef9db203d27e07d7ff59b8739b1c0f6f2150fff3987083eef00a4ac6"
+  },
+  "S4/rob_probe_setting": {
+   "solve.py": "9d04e1909d27644fa8b24401f6a5d644cf0cf847e116724861e23be96e5d0205"
+  },
+  "S4/eco_free_select": {
+   "solve.py": "7b626d01fa2a69c49a9b87c711121f67db427109c3cd3e9ccd4a8aafc4a6b5cf"
+  },
+  "S4/ops_audit_trail": {
+   "solve.py": "21aa70b424d4d2066dacf05283b25f82f735a574a393665ede38325589d390c0"
+  },
+  "S5/rank_signal": {
+   "solve.py": "f7437d32b7a4a7d160deaee71d357f9f456504f8bfce3e81c71402f514038f98"
+  },
+  "S5/null_vs_flat": {
+   "solve.py": "e3a7e2397df118bfd57c13373d3ff011454f631b85c4f645ed5ec077fcab267b"
+  },
+  "S5/freq_unstated": {
+   "solve.py": "076a9b43c2ed6673a4411b5ceeaecc023b1b451e27d6604dfd434e92a70a88b1"
+  },
+  "S5/free_signal": {
+   "solve.py": "7ab28ad359fd10b4620744142d49b91ec805e3476e81ba7f6f198b304881e8bd"
+  },
+  "S5/format_audit": {
+   "solve.py": "c14fe9ffafdbb2551e4a80865d5ba03eb9952d42efd546162ea50b2b1bb36071"
+  },
+  "S6/cor_ledger": {
+   "solve.py": "b14ceeaa192bfa767f732835fa6802a45edbeee4990eb62637d988b08cd3ff88"
+  },
+  "S6/rob_optimizer_failure": {
+   "solve.py": "f9bcc69bc7ddc19a2867d93b354b42184ae5cbc6771f5a3df09097c2fcb56171"
+  },
+  "S6/eco_swap_cap": {
+   "solve.py": "7bf41273ac0d86f5b7efd949626279223e892e1ed7144e355da353d25b2593ce"
+  },
+  "S6/ops_ledger_audit": {
+   "solve.py": "566c3e7993936af2e6943c27ef74e45680af57a9479aabf42e5f229c748b8d70"
+  },
+  "S6/rob_underdetermined": {
+   "solve.py": "fa38d5cd7cd2ebbd9d029be354463b5b131c5e32ad0f78b89554fb4274eaae03"
+  },
+  "S7/cor_reproduce": {
+   "solve.py": "2a1014f69fc5930d2ddbcfdea8d15ddf8402f654094569536077bf7a47f07e7c"
+  },
+  "S7/rob_tradability": {
+   "solve.py": "ec69562751f7f66fda5e4ed5390ece85054b788e6fe006b77a35cb7c64969699"
+  },
+  "S7/eco_attribution": {
+   "solve.py": "e47ae1f1c9a3a281362bc2194ce0494229b1623765c65e619b25501e311ca6d1"
+  },
+  "S7/ops_audit": {
+   "solve.py": "64adb2d52bad2f1b826fc148936239c7f983ec0cb1f67e255467f7e4309b1890"
+  },
+  "S7/rob_underdetermined": {
+   "solve.py": "61c40b9b7c2700726f8ac037e35092f911f3dd5d309322c1b858903a266f696a"
+  },
+  "S8/s8_lifecycle": {
+   "solve.py": "240c97ca29e6f1f3837826b5383c94375f2fd833b2ed43378499dea2855d0856"
+  },
+  "S8/s8_idempotent": {
+   "solve.py": "587c06bf13b6e4d403983ec06c72eea18008156bf1d2d6a77de94e98669cf263"
+  },
+  "S8/s8_probe_calendar": {
+   "solve.py": "371f574fc0e52fb77bb6610476f964cb35cae00da2c1fc594ce148b495364be5"
+  },
+  "S8/s8_min_slippage": {
+   "solve.py": "1001073326a648b95cd28e72bdbcdd9d429ba7ba35abbbd94e682a5a39445969"
+  },
+  "S8/s8_audit_overreach": {
+   "solve.py": "571c8b184c4fd9e41d80c30470f111cd0175f92cc405e167b750e906ef8d1f60"
+  }
+ },
+ "reference_modules": {
+  "reference/oracle_io.py": "ee119d4ecc40381e5676c36e03acb0c7005235b9aee966e1ca6f1d8168604de6",
+  "reference/gateway_client.py": "a182d7cb3368b439034a91135bd6643040bdac0543d0ff57986ce2503ec9bf7f",
+  "reference/s3_oracle_common.py": "30e3ca4a30a2e68a660f5c9a7a5f1206f8057b8122a932a6a366b4612273eee8",
+  "reference/s7_oracle_common.py": "315a51d704d7fe39394ff7cb4a5994e478822b5af1562cd925718126976b389b",
+  "reference/b2_engine.py": "bde8cbbab7f8f5d5cba46c90f50feaf016e67762fe7f248b4e222576bc9a7c53",
+  "reference/make_s7_signal.py": "a7cca6c271a37d5b4abf890ae3e23f6db9c92741764d14e574a85794b7710e73",
+  "reference/make_epsilon_panel.py": "a19c98afc69073e27d11323a94ebbd20d41d62e03d6ba99d0374d248fa131ce3",
+  "reference/s8_oracle_common.py": "ff329ae638298c00a07c91f51cebdac62fdc1931173ed1e0d1eac8a7779855b0",
+  "reference/s4_oracle_common.py": "9048756725ee85d9c945a7fd45ca63f1eea7bd87b45af4eaf6be0f7cc7745946",
+  "reference/make_fixtures.py": "ce307370401674319d7587bb24324751668794df1a7f134ac4383f0da9de7e2a"
+ },
+ "note": "**答案面**：40 个 oracle 参考解与它们的公共主干。agent 永远看不见这些。与任务集清单分开编号 —— 前者回答「我们算 gold 的方式变了吗」，后者回答「agent 看到的东西变了吗」。可比性要求**两者都相同**。"
+}

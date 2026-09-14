@@ -1,0 +1,10 @@
+# W-0 施工基础 —— 待登记事项
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | `ops/test_c41.py:366` 写死 `len(REG.CONFIGS) == 3` | 待处理 | 数据驱动合并已上线：`harnesses/`、`integrations/` 下 `enabled: true` 的 `config.yaml` 会追加进 `CONFIGS`。第一个启用配置的阶段二/三代理会把这条断言跑红。**那不是回归**，是断言该改成「内置三条在最前面且互不重名」。`ops/test_c41.py` 不在 W-0 的路径清单里，没动。 |
+| N-? | `exec/` 同步只能用白名单，不能用「四个目录减排除项」 | 已处理（CONFLICT） | 任务书给的排除清单（`__pycache__` `.pytest_cache` `ops/reports` `ops/acceptance` `ops/recon`）挡不住 `genetask/templates/**/{solve.py,scorer.yaml}`（各 ~170 份）、`ops/data_cards/{gold_factors,s7_backtest_gold}.md`、以及 `ops/test_*.py` 里的合成 gold 串。照做即踩红线 2。`ops/push_exec_to_f02.sh` 改成白名单 + 推前用 `runner/f02/answer_plane_guard.scan` 扫 staging（命中即停）。**加新模块 = 在脚本里加一行**。 |
+| N-? | f02 的 `exec/` 树看不见 `harnesses/` 与 `integrations/` | 待裁定 | 同步只推 `genetask ops runner vendor` 四个目录（任务书原文），所以 f02 上 `discover_launch_specs()` 返回空、`load_data_configs()` 也读不到 —— `command_for` 落回硬编码（两条内置的输出逐字节相同，现在无害），但**阶段二/三新增的 `config_id` 在 f02 上会 `by_id` 找不到**。脚本已备好 `--with-launch-data`（默认关）。需裁定：默认打开，还是让 `run_f02_a1.py` 改成不依赖 registry 查配置。倾向**默认打开** —— `launch.json`/`config.yaml` 里没有答案面，且 `--with-launch-data` 走的是同一道 staging 扫描。 |
+| N-? | `vendor/h11` 只在 f02 上，仓库里没有 | 待处理 | `ops/run_f02_sim_n.sh` 指着 `/data/genebench_runner/exec/vendor/h11`，但仓库里没有 `vendor/`。同步脚本因此对 `vendor/` **跳过且不 `--delete`**（否则一次同步就把对面的 h11 删光）。要么把 h11 收进仓库，要么在 HANDOFF 里写清「它是在 f02 就地铺的」。 |
+| N-? | `exec/` 的来历此前没有脚本 | 已处理 | `ops/tickets.md:1947` 只留了一句「同步 `exec/` 后 P2 判绿」；2026-09-04 因此发生过一次「按规格调用却拿到错函数」（对面是改名前的旧版）。现在有 `ops/push_exec_to_f02.sh`，推完自动逐字节比对两侧的 `command_for("Codex CLI")`。 |
+| N-? | 真 API 用量此前只有人工记账 | 已处理 | `ops/api_usage.py` 从 f02 各 run 的 `log/llm_log.jsonl` 数 `decision == "allow"`。表头固定带一行「历史口径：2026-09-06 签字前人工记账累计约 1 700 次；本表为机器统计，以本表为准」。 |

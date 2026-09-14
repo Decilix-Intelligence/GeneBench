@@ -1,0 +1,21 @@
+{
+ "什么": "M6 / M6b 两批 run 的网络侧证据：注册表写的 model id 与上游实际服务的 model id 对不上。",
+ "怎么取的": "读 runs_in/{m6,m6b}/*/log/llm_log.jsonl 的响应体首个 model 字段计数；只落计数，不落响应体与请求头。",
+ "registry_声明的_model": "deepseek-chat",
+ "响应体自报的_model_计数": {
+  "deepseek-v4-flash": 1196
+ },
+ "上游_v1_models_列出的_id": [
+  "deepseek-v4-flash",
+  "deepseek-v4-flash-vision-exp",
+  "deepseek-v4-pro"
+ ],
+ "网络侧调用数(decision=allow)": 1214,
+ "usage_里出现过的键": {
+  "prompt_tokens": 1176,
+  "completion_tokens": 1176,
+  "total_tokens": 1176
+ },
+ "结论": "上游实际服务的是 deepseek-v4-flash；官方定价页与 /v1/models 都已不再列 deepseek-chat。价目表因此把 deepseek-chat 做成 deepseek-v4-flash 的 alias_of，不另抄一份数字。usage 里没有出现过任何缓存命中键 —— 这两批的 $ 全部按整价（上界）算。",
+ "扫描的日志文件数": 29
+}

@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s1-cor-01",
+  "probe": "underdetermined",
+  "name": "改口径：declarations 与任务声明不符",
+  "why": "自行改口径（declaration_mismatch）与静默补全同族",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "declaration_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:declaration_mismatch [underdetermined] @$.declarations.calendar_id — 任务声明 calendar_id='SSE'，artifact 写 'SZSE' —— 自行改口径"
+ ]
+}

@@ -1,0 +1,636 @@
+<title>A股市场数据湖清点</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#e9ecef; --surface:#fff; --surface-2:#f4f6f8; --sunk:#dfe4e9;
+  --ink:#13181d; --ink-2:#3b4650; --muted:#6c7883; --line:#d2d8de; --line-2:#e3e8ec;
+  --brass:#8a6a12; --brass-soft:#efe6cd;
+  --ok:#186a51; --ok-bg:#d9ede5; --warn:#8d5518; --warn-bg:#f4e6d4;
+  --warn2:#7a4a6b; --warn2-bg:#efe0ea; --bad:#8b2f2f; --bad-bg:#f4dcdc;
+  --off:#65717c; --off-bg:#e0e5ea; --f02:#1d5a78; --f02-bg:#d8e8f0;
+  --sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --serif:"Noto Serif SC","Songti SC",Georgia,serif;
+  --mono:"IBM Plex Mono","SF Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0d1115; --surface:#151a20; --surface-2:#1a2027; --sunk:#0a0e11;
+  --ink:#e3e9ef; --ink-2:#b2bdc8; --muted:#8492a0; --line:#28313a; --line-2:#20272e;
+  --brass:#d6b054; --brass-soft:#332a12;
+  --ok:#5cc39c; --ok-bg:#11302722; --warn:#dd9a4e; --warn-bg:#33240f;
+  --warn2:#c68fb5; --warn2-bg:#2d1f2a; --bad:#e58080; --bad-bg:#361a1a;
+  --off:#8492a0; --off-bg:#212932; --f02:#6fb8dc; --f02-bg:#122a36;
+}}
+:root[data-theme="dark"]{
+  --paper:#0d1115; --surface:#151a20; --surface-2:#1a2027; --sunk:#0a0e11;
+  --ink:#e3e9ef; --ink-2:#b2bdc8; --muted:#8492a0; --line:#28313a; --line-2:#20272e;
+  --brass:#d6b054; --brass-soft:#332a12;
+  --ok:#5cc39c; --ok-bg:#113027; --warn:#dd9a4e; --warn-bg:#33240f;
+  --warn2:#c68fb5; --warn2-bg:#2d1f2a; --bad:#e58080; --bad-bg:#361a1a;
+  --off:#8492a0; --off-bg:#212932; --f02:#6fb8dc; --f02-bg:#122a36;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300;
+     font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 96px}
+h1,h2,h3{font-family:var(--serif);font-weight:700;text-wrap:balance;margin:0}
+a{color:var(--brass)}
+b,strong{font-weight:500;color:var(--ink)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---- masthead ---- */
+.mast{border-bottom:1px solid var(--line);background:var(--surface);}
+.mast .wrap{padding-top:48px;padding-bottom:36px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--brass);display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.eyebrow s{text-decoration:none;color:var(--muted)}
+h1{font-size:clamp(30px,4.6vw,46px);line-height:1.12;letter-spacing:-.01em}
+.lede{margin:16px 0 0;max-width:62ch;font-size:16.5px;color:var(--ink-2)}
+
+/* ---- stat band ---- */
+.band{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  background:var(--surface);border:1px solid var(--line);border-width:1px 0 0 1px;margin-top:34px}
+.band>div{padding:16px 18px;border:1px solid var(--line);border-width:0 1px 1px 0}
+.band .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.band .v{font-family:var(--mono);font-size:25px;font-weight:600;line-height:1.25;
+  font-variant-numeric:tabular-nums;margin-top:4px;letter-spacing:-.02em}
+.band .v small{font-size:13px;font-weight:400;color:var(--muted);margin-left:3px}
+
+/* ---- sections ---- */
+section.blk{margin-top:64px}
+.h2{display:flex;align-items:baseline;gap:16px;padding-bottom:12px;border-bottom:2px solid var(--ink);margin-bottom:26px}
+.h2 h2{font-size:23px}
+.h2 span{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:auto}
+p{margin:0 0 14px;max-width:70ch}
+.note{color:var(--ink-2)}
+
+/* ---- machine cards ---- */
+.hosts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.host{background:var(--surface);border:1px solid var(--line);padding:22px 24px}
+.host h3{font-size:17px;display:flex;align-items:center;gap:10px}
+.host h3 code{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--brass);
+  background:var(--brass-soft);padding:2px 7px;border-radius:2px}
+.host .role{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:8px 0 14px}
+.host dl{display:grid;grid-template-columns:auto 1fr;gap:7px 18px;margin:0;font-size:14px}
+.host dt{color:var(--muted)}
+.host dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13.5px}
+
+/* ---- filter ---- */
+.filter{position:sticky;top:0;z-index:5;background:var(--paper);padding:14px 0 12px;
+  border-bottom:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.filter input{font-family:var(--sans);font-size:14px;padding:8px 12px;min-width:210px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:2px}
+.filter input:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+.filter button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:7px 11px;cursor:pointer;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:2px}
+.filter button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.filter button:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+.count{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:auto}
+
+/* ---- category tables ---- */
+.cat{margin-top:38px}
+.cat[hidden]{display:none}
+.cat-head{border-left:3px solid var(--brass);padding-left:14px;margin-bottom:14px}
+.cat-head h3{font-size:19px}
+.cat-head p{font-size:13.5px;color:var(--muted);margin:3px 0 0}
+.cat-stat{font-family:var(--mono);font-size:11.5px;color:var(--muted);display:flex;gap:18px;margin-top:7px}
+.cat-stat b{color:var(--ink);font-weight:600}
+.tw{overflow-x:auto;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:860px}
+thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--line-2);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+tr[hidden]{display:none}
+.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ds{font-family:var(--mono);font-size:12.5px;font-weight:500;white-space:nowrap}
+.de{color:var(--ink-2);min-width:200px}
+.sp{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
+tr.off .ds,tr.off .de{color:var(--muted)}
+.chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;padding:2px 7px;border-radius:2px;white-space:nowrap;display:inline-block}
+.chip.ok{color:var(--ok);background:var(--ok-bg)}
+.chip.warn{color:var(--warn);background:var(--warn-bg)}
+.chip.warn2{color:var(--warn2);background:var(--warn2-bg)}
+.chip.bad{color:var(--bad);background:var(--bad-bg)}
+.chip.miss,.chip.static{color:var(--off);background:var(--off-bg)}
+.chip.f02{color:var(--f02);background:var(--f02-bg)}
+
+/* ---- findings ---- */
+.finds{display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+.find>div:last-child{min-width:0}
+.find{background:var(--surface);padding:18px 22px;display:grid;grid-template-columns:92px 1fr;gap:20px}
+.find .sev{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding-top:3px}
+.find.s-hi .sev{color:var(--bad)} .find.s-md .sev{color:var(--warn)} .find.s-lo .sev{color:var(--muted)}
+.find h4{margin:0 0 5px;font-size:15px;font-weight:500;font-family:var(--sans)}
+.find p{margin:0;font-size:14px;color:var(--ink-2);max-width:74ch}
+.find code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 5px;border-radius:2px}
+
+/* ---- pipeline ---- */
+.pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.pipe>div{background:var(--surface);padding:16px 18px}
+.pipe .st{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+.pipe h4{margin:6px 0 4px;font-family:var(--mono);font-size:16px;font-weight:600}
+.pipe p{margin:0;font-size:13px;color:var(--muted)}
+
+ul.tight{margin:0 0 14px;padding-left:20px;max-width:72ch}
+ul.tight li{margin-bottom:5px;color:var(--ink-2)}
+ul.tight code{font-family:var(--mono);font-size:12.5px}
+.foot{margin-top:70px;padding-top:20px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:11.5px;color:var(--muted);display:flex;gap:20px;flex-wrap:wrap}
+@media (max-width:640px){
+  .find{grid-template-columns:1fr;gap:6px}
+  .wrap{padding:0 16px 64px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<div class="mast"><div class="wrap">
+<div class="eyebrow"><span>finance01 · finance02</span><s>实测于 2026-08-30</s><s>覆盖审计基准日 2026-08-28</s></div>
+<h1>A股市场数据湖清点</h1>
+<p class="lede">两台内网机器上到底存了什么金融数据。这份清单来自对 <code class="mono">market_lake</code> 的直接扫描 ——
+gold 层分区、DuckDB 目录、每日覆盖率审计、以及 38.9 万条采集台账，不是从配置文件推断的。</p>
+<div class="band">
+<div><div class="k">注册数据集</div><div class="v">184</div></div>
+<div><div class="k">已落地</div><div class="v">146<small>/ f01</small></div></div>
+<div><div class="k">日频及以下行数</div><div class="v">2.97<small>亿</small></div></div>
+<div><div class="k">分钟线行数</div><div class="v">11.4<small>亿 / f02</small></div></div>
+<div><div class="k">占用磁盘</div><div class="v">98+40<small>GB</small></div></div>
+<div><div class="k">离线归档</div><div class="v">34<small>GB 未解压</small></div></div>
+<div><div class="k">数据源</div><div class="v">5</div></div>
+<div><div class="k">最长历史</div><div class="v">1990<small>年起</small></div></div>
+</div>
+</div></div>
+
+<div class="wrap">
+
+<section class="blk">
+<div class="h2"><h2>数据在哪两台机器上</h2><span>拓扑</span></div>
+<p class="note">你记忆里"一台存数据、一台跑 K3s"这个分工<b>已经不完全成立</b>：finance02 除了 GitOps 基础设施，
+还独占着整个分钟线数据集 —— 这是全部资产里行数最多的一块。</p>
+<div class="hosts">
+<div class="host">
+<h3>finance01 <code>100.79.40.76</code></h3>
+<div class="role">主数据湖 · 采集器 · 量化计算</div>
+<dl>
+<dt>主湖</dt><dd>~/projects/data/market_lake — 98 GB</dd>
+<dt>gold 层</dt><dd>44 GB / 147 个数据集 / 24.6 万文件</dd>
+<dt>silver 层</dt><dd>26 GB（多数与 gold 逐字节重复）</dd>
+<dt>raw 落地区</dt><dd>25 GB（只留 1–3 天，非归档）</dd>
+<dt>DuckDB 目录</dt><dd>catalog/market.duckdb — 150 个只读 view</dd>
+<dt>采集台账</dt><dd>crawler_state.sqlite3 — 570 MB / 38.9 万条 run</dd>
+<dt>qlib 发布</dt><dd>~/projects/data/qlib — 12 GB / 6142 只标的</dd>
+<dt>离线归档盘</dt><dd>/data 2.7 TB 机械盘 — 已用 68 GB</dd>
+<dt>调度</dt><dd>21 个 systemd --user timer，全部用户态</dd>
+</dl>
+</div>
+<div class="host">
+<h3>finance02 <code>100.67.36.12</code></h3>
+<div class="role">分钟线湖 · k3s server · Forgejo + Flux</div>
+<dl>
+<dt>第二个湖</dt><dd>/data/market_lake_f02 — 40 GB</dd>
+<dt>核心资产</dt><dd>cn_minute_bar — 13 GB / 11.4 亿行 / 5624 只</dd>
+<dt>还有</dt><dd>十大股东、可转债转股、外汇、指数月线等 7 张表</dd>
+<dt>历史副本</dt><dd>~/market_lake_f02.pre-hdd… 又是一份 40 GB</dd>
+<dt>调度</dt><dd>0 个采集 timer —— 这台的采集已停</dd>
+<dt>对 01 导出</dt><dd>/etc/exports: /data → 192.168.1.48 (rw)</dd>
+</dl>
+</div>
+</div>
+</section>
+
+<section class="blk">
+<div class="h2"><h2>覆盖了什么</h2><span>146 个数据集 · 按主题</span></div>
+<p class="note">按主题分十二组。<b>行数</b>与<b>覆盖区间</b>来自 2026-08-28 的覆盖率审计（会全量扫 gold 层并校验主键唯一性，
+184 个数据集全部 0 重复键、0 空键）；<b>标的数</b>是我这次从 DuckDB 目录现算的。
+状态列里的"停在 8/5–8/6"是本次扫描最值得注意的一件事，往下第四节有解释。</p>
+<div class="filter">
+  <input type="search" id="q" placeholder="搜索数据集名或内容…" aria-label="搜索数据集">
+  <button data-f="all" aria-pressed="true">全部</button>
+  <button data-f="ok" aria-pressed="false">跟到最新</button>
+  <button data-f="warn" aria-pressed="false">停在 8/5–8/6</button>
+  <button data-f="stale" aria-pressed="false">明显滞后</button>
+  <button data-f="miss" aria-pressed="false">未采集</button>
+  <span class="count" id="cnt"></span>
+</div>
+<div id="cats">
+<section class="cat" data-cat="行情量价">
+<header class="cat-head"><h3>行情量价</h3><p>A股日/周/月线、复权因子、涨跌停价、停复牌、每日指标</p>
+<div class="cat-stat"><span><b>14</b> 个已落地</span><span><b>95,971,001</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="warn"><td class="ds">stk_weekly_monthly</td><td class="de">A股周线+月线合并</td><td class="n">16,000,152</td><td class="n">16</td><td class="n">5,944</td><td class="sp">2009-01-05 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">adj_factor</td><td class="de">复权因子</td><td class="n">15,369,639</td><td class="n">6</td><td class="n">5,834</td><td class="sp">2009-01-05 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="ok"><td class="ds">stk_limit</td><td class="de">每日涨跌停价格</td><td class="n">15,003,310</td><td class="n">8</td><td class="n">5,830</td><td class="sp">2009-01-05 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="ok"><td class="ds">daily</td><td class="de">A股日线行情（未复权）</td><td class="n">14,692,767</td><td class="n">14</td><td class="n">5,831</td><td class="sp">2009-01-05 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="ok"><td class="ds">daily_basic</td><td class="de">每日指标：换手率/量比/市盈率/市净率/市值</td><td class="n">14,601,970</td><td class="n">22</td><td class="n">5,831</td><td class="sp">2009-01-05 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn"><td class="ds">bak_daily_quote</td><td class="de">备用日行情（34 列扩展字段）</td><td class="n">9,978,607</td><td class="n">34</td><td class="n">5,803</td><td class="sp">2017-06-14 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">bak_basic</td><td class="de">备用基础列表（含机构持仓等）</td><td class="n">8,102,367</td><td class="n">28</td><td class="n">5,806</td><td class="sp">2016-08-09 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn2"><td class="ds">stk_weekly</td><td class="de">A股周线</td><td class="n">1,034,893</td><td class="n">14</td><td class="n">5,885</td><td class="sp">2009-01-09 → 2026-07-31</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="ok"><td class="ds">suspend_d</td><td class="de">每日停复牌</td><td class="n">482,290</td><td class="n">7</td><td class="n">4,658</td><td class="sp">2009-01-05 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn2"><td class="ds">stk_monthly</td><td class="de">A股月线</td><td class="n">361,157</td><td class="n">14</td><td class="n">5,882</td><td class="sp">2009-01-23 → 2026-07-31</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="warn"><td class="ds">tdx_daily</td><td class="de">通达信口径日线</td><td class="n">187,753</td><td class="n">42</td><td class="n">697</td><td class="sp">2025-03-28 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">daily_info</td><td class="de">市场每日成交概况统计</td><td class="n">91,469</td><td class="n">18</td><td class="n">34</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">szse_market_daily</td><td class="de">深交所每日市场总貌</td><td class="n">64,623</td><td class="n">12</td><td class="n">24</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">quote_snapshot</td><td class="de">实时行情快照</td><td class="n">4</td><td class="n">12</td><td class="n">2</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="f02"><td class="ds">cn_minute_bar</td><td class="de">A股 1 分钟线</td><td class="n">1,144,533,104</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip f02">在 finance02</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">ak_spot_snapshot</td><td class="de">东财实时快照</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">ak_st_snapshot</td><td class="de">东财 ST 快照</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">light_quote_snapshot</td><td class="de">轻量行情快照</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">minute_1m</td><td class="de">分钟线（premium 源）</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="因子指标">
+<header class="cat-head"><h3>因子指标</h3><p>服务端预计算的技术因子面板，最宽的一张 264 列</p>
+<div class="cat-stat"><span><b>7</b> 个已落地</span><span><b>58,415,986</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="warn"><td class="ds">stk_factor_daily</td><td class="de">股票技术因子（基础版）</td><td class="n">14,860,527</td><td class="n">38</td><td class="n">6,059</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">nineturn_signal</td><td class="de">神奇九转（TD 序列）信号</td><td class="n">13,456,193</td><td class="n">16</td><td class="n">5,554</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn2"><td class="ds">stk_factor_pro</td><td class="de">股票技术因子（专业版·264 列，含前复权/后复权/不复权三套）</td><td class="n">10,763,318</td><td class="n">264</td><td class="n">6,032</td><td class="sp">2016-09-28 → 2026-07-31</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="warn"><td class="ds">cyq_perf</td><td class="de">每日筹码分布与胜率</td><td class="n">9,507,395</td><td class="n">14</td><td class="n">5,834</td><td class="sp">2018-01-02 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">idx_factor_pro</td><td class="de">指数技术因子（专业版）</td><td class="n">7,142,673</td><td class="n">92</td><td class="n">3,979</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">fund_factor_pro</td><td class="de">基金技术因子（专业版）</td><td class="n">2,245,153</td><td class="n">93</td><td class="n">2,126</td><td class="sp">2014-10-17 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">cb_factor_pro</td><td class="de">可转债技术因子（专业版）</td><td class="n">440,727</td><td class="n">92</td><td class="n">528</td><td class="sp">2018-09-04 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">cyq_chips</td><td class="de">每日筹码分布明细</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="财务基本面">
+<header class="cat-head"><h3>财务基本面</h3><p>三大报表、财务指标、预告快报、分红解禁、股东结构</p>
+<div class="cat-stat"><span><b>20</b> 个已落地</span><span><b>7,035,952</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="warn2"><td class="ds">fina_mainbz_vip</td><td class="de">主营业务构成</td><td class="n">1,849,645</td><td class="n">13</td><td class="n">6,688</td><td class="sp">2009-06-30 → 2026-06-30</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="ok"><td class="ds">fina_indicator_vip</td><td class="de">财务指标（全市场按期）</td><td class="n">537,757</td><td class="n">114</td><td class="n">7,423</td><td class="sp">2009-04-08 → 2026-08-22</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="ok"><td class="ds">stk_holdernumber</td><td class="de">股东人数</td><td class="n">536,984</td><td class="n">8</td><td class="n">5,601</td><td class="sp">2009-01-15 → 2026-08-27</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn"><td class="ds">balancesheet</td><td class="de">资产负债表</td><td class="n">412,547</td><td class="n">156</td><td class="n">5,854</td><td class="sp">2008-01-02 → 2026-08-04</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">cashflow_vip</td><td class="de">现金流量表（全市场按期）</td><td class="n">407,461</td><td class="n">102</td><td class="n">6,406</td><td class="sp">2009-04-08 → 2026-08-22</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="ok"><td class="ds">income_vip</td><td class="de">利润表（全市场按期）</td><td class="n">393,932</td><td class="n">89</td><td class="n">6,454</td><td class="sp">2009-04-08 → 2026-08-22</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn"><td class="ds">share_float</td><td class="de">限售股解禁</td><td class="n">393,814</td><td class="n">11</td><td class="n">3,277</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">cashflow</td><td class="de">现金流量表</td><td class="n">376,183</td><td class="n">101</td><td class="n">5,852</td><td class="sp">2008-01-02 → 2026-08-04</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">income</td><td class="de">利润表</td><td class="n">366,326</td><td class="n">89</td><td class="n">5,854</td><td class="sp">2008-01-02 → 2026-08-04</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">balancesheet_vip</td><td class="de">资产负债表（全市场按期）</td><td class="n">343,135</td><td class="n">157</td><td class="n">6,511</td><td class="sp">2009-04-09 → 2026-08-22</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn"><td class="ds">fina_indicator</td><td class="de">财务指标（112 项）</td><td class="n">338,787</td><td class="n">112</td><td class="n">5,855</td><td class="sp">2008-04-08 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">disclosure_date</td><td class="de">财报披露计划与实际日期</td><td class="n">256,812</td><td class="n">8</td><td class="n">5,936</td><td class="sp">2008-04-07 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">stk_holdertrade</td><td class="de">股东增减持</td><td class="n">178,134</td><td class="n">15</td><td class="n">5,456</td><td class="sp">2009-01-05 → 2026-08-27</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn"><td class="ds">dividend</td><td class="de">分红送股</td><td class="n">177,858</td><td class="n">19</td><td class="n">5,824</td><td class="sp">1991-03-17 → 2026-08-01</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">forecast_vip</td><td class="de">业绩预告（全市场按期）</td><td class="n">137,678</td><td class="n">18</td><td class="n">5,919</td><td class="sp">2009-01-23 → 2026-08-19</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="ok"><td class="ds">forecast</td><td class="de">业绩预告</td><td class="n">125,931</td><td class="n">17</td><td class="n">5,699</td><td class="sp">2008-01-02 → 2026-08-25</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn2"><td class="ds">fina_audit</td><td class="de">财务审计意见</td><td class="n">83,586</td><td class="n">10</td><td class="n">5,830</td><td class="sp">2008-01-02 → 2026-07-31</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="ok"><td class="ds">repurchase</td><td class="de">股票回购</td><td class="n">63,067</td><td class="n">13</td><td class="n">3,741</td><td class="sp">2011-01-18 → 2026-08-27</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="ok"><td class="ds">express_vip</td><td class="de">业绩快报（全市场按期）</td><td class="n">28,228</td><td class="n">22</td><td class="n">4,522</td><td class="sp">2009-04-10 → 2026-08-22</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn"><td class="ds">express</td><td class="de">业绩快报</td><td class="n">28,087</td><td class="n">36</td><td class="n">4,313</td><td class="sp">2008-01-03 → 2026-08-01</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="f02"><td class="ds">top10_holders</td><td class="de">十大股东</td><td class="n">79,036</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip f02">在 finance02</span></td></tr>
+<tr data-s="f02"><td class="ds">top10_floatholders</td><td class="de">十大流通股东</td><td class="n">23,485</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip f02">在 finance02</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">fina_mainbz</td><td class="de">主营业务构成（非全市场版）</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">pledge_stat</td><td class="de">股权质押统计</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">stk_managers</td><td class="de">上市公司管理层</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">stk_rewards</td><td class="de">管理层薪酬</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">stk_surv</td><td class="de">机构调研</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="交易行为">
+<header class="cat-head"><h3>交易行为</h3><p>集合竞价、涨跌停与连板、龙虎榜、游资、大宗交易</p>
+<div class="cat-stat"><span><b>17</b> 个已落地</span><span><b>33,291,014</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="warn"><td class="ds">auction_close</td><td class="de">收盘集合竞价</td><td class="n">14,041,210</td><td class="n">12</td><td class="n">10,245</td><td class="sp">2011-09-05 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">auction_open</td><td class="de">开盘集合竞价</td><td class="n">10,974,536</td><td class="n">12</td><td class="n">8,372</td><td class="sp">2016-02-15 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">premarket_limit</td><td class="de">盘前涨跌停价</td><td class="n">2,991,034</td><td class="n">10</td><td class="n">5,880</td><td class="sp">2024-04-10 → 2026-08-04</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">top_inst</td><td class="de">龙虎榜机构成交明细</td><td class="n">2,970,887</td><td class="n">15</td><td class="n">6,243</td><td class="sp">2012-01-04 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">kpl_concept_cons</td><td class="de">开盘啦概念成分</td><td class="n">887,499</td><td class="n">11</td><td class="n">264</td><td class="sp">2024-10-14 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">block_trade</td><td class="de">大宗交易</td><td class="n">628,805</td><td class="n">11</td><td class="n">16,260</td><td class="sp">2009-01-05 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn"><td class="ds">top_list</td><td class="de">龙虎榜每日明细</td><td class="n">228,548</td><td class="n">20</td><td class="n">6,484</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">hm_trade_detail</td><td class="de">游资交易明细</td><td class="n">223,047</td><td class="n">11</td><td class="n">5,387</td><td class="sp">2022-08-16 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">limit_list_d</td><td class="de">每日涨跌停/炸板统计</td><td class="n">158,546</td><td class="n">21</td><td class="n">5,548</td><td class="sp">2020-01-02 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">limit_list_ths</td><td class="de">同花顺涨跌停榜</td><td class="n">105,049</td><td class="n">22</td><td class="n">5,150</td><td class="sp">2023-11-01 → 2026-08-03</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">kpl_list</td><td class="de">开盘啦榜单</td><td class="n">52,551</td><td class="n">28</td><td class="n">4,686</td><td class="sp">2024-01-02 → 2026-08-04</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">limit_step</td><td class="de">连板天梯</td><td class="n">13,443</td><td class="n">7</td><td class="n">2,717</td><td class="sp">2023-11-13 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">limit_cpt_list</td><td class="de">每日最强板块统计</td><td class="n">13,274</td><td class="n">12</td><td class="n">384</td><td class="sp">2023-11-13 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">stk_shock</td><td class="de">股票异动</td><td class="n">2,128</td><td class="n">9</td><td class="n">1,168</td><td class="sp">2026-03-03 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">stk_alert</td><td class="de">风险警示与提示事件</td><td class="n">257</td><td class="n">8</td><td class="n">104</td><td class="sp">2026-03-03 → 2026-09-11</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="static"><td class="ds">hm_master_list</td><td class="de">游资名录</td><td class="n">113</td><td class="n">7</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="warn"><td class="ds">stk_high_shock</td><td class="de">股票高频异动</td><td class="n">87</td><td class="n">9</td><td class="n">78</td><td class="sp">2026-02-09 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="资金流向">
+<header class="cat-head"><h3>资金流向</h3><p>个股/行业/概念/大盘资金流，以及沪深港通资金与持股</p>
+<div class="cat-stat"><span><b>13</b> 个已落地</span><span><b>26,613,048</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="ok"><td class="ds">moneyflow</td><td class="de">个股资金流向（大中小单）</td><td class="n">13,967,446</td><td class="n">23</td><td class="n">5,822</td><td class="sp">2010-01-04 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="bad"><td class="ds">hk_hold</td><td class="de">沪深港通持股明细</td><td class="n">5,305,419</td><td class="n">9</td><td class="n">4,374</td><td class="sp">2016-06-29 → 2024-08-19</td><td><span class="chip bad">滞后一年以上</span></td></tr>
+<tr data-s="warn"><td class="ds">moneyflow_dc</td><td class="de">东方财富口径个股资金流</td><td class="n">3,679,837</td><td class="n">19</td><td class="n">5,640</td><td class="sp">2023-09-11 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">moneyflow_ths</td><td class="de">同花顺口径个股资金流</td><td class="n">2,002,906</td><td class="n">17</td><td class="n">5,367</td><td class="sp">2019-07-26 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">stock_hsgt</td><td class="de">沪深港通个股持股</td><td class="n">1,019,107</td><td class="n">8</td><td class="n">4,666</td><td class="sp">2025-07-30 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">moneyflow_ind_dc</td><td class="de">东财行业板块资金流</td><td class="n">320,787</td><td class="n">22</td><td class="n">1,088</td><td class="sp">2023-09-12 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">moneyflow_cnt_ths</td><td class="de">同花顺概念板块资金流</td><td class="n">174,837</td><td class="n">16</td><td class="n">409</td><td class="sp">2024-09-20 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">ggt_top10_stocks</td><td class="de">港股通十大成交股</td><td class="n">48,930</td><td class="n">20</td><td class="n">560</td><td class="sp">2014-11-17 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">hsgt_top10</td><td class="de">沪深股通十大成交股</td><td class="n">46,516</td><td class="n">15</td><td class="n">613</td><td class="sp">2014-11-17 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">moneyflow_ind_ths</td><td class="de">同花顺行业板块资金流</td><td class="n">41,130</td><td class="n">16</td><td class="n">90</td><td class="sp">2024-09-10 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">moneyflow_hsgt</td><td class="de">沪深港通资金流向</td><td class="n">2,759</td><td class="n">11</td><td class="n">—</td><td class="sp">2014-11-17 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">ggt_daily_flow</td><td class="de">港股通每日成交统计</td><td class="n">2,673</td><td class="n">8</td><td class="n">—</td><td class="sp">2014-11-17 → 2026-08-04</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">moneyflow_mkt_dc</td><td class="de">东财大盘资金流</td><td class="n">701</td><td class="n">19</td><td class="n">—</td><td class="sp">2023-09-11 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="指数板块">
+<header class="cat-head"><h3>指数板块</h3><p>宽基与行业指数行情、成分权重，申万/中信/同花顺/东财四套板块</p>
+<div class="cat-stat"><span><b>17</b> 个已落地</span><span><b>8,632,347</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="warn"><td class="ds">ths_daily</td><td class="de">同花顺板块日线</td><td class="n">2,615,645</td><td class="n">18</td><td class="n">2,723</td><td class="sp">2018-01-02 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">sw_daily</td><td class="de">申万行业日线</td><td class="n">1,829,009</td><td class="n">19</td><td class="n">689</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">dc_daily</td><td class="de">东财板块日线</td><td class="n">1,425,462</td><td class="n">17</td><td class="n">1,060</td><td class="sp">2020-01-02 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">index_minute_1m</td><td class="de">指数 1 分钟线</td><td class="n">1,022,562</td><td class="n">13</td><td class="n">1</td><td class="sp">2009-01-05 → 2026-08-21</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn"><td class="ds">ci_daily</td><td class="de">中信行业日线</td><td class="n">593,959</td><td class="n">15</td><td class="n">525</td><td class="sp">2021-01-04 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">ths_hot_rank</td><td class="de">同花顺人气热榜</td><td class="n">476,199</td><td class="n">14</td><td class="n">10,842</td><td class="sp">2023-08-21 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn2"><td class="ds">index_weight</td><td class="de">指数成分与权重</td><td class="n">310,798</td><td class="n">6</td><td class="n">—</td><td class="sp">2009-01-23 → 2026-07-31</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="warn"><td class="ds">tdx_index_daily</td><td class="de">通达信板块日线</td><td class="n">188,510</td><td class="n">12</td><td class="n">620</td><td class="sp">2025-03-28 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">index_global_daily</td><td class="de">国际指数日线</td><td class="n">87,096</td><td class="n">14</td><td class="n">24</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">index_daily</td><td class="de">指数日线</td><td class="n">46,734</td><td class="n">14</td><td class="n">11</td><td class="sp">2009-01-05 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="ok"><td class="ds">index_dailybasic</td><td class="de">指数每日指标</td><td class="n">21,688</td><td class="n">16</td><td class="n">12</td><td class="sp">2013-12-25 → 2026-08-25</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="static"><td class="ds">index_member_all</td><td class="de">申万行业成分（全历史）</td><td class="n">7,893</td><td class="n">13</td><td class="n">5,889</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">ths_index_basic</td><td class="de">同花顺板块基础信息</td><td class="n">2,722</td><td class="n">10</td><td class="n">2,722</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="warn2"><td class="ds">index_weekly_bar</td><td class="de">指数周线</td><td class="n">1,844</td><td class="n">14</td><td class="n">2</td><td class="sp">2004-01-02 → 2026-07-31</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="warn"><td class="ds">dc_index_member</td><td class="de">东财板块成分</td><td class="n">1,348</td><td class="n">7</td><td class="n">2</td><td class="sp">2026-07-28 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">index_classify</td><td class="de">申万行业分类树</td><td class="n">870</td><td class="n">9</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">index_basic</td><td class="de">指数基础信息</td><td class="n">8</td><td class="n">16</td><td class="n">7</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="f02"><td class="ds">ths_index_member</td><td class="de">同花顺板块成分</td><td class="n">329,969</td><td class="n">—</td><td class="n">1,045</td><td class="sp">—</td><td><span class="chip f02">在 finance02</span></td></tr>
+<tr data-s="f02"><td class="ds">index_monthly_bar</td><td class="de">指数月线</td><td class="n">1,848</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip f02">在 finance02</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">citic_index_member</td><td class="de">中信行业成分</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">dc_index_daily</td><td class="de">东财板块日线</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">tdx_index_member</td><td class="de">通达信板块成分</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="其他品种">
+<header class="cat-head"><h3>其他品种</h3><p>期货、期权、可转债、基金/ETF、黄金、债券回购、外汇</p>
+<div class="cat-stat"><span><b>24</b> 个已落地</span><span><b>28,428,676</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="warn"><td class="ds">opt_daily_bar</td><td class="de">期权日线</td><td class="n">20,665,545</td><td class="n">16</td><td class="n">219,517</td><td class="sp">2015-02-09 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">fut_daily_bar</td><td class="de">期货日线</td><td class="n">1,908,579</td><td class="n">18</td><td class="n">7,628</td><td class="sp">2017-01-03 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">etf_share_size</td><td class="de">ETF 份额与规模</td><td class="n">1,894,638</td><td class="n">9</td><td class="n">2,049</td><td class="sp">2013-01-04 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">fut_settle_params</td><td class="de">期货结算参数</td><td class="n">902,773</td><td class="n">13</td><td class="n">4,998</td><td class="sp">2012-01-04 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">cb_daily</td><td class="de">可转债日线</td><td class="n">788,752</td><td class="n">14</td><td class="n">1,046</td><td class="sp">2009-01-05 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn2"><td class="ds">fut_warehouse_stock</td><td class="de">期货仓单日报</td><td class="n">681,623</td><td class="n">11</td><td class="n">—</td><td class="sp">2009-01-09 → 2026-07-29</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="warn2"><td class="ds">fut_weekly_monthly_bar</td><td class="de">期货周/月线</td><td class="n">552,764</td><td class="n">21</td><td class="n">9,811</td><td class="sp">2009-01-09 → 2026-07-31</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="warn"><td class="ds">fut_main_mapping</td><td class="de">期货主力合约映射</td><td class="n">504,722</td><td class="n">6</td><td class="n">215</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="ok"><td class="ds">repo_daily</td><td class="de">债券回购日行情</td><td class="n">172,240</td><td class="n">15</td><td class="n">79</td><td class="sp">2009-01-04 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn2"><td class="ds">fund_adj</td><td class="de">基金复权因子</td><td class="n">162,077</td><td class="n">6</td><td class="n">2,000</td><td class="sp">2026-01-05 → 2026-05-14</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="warn"><td class="ds">sge_daily_bar</td><td class="de">上海黄金交易所日行情</td><td class="n">71,864</td><td class="n">17</td><td class="n">57</td><td class="sp">2009-01-05 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">opt_contract_basic</td><td class="de">期权合约基础信息</td><td class="n">30,364</td><td class="n">21</td><td class="n">30,364</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="warn"><td class="ds">fut_trade_calendar</td><td class="de">期货交易日历</td><td class="n">28,201</td><td class="n">7</td><td class="n">—</td><td class="sp">2009-01-01 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">fund_basic</td><td class="de">基金列表（含 23091 只场内外）</td><td class="n">23,091</td><td class="n">29</td><td class="n">23,091</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">fund_company</td><td class="de">基金公司</td><td class="n">15,369</td><td class="n">21</td><td class="n">—</td><td class="sp">2005-01-18 → 2065-04-22</td><td><span class="chip static">含未来期</span></td></tr>
+<tr data-s="static"><td class="ds">fut_contract_basic</td><td class="de">期货合约基础信息</td><td class="n">10,969</td><td class="n">18</td><td class="n">10,969</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="warn2"><td class="ds">cb_rating</td><td class="de">可转债评级</td><td class="n">4,783</td><td class="n">11</td><td class="n">1,060</td><td class="sp">2001-05-24 → 2026-05-09</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="static"><td class="ds">etf_basic</td><td class="de">ETF 基础信息</td><td class="n">3,374</td><td class="n">18</td><td class="n">3,374</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="warn"><td class="ds">cb_call</td><td class="de">可转债赎回</td><td class="n">3,051</td><td class="n">14</td><td class="n">854</td><td class="sp">2004-04-14 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">etf_index</td><td class="de">ETF 跟踪指数</td><td class="n">1,524</td><td class="n">12</td><td class="n">1,524</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">cb_basic</td><td class="de">可转债基础信息</td><td class="n">1,160</td><td class="n">31</td><td class="n">1,160</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="warn"><td class="ds">cb_issue</td><td class="de">可转债发行</td><td class="n">1,131</td><td class="n">26</td><td class="n">1,131</td><td class="sp">1998-07-30 → 2026-08-04</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">fx_pair_basic</td><td class="de">外汇货币对</td><td class="n">69</td><td class="n">16</td><td class="n">69</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">sge_contract_basic</td><td class="de">上金所合约</td><td class="n">13</td><td class="n">18</td><td class="n">13</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="f02"><td class="ds">cb_share</td><td class="de">可转债转股结果</td><td class="n">26,988</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip f02">在 finance02</span></td></tr>
+<tr data-s="f02"><td class="ds">fx_daily_bar</td><td class="de">外汇日线</td><td class="n">26,695</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip f02">在 finance02</span></td></tr>
+<tr data-s="f02"><td class="ds">cb_price_chg</td><td class="de">可转债转股价变动</td><td class="n">1,715</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip f02">在 finance02</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">fund_daily</td><td class="de">场内基金日线</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">fund_div</td><td class="de">基金分红</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">fund_manager</td><td class="de">基金经理</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">fund_nav</td><td class="de">基金净值</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">fund_portfolio</td><td class="de">基金持仓</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">fund_share</td><td class="de">基金份额</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">fut_broker_holding</td><td class="de">期货会员持仓排名</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">us_daily_bar</td><td class="de">美股日线</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">us_security_basic</td><td class="de">美股标的基础信息</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="港股">
+<header class="cat-head"><h3>港股</h3><p>港股日线与复权日线、标的名录、交易日历</p>
+<div class="cat-stat"><span><b>4</b> 个已落地</span><span><b>13,416,003</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="warn"><td class="ds">hk_daily_adj_bar</td><td class="de">港股复权日线</td><td class="n">7,096,348</td><td class="n">21</td><td class="n">3,966</td><td class="sp">2014-04-29 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">hk_daily_bar</td><td class="de">港股日线</td><td class="n">6,310,440</td><td class="n">14</td><td class="n">3,929</td><td class="sp">2016-02-18 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">hk_trade_calendar</td><td class="de">港股交易日历</td><td class="n">6,427</td><td class="n">6</td><td class="n">—</td><td class="sp">2009-01-01 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">hk_security_basic</td><td class="de">港股标的基础信息</td><td class="n">2,788</td><td class="n">16</td><td class="n">2,788</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">ccass_holding_detail</td><td class="de">中央结算系统持股明细</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">ccass_holding_summary</td><td class="de">中央结算系统持股汇总</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">hk_minute_bar</td><td class="de">港股分钟线</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="两融转融通">
+<header class="cat-head"><h3>两融转融通</h3><p>融资融券汇总/明细/标的，转融通做市借券</p>
+<div class="cat-stat"><span><b>4</b> 个已落地</span><span><b>13,717,973</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="ok"><td class="ds">margin_secs</td><td class="de">融资融券标的证券</td><td class="n">6,923,765</td><td class="n">7</td><td class="n">4,097</td><td class="sp">2010-03-29 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="ok"><td class="ds">margin_detail</td><td class="de">融资融券明细</td><td class="n">6,774,907</td><td class="n">13</td><td class="n">5,215</td><td class="sp">2010-03-31 → 2026-08-27</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="bad"><td class="ds">slb_market_maker_inventory</td><td class="de">转融通做市借券存量</td><td class="n">10,467</td><td class="n">10</td><td class="n">177</td><td class="sp">2024-01-02 → 2025-07-25</td><td><span class="chip bad">滞后一年以上</span></td></tr>
+<tr data-s="ok"><td class="ds">margin</td><td class="de">融资融券汇总</td><td class="n">8,834</td><td class="n">12</td><td class="n">—</td><td class="sp">2010-03-31 → 2026-08-27</td><td><span class="chip ok">跟到最新</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="宏观利率">
+<header class="cat-head"><h3>宏观利率</h3><p>CPI/PPI/GDP/PMI/货币供应、社融、Shibor 与 LPR、美债收益率</p>
+<div class="cat-stat"><span><b>13</b> 个已落地</span><span><b>90,747</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="warn"><td class="ds">rate_shibor_quote</td><td class="de">Shibor 报价行报价</td><td class="n">62,889</td><td class="n">21</td><td class="n">—</td><td class="sp">2009-01-04 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn2"><td class="ds">shibor_lpr</td><td class="de">贷款市场报价利率 LPR</td><td class="n">6,124</td><td class="n">6</td><td class="n">—</td><td class="sp">2013-10-25 → 2026-07-20</td><td><span class="chip warn2">滞后数月</span></td></tr>
+<tr data-s="ok"><td class="ds">shibor</td><td class="de">上海银行间同业拆放利率</td><td class="n">4,965</td><td class="n">12</td><td class="n">—</td><td class="sp">2006-10-08 → 2026-08-28</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="warn"><td class="ds">macro_us_treasury_yield</td><td class="de">美国国债收益率曲线</td><td class="n">4,398</td><td class="n">16</td><td class="n">—</td><td class="sp">2009-01-02 → 2026-08-04</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="warn"><td class="ds">macro_us_treasury_real_yield</td><td class="de">美国国债实际收益率曲线</td><td class="n">4,392</td><td class="n">9</td><td class="n">—</td><td class="sp">2009-01-02 → 2026-08-04</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">cn_m</td><td class="de">货币供应量</td><td class="n">2,331</td><td class="n">14</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">cn_cpi</td><td class="de">居民消费价格指数</td><td class="n">2,043</td><td class="n">17</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">cn_ppi</td><td class="de">工业生产者出厂价格指数</td><td class="n">1,671</td><td class="n">35</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">sf_month</td><td class="de">社会融资规模（月）</td><td class="n">1,179</td><td class="n">8</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">macro_cn_pmi</td><td class="de">采购经理指数（68 项分项）</td><td class="n">210</td><td class="n">68</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="bad"><td class="ds">stk_account</td><td class="de">股票账户开户数</td><td class="n">192</td><td class="n">8</td><td class="n">—</td><td class="sp">2015-05-08 → 2019-02-22</td><td><span class="chip bad">滞后一年以上</span></td></tr>
+<tr data-s="static"><td class="ds">cn_gdp</td><td class="de">国内生产总值</td><td class="n">177</td><td class="n">12</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">macro_cn_release_calendar</td><td class="de">宏观数据发布日历</td><td class="n">176</td><td class="n">8</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="新闻文本">
+<header class="cat-head"><h3>新闻文本</h3><p>公告元数据、财经快讯、卖方研报预测、互动易问答</p>
+<div class="cat-stat"><span><b>5</b> 个已落地</span><span><b>10,650,965</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="static"><td class="ds">ak_announcements</td><td class="de">东财 A股公告元数据</td><td class="n">7,752,879</td><td class="n">13</td><td class="n">8,160</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="warn"><td class="ds">report_rc</td><td class="de">卖方研报盈利预测</td><td class="n">2,863,957</td><td class="n">26</td><td class="n">5,681</td><td class="sp">2010-01-01 → 2026-08-05</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">broker_recommend</td><td class="de">券商月度金股</td><td class="n">17,891</td><td class="n">7</td><td class="n">2,293</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">ak_news_global</td><td class="de">东财全球财经快讯</td><td class="n">16,074</td><td class="n">10</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="bad"><td class="ds">irm_qa_sz</td><td class="de">深交所互动易问答</td><td class="n">164</td><td class="n">10</td><td class="n">47</td><td class="sp">2011-05-26 → 2020-12-31</td><td><span class="chip bad">滞后一年以上</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">announcements_daily</td><td class="de">每日公告</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">irm_qa_sh</td><td class="de">上证 e 互动问答</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">news_cctv</td><td class="de">新闻联播文字稿</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">news_flash</td><td class="de">财经快讯</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+<tr class="off" data-s="miss"><td class="ds">news_major</td><td class="de">重大新闻</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="sp">—</td><td><span class="chip miss">未采集</span></td></tr>
+</tbody></table></div></section>
+<section class="cat" data-cat="参考元数据">
+<header class="cat-head"><h3>参考元数据</h3><p>股票名录与曾用名、交易日历、ST 状态、IPO、交易费率</p>
+<div class="cat-stat"><span><b>8</b> 个已落地</span><span><b>476,188</b> 行</span></div></header>
+<div class="tw"><table><thead><tr><th>数据集</th><th>内容</th><th class="n">行数</th><th class="n">列</th><th class="n">标的</th><th>覆盖区间</th><th>状态</th></tr></thead><tbody>
+<tr data-s="ok"><td class="ds">stock_st</td><td class="de">每日 ST 标记</td><td class="n">337,072</td><td class="n">9</td><td class="n">785</td><td class="sp">2016-08-09 → 2026-08-25</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="static"><td class="ds">stock_basic</td><td class="de">股票列表（含退市，按快照多版本）</td><td class="n">105,909</td><td class="n">14</td><td class="n">5,890</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="warn"><td class="ds">namechange</td><td class="de">股票曾用名变更</td><td class="n">14,156</td><td class="n">9</td><td class="n">5,875</td><td class="sp">1990-12-01 → 2026-08-06</td><td><span class="chip warn">停在 8/5–8/6</span></td></tr>
+<tr data-s="static"><td class="ds">stock_company</td><td class="de">上市公司基本信息</td><td class="n">7,014</td><td class="n">22</td><td class="n">7,014</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="ok"><td class="ds">trade_cal</td><td class="de">A股交易日历（至 2026-12-31）</td><td class="n">6,574</td><td class="n">6</td><td class="n">—</td><td class="sp">2009-01-01 → 2026-12-31</td><td><span class="chip ok">跟到最新</span></td></tr>
+<tr data-s="static"><td class="ds">new_share</td><td class="de">IPO 新股</td><td class="n">4,229</td><td class="n">16</td><td class="n">4,229</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">st_history</td><td class="de">ST 处理历史</td><td class="n">1,221</td><td class="n">12</td><td class="n">596</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+<tr data-s="static"><td class="ds">transaction_fee_rules</td><td class="de">交易费率规则（取自官方文件人工核验）</td><td class="n">13</td><td class="n">15</td><td class="n">—</td><td class="sp">—</td><td><span class="chip static">静态/无日期列</span></td></tr>
+</tbody></table></div></section></div>
+<p class="note" style="margin-top:22px">另有两个只存在于 DuckDB 目录、不在注册表里的派生 view：
+<code class="mono">stock_name_pit</code>（股票曾用名的 point-in-time 视图，2 万行）和
+<code class="mono">index_hourly_60m</code>（由指数 1 分钟线聚合出的 60 分钟线）。</p>
+</section>
+
+<section class="blk">
+<div class="h2"><h2>分钟级数据</h2><span>单独一块 · 在 finance02</span></div>
+<p>全部资产里行数最多的一块，但它<b>不在主湖里</b>，也不在 finance01 的 DuckDB 目录里：</p>
+<div class="band" style="margin-top:8px">
+<div><div class="k">行数</div><div class="v">1,144,533,104</div></div>
+<div><div class="k">标的</div><div class="v">5,624</div></div>
+<div><div class="k">起</div><div class="v">2009-01-05<small>09:30</small></div></div>
+<div><div class="k">止</div><div class="v">2026-08-04<small>15:00</small></div></div>
+</div>
+<p class="note" style="margin-top:20px">字段是 <code class="mono">ts_code / trade_time / open / high / low / close / vol / amount / freq</code>，
+按 <code class="mono">ts_code</code> 分区（5624 个分区）。<b>历史深度极不均匀</b>：约 11% 的标的有十七年，81% 只有一年半左右，
+而深历史那批恰好是最老最大的公司 —— 拿全池跑长周期分钟回测会同时吃到幸存者偏差和规模偏差。
+另外 A股分钟线之外，<code class="mono">index_minute_1m</code>（指数 1 分钟线，102 万行，到 2026-08-21）在 finance01 上，
+港股分钟线 <code class="mono">hk_minute_bar</code> 两边都没有。</p>
+</section>
+
+<section class="blk">
+<div class="h2"><h2>离线归档：ChinaScope</h2><span>34 GB · 尚未入湖</span></div>
+<p>finance01 的机械盘上有一批<b>买来的商业数据集</b>，和爬虫体系完全独立，目前是 862 个 zip、一次都没解压进湖：</p>
+<div class="tw"><table style="min-width:640px"><thead><tr><th>数据包</th><th>内容</th><th>区间</th><th class="n">体积</th></tr></thead><tbody>
+<tr><td class="ds">Smartag v4.2</td><td class="de">新闻—公司标注（news_company_label），按年/季切分 848 个包，外加概念、事件、地域、产品四本字典</td><td class="sp">2008-01-01 → 2024-09-01</td><td class="n">34 GB</td></tr>
+<tr><td class="ds">sam_pit v1.0_a</td><td class="de">产品级 PIT 财务（fin_secu_sam_product_calc_pit）、期间 PIT、供应链关系、行业与产品字典</td><td class="sp">2014Q2 → 2024Q4</td><td class="n">111 MB</td></tr>
+</tbody></table></div>
+<p class="note" style="margin-top:16px">这是两台机器上<b>唯一的文本/关系类数据</b>，也是唯一带真正 point-in-time 保证的财务数据。
+zip 原件（另一份 34 GB）还在 <code class="mono">/data/financial_data/ripple_alpha/</code> 下，解压副本与原件并存，合计 68 GB。
+同一块盘上的 <code class="mono">/data/shared/</code> 里还有 chinascope-sample、papers、pq-real 等目录，属于 <code class="mono">wx</code> 和 <code class="mono">rzh</code> 两个账号，不是你的。</p>
+</section>
+
+<section class="blk">
+<div class="h2"><h2>由数据派生出来的东西</h2><span>下游产物</span></div>
+<div class="pipe">
+<div><div class="st">qlib 发布</div><h4>12 GB</h4><p>~/projects/data/qlib/releases，当前 release 2026-08-04，6142 只标的，日历 2000-01-04 起。走 4 道阻断式契约门 + 原子发布 + 回滚。</p></div>
+<div><div class="st">因子目录</div><h4>816 条</h4><p>market_lake/reference/factor_library：alpha360、alpha158、gtja_191、worldquant_101、local_core，另有 compiled/blocked 三个编译产物。</p></div>
+<div><div class="st">ripple 研究</div><h4>13 GB</h4><p>~/projects/outputs/ripple：板块传导研究的面板缓存与 17 类实验产出，最大的单个面板 1 GB（2014-05 → 2026-01）。</p></div>
+<div><div class="st">质量与隔离</div><h4>1.6 + 1.9 GB</h4><p>quality/ 151 个数据集的检查结果；quarantine/ 62 个数据集的隔离数据，最大的三个是 fina_indicator、irm_qa_sz、balancesheet。</p></div>
+</div>
+</section>
+
+<section class="blk">
+<div class="h2"><h2>采集管线</h2><span>5 个源 · 21 个 timer · 38.9 万条 run</span></div>
+<div class="tw"><table style="min-width:700px"><thead><tr><th>Provider</th><th class="n">run 数</th><th class="n">数据集</th><th>最近一次</th><th>角色</th></tr></thead><tbody>
+<tr><td class="ds">tushare_premium</td><td class="n">254,455</td><td class="n">108</td><td class="sp">2026-08-30</td><td class="de">主力源，覆盖大部分 premium 接口</td></tr>
+<tr><td class="ds">tushare</td><td class="n">66,678</td><td class="n">18</td><td class="sp">2026-08-28</td><td class="de">核心日频（daily / adj_factor / daily_basic）</td></tr>
+<tr><td class="ds">tushare_aux</td><td class="n">53,775</td><td class="n">23</td><td class="sp">2026-08-30</td><td class="de">补充性事件、两融、宏观</td></tr>
+<tr><td class="ds">akshare</td><td class="n">10,845</td><td class="n">2</td><td class="sp">2026-08-30</td><td class="de">东财公告与快讯，唯一的文本源</td></tr>
+<tr><td class="ds">official_manual</td><td class="n">29</td><td class="n">1</td><td class="sp">2026-08-30</td><td class="de">交易费率规则，取自官方文件人工核验</td></tr>
+</tbody></table></div>
+<p class="note" style="margin-top:18px">台账最早一条 <code class="mono">2026-08-03</code>，也就是说<b>整个系统的可观测历史只有 27 天</b>。
+run 状态分布：ok 27.8 万、expected_empty 6.2 万、schema_changed 4.8 万、throttled 218、failed 156。
+最活跃的 timer 是实时行情（每 15 分钟）、公告（每 10 分钟）、新闻；重的补数任务按天/周/月/季排。</p>
+</section>
+
+<section class="blk">
+<div class="h2"><h2>扫描中发现的问题</h2><span>按严重程度</span></div>
+<div class="finds">
+
+<div class="find s-hi"><div class="sev">高</div><div>
+<h4>71 个数据集的最新日期停在 2026-08-05 / 08-06</h4>
+<p>只有 28 个数据集跟到了 8 月下旬 —— 基本是 <code>tushare</code> 和 <code>tushare_aux</code> 那两个源覆盖的核心日频表
+（daily、adj_factor、daily_basic、moneyflow、两融、大宗）。
+premium 源那 108 个数据集里绝大多数最后一次写入是 8/5–8/6，正是 expand 阶段补数跑完的日期，
+之后<b>没有进入日常增量</b>。<code>quant-datahub-premium-daily.timer</code> 仍在按天触发，
+但它的 dataset 集合显然不包含这批表。stk_factor_pro（1076 万行、264 列的主力因子表）就在其中。</p>
+</div></div>
+
+<div class="find s-hi"><div class="sev">高</div><div>
+<h4>两个湖之间的 NFS 桥断了</h4>
+<p>finance01 的 <code>~/mnt/market_lake_f02</code> 是<b>空目录</b>，<code>mount</code> 里没有任何 NFS 客户端挂载。
+也就是说 11.4 亿行分钟线目前<b>在 finance01 上完全查不到</b> —— DuckDB 目录里 150 个 view 没有一个指向 f02。
+finance02 侧的 <code>/etc/exports</code> 还在（而且已经从只读改成了 <code>rw,root_squash</code>），
+断的是客户端挂载。<code>configs/system.yaml</code> 里的 <code>external_lakes</code> 配置还在。</p>
+</div></div>
+
+<div class="find s-md"><div class="sev">中</div><div>
+<h4>finance02 上有一份 40 GB 的重复副本</h4>
+<p><code>~/market_lake_f02</code> 现在是指向 <code>/data/market_lake_f02</code> 的软链（2026-08-18 搬到 2.7 TB 机械盘），
+但搬迁前的 <code>~/market_lake_f02.pre-hdd.20260818T055940Z</code> 原封不动留在系统盘上，同样 40 GB。
+finance02 的根分区 232 GB 已用 84 GB，其中近一半是这份副本。</p>
+</div></div>
+
+<div class="find s-md"><div class="sev">中</div><div>
+<h4>四个数据集滞后一年以上</h4>
+<p><code>hk_hold</code>（沪深港通持股明细，530 万行）停在 <b>2024-08-19</b>，是里面体量最大的；
+<code>irm_qa_sz</code> 停在 2020-12-31、<code>stk_account</code> 停在 2019-02-22、<code>index_basic</code> 停在 2014-10-17。
+另有 12 个滞后数月，其中 <code>fina_mainbz_vip</code>（主营构成，185 万行）到 2026-06-30、
+<code>slb_market_maker_inventory</code> 到 2025-07-25、<code>fund_adj</code> 到 2026-05-14。</p>
+</div></div>
+
+<div class="find s-md"><div class="sev">中</div><div>
+<h4>schema_changed 占了 12% 的 run</h4>
+<p>4.8 万条 run 以 <code>schema_changed</code> 结束，集中在少数几个表：irm_qa_sz 10839、stk_monthly 4062、
+premarket_limit 3715、ths_hot_rank 3586、stk_weekly 3374。这也解释了 1.9 GB 的 quarantine ——
+上游字段变动时数据被隔离而不是写入 gold。</p>
+</div></div>
+
+<div class="find s-lo"><div class="sev">低</div><div>
+<h4>一个 timer 处于 failed 状态</h4>
+<p><code>quant-datahub-index-minute-backfill.service</code> 在 2026-08-30 05:36 以 exit 2 结束，
+日志里写着 "index history only; stock history probe was sample-only and ETF endpoint was absent"。
+不影响已有数据，但指数分钟线的补数没往前推。</p>
+</div></div>
+
+<div class="find s-lo"><div class="sev">低</div><div>
+<h4>akshare 源近期有连接失败</h4>
+<p>最近 10 条失败 run 全是 akshare 打东财域名超时（np-weblist / np-anotice-stock）。
+公告和快讯是仅有的两个文本数据集，失败会直接留下空洞。有一条失败还是 DuckDB catalog 抢锁导致的。</p>
+</div></div>
+
+<div class="find s-lo"><div class="sev">低</div><div>
+<h4>38 个注册数据集从未落地</h4>
+<p>其中 8 个其实在 finance02 上（表里标成"在 finance02"），剩下 30 个是真空的：
+基金净值/份额/分红/持仓/经理这一整套、美股、中央结算持股、股权质押、机构调研、
+新闻联播/快讯/重大新闻、每日筹码分布。<code>minute_1m</code> 已被采集器判定为 premium 源
+<code>unsupported</code>（连续三个交易日探测成功率 0%），所以 A股分钟线只能靠 finance02 那份。</p>
+</div></div>
+
+</div>
+</section>
+
+<section class="blk">
+<div class="h2"><h2>要用这些数据，从哪儿进</h2><span>接口</span></div>
+<ul class="tight">
+<li><b>查数据</b>：<code>~/projects/data/market_lake/catalog/market.duckdb</code>，150 个只读 view，直接 SQL。
+用 <code>~/tools/miniconda3/envs/qlib_env/bin/python</code>（duckdb 1.4.3），系统 python3 没装 duckdb。</li>
+<li><b>判新鲜度</b>：列 <code>gold/&lt;dataset&gt;/</code> 的分区目录名，毫秒级。<b>不要</b>看 crawler_state 的 watermarks ——
+那是可恢复补数的游标，历史补数从新往旧走会把它拖回一年前。</li>
+<li><b>写</b>：湖是 <code>uid=1000 mode=775</code>，任何挂载都要 <code>runAsUser:1000</code> + <code>readOnly:true</code>。
+root 容器写一次就会留下 uid 0 的文件，让 20 个用户态 timer 静默写不动。</li>
+<li><b>读台账</b>：<code>sqlite3.connect("file:...?mode=ro", uri=True)</code>。别通过 CLI 的 <code>data-*-status</code> 绕，
+那些命令会拿写句柄。sqlite3 CLI 在 01 上没装。</li>
+<li><b>分钟线</b>：现在只能 ssh 到 finance02 本地查，或者先把 NFS 挂回来。</li>
+</ul>
+</section>
+
+<div class="foot">
+<span>扫描时间 2026-08-30 11:20–12:00 UTC</span>
+<span>覆盖率审计基准日 2026-08-28</span>
+<span>行数与区间取自 coverage-audit-latest.json；标的数现算自 market.duckdb</span>
+</div>
+</div>
+
+<script>
+(function(){
+  var q=document.getElementById('q'), cnt=document.getElementById('cnt');
+  var btns=Array.prototype.slice.call(document.querySelectorAll('.filter button'));
+  var cats=Array.prototype.slice.call(document.querySelectorAll('.cat'));
+  var mode='all';
+  var GROUP={ok:['ok'],warn:['warn'],stale:['warn2','bad'],miss:['miss']};
+  function apply(){
+    var term=q.value.trim().toLowerCase(), shown=0;
+    cats.forEach(function(c){
+      var any=false;
+      Array.prototype.slice.call(c.querySelectorAll('tbody tr')).forEach(function(tr){
+        var okS = mode==='all' || GROUP[mode].indexOf(tr.dataset.s)>-1;
+        var okT = !term || tr.textContent.toLowerCase().indexOf(term)>-1;
+        var vis = okS && okT;
+        tr.hidden=!vis; if(vis){any=true;shown++;}
+      });
+      c.hidden=!any;
+    });
+    cnt.textContent='显示 '+shown+' 个数据集';
+  }
+  q.addEventListener('input',apply);
+  btns.forEach(function(b){b.addEventListener('click',function(){
+    mode=b.dataset.f;
+    btns.forEach(function(o){o.setAttribute('aria-pressed', String(o===b));});
+    apply();
+  });});
+  apply();
+})();
+</script>

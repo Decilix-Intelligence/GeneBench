@@ -1,0 +1,3 @@
+config_id,arm,arm_kind,stage,n_runs,n_runs_denom,invalid_rate,honest_halt_rate,unsettled_rate,Decl,Set,Ovr,Audit,FillSelfConsistent,SlipSelfConsistent,legal_transitions,events_monotone,orders_replayable,fills_linked_to_orders
+cfg-codex-deepseek,open,baseline,S8,4,4,1.0,0.0,0.0,—,—,0.0547945205479452,—,—,—,—,—,—,—
+cfg-codex-deepseek,strict,protocol,S8,4,4,1.0,0.0,0.0,—,—,0.10443864229765012,—,—,—,—,—,—,—

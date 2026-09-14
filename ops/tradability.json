@@ -1,0 +1,1884 @@
+{
+ "card": "1.2",
+ "table": "tradability",
+ "generated_at_utc": "2026-08-31T14:33:54+00:00",
+ "freeze_line": "2026-07-31",
+ "calendar": {
+  "view": "trade_cal",
+  "exchanges_in_lake": [
+   "SSE"
+  ],
+  "convention": "深市 / 北交所的票同样使用 SSE 日历。**这是约定不是数据事实** —— 湖里没有 SZSE / BSE 日历可对。",
+  "n_trading_days": 4269,
+  "first": "2009-01-05",
+  "last": "2026-07-31"
+ },
+ "row_domain": {
+  "definition": "listing_window ∪ daily ∪ stk_limit ∪ suspend_d(交易日网格上)",
+  "listing_source": {
+   "view": "stock_basic",
+   "convention": "list_date <= D < delist_date(左闭右开);证据见 docstring",
+   "n_codes_in_view": 5890,
+   "n_codes_with_window_in_grid": 5830,
+   "n_codes_delisted_before_grid": 60,
+   "n_codes_outside_grid_other": 0,
+   "n_still_listed_at_freeze": 5551,
+   "n_listed_before_grid_start": 1602,
+   "multi_snapshot_note": "stock_basic 是多快照表(19 个 snapshot_date 分区被 view 全部 union),直接 join 会把行数乘 19;DISTINCT 之后一码一行这件事在代码里被断言。"
+  }
+ },
+ "totals": {
+  "rows": 15073606,
+  "in_listing_window": 14941017,
+  "outside_listing_window": 132589,
+  "has_daily": 14581977,
+  "has_limit": 14892432,
+  "no_price_limit": 7107,
+  "intraday_halt": 6311,
+  "intraday_halt_timing_nonnull": 2613,
+  "limit_touched_up": 362575,
+  "limit_touched_down": 215021,
+  "limit_up_close": 246248,
+  "limit_down_close": 121612,
+  "touched_up_not_closed": 116327,
+  "touched_down_not_closed": 93409,
+  "daily_without_limit": 102073,
+  "zero_volume_with_daily": 0,
+  "status": {
+   "trade": 14214117,
+   "suspend": 472920,
+   "limit_up": 246248,
+   "limit_down": 121612,
+   "no_data": 18709
+  },
+  "suspend_basis": {
+   "suspend_d_S": 450823,
+   "carried_after_S": 22097,
+   "none": 14600686
+  }
+ },
+ "by_year": [
+  {
+   "year": 2009,
+   "rows": 395463,
+   "status": {
+    "trade": 362629,
+    "suspend": 13935,
+    "limit_up": 9543,
+    "limit_down": 3604,
+    "no_data": 5752
+   },
+   "suspend_basis": {
+    "suspend_d_S": 12740,
+    "carried_after_S": 1195,
+    "none": 381528
+   },
+   "in_listing_window": 394995,
+   "outside_listing_window": 468,
+   "has_daily": 375776,
+   "has_limit": 394751,
+   "no_price_limit": 3,
+   "intraday_halt": 1435,
+   "intraday_halt_timing_nonnull": 0,
+   "limit_touched_up": 14492,
+   "limit_touched_down": 8638,
+   "limit_up_close": 9543,
+   "limit_down_close": 3604,
+   "touched_up_not_closed": 4949,
+   "touched_down_not_closed": 5034,
+   "daily_without_limit": 688,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2009/part-0.parquet",
+    "bytes": 5384366,
+    "sha256": "21f9fafbcd48798165ec41e4b68af052820af0ccf2c7754119af94940fc557f5",
+    "mode": "0o600",
+    "rows": 395463
+   }
+  },
+  {
+   "year": 2010,
+   "rows": 453281,
+   "status": {
+    "trade": 424520,
+    "suspend": 16609,
+    "limit_up": 5063,
+    "limit_down": 2553,
+    "no_data": 4536
+   },
+   "suspend_basis": {
+    "suspend_d_S": 13864,
+    "carried_after_S": 2745,
+    "none": 436672
+   },
+   "in_listing_window": 452708,
+   "outside_listing_window": 573,
+   "has_daily": 432136,
+   "has_limit": 445193,
+   "no_price_limit": 18,
+   "intraday_halt": 778,
+   "intraday_halt_timing_nonnull": 0,
+   "limit_touched_up": 8487,
+   "limit_touched_down": 5815,
+   "limit_up_close": 5063,
+   "limit_down_close": 2553,
+   "touched_up_not_closed": 3424,
+   "touched_down_not_closed": 3262,
+   "daily_without_limit": 807,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2010/part-0.parquet",
+    "bytes": 6310019,
+    "sha256": "2ad69720031ebdf827858cf03474bb82c43b29f0ef3f2c3da00599f1fd798750",
+    "mode": "0o600",
+    "rows": 453281
+   }
+  },
+  {
+   "year": 2011,
+   "rows": 537327,
+   "status": {
+    "trade": 505743,
+    "suspend": 21034,
+    "limit_up": 3989,
+    "limit_down": 2445,
+    "no_data": 4116
+   },
+   "suspend_basis": {
+    "suspend_d_S": 17836,
+    "carried_after_S": 3198,
+    "none": 516293
+   },
+   "in_listing_window": 536603,
+   "outside_listing_window": 724,
+   "has_daily": 512177,
+   "has_limit": 528458,
+   "no_price_limit": 1,
+   "intraday_halt": 719,
+   "intraday_halt_timing_nonnull": 1,
+   "limit_touched_up": 6854,
+   "limit_touched_down": 5472,
+   "limit_up_close": 3989,
+   "limit_down_close": 2445,
+   "touched_up_not_closed": 2865,
+   "touched_down_not_closed": 3027,
+   "daily_without_limit": 960,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2011/part-0.parquet",
+    "bytes": 7287037,
+    "sha256": "3490c8736623287f3fc48c60e4bd54a6da1c005812ae33cbf40060a14b5c653e",
+    "mode": "0o600",
+    "rows": 537327
+   }
+  },
+  {
+   "year": 2012,
+   "rows": 587432,
+   "status": {
+    "trade": 558144,
+    "suspend": 17872,
+    "limit_up": 5835,
+    "limit_down": 2416,
+    "no_data": 3165
+   },
+   "suspend_basis": {
+    "suspend_d_S": 15723,
+    "carried_after_S": 2149,
+    "none": 569560
+   },
+   "in_listing_window": 586709,
+   "outside_listing_window": 723,
+   "has_daily": 566395,
+   "has_limit": 581158,
+   "no_price_limit": 2,
+   "intraday_halt": 1060,
+   "intraday_halt_timing_nonnull": 337,
+   "limit_touched_up": 9599,
+   "limit_touched_down": 5058,
+   "limit_up_close": 5835,
+   "limit_down_close": 2416,
+   "touched_up_not_closed": 3764,
+   "touched_down_not_closed": 2642,
+   "daily_without_limit": 957,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2012/part-0.parquet",
+    "bytes": 7669510,
+    "sha256": "549bdeecc44501756b1e54445643f0c2cd183dc8b3b99a0c23f5a3e64222bfd2",
+    "mode": "0o600",
+    "rows": 587432
+   }
+  },
+  {
+   "year": 2013,
+   "rows": 588262,
+   "status": {
+    "trade": 556220,
+    "suspend": 22796,
+    "limit_up": 6733,
+    "limit_down": 1901,
+    "no_data": 612
+   },
+   "suspend_basis": {
+    "suspend_d_S": 21875,
+    "carried_after_S": 921,
+    "none": 565466
+   },
+   "in_listing_window": 587574,
+   "outside_listing_window": 688,
+   "has_daily": 564854,
+   "has_limit": 585431,
+   "no_price_limit": 0,
+   "intraday_halt": 125,
+   "intraday_halt_timing_nonnull": 97,
+   "limit_touched_up": 10756,
+   "limit_touched_down": 5251,
+   "limit_up_close": 6733,
+   "limit_down_close": 1901,
+   "touched_up_not_closed": 4023,
+   "touched_down_not_closed": 3350,
+   "daily_without_limit": 924,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2013/part-0.parquet",
+    "bytes": 7703926,
+    "sha256": "7dfedb01188fe1669322753960c2ff9b54e918b032388e6a223bde8cf5c546e2",
+    "mode": "0o600",
+    "rows": 588262
+   }
+  },
+  {
+   "year": 2014,
+   "rows": 621169,
+   "status": {
+    "trade": 561458,
+    "suspend": 50129,
+    "limit_up": 7929,
+    "limit_down": 1646,
+    "no_data": 7
+   },
+   "suspend_basis": {
+    "suspend_d_S": 49197,
+    "carried_after_S": 932,
+    "none": 571040
+   },
+   "in_listing_window": 620067,
+   "outside_listing_window": 1102,
+   "has_daily": 571033,
+   "has_limit": 618831,
+   "no_price_limit": 2,
+   "intraday_halt": 247,
+   "intraday_halt_timing_nonnull": 245,
+   "limit_touched_up": 12105,
+   "limit_touched_down": 3756,
+   "limit_up_close": 7929,
+   "limit_down_close": 1646,
+   "touched_up_not_closed": 4176,
+   "touched_down_not_closed": 2110,
+   "daily_without_limit": 1330,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2014/part-0.parquet",
+    "bytes": 8038888,
+    "sha256": "af9a430d3d63c2df01fea3751f75c88fc86bc24bb11f027056a2a0c9f492aaf9",
+    "mode": "0o600",
+    "rows": 621169
+   }
+  },
+  {
+   "year": 2015,
+   "rows": 670955,
+   "status": {
+    "trade": 508538,
+    "suspend": 95765,
+    "limit_up": 35197,
+    "limit_down": 31449,
+    "no_data": 6
+   },
+   "suspend_basis": {
+    "suspend_d_S": 94971,
+    "carried_after_S": 794,
+    "none": 575190
+   },
+   "in_listing_window": 665178,
+   "outside_listing_window": 5777,
+   "has_daily": 575184,
+   "has_limit": 664580,
+   "no_price_limit": 2,
+   "intraday_halt": 335,
+   "intraday_halt_timing_nonnull": 331,
+   "limit_touched_up": 48483,
+   "limit_touched_down": 48586,
+   "limit_up_close": 35197,
+   "limit_down_close": 31449,
+   "touched_up_not_closed": 13286,
+   "touched_down_not_closed": 17137,
+   "daily_without_limit": 5730,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2015/part-0.parquet",
+    "bytes": 8510071,
+    "sha256": "040fbefbecd2b331a903ebad8847d47846bdcce2baf7a99d09ca5a10f0188571",
+    "mode": "0o600",
+    "rows": 670955
+   }
+  },
+  {
+   "year": 2016,
+   "rows": 716117,
+   "status": {
+    "trade": 630915,
+    "suspend": 63245,
+    "limit_up": 11850,
+    "limit_down": 10099,
+    "no_data": 8
+   },
+   "suspend_basis": {
+    "suspend_d_S": 62353,
+    "carried_after_S": 892,
+    "none": 652872
+   },
+   "in_listing_window": 704145,
+   "outside_listing_window": 11972,
+   "has_daily": 652864,
+   "has_limit": 703422,
+   "no_price_limit": 1,
+   "intraday_halt": 240,
+   "intraday_halt_timing_nonnull": 235,
+   "limit_touched_up": 16505,
+   "limit_touched_down": 16628,
+   "limit_up_close": 11850,
+   "limit_down_close": 10099,
+   "touched_up_not_closed": 4655,
+   "touched_down_not_closed": 6529,
+   "daily_without_limit": 11493,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2016/part-0.parquet",
+    "bytes": 9322725,
+    "sha256": "038baa561841c469e21ebdcd92ac16269ae52cc7916a7e863b69eb26570ffa3d",
+    "mode": "0o600",
+    "rows": 716117
+   }
+  },
+  {
+   "year": 2017,
+   "rows": 814075,
+   "status": {
+    "trade": 740685,
+    "suspend": 59672,
+    "limit_up": 10402,
+    "limit_down": 3285,
+    "no_data": 31
+   },
+   "suspend_basis": {
+    "suspend_d_S": 58229,
+    "carried_after_S": 1443,
+    "none": 754403
+   },
+   "in_listing_window": 799064,
+   "outside_listing_window": 15011,
+   "has_daily": 754372,
+   "has_limit": 797919,
+   "no_price_limit": 0,
+   "intraday_halt": 344,
+   "intraday_halt_timing_nonnull": 341,
+   "limit_touched_up": 13815,
+   "limit_touched_down": 6703,
+   "limit_up_close": 10402,
+   "limit_down_close": 3285,
+   "touched_up_not_closed": 3413,
+   "touched_down_not_closed": 3418,
+   "daily_without_limit": 11377,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2017/part-0.parquet",
+    "bytes": 10552978,
+    "sha256": "713780b640a5ea4715a91b535c7e6da544a7c5ce71e25d6654543d1a1252e129",
+    "mode": "0o600",
+    "rows": 814075
+   }
+  },
+  {
+   "year": 2018,
+   "rows": 867289,
+   "status": {
+    "trade": 804711,
+    "suspend": 42721,
+    "limit_up": 11488,
+    "limit_down": 8336,
+    "no_data": 33
+   },
+   "suspend_basis": {
+    "suspend_d_S": 41540,
+    "carried_after_S": 1181,
+    "none": 824568
+   },
+   "in_listing_window": 856800,
+   "outside_listing_window": 10489,
+   "has_daily": 824535,
+   "has_limit": 855868,
+   "no_price_limit": 0,
+   "intraday_halt": 112,
+   "intraday_halt_timing_nonnull": 111,
+   "limit_touched_up": 17734,
+   "limit_touched_down": 16044,
+   "limit_up_close": 11488,
+   "limit_down_close": 8336,
+   "touched_up_not_closed": 6246,
+   "touched_down_not_closed": 7708,
+   "daily_without_limit": 7790,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2018/part-0.parquet",
+    "bytes": 11393440,
+    "sha256": "ba1206889dce18e344efd98c2fb1fad94685a8e551c41e397a0b5d9c48cd8211",
+    "mode": "0o600",
+    "rows": 867289
+   }
+  },
+  {
+   "year": 2019,
+   "rows": 901119,
+   "status": {
+    "trade": 871897,
+    "suspend": 6915,
+    "limit_up": 16019,
+    "limit_down": 6261,
+    "no_data": 27
+   },
+   "suspend_basis": {
+    "suspend_d_S": 5018,
+    "carried_after_S": 1897,
+    "none": 894204
+   },
+   "in_listing_window": 890251,
+   "outside_listing_window": 10868,
+   "has_daily": 894177,
+   "has_limit": 888574,
+   "no_price_limit": 379,
+   "intraday_halt": 149,
+   "intraday_halt_timing_nonnull": 149,
+   "limit_touched_up": 23989,
+   "limit_touched_down": 11407,
+   "limit_up_close": 16019,
+   "limit_down_close": 6261,
+   "touched_up_not_closed": 7970,
+   "touched_down_not_closed": 5146,
+   "daily_without_limit": 9532,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2019/part-0.parquet",
+    "bytes": 12350596,
+    "sha256": "3ad23e0bba4fe46a39ae297be873afa06fb395f8c1bd2fe4446a602c0b75709c",
+    "mode": "0o600",
+    "rows": 901119
+   }
+  },
+  {
+   "year": 2020,
+   "rows": 975765,
+   "status": {
+    "trade": 935176,
+    "suspend": 11582,
+    "limit_up": 19701,
+    "limit_down": 9254,
+    "no_data": 52
+   },
+   "suspend_basis": {
+    "suspend_d_S": 8590,
+    "carried_after_S": 2992,
+    "none": 964183
+   },
+   "in_listing_window": 955604,
+   "outside_listing_window": 20161,
+   "has_daily": 964131,
+   "has_limit": 949800,
+   "no_price_limit": 1028,
+   "intraday_halt": 240,
+   "intraday_halt_timing_nonnull": 240,
+   "limit_touched_up": 28688,
+   "limit_touched_down": 16516,
+   "limit_up_close": 19701,
+   "limit_down_close": 9254,
+   "touched_up_not_closed": 8987,
+   "touched_down_not_closed": 7262,
+   "daily_without_limit": 18169,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2020/part-0.parquet",
+    "bytes": 13732398,
+    "sha256": "64fe84e21628d0c2069260a0c33332cf36f809d2a2fe2e498417971f18dec267",
+    "mode": "0o600",
+    "rows": 975765
+   }
+  },
+  {
+   "year": 2021,
+   "rows": 1097123,
+   "status": {
+    "trade": 1058812,
+    "suspend": 11622,
+    "limit_up": 20907,
+    "limit_down": 5726,
+    "no_data": 56
+   },
+   "suspend_basis": {
+    "suspend_d_S": 10096,
+    "carried_after_S": 1526,
+    "none": 1085501
+   },
+   "in_listing_window": 1076806,
+   "outside_listing_window": 20317,
+   "has_daily": 1085445,
+   "has_limit": 1064162,
+   "no_price_limit": 1825,
+   "intraday_halt": 218,
+   "intraday_halt_timing_nonnull": 218,
+   "limit_touched_up": 30015,
+   "limit_touched_down": 11050,
+   "limit_up_close": 20907,
+   "limit_down_close": 5726,
+   "touched_up_not_closed": 9108,
+   "touched_down_not_closed": 5324,
+   "daily_without_limit": 23782,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2021/part-0.parquet",
+    "bytes": 15716864,
+    "sha256": "6aeba9c6ceb18c94cb50814f1fd120ccad64f6bb0dd91c2bb083d8b1a78a3b2c",
+    "mode": "0o600",
+    "rows": 1097123
+   }
+  },
+  {
+   "year": 2022,
+   "rows": 1197939,
+   "status": {
+    "trade": 1153991,
+    "suspend": 18762,
+    "limit_up": 18490,
+    "limit_down": 6591,
+    "no_data": 105
+   },
+   "suspend_basis": {
+    "suspend_d_S": 18530,
+    "carried_after_S": 232,
+    "none": 1179177
+   },
+   "in_listing_window": 1174346,
+   "outside_listing_window": 23593,
+   "has_daily": 1179072,
+   "has_limit": 1174118,
+   "no_price_limit": 1489,
+   "intraday_halt": 114,
+   "intraday_halt_timing_nonnull": 114,
+   "limit_touched_up": 27428,
+   "limit_touched_down": 11569,
+   "limit_up_close": 18490,
+   "limit_down_close": 6591,
+   "touched_up_not_closed": 8938,
+   "touched_down_not_closed": 4978,
+   "daily_without_limit": 8034,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2022/part-0.parquet",
+    "bytes": 17148938,
+    "sha256": "6013f41983660eb9abdd6076aad34d40575aaede1a5703632cc35dab36ce6d5b",
+    "mode": "0o600",
+    "rows": 1197939
+   }
+  },
+  {
+   "year": 2023,
+   "rows": 1270475,
+   "status": {
+    "trade": 1244596,
+    "suspend": 11624,
+    "limit_up": 10667,
+    "limit_down": 3471,
+    "no_data": 117
+   },
+   "suspend_basis": {
+    "suspend_d_S": 11624,
+    "carried_after_S": 0,
+    "none": 1258851
+   },
+   "in_listing_window": 1260984,
+   "outside_listing_window": 9491,
+   "has_daily": 1258734,
+   "has_limit": 1260984,
+   "no_price_limit": 1178,
+   "intraday_halt": 84,
+   "intraday_halt_timing_nonnull": 84,
+   "limit_touched_up": 16034,
+   "limit_touched_down": 5587,
+   "limit_up_close": 10667,
+   "limit_down_close": 3471,
+   "touched_up_not_closed": 5367,
+   "touched_down_not_closed": 2116,
+   "daily_without_limit": 232,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2023/part-0.parquet",
+    "bytes": 18018385,
+    "sha256": "07d0af7b86acaf379f3a84c944da2318215eb7394165dd649bed75571b51f6e5",
+    "mode": "0o600",
+    "rows": 1270475
+   }
+  },
+  {
+   "year": 2024,
+   "rows": 1297286,
+   "status": {
+    "trade": 1261606,
+    "suspend": 3370,
+    "limit_up": 21473,
+    "limit_down": 10814,
+    "no_data": 23
+   },
+   "suspend_basis": {
+    "suspend_d_S": 3370,
+    "carried_after_S": 0,
+    "none": 1293916
+   },
+   "in_listing_window": 1296743,
+   "outside_listing_window": 543,
+   "has_daily": 1293893,
+   "has_limit": 1296743,
+   "no_price_limit": 427,
+   "intraday_halt": 41,
+   "intraday_halt_timing_nonnull": 41,
+   "limit_touched_up": 33134,
+   "limit_touched_down": 17711,
+   "limit_up_close": 21473,
+   "limit_down_close": 10814,
+   "touched_up_not_closed": 11661,
+   "touched_down_not_closed": 6897,
+   "daily_without_limit": 242,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2024/part-0.parquet",
+    "bytes": 18132757,
+    "sha256": "2e7b8062992382e01f7580116f900e0d92703d1d3da3478b175acbde462c156b",
+    "mode": "0o600",
+    "rows": 1297286
+   }
+  },
+  {
+   "year": 2025,
+   "rows": 1317402,
+   "status": {
+    "trade": 1288156,
+    "suspend": 3441,
+    "limit_up": 18611,
+    "limit_down": 7131,
+    "no_data": 63
+   },
+   "suspend_basis": {
+    "suspend_d_S": 3441,
+    "carried_after_S": 0,
+    "none": 1313961
+   },
+   "in_listing_window": 1317313,
+   "outside_listing_window": 89,
+   "has_daily": 1313898,
+   "has_limit": 1317313,
+   "no_price_limit": 482,
+   "intraday_halt": 39,
+   "intraday_halt_timing_nonnull": 38,
+   "limit_touched_up": 27021,
+   "limit_touched_down": 11277,
+   "limit_up_close": 18611,
+   "limit_down_close": 7131,
+   "touched_up_not_closed": 8410,
+   "touched_down_not_closed": 4146,
+   "daily_without_limit": 26,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2025/part-0.parquet",
+    "bytes": 18937489,
+    "sha256": "c7468c8048d387f96d930eb3650a25b43728f5e85f4997e150e4de031bbbc36e",
+    "mode": "0o600",
+    "rows": 1317402
+   }
+  },
+  {
+   "year": 2026,
+   "rows": 765127,
+   "status": {
+    "trade": 746320,
+    "suspend": 1826,
+    "limit_up": 12351,
+    "limit_down": 4630,
+    "no_data": 0
+   },
+   "suspend_basis": {
+    "suspend_d_S": 1826,
+    "carried_after_S": 0,
+    "none": 763301
+   },
+   "in_listing_window": 765127,
+   "outside_listing_window": 0,
+   "has_daily": 763301,
+   "has_limit": 765127,
+   "no_price_limit": 270,
+   "intraday_halt": 31,
+   "intraday_halt_timing_nonnull": 31,
+   "limit_touched_up": 17436,
+   "limit_touched_down": 7953,
+   "limit_up_close": 12351,
+   "limit_down_close": 4630,
+   "touched_up_not_closed": 5085,
+   "touched_down_not_closed": 3323,
+   "daily_without_limit": 0,
+   "zero_volume_with_daily": 0,
+   "artifact": {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2026/part-0.parquet",
+    "bytes": 11274484,
+    "sha256": "45b807a8ce6abcab4e1806b9f62b18bfa5408fb36b526f7352f4cf7cdfefdcdd",
+    "mode": "0o600",
+    "rows": 765127
+   }
+  }
+ ],
+ "acceptance": {
+  "date": "2026-08-28",
+  "beyond_freeze_line": true,
+  "rows": 5551,
+  "status": {
+   "trade": 5461,
+   "suspend": 4,
+   "limit_up": 83,
+   "limit_down": 3,
+   "no_data": 0
+  }
+ },
+ "build": {
+  "grid_bound": "2026-08-28",
+  "acceptance_enabled": true,
+  "rows_beyond_freeze_discarded": 105327,
+  "cross_year_carry": "exact(逐年把最后一个交易日的停牌态传给下一年)",
+  "partitions": [
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2009/part-0.parquet",
+    "bytes": 5384366,
+    "sha256": "21f9fafbcd48798165ec41e4b68af052820af0ccf2c7754119af94940fc557f5",
+    "mode": "0o600",
+    "rows": 395463
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2010/part-0.parquet",
+    "bytes": 6310019,
+    "sha256": "2ad69720031ebdf827858cf03474bb82c43b29f0ef3f2c3da00599f1fd798750",
+    "mode": "0o600",
+    "rows": 453281
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2011/part-0.parquet",
+    "bytes": 7287037,
+    "sha256": "3490c8736623287f3fc48c60e4bd54a6da1c005812ae33cbf40060a14b5c653e",
+    "mode": "0o600",
+    "rows": 537327
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2012/part-0.parquet",
+    "bytes": 7669510,
+    "sha256": "549bdeecc44501756b1e54445643f0c2cd183dc8b3b99a0c23f5a3e64222bfd2",
+    "mode": "0o600",
+    "rows": 587432
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2013/part-0.parquet",
+    "bytes": 7703926,
+    "sha256": "7dfedb01188fe1669322753960c2ff9b54e918b032388e6a223bde8cf5c546e2",
+    "mode": "0o600",
+    "rows": 588262
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2014/part-0.parquet",
+    "bytes": 8038888,
+    "sha256": "af9a430d3d63c2df01fea3751f75c88fc86bc24bb11f027056a2a0c9f492aaf9",
+    "mode": "0o600",
+    "rows": 621169
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2015/part-0.parquet",
+    "bytes": 8510071,
+    "sha256": "040fbefbecd2b331a903ebad8847d47846bdcce2baf7a99d09ca5a10f0188571",
+    "mode": "0o600",
+    "rows": 670955
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2016/part-0.parquet",
+    "bytes": 9322725,
+    "sha256": "038baa561841c469e21ebdcd92ac16269ae52cc7916a7e863b69eb26570ffa3d",
+    "mode": "0o600",
+    "rows": 716117
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2017/part-0.parquet",
+    "bytes": 10552978,
+    "sha256": "713780b640a5ea4715a91b535c7e6da544a7c5ce71e25d6654543d1a1252e129",
+    "mode": "0o600",
+    "rows": 814075
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2018/part-0.parquet",
+    "bytes": 11393440,
+    "sha256": "ba1206889dce18e344efd98c2fb1fad94685a8e551c41e397a0b5d9c48cd8211",
+    "mode": "0o600",
+    "rows": 867289
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2019/part-0.parquet",
+    "bytes": 12350596,
+    "sha256": "3ad23e0bba4fe46a39ae297be873afa06fb395f8c1bd2fe4446a602c0b75709c",
+    "mode": "0o600",
+    "rows": 901119
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2020/part-0.parquet",
+    "bytes": 13732398,
+    "sha256": "64fe84e21628d0c2069260a0c33332cf36f809d2a2fe2e498417971f18dec267",
+    "mode": "0o600",
+    "rows": 975765
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2021/part-0.parquet",
+    "bytes": 15716864,
+    "sha256": "6aeba9c6ceb18c94cb50814f1fd120ccad64f6bb0dd91c2bb083d8b1a78a3b2c",
+    "mode": "0o600",
+    "rows": 1097123
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2022/part-0.parquet",
+    "bytes": 17148938,
+    "sha256": "6013f41983660eb9abdd6076aad34d40575aaede1a5703632cc35dab36ce6d5b",
+    "mode": "0o600",
+    "rows": 1197939
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2023/part-0.parquet",
+    "bytes": 18018385,
+    "sha256": "07d0af7b86acaf379f3a84c944da2318215eb7394165dd649bed75571b51f6e5",
+    "mode": "0o600",
+    "rows": 1270475
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2024/part-0.parquet",
+    "bytes": 18132757,
+    "sha256": "2e7b8062992382e01f7580116f900e0d92703d1d3da3478b175acbde462c156b",
+    "mode": "0o600",
+    "rows": 1297286
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2025/part-0.parquet",
+    "bytes": 18937489,
+    "sha256": "c7468c8048d387f96d930eb3650a25b43728f5e85f4997e150e4de031bbbc36e",
+    "mode": "0o600",
+    "rows": 1317402
+   },
+   {
+    "path": "/data/shared/genebench/snapshots/v1/tradability/year=2026/part-0.parquet",
+    "bytes": 11274484,
+    "sha256": "45b807a8ce6abcab4e1806b9f62b18bfa5408fb36b526f7352f4cf7cdfefdcdd",
+    "mode": "0o600",
+    "rows": 765127
+   }
+  ],
+  "acceptance_artifact": {
+   "path": "/data/shared/genebench/snapshots/v1/tradability_acceptance/date=2026-08-28/part-0.parquet",
+   "bytes": 161946,
+   "sha256": "9e1dc77fffeb428037502ada962fb6bddb2b879af4300bf4a356948cf8196b17",
+   "mode": "0o600",
+   "rows": 5551
+  }
+ },
+ "sampling": {
+  "seed": 20260731,
+  "n": 50,
+  "detail_n": 10,
+  "sample_status_distribution": {
+   "trade": 48,
+   "suspend": 2,
+   "limit_up": 0,
+   "limit_down": 0,
+   "no_data": 0
+  },
+  "rule": "抽 `n` 条随机样本,并从中**挑** `detail_n` 条做链路取证。"
+ },
+ "sample_50": [
+  {
+   "code": "600791.SH",
+   "date_compact": "20090630",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "000100.SZ",
+   "date_compact": "20101202",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "002348.SZ",
+   "date_compact": "20100914",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600193.SH",
+   "date_compact": "20110506",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "002206.SZ",
+   "date_compact": "20120731",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600112.SH",
+   "date_compact": "20120210",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600139.SH",
+   "date_compact": "20121212",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "002565.SZ",
+   "date_compact": "20140103",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300079.SZ",
+   "date_compact": "20140714",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300203.SZ",
+   "date_compact": "20140704",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600526.SH",
+   "date_compact": "20140905",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600818.SH",
+   "date_compact": "20140822",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600666.SH",
+   "date_compact": "20150116",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "000973.SZ",
+   "date_compact": "20161013",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300148.SZ",
+   "date_compact": "20160613",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600163.SH",
+   "date_compact": "20160826",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "601000.SH",
+   "date_compact": "20160107",
+   "status": "suspend",
+   "suspend_basis": "suspend_d_S",
+   "has_daily": false,
+   "has_limit": true
+  },
+  {
+   "code": "002488.SZ",
+   "date_compact": "20170825",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "002493.SZ",
+   "date_compact": "20170207",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300067.SZ",
+   "date_compact": "20170630",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "000962.SZ",
+   "date_compact": "20180921",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "603606.SH",
+   "date_compact": "20180302",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "000939.SZ",
+   "date_compact": "20190718",
+   "status": "suspend",
+   "suspend_basis": "carried_after_S",
+   "has_daily": false,
+   "has_limit": false
+  },
+  {
+   "code": "002156.SZ",
+   "date_compact": "20190115",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "603677.SH",
+   "date_compact": "20191217",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300572.SZ",
+   "date_compact": "20200623",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600731.SH",
+   "date_compact": "20200616",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "603160.SH",
+   "date_compact": "20200608",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "000596.SZ",
+   "date_compact": "20221107",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300482.SZ",
+   "date_compact": "20220923",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "601098.SH",
+   "date_compact": "20220823",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300605.SZ",
+   "date_compact": "20231214",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300989.SZ",
+   "date_compact": "20231117",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "002615.SZ",
+   "date_compact": "20240419",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300500.SZ",
+   "date_compact": "20240103",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300861.SZ",
+   "date_compact": "20241219",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300939.SZ",
+   "date_compact": "20240726",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "301222.SZ",
+   "date_compact": "20241014",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600360.SH",
+   "date_compact": "20240528",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "000563.SZ",
+   "date_compact": "20251021",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300176.SZ",
+   "date_compact": "20250207",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300705.SZ",
+   "date_compact": "20250417",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "300883.SZ",
+   "date_compact": "20251231",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "600676.SH",
+   "date_compact": "20250819",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "605138.SH",
+   "date_compact": "20251203",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "920275.BJ",
+   "date_compact": "20250929",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "002192.SZ",
+   "date_compact": "20260120",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "601019.SH",
+   "date_compact": "20260227",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "920122.BJ",
+   "date_compact": "20260113",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  },
+  {
+   "code": "920580.BJ",
+   "date_compact": "20260610",
+   "status": "trade",
+   "suspend_basis": "none",
+   "has_daily": true,
+   "has_limit": true
+  }
+ ],
+ "sample_10_evidence": [
+  {
+   "code": "600791.SH",
+   "date": "2009-06-30",
+   "status": "trade",
+   "origin": "来自 50 条随机样本",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 1,
+   "daily": {
+    "ts_code": "600791.SH",
+    "trade_date": "20090630",
+    "open": 7.0,
+    "high": 7.1,
+    "low": 6.82,
+    "close": 6.86,
+    "pre_close": 7.0,
+    "volume": 11938619.0
+   },
+   "suspend_rows": 0,
+   "suspend": null,
+   "limit_rows": 1,
+   "limit": {
+    "ts_code": "600791.SH",
+    "trade_date": "20090630",
+    "up_limit": 7.7,
+    "down_limit": 6.3
+   },
+   "product": {
+    "code": "600791.SH",
+    "date": "2009-06-30",
+    "date_compact": "20090630",
+    "status": "trade",
+    "in_listing_window": true,
+    "has_daily": true,
+    "has_limit": true,
+    "suspend_flag": null,
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": 6.86,
+    "high": 7.1,
+    "low": 6.82,
+    "volume": 11938619.0,
+    "up_limit": 7.7,
+    "down_limit": 6.3,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  },
+  {
+   "code": "601000.SH",
+   "date": "2016-01-07",
+   "status": "suspend",
+   "origin": "来自 50 条随机样本",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 0,
+   "daily": null,
+   "suspend_rows": 1,
+   "suspend": {
+    "ts_code": "601000.SH",
+    "trade_date": "20160107",
+    "suspend_type": "S",
+    "suspend_timing": null
+   },
+   "limit_rows": 1,
+   "limit": {
+    "ts_code": "601000.SH",
+    "trade_date": "20160107",
+    "up_limit": 9.08,
+    "down_limit": 7.43
+   },
+   "product": {
+    "code": "601000.SH",
+    "date": "2016-01-07",
+    "date_compact": "20160107",
+    "status": "suspend",
+    "in_listing_window": true,
+    "has_daily": false,
+    "has_limit": true,
+    "suspend_flag": "S",
+    "suspend_timing": null,
+    "suspend_basis": "suspend_d_S",
+    "intraday_halt": false,
+    "close": NaN,
+    "high": NaN,
+    "low": NaN,
+    "volume": NaN,
+    "up_limit": 9.08,
+    "down_limit": 7.43,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  },
+  {
+   "code": "600804.SH",
+   "date": "2021-08-30",
+   "status": "limit_up",
+   "origin": "50 条里没有 `limit_up`,同种子从全表该状态补抽",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 1,
+   "daily": {
+    "ts_code": "600804.SH",
+    "trade_date": "20210830",
+    "open": 5.84,
+    "high": 6.09,
+    "low": 5.75,
+    "close": 6.09,
+    "pre_close": 5.54,
+    "volume": 204756785.0
+   },
+   "suspend_rows": 0,
+   "suspend": null,
+   "limit_rows": 1,
+   "limit": {
+    "ts_code": "600804.SH",
+    "trade_date": "20210830",
+    "up_limit": 6.09,
+    "down_limit": 4.99
+   },
+   "product": {
+    "code": "600804.SH",
+    "date": "2021-08-30",
+    "date_compact": "20210830",
+    "status": "limit_up",
+    "in_listing_window": true,
+    "has_daily": true,
+    "has_limit": true,
+    "suspend_flag": null,
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": 6.09,
+    "high": 6.09,
+    "low": 5.75,
+    "volume": 204756785.0,
+    "up_limit": 6.09,
+    "down_limit": 4.99,
+    "no_price_limit": false,
+    "limit_up_close": true,
+    "limit_down_close": false,
+    "limit_touched_up": true,
+    "limit_touched_down": false
+   }
+  },
+  {
+   "code": "002100.SZ",
+   "date": "2015-06-19",
+   "status": "limit_down",
+   "origin": "50 条里没有 `limit_down`,同种子从全表该状态补抽",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 1,
+   "daily": {
+    "ts_code": "002100.SZ",
+    "trade_date": "20150619",
+    "open": 14.71,
+    "high": 14.71,
+    "low": 13.54,
+    "close": 13.54,
+    "pre_close": 15.04,
+    "volume": 20853737.0
+   },
+   "suspend_rows": 0,
+   "suspend": null,
+   "limit_rows": 1,
+   "limit": {
+    "ts_code": "002100.SZ",
+    "trade_date": "20150619",
+    "up_limit": 16.54,
+    "down_limit": 13.54
+   },
+   "product": {
+    "code": "002100.SZ",
+    "date": "2015-06-19",
+    "date_compact": "20150619",
+    "status": "limit_down",
+    "in_listing_window": true,
+    "has_daily": true,
+    "has_limit": true,
+    "suspend_flag": null,
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": 13.54,
+    "high": 14.71,
+    "low": 13.54,
+    "volume": 20853737.0,
+    "up_limit": 16.54,
+    "down_limit": 13.54,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": true,
+    "limit_touched_up": false,
+    "limit_touched_down": true
+   }
+  },
+  {
+   "code": "000498.SZ",
+   "date": "2010-03-15",
+   "status": "no_data",
+   "origin": "50 条里没有 `no_data`,同种子从全表该状态补抽",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 0,
+   "daily": null,
+   "suspend_rows": 0,
+   "suspend": null,
+   "limit_rows": 0,
+   "limit": null,
+   "product": {
+    "code": "000498.SZ",
+    "date": "2010-03-15",
+    "date_compact": "20100315",
+    "status": "no_data",
+    "in_listing_window": true,
+    "has_daily": false,
+    "has_limit": false,
+    "suspend_flag": null,
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": NaN,
+    "high": NaN,
+    "low": NaN,
+    "volume": NaN,
+    "up_limit": NaN,
+    "down_limit": NaN,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  },
+  {
+   "code": "000100.SZ",
+   "date": "2010-12-02",
+   "status": "trade",
+   "origin": "来自 50 条随机样本(补足名额)",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 1,
+   "daily": {
+    "ts_code": "000100.SZ",
+    "trade_date": "20101202",
+    "open": 3.58,
+    "high": 3.58,
+    "low": 3.53,
+    "close": 3.55,
+    "pre_close": 3.53,
+    "volume": 22009573.0
+   },
+   "suspend_rows": 0,
+   "suspend": null,
+   "limit_rows": 1,
+   "limit": {
+    "ts_code": "000100.SZ",
+    "trade_date": "20101202",
+    "up_limit": 3.88,
+    "down_limit": 3.18
+   },
+   "product": {
+    "code": "000100.SZ",
+    "date": "2010-12-02",
+    "date_compact": "20101202",
+    "status": "trade",
+    "in_listing_window": true,
+    "has_daily": true,
+    "has_limit": true,
+    "suspend_flag": null,
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": 3.55,
+    "high": 3.58,
+    "low": 3.53,
+    "volume": 22009573.0,
+    "up_limit": 3.88,
+    "down_limit": 3.18,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  },
+  {
+   "code": "002348.SZ",
+   "date": "2010-09-14",
+   "status": "trade",
+   "origin": "来自 50 条随机样本(补足名额)",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 1,
+   "daily": {
+    "ts_code": "002348.SZ",
+    "trade_date": "20100914",
+    "open": 22.29,
+    "high": 22.43,
+    "low": 22.03,
+    "close": 22.2,
+    "pre_close": 22.29,
+    "volume": 1592830.0
+   },
+   "suspend_rows": 0,
+   "suspend": null,
+   "limit_rows": 1,
+   "limit": {
+    "ts_code": "002348.SZ",
+    "trade_date": "20100914",
+    "up_limit": 24.52,
+    "down_limit": 20.06
+   },
+   "product": {
+    "code": "002348.SZ",
+    "date": "2010-09-14",
+    "date_compact": "20100914",
+    "status": "trade",
+    "in_listing_window": true,
+    "has_daily": true,
+    "has_limit": true,
+    "suspend_flag": null,
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": 22.2,
+    "high": 22.43,
+    "low": 22.03,
+    "volume": 1592830.0,
+    "up_limit": 24.52,
+    "down_limit": 20.06,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  },
+  {
+   "code": "600193.SH",
+   "date": "2011-05-06",
+   "status": "trade",
+   "origin": "来自 50 条随机样本(补足名额)",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 1,
+   "daily": {
+    "ts_code": "600193.SH",
+    "trade_date": "20110506",
+    "open": 18.0,
+    "high": 18.45,
+    "low": 17.38,
+    "close": 18.38,
+    "pre_close": 18.4,
+    "volume": 11048025.0
+   },
+   "suspend_rows": 0,
+   "suspend": null,
+   "limit_rows": 1,
+   "limit": {
+    "ts_code": "600193.SH",
+    "trade_date": "20110506",
+    "up_limit": 20.24,
+    "down_limit": 16.56
+   },
+   "product": {
+    "code": "600193.SH",
+    "date": "2011-05-06",
+    "date_compact": "20110506",
+    "status": "trade",
+    "in_listing_window": true,
+    "has_daily": true,
+    "has_limit": true,
+    "suspend_flag": null,
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": 18.38,
+    "high": 18.45,
+    "low": 17.38,
+    "volume": 11048025.0,
+    "up_limit": 20.24,
+    "down_limit": 16.56,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  },
+  {
+   "code": "002206.SZ",
+   "date": "2012-07-31",
+   "status": "trade",
+   "origin": "来自 50 条随机样本(补足名额)",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 1,
+   "daily": {
+    "ts_code": "002206.SZ",
+    "trade_date": "20120731",
+    "open": 5.69,
+    "high": 5.74,
+    "low": 5.46,
+    "close": 5.69,
+    "pre_close": 5.65,
+    "volume": 1356492.0
+   },
+   "suspend_rows": 0,
+   "suspend": null,
+   "limit_rows": 1,
+   "limit": {
+    "ts_code": "002206.SZ",
+    "trade_date": "20120731",
+    "up_limit": 6.22,
+    "down_limit": 5.09
+   },
+   "product": {
+    "code": "002206.SZ",
+    "date": "2012-07-31",
+    "date_compact": "20120731",
+    "status": "trade",
+    "in_listing_window": true,
+    "has_daily": true,
+    "has_limit": true,
+    "suspend_flag": null,
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": 5.69,
+    "high": 5.74,
+    "low": 5.46,
+    "volume": 1356492.0,
+    "up_limit": 6.22,
+    "down_limit": 5.09,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  },
+  {
+   "code": "600112.SH",
+   "date": "2012-02-10",
+   "status": "trade",
+   "origin": "来自 50 条随机样本(补足名额)",
+   "cal_exchanges": "SSE",
+   "cal_is_open": 1,
+   "daily_rows": 1,
+   "daily": {
+    "ts_code": "600112.SH",
+    "trade_date": "20120210",
+    "open": 13.93,
+    "high": 14.27,
+    "low": 13.86,
+    "close": 14.11,
+    "pre_close": 14.09,
+    "volume": 9432167.0
+   },
+   "suspend_rows": 0,
+   "suspend": null,
+   "limit_rows": 1,
+   "limit": {
+    "ts_code": "600112.SH",
+    "trade_date": "20120210",
+    "up_limit": 15.5,
+    "down_limit": 12.68
+   },
+   "product": {
+    "code": "600112.SH",
+    "date": "2012-02-10",
+    "date_compact": "20120210",
+    "status": "trade",
+    "in_listing_window": true,
+    "has_daily": true,
+    "has_limit": true,
+    "suspend_flag": null,
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": 14.11,
+    "high": 14.27,
+    "low": 13.86,
+    "volume": 9432167.0,
+    "up_limit": 15.5,
+    "down_limit": 12.68,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  }
+ ],
+ "acceptance_cases": {
+  "000711.SZ": [
+   {
+    "code": "000711.SZ",
+    "date": "2026-08-28",
+    "date_compact": "20260828",
+    "status": "suspend",
+    "in_listing_window": true,
+    "has_daily": false,
+    "has_limit": true,
+    "suspend_flag": "S",
+    "suspend_timing": null,
+    "suspend_basis": "suspend_d_S",
+    "intraday_halt": false,
+    "close": NaN,
+    "high": NaN,
+    "low": NaN,
+    "volume": NaN,
+    "up_limit": 6.88,
+    "down_limit": 5.63,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  ],
+  "600491.SH": [
+   {
+    "code": "600491.SH",
+    "date": "2026-08-28",
+    "date_compact": "20260828",
+    "status": "trade",
+    "in_listing_window": true,
+    "has_daily": true,
+    "has_limit": true,
+    "suspend_flag": "R",
+    "suspend_timing": null,
+    "suspend_basis": "none",
+    "intraday_halt": false,
+    "close": 1.68,
+    "high": 1.75,
+    "low": 1.61,
+    "volume": 104025044.0,
+    "up_limit": 1.79,
+    "down_limit": 1.47,
+    "no_price_limit": false,
+    "limit_up_close": false,
+    "limit_down_close": false,
+    "limit_touched_up": false,
+    "limit_touched_down": false
+   }
+  ]
+ },
+ "sample_report": {
+  "path": "/data/shared/genebench/repo/ops/reports/tradability_sample_10.md",
+  "bytes": 9040,
+  "sha256": "1e22bffaf7bf3f2e9e579d284c04eb3d650382d277ffc7d0cfb39b65198730d7",
+  "mode": "0o600"
+ },
+ "data_card": {
+  "path": "/data/shared/genebench/repo/ops/data_cards/tradability.md",
+  "bytes": 13763,
+  "sha256": "03af9706e1ac5a674b1d05e4166ed46ee9da04890e0c3202edabc01769b9a50f",
+  "mode": "0o600"
+ }
+}

@@ -1,0 +1,8 @@
+{
+  "harness": "quantagent",
+  "paradigm": "P2",
+  "image": "gb-quantagent-u:r1",
+  "command": ["sh", "-c", "export HOME=/tmp/h XDG_CACHE_HOME=/tmp/h/.cache && mkdir -p \"$$HOME\" && cd /task && python3 /opt/quantagent/glue/run.py"],
+  "env_required": ["GENEBENCH_GATEWAY", "OPENAI_BASE_URL", "OPENAI_API_KEY"],
+  "notes": "命令里的 $ 一律写 $$（N-101）。HOME 指到 /tmp 而不是 /task：P2 的代码是我们自己的，没有「第三方 CLI 的 HOME 只能从外面设」那个约束，落在 /task 下的东西会进 run.json 的 unexpected（integrations/README.md §1④）。上游是 MCP Server 形态，LLM 由外部编排方提供，所以本接入 0 次模型调用 —— OPENAI_* 只登记不使用。"
+}

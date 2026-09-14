@@ -1,0 +1,17 @@
+# 传递依赖的钉死清单，取自既有 gb-base:bookworm-r1 里的 `pip freeze --all`
+# （f02，镜像 sha256:fd1e2fd0c7ae39ec2d15e293801a6744b286c4dfe76c45dcc8888c8b92da8e52，
+#  构建于 2026-09-05T13:04:21Z）。有它，换一台机器换一天构建装到的是同一批版本；
+# 没有它，pandas 的 numpy 会随构建日期漂 —— 而 S2/S3/S7 的产出是数值。
+#
+# `pip` 自身不列在这里：它是基座镜像自带的（25.0.1），不是本层装的。
+#
+# 架构可得性（2026-09-13 查 PyPI JSON 实证，见 ops/reports/base_image_portability.md）：
+#   numpy / pandas / pyarrow 三个二进制包 cp312 的 manylinux **aarch64 与 x86_64 轮子都在**；
+#   python-dateutil / pytz / six / tzdata 是 py2.py3-none-any 纯 Python，与架构无关。
+numpy==2.5.2
+pandas==2.3.3
+pyarrow==25.0.1
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+six==1.17.0
+tzdata==2026.3

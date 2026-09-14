@@ -1,0 +1,94 @@
+# 卡 2.6-alphaagent 的票据收件箱
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `gb-base:bookworm-r1` 里没有 setuptools，凡是 `pip install --no-build-isolation` 的接入都会当场停在 `BackendUnavailable: Cannot import 'setuptools.build_meta'` | 建议 | 本卡第一次构建就是这么挂的（`build.log`，第 1 层）。finrobot 的 Dockerfile 里也有同一行 `pip install "setuptools>=61" wheel` —— 也就是说这已经是**每个接入各自踩一次、各自补一行**的状态。两个方向：① 把 setuptools+wheel 加进 `gb-base`（一处改、所有接入受益，但动的是统一基座，要重建全部下游镜像）；② 在 `integrations/README.md` §1② 的 Dockerfile 骨架里把这一行写进去（不动基座，但仍然是每个接入抄一遍）。倾向 ②：基座的意义是「固定模型效应之外的运行时」，为了省一行去重建全部镜像不划算。**不是我的路径，没动。** |
+| N-? | `alphaagent/dsl/core/accel.py` 的滚动内核在序列头部是**扩张窗**，与 `warmup_policy=null_until_full` 直接冲突 | 记录 | 上游行为，不是我们的缺陷，登记在此只为让后来者不必再查一遍：`_roll_corr_numba` 里 `if w > i + 1: w = i + 1` + `if c < 2: nan`，于是 `TS_CORR(...,10)` 从第 2 个观测起就有值。本卡两臂真跑都因此吃 `warmup_boundary`（详见 `integrations/alphaagent/README.md` §4.1）。**接入层没有替它修** —— 修了就是「我们替它改了多少」的分数。 |
+| N-? | S3 的 `values_ref` 只有 `coverage` 与 `sha256`，没有「暖机期该不该有值」的机器可读口径 | 建议 | 现状：`warmup.nonnull_before_warmup` 是被测方**自报**的一个整数，评分侧再按 gold 判 `warmup_boundary`。被测方要自检「我这个数是不是该为 0」，只能自己去读 `warmup_policy` 的枚举含义。若在 S3 的 JSON Schema 里给 `warmup_policy` 的每个枚举值配一句机器可读的期望（如 `null_until_full` → `nonnull_before_warmup == 0`），协议臂的 validator 就能当场报，而不必等到结算。属冻结根（任务集轴），**没动**，也没写进 pending_freeze_bumps —— 它是增强不是修复，题面现在没有说错话。 |
+| N-? | run dir 没有「系统自留日志」的采集位 | 建议 | AlphaAgent 的 agent 轨迹（`run_trajectory` 写的 JSONL + messages 快照 + summary）落在容器 `/tmp`，随容器消失；不能落 `/task`（P8 文件集封闭核对会判 `unexpected`）。本卡的证据是从 `log/llm_log.jsonl` 反向摘出来的（`ops/reports/i_alphaagent/agent_trajectory.json`），够用但粗。若 runner 在 run dir 下留一个 `system_log/` 并把容器里某个约定路径拷出来，接入方的自留轨迹就能进证据链。**是 runner 的路径，没动。** |
+
+## 指南 findings（`integrations/README.md` —— 我是这份指南的第一个用户）
+
+按任务书要求逐条记在这里，**没有自己改指南**。
+
+1. **§1② 的 Dockerfile 骨架跑不下去：缺 setuptools。** 骨架给的三行是
+   `FROM gb-base` / `COPY genebench_client/` / `RUN pip install --no-index --no-build-isolation`，
+   照抄的结果是第一层就 `BackendUnavailable`（见上面第一条票据）。建议在骨架里
+   补上 `RUN pip install --no-cache-dir "setuptools>=61" wheel`，并加一句
+   「gb-base 只有七个包，构建后端要自己装」。
+
+2. **§1② 没提「`COPY` 会带上宿主的 0600，容器非 root 跑就 `Permission denied`」。**
+   这条在 `integrations/finrobot/Dockerfile` 的注释里写得很清楚（还注明了
+   卡 2.6-tradingagents 第一次真跑就是这么挂的、判 `no_artifact`），但**指南正文里没有**。
+   接入方按指南走、不去读别人的 Dockerfile，就会踩。建议在 §1② 的表格
+   「`Dockerfile` 硬约束」那一格加一句：接线层 `COPY` 之后必须
+   `RUN chmod -R a+rX <目标目录>`。我是照着 finrobot 学的，不是照着指南学的。
+
+3. **§1⑥ 的构建命令与真正能用的那条不一致。** 指南写：
+   `scp -r integrations/<id> integrations/genebench_client ljn@…:/data/genebench_runner/build/<id>/`
+   然后 `docker build -t gb-<id>:r1 -f <id>/Dockerfile .`。两处对不上：
+   ① 镜像名，指南是 `gb-<id>:r1`，而 `harnesses/` 与既有四个接入实际用的都是
+   `gb-<id>-u:r1`（`-u` 后缀），`launch.json` 里的 `image` 也是后者；照指南命名，
+   `launch.json` 与镜像名会不一致。
+   ② 构建上下文里还得有第三样东西（上游源码 tarball），指南只说了两样 ——
+   而 §1② 又明确要求 GitHub 不可达时走 tarball + COPY，两节没有接上。
+   建议 §1⑥ 把镜像名改成 `gb-<id>-u:r1`，并把 tarball 列进构建上下文清单。
+
+4. **§1⑦ 的 `--outcome` 三选一没有覆盖本卡这种结局。**
+   三个值是 `passed_real_task` / `blocked` / `abandoned`。本卡：真跑跑通了、产物合规、
+   越权率 0、L3 容差过，但被闸判 `invalid` —— 既不是 `passed_real_task`（没通过），
+   也不是 `blocked`（没卡住）、更不是 `abandoned`（没放弃）。我填的是
+   `passed_real_task`，**因为「接入这件事」确实做成了**（真跑了一道题、拿到了结论），
+   而 `invalid` 是被测系统的成绩不是接入的成绩 —— 但这是我自己的解读，
+   指南没说。建议指南给一句话裁定，或者加第四个值（如 `ran_real_task`）把
+   「接入成功 / 系统未通过」与「接入成功 / 系统通过」分开。COVERAGE.md 的格值
+   已经把这件事记住了，成本表这一栏现在是重复且更模糊的那一份。
+
+5. **§1⑥「结算」只写了 `ops/score_runs.py --help`，没给能用的参数。**
+   实际要的是 `--batch <batch> --remote <run-root>/runs`（注意 `run_f02_a1` 会在
+   `--run-root` 下**再建一层 `runs/`**，所以 `--remote` 比 `--run-root` 多一段）。
+   这一段在 W-0 的 notes 里有，指南正文里没有；`--help` 固然是权威，但接入方
+   第一次跑到这里时最需要的是一条能抄的完整命令。
+
+6. **§3 缺一条：「产物合规但被闸判 invalid」时该怎么读。**
+   §3 的十条讲的都是「症状 → 原因 → 看哪里」，但都是**失败**（403 / 畸形 / 起不来）。
+   本卡的结局是「全绿但 gate 非空」，指南里没有对应条目，接入方容易误以为
+   自己链路有问题而去重跑 —— 而重跑一次只是买一个更好看的格子。建议加一条：
+   gate 非空且 `越权率=0`、`l3` 过时，多半是被测系统的语义与题面口径不合，
+   **不属于「我们链路的问题」，不该重试**（施工纪律：只有失败原因是我们的链路时才重试）。
+
+## 恒绿自证
+
+`ops/test_integration_alphaagent.py` 的 A/B/C 三族读的是磁盘上的真文件。收口时在
+`$GB/scratch/2.6-alphaagent/evergreen/`（仓库的一份只读副本，**不动真仓库**）做了
+四处定向破坏，每一处都让对应的那条当场红、复原后全绿：
+
+| 破坏 | 该红的判据 | 实测 |
+| --- | --- | --- |
+| `pin.json` 的 `dist_sha256` 改一个字符（与 Dockerfile 里核的那串不再相同） | `test_pin_cross_field_the_sha256_is_the_one_the_dockerfile_checks` | 红 |
+| `launch.json` 的命令把 `$$` 写成一个 `$`（N-101） | `test_launch_command_has_no_bare_dollar` | 红 |
+| `Dockerfile` 的 `pip install` 里加回 `tushare` | `test_dockerfile_installs_neither_tushare_nor_numba` | 红 |
+| `Dockerfile` 去掉接线层的 `chmod -R a+rX`（容器非 root 会 `Permission denied`） | `test_dockerfile_makes_the_glue_readable_by_a_non_root_container_user` | 红 |
+
+复现：`sh $GB/scratch/2.6-alphaagent/evergreen.sh`（第三条的 sed 转义在那个脚本里
+没生效、看起来像"破坏了却仍绿"，单独复跑见 `eg2.sh` —— 实际是红的）。
+
+另有三条**不是自己安排的**恒绿反证，都是真事故：
+
+* `test_pin_cross_field_an_undeclared_license_must_be_explained_in_the_readme`
+  第一次就红了 —— README 当时确实没写许可证那一段（后补 §7）。
+* `test_dockerfile_does_not_reach_the_network_for_source` 第一次红在**注释**上：
+  Dockerfile 里正当地写着「不在 Dockerfile 里 git clone」。判据改成只看指令行。
+* `test_config_id_and_harness_name_are_unique_across_both_trees` 抓到了我自己
+  一条打错的 `scp`（少写目的地，把接入目录复制成了 `integrations/harnesses/`）——
+  那份误建的副本已删，`git status` 干净。
+
+## 容器里才跑得到的那一族
+
+`_upstream()` 那四条要 import 上游 `alphaagent`，f01 的解释器上没有它（只装在
+接入镜像里），所以在 f01 上是 **skip 并说明**，在容器里是真跑：
+
+```
+f01：      16 passed, 4 skipped
+容器里：   20 passed          （命令见 integrations/alphaagent/README.md §5.5）
+```

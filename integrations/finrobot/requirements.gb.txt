@@ -1,0 +1,40 @@
+# FinRobot 0.1.5 在本环境里的依赖集。**这不是上游的 requirements.txt。**
+#
+# 上游 setup.py 的 install_requires 里有三样在本环境**必须不装**：
+#   yfinance / tushare  —— 由 genebench_client.compat 顶替进 sys.modules（run.py 里
+#                          compat.install()）。真库装进镜像就是一条绕过网关的路，
+#                          而"没装"比"装了但被出向代理拦"更早、更响。
+#   pandas_datareader   —— 同理（它也是取数库），上游代码路径里没人 import 它。
+# 剩下的照装：它们是 import 期就要的（agent_library → functional/* → 这些库），
+# 少一个 `import finrobot.agents.workflow` 就进不去。
+#
+# 版本策略：**钉住 pyautogen**（FinRobot 0.1.5 是照 0.2.x 的 API 写的，
+# 0.4/0.9 那两代把 register_function 与 config_list 都改了），其余取解析结果，
+# 实际落到镜像里的版本逐字记在 pin.json 的 resolved_deps 里。
+pyautogen==0.2.32
+
+# autogen.agentchat.contrib.retrieve_user_proxy_agent 是 finrobot/functional/rag.py
+# 的模块层 import，它又拉 autogen.retrieve_utils —— 于是 retrievechat 这一档的
+# 依赖是**进不进得了 import** 的问题，不是"用不用得上 RAG"的问题。
+# 只装 import 期真要的四个；`sentence_transformers`（→ torch，2GB+）不装，
+# 我们一次都不调 RAG。
+chromadb
+markdownify
+pypdf
+beautifulsoup4
+
+# data_source 的四个原生 SDK：方法体全被接线层换掉了，但 import 还在
+# （`from .finnhub_utils import FinnHubUtils` 在 data_source/__init__.py 的模块层）。
+# 它们在容器里连不上任何东西（出向白名单只有模型 API），也没有任何 API key。
+finnhub-python
+sec-api
+praw
+
+# functional/* 的模块层 import：charting→mplfinance/matplotlib、
+# quantitative→backtrader、reportlab→reportlab、coding→IPython。
+mplfinance
+backtrader
+reportlab
+ipython
+PyPDF2
+huggingface_hub

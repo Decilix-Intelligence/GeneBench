@@ -1,0 +1,58 @@
+{
+ "kind": "artifact",
+ "artifact": {
+  "schema_version": "1.0",
+  "artifact_id": "S2-art-1",
+  "stage": "S2",
+  "task_id": "T-sample",
+  "config_id": "cfg-sample",
+  "arm": "strict",
+  "seed": 0,
+  "as_of": "2026-07-31",
+  "produced_at": "2026-09-01T12:00:00.000+00:00",
+  "provenance": [],
+  "declarations": {
+   "adjust": "post",
+   "calendar_id": "SSE",
+   "universe_ref": "csi300@2026-07-31",
+   "missing_row_policy": "drop",
+   "alignment_target": "gold_panel_v1"
+  },
+  "payload": {
+   "panel_ref": {
+    "rows": 1200,
+    "n_symbols": 300,
+    "n_dates": 4,
+    "sha256": "abababababababababababababababababababababababababababababababab"
+   },
+   "field_map": {
+    "ts_code": "symbol",
+    "trade_date": "date",
+    "close": "close"
+   },
+   "missing_rows": {
+    "count": 0,
+    "policy_applied": "drop"
+   }
+  }
+ },
+ "task": {
+  "task_id": "T-sample",
+  "stage": "S2",
+  "declared": {
+   "adjust": "post",
+   "calendar_id": "SSE",
+   "universe_ref": "csi300@2026-07-31",
+   "missing_row_policy": "keep_missing",
+   "alignment_target": "gold_panel_v1"
+  },
+  "underdetermined": []
+ },
+ "gateway_log": null,
+ "tradability": {
+  "2026-07-01|000001.SZ": "trade",
+  "2026-07-02|000001.SZ": "no_data",
+  "2026-07-03|000001.SZ": "suspend",
+  "2026-07-06|000001.SZ": "no_data"
+ }
+}

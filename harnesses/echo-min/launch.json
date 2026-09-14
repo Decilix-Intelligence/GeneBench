@@ -1,0 +1,8 @@
+{
+  "harness": "Echo Min",
+  "paradigm": "P1",
+  "image": "gb-echo-min-u:r1",
+  "command": ["sh", "-c", "export HOME=/task/.echo-min && mkdir -p \"$$HOME\" && cd /task && python3 /opt/echo-min/echo_driver.py"],
+  "env_required": ["OPENAI_BASE_URL", "OPENAI_API_KEY", "GENEBENCH_GATEWAY", "GENEBENCH_TASK_ID", "GENEBENCH_CONFIG_ID", "GENEBENCH_ARM"],
+  "notes": "不调模型的最小 harness，用来验证启动契约本身。command 里的 $ 一律写 $$（N-101）。HOME 按 harnesses/README.md §1.2 第 1 条指到 /task 下——代价是 run.json 的 unexpected 里会出现 .echo-min/（P2 那份手册对自己的代码给的是 /tmp，两份的 CONFLICT 在 integrations/README.md §1④ 里有原文）。env_required 只登记不校验，名字抄错是静默的。"
+}

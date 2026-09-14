@@ -1,0 +1,14 @@
+# 收件箱：3.2 harness「Grok CLI」（id=grok-cli）
+
+不要直接改 `ops/tickets.md`（共享文件）。下面几条请编排方裁定后并进正表，编号先写 N-?。
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | 接入检查表缺一项：「harness 的默认输出上限」 | 待并入 | claude-code 撞过一次（`CLAUDE_CODE_MAX_OUTPUT_TOKENS`，默认按 Claude 的上限走），grok-cli 又撞一次（`GROK_MAX_TOKENS` 默认 16384，deepseek-chat 上限 8192，不设则**第一个请求**就被上游拒）。这已经是同一个坑的第二次。建议在 `harnesses/README.md` 的接入检查表里加一行固定检查项：**「这个 CLI 的默认 max output tokens 是多少？超过目标模型上限就要显式压下去」**。`harnesses/README.md` 是共享文件，本卡没动。 |
+| N-? | 接入检查表缺一项：「harness 有没有写死的第二模型」 | 待并入 | Grok CLI 的 recap（`refreshSessionRecap` → `DEFAULT_RECAP_MODEL = "grok-4.20-non-reasoning"`）与 title 生成都用**写死的模型名**，在 DeepSeek 上必然失败；失败被 `catch` 吞掉、**不报错**，但**照样吃掉一次预算闸计数**。claude-code 是同一类问题的另一种表现（五个 `ANTHROPIC_*_MODEL` 都得指到 deepseek-chat，否则后台小模型调用报 model not found）。建议加固定检查项：**「除主模型外，这个 CLI 还会用哪些写死的模型名？各自怎么关掉或改指」**。本 harness 的关法是预写 `~/.grok/user-settings.json` 的 `recapsEnabled: false`。 |
+| N-? | `grok-dev@1.1.7` 的 `engines.node: ">=18.0.0"` 与事实不符 | 仅登记，不修 | 它实际必须 Bun：shebang `#!/usr/bin/env bun`、dist 是不带扩展名的 tsc ESM、且 `dist/storage/db.js` 直接 `import { Database } from "bun:sqlite"`。这是上游包的元数据问题，我们只在 `harnesses/grok-cli/Dockerfile` 顶部与 README §2 记明并装 `bun@1.4.2`。**给后人的判据**：判断一个 npm CLI 能不能只用 Node 跑，看 `engines` 不够，要 `grep -r "bun:" dist/`。 |
+| N-? | `harnesses/README.md` §4④ 的 `--remote` 少一层 `runs/` | 已由 3.2-gemini-cli 登记，此处仅附议 | 本卡真跑照 §7 写的 `runs/runs` 才拿到结果。建议改手册那一侧（改 `run_f02_a1.py` 的落点会让 m6/m6b 的历史 run 根对不上）。 |
+| N-? | 镜像 digest 钉的是「构建那一刻的依赖树」 | 仅登记，不修 | `grok-dev` 对 `@ai-sdk/xai` 写的是 `^3.0.67`（本卡构建时解析到 3.0.130），随包没有 lockfile。codex/gemini 同性质。复核镜像来历只能**比 digest**（同基座 + 同一条 RUN → 同一条层链），不要指望「重装能得到同一棵树」，更不要用 `--no-cache` 去「更严格地」复现 —— 那不是回归，是方法本身不适用（3.2-codex 已写进它的 README §4）。 |
+| N-? | Grok CLI 在任何「标准 OpenAI 流式工具调用」的上游上都拿不到工具参数 | 结论，待并入 | `@ai-sdk/xai` 的 `xaiChatChunkSchema` 要求每一片 `tool_calls` 自带 `id`/`type`/`function.name`，transform 也把每一片当成完整的一次调用（没有按 `index` 累积的分支）。DeepSeek / OpenAI 的续片只带 `index` + 参数片段 → 整片被 zod 丢弃 → 工具参数恒为 `{}`。`^3.0.67` 范围内四个版本 schema 逐字相同；`grok-dev` 写死 `createXai`，没有换 provider 的开关。**给编排方的判断依据**：这不是「模型待换」那种化妆项，是这条配置**在 DeepSeek 上永远拿不到产物**，所以 `enabled: false`。要它进主表只有一条路：真 xAI 端点（XAI key + `api.x.ai` 进白名单 + 过 M7）。证据与假上游对照实验见 `harnesses/grok-cli/README.md` §5。 |
+| N-? | 接入检查表缺一项：「这个 CLI 的 SSE 解析器接不接受标准的分片工具调用」 | 待并入 | 本卡的根因是**协议方言**，而它在「能不能跑起来」这一层完全看不出来：CLI 起得来、200 全绿、模型也在说话，只有工具参数是空的。建议在 `harnesses/README.md` 的接入检查表里加一条**必做的假上游冒烟**：起一个只说 SSE 的本地假上游，发一次**分片**的工具调用（首片带 id/type/name、续片只带 index + arguments），看 harness 的会话库里参数是不是完整的。零真调用、两分钟出结果。可直接抄 `scratch/3.2-grok-cli/smoke/{fake_upstream.py,smoke.sh}`（三种 MODE：frag / whole / xai）。 |
+| N-? | bun 的运行时转译缓存把 `unexpected` 淹掉 297 条 | 已在本 harness 修，登记供他人参考 | `HOME` 在 `/task` 下时 bun 往 `$HOME/.bun/install/cache/@t@/` 写 297 个 `.pile`，`run.json` 的 `unexpected` 于是全是噪声。`BUN_INSTALL_CACHE_DIR` 与 `BUN_INSTALL` **都不管用**（管的是包安装缓存），只有 `BUN_RUNTIME_TRANSPILER_CACHE_PATH=0` 管用（297 → 0）。凡是以 bun 为运行时的 harness 都会撞。 |

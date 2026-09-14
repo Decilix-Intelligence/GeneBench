@@ -1,0 +1,49 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.20, pytest-9.1.1, pluggy-1.6.0 -- /data/shared/genebench/env/bin/python
+cachedir: .pytest_cache
+rootdir: /data/shared/genebench/repo
+plugins: anyio-4.14.2
+collecting ... collected 40 items
+
+ops/test_tradability.py::test_columns_schema_and_doc_agree PASSED        [  2%]
+ops/test_tradability.py::test_partitions_exist_for_every_year_in_grid PASSED [  5%]
+ops/test_tradability.py::test_enums_are_closed PASSED                    [  7%]
+ops/test_tradability.py::test_every_status_actually_occurs PASSED        [ 10%]
+ops/test_tradability.py::test_no_row_beyond_freeze_line PASSED           [ 12%]
+ops/test_tradability.py::test_key_is_unique PASSED                       [ 15%]
+ops/test_tradability.py::test_date_and_compact_agree PASSED              [ 17%]
+ops/test_tradability.py::test_status_is_reproducible_from_its_own_row PASSED [ 20%]
+ops/test_tradability.py::test_suspend_basis_matches_flag PASSED          [ 22%]
+ops/test_tradability.py::test_intraday_halt_is_S_with_a_daily_row PASSED [ 25%]
+ops/test_tradability.py::test_limit_flags_are_false_without_a_judgable_limit PASSED [ 27%]
+ops/test_tradability.py::test_close_sealed_implies_touched PASSED        [ 30%]
+ops/test_tradability.py::test_limit_up_and_down_are_mutually_exclusive PASSED [ 32%]
+ops/test_tradability.py::test_price_columns_are_present_exactly_when_has_daily PASSED [ 35%]
+ops/test_tradability.py::test_limit_judgement_recomputes_from_prices PASSED [ 37%]
+ops/test_tradability.py::test_float_tolerance_changes_nothing_on_current_data PASSED [ 40%]
+ops/test_tradability.py::test_no_price_limit_sentinel_is_recognised PASSED [ 42%]
+ops/test_tradability.py::test_artifact_permissions_block_group_and_world PASSED [ 45%]
+ops/test_tradability.py::test_parquet_metadata_carries_the_convention PASSED [ 47%]
+ops/test_tradability.py::test_month_recomputes_row_for_row_from_the_lake PASSED [ 50%]
+ops/test_tradability.py::test_carried_rows_have_no_daily_row_and_no_S_that_day PASSED [ 52%]
+ops/test_tradability.py::test_grid_matches_universe_build_grid PASSED    [ 55%]
+ops/test_tradability.py::test_calendar_really_only_has_sse PASSED        [ 57%]
+ops/test_tradability.py::test_suspend_timing_cannot_be_used_as_the_criterion PASSED [ 60%]
+ops/test_tradability.py::test_limit_list_d_is_fully_covered PASSED       [ 62%]
+ops/test_tradability.py::test_we_are_a_strict_superset_of_limit_list_d_because_of_ST PASSED [ 65%]
+ops/test_tradability.py::test_acceptance_slice_is_marked_beyond_freeze PASSED [ 67%]
+ops/test_tradability.py::test_acceptance_000711_is_suspend_with_no_daily_row PASSED [ 70%]
+ops/test_tradability.py::test_acceptance_600491_trades_on_its_resume_day PASSED [ 72%]
+ops/test_tradability.py::test_sample_report_has_ten_rows_with_full_evidence PASSED [ 75%]
+ops/test_tradability.py::test_sampling_is_reproducible PASSED            [ 77%]
+ops/test_tradability.py::test_data_card_numbers_come_from_the_summary PASSED [ 80%]
+ops/test_tradability.py::test_classify_priority_table PASSED             [ 82%]
+ops/test_tradability.py::test_classify_carry_stops_at_R PASSED           [ 85%]
+ops/test_tradability.py::test_classify_carry_does_not_cross_a_gap PASSED [ 87%]
+ops/test_tradability.py::test_classify_carry_does_not_cross_codes PASSED [ 90%]
+ops/test_tradability.py::test_negative_control_tampered_status_is_caught PASSED [ 92%]
+ops/test_tradability.py::test_negative_control_dropping_the_sentinel_guard_would_misjudge PASSED [ 95%]
+ops/test_tradability.py::test_tradability_at_refuses_to_read_beyond_the_freeze_line PASSED [ 97%]
+ops/test_tradability.py::test_tradability_at_reads_a_real_row PASSED     [100%]
+
+============================= 40 passed in 12.15s ==============================

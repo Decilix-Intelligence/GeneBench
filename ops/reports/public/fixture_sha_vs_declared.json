@@ -1,0 +1,224 @@
+{
+ "what": "公开出集的夹具 sha256 vs 题面（私有行情下标定的）声明值",
+ "why": "两者必然不同 —— 夹具是从公开 gold 切出来的。这里逐条记账，而不是把 sha 写回题面（那是冻结根，红线 4）。**任何一件相同都当作私有源漏进来了**（default-arg 把私有路径烤进签名的那种漏法）。",
+ "sources": {
+  "gold_factors": "/data/shared/genebench/snapshots/public_v1/gold_factors",
+  "s7_signal_panel": "/data/shared/genebench/snapshots/public_v1/epsilon/bt_input_csi300_v2.parquet"
+ },
+ "n": 30,
+ "n_missing": 0,
+ "n_identical_to_declared": 0,
+ "identical": [],
+ "rows": [
+  {
+   "task": "s4-cor-01",
+   "path": "work/factor_panel.parquet",
+   "declared_sha256": "c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6",
+   "public_sha256": "034c4526ad20d25675dee361869a60cd3d8c6a427a008e1f9051dfaa9ccf4e92",
+   "exists": true
+  },
+  {
+   "task": "s4-eco-01",
+   "path": "work/factor_pool.parquet",
+   "declared_sha256": "488e7cf2c0cece140044ad9b9322d8cb0b7ac23d1e1c7451888fcf606a5c0469",
+   "public_sha256": "53d681ea216425ab21bcd275a606e454a4713570ed79625bb6edccd81df61412",
+   "exists": true
+  },
+  {
+   "task": "s4-ops-01",
+   "path": "work/factor_panel.parquet",
+   "declared_sha256": "c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6",
+   "public_sha256": "034c4526ad20d25675dee361869a60cd3d8c6a427a008e1f9051dfaa9ccf4e92",
+   "exists": true
+  },
+  {
+   "task": "s4-ops-01",
+   "path": "work/factor_panel.meta.json",
+   "declared_sha256": "da0599c9dacbc28754f303a6058f9653443cc96bf74f1c2a1af6ab86bf8d1584",
+   "public_sha256": "2b0f609b1deb1cf076bcf32cafdf4ae1fa6b90cbe9a6fba60b53d714519abe1b",
+   "exists": true
+  },
+  {
+   "task": "s4-rob-01",
+   "path": "work/factor_panel.parquet",
+   "declared_sha256": "b34144bbde8855378466b903b1b2c230f791ec7c86d1d2735ec068c42c78cf77",
+   "public_sha256": "cef4c743ff796622f560e650d181c222c6f698c9e80c7d078c5dd012f793429d",
+   "exists": true
+  },
+  {
+   "task": "s5-cor-01",
+   "path": "work/inputs/manifest.json",
+   "declared_sha256": "5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a",
+   "public_sha256": "ac18cf7ed2626ce777e874eba9b8e6a249ec637787f85646b378f695ccafe537",
+   "exists": true
+  },
+  {
+   "task": "s5-cor-01",
+   "path": "work/inputs/gtja_191.001.parquet",
+   "declared_sha256": "6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847",
+   "public_sha256": "1cc3497b2baf5ac01bb8f4dd99fb235778f5eb9090b28f8b5cfe3db86a488271",
+   "exists": true
+  },
+  {
+   "task": "s5-eco-01",
+   "path": "work/inputs/manifest.json",
+   "declared_sha256": "47a7498b92b57952ae3bcca783bc9e182d1f2842a10775c13027a566b623a986",
+   "public_sha256": "3da4065c21331fb93be83e758991cdffb59bea6890fb7ad32949557601c0c79c",
+   "exists": true
+  },
+  {
+   "task": "s5-eco-01",
+   "path": "work/inputs/gtja_191.001.parquet",
+   "declared_sha256": "9d618fa6ee15ba4193718409df455f2fdfb80337201333baf668792afb25a43c",
+   "public_sha256": "94f82859a459b768bc630aae50c4a2eb412acc37f3f6c0e21ef28b0a3cf634c9",
+   "exists": true
+  },
+  {
+   "task": "s5-eco-01",
+   "path": "work/inputs/gtja_191.002.parquet",
+   "declared_sha256": "b58de67658ae2febbd66f6c2003e1a462b90890649881f96169a4ec8f5cc37cd",
+   "public_sha256": "128f4128e3c0c1134ff8de69c88f77868e6e07b85e90eb8c14c69c609692b434",
+   "exists": true
+  },
+  {
+   "task": "s5-eco-01",
+   "path": "work/inputs/gtja_191.003.parquet",
+   "declared_sha256": "ae21efa67eed5294d070a07fc32f8067fd9790a0f0b37d524e048831a5ab4623",
+   "public_sha256": "dde35e80901d3febbe47865bbd3ccc910287e6cc0c37e9029fd35bdc630a34cd",
+   "exists": true
+  },
+  {
+   "task": "s5-ops-01",
+   "path": "work/inputs/manifest.json",
+   "declared_sha256": "5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a",
+   "public_sha256": "ac18cf7ed2626ce777e874eba9b8e6a249ec637787f85646b378f695ccafe537",
+   "exists": true
+  },
+  {
+   "task": "s5-ops-01",
+   "path": "work/inputs/gtja_191.001.parquet",
+   "declared_sha256": "6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847",
+   "public_sha256": "1cc3497b2baf5ac01bb8f4dd99fb235778f5eb9090b28f8b5cfe3db86a488271",
+   "exists": true
+  },
+  {
+   "task": "s5-rob-01",
+   "path": "work/inputs/manifest.json",
+   "declared_sha256": "5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a",
+   "public_sha256": "ac18cf7ed2626ce777e874eba9b8e6a249ec637787f85646b378f695ccafe537",
+   "exists": true
+  },
+  {
+   "task": "s5-rob-01",
+   "path": "work/inputs/gtja_191.001.parquet",
+   "declared_sha256": "6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847",
+   "public_sha256": "1cc3497b2baf5ac01bb8f4dd99fb235778f5eb9090b28f8b5cfe3db86a488271",
+   "exists": true
+  },
+  {
+   "task": "s6-cor-01",
+   "path": "work/signal_s5_gtja001_csi300_v1.parquet",
+   "declared_sha256": "5f91bee97dd580ffe00bd126348437538168a6ef920d480755ae61051ae986cb",
+   "public_sha256": "4bfb0ed5b3cd79c7feb816f815d9b4556ed8d3e40e2fe943fa7b281e51fbbfed",
+   "exists": true
+  },
+  {
+   "task": "s6-eco-01",
+   "path": "work/signal_s5_gtja001_csi300_v1.parquet",
+   "declared_sha256": "58c6bfd79199979fff039abbbce024391187e8eff3ad5801f5b82138985b73f1",
+   "public_sha256": "7b84f279b2aa7f4241aeb5534fe2a4f32fc33ee8bbfdff78c1f6ba53578458d0",
+   "exists": true
+  },
+  {
+   "task": "s6-ops-01",
+   "path": "work/signal_s5_gtja001_csi300_v1.parquet",
+   "declared_sha256": "58c6bfd79199979fff039abbbce024391187e8eff3ad5801f5b82138985b73f1",
+   "public_sha256": "7b84f279b2aa7f4241aeb5534fe2a4f32fc33ee8bbfdff78c1f6ba53578458d0",
+   "exists": true
+  },
+  {
+   "task": "s6-rob-01",
+   "path": "work/signal_s6_sparse_coverage_csi300_v1.parquet",
+   "declared_sha256": "b0a73425e28a4a2b194ce7315786e124c8abf84f6fc4ba9dddeb4f9058a229f6",
+   "public_sha256": "d355abdcebd58a4af5ac7d84b15c4790612c07f1d0f58606c26751a2119c8e40",
+   "exists": true
+  },
+  {
+   "task": "s6-rob-02",
+   "path": "work/signal_s5_gtja001_csi300_v1.parquet",
+   "declared_sha256": "f269d7725437c16f67847d8dfb4aa217d17c65baa4bf83a25f7d15efb9ee5f70",
+   "public_sha256": "de075f57ad07930dcfbfddd089038d588ebc34c8eac27bc264a09cc08f49c60d",
+   "exists": true
+  },
+  {
+   "task": "s7-cor-01",
+   "path": "work/signal.parquet",
+   "declared_sha256": "4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e",
+   "public_sha256": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325",
+   "exists": true
+  },
+  {
+   "task": "s7-cor-01",
+   "path": "work/signal.meta.json",
+   "declared_sha256": "10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc",
+   "public_sha256": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "exists": true
+  },
+  {
+   "task": "s7-eco-01",
+   "path": "work/signal.parquet",
+   "declared_sha256": "4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e",
+   "public_sha256": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325",
+   "exists": true
+  },
+  {
+   "task": "s7-eco-01",
+   "path": "work/signal.meta.json",
+   "declared_sha256": "10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc",
+   "public_sha256": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "exists": true
+  },
+  {
+   "task": "s7-ops-01",
+   "path": "work/signal.parquet",
+   "declared_sha256": "4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e",
+   "public_sha256": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325",
+   "exists": true
+  },
+  {
+   "task": "s7-ops-01",
+   "path": "work/signal.meta.json",
+   "declared_sha256": "10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc",
+   "public_sha256": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "exists": true
+  },
+  {
+   "task": "s7-rob-01",
+   "path": "work/signal.parquet",
+   "declared_sha256": "4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e",
+   "public_sha256": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325",
+   "exists": true
+  },
+  {
+   "task": "s7-rob-01",
+   "path": "work/signal.meta.json",
+   "declared_sha256": "10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc",
+   "public_sha256": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "exists": true
+  },
+  {
+   "task": "s7-rob-02",
+   "path": "work/signal.parquet",
+   "declared_sha256": "4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e",
+   "public_sha256": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325",
+   "exists": true
+  },
+  {
+   "task": "s7-rob-02",
+   "path": "work/signal.meta.json",
+   "declared_sha256": "10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc",
+   "public_sha256": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "exists": true
+  }
+ ]
+}

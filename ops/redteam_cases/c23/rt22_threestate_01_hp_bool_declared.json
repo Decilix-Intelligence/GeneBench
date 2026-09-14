@@ -1,0 +1,64 @@
+{
+ "kind": "artifact",
+ "artifact": {
+  "schema_version": "1.0",
+  "artifact_id": "S4-art-1",
+  "stage": "S4",
+  "task_id": "T-sample",
+  "config_id": "cfg-sample",
+  "arm": "strict",
+  "seed": 0,
+  "as_of": "2026-07-31",
+  "produced_at": "2026-09-01T12:00:00.000+00:00",
+  "provenance": [],
+  "declarations": {
+   "quantiles": 10,
+   "tie_handling": "average",
+   "weighting": "equal",
+   "rebalance_timing": "close",
+   "holding_periods": [
+    true,
+    5,
+    20
+   ],
+   "ic_method": "spearman",
+   "annualization": 252,
+   "uncertainty_method": "block_bootstrap"
+  },
+  "payload": {
+   "ic_stats": {
+    "mean": 0.031,
+    "std": 0.12,
+    "icir": 0.258,
+    "positive_ratio": 0.56,
+    "coverage": 0.98,
+    "ci_low": 0.012,
+    "ci_high": 0.05,
+    "ci_method": "block_bootstrap"
+   },
+   "nw_t": 3.4,
+   "half_life_days": 6.5
+  }
+ },
+ "task": {
+  "task_id": "T-sample",
+  "stage": "S4",
+  "declared": {
+   "quantiles": 10,
+   "tie_handling": "average",
+   "weighting": "equal",
+   "rebalance_timing": "close",
+   "holding_periods": [
+    1,
+    5,
+    20
+   ],
+   "ic_method": "spearman",
+   "annualization": 252,
+   "uncertainty_method": "block_bootstrap"
+  },
+  "underdetermined": []
+ },
+ "gateway_log": null,
+ "tradability": null
+}

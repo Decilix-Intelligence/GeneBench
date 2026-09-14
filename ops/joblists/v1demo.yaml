@@ -1,0 +1,34 @@
+# 卡 5.3 的真跑验收矩阵：4 道题 × 双臂 × 1 配置 × 1 种子 = 8 个 run。
+#
+# 选题：四个**不同阶段**且在 M6-lite 里已知能跑通的 cor-01（`ops/reports/m6/records.json`
+# 里这四道题两臂都是 run_status=ok/malformed/violation —— 都出了产物、都进了结算）。
+# **刻意避开 S4 / S7**：那两个阶段是多轮研究循环（档位 150/9M 与 300/18M），
+# 一道题就能吃掉本轮全部预算，而本卡要验的是**清单跑通到出表**，不是 agent 能力。
+#
+# **预算：`max_calls` 与 `max_tokens` 两行都不写。**（2026-09-10，N-388 已裁定）
+#   不写 = 让注入器按 `stage` 取档（`runner.registry.budget_for`，卡 4.3）：
+#   S4 150 次 / 9M、S7 300 次 / 18M、其余 100 次 / **6M**。
+#   **默认档已经从 600,000 抬到 6,000,000**，与 `BUDGET_TIERS` 的换算规则同源（100 × 60k/次），
+#   所以此前那条「显式给 3M」的绕法**作废**：3M 比默认档还低，写上去是把预算压下去。
+#   为什么当初要绕，是实测出来的：2026-09-06 这一批（`ops/reports/v1demo/records.json`）
+#   在 600k 默认档下 **8/8 撞 token 闸**，调用次数只用到 18–22 / 100 —— 表上的 SR / pass@1
+#   读的是「预算够不够」而不是能力。**那份历史记录不改**（它是 N-388 的证据）。
+name: v1demo
+batch: v1demo
+configs:
+  - cfg-codex-deepseek
+tasks:
+  - s1-cor-01
+  - s2-cor-01
+  - s3-cor-01
+  - s5-cor-01
+# 第一个必须是**干预臂**（N-364：出集把 arm_ids[0] 当干预臂写进等价表）。
+arms:
+  - strict
+  - open
+seeds:
+  - 1
+image: gb-cx-u
+digest: sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a
+timeout_s: 1500
+note: 卡 5.3 作业清单运行器的真跑验收（构造验收，不是实验数据）

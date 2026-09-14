@@ -1,0 +1,17 @@
+[
+ {
+  "task_id": "s6-rob-02",
+  "stage": "S6",
+  "template_id": "rob_underdetermined",
+  "ok": true,
+  "rc": 0,
+  "log_rows": 1,
+  "note": "",
+  "evidence": [],
+  "probes": {},
+  "at": "2026-09-07T21:41:04+00:00",
+  "tradability_rows": 13200,
+  "stderr_tail": "wrote /data/shared/genebench/reference/tasks/public/v1.0-smoke-public/s6-rob-02/solution/artifact.json halted ['targets']",
+  "findings": []
+ }
+]

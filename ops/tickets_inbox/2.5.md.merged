@@ -1,0 +1,9 @@
+# 卡 2.5 接入成本记录工具 —— 待登记事项
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | 接入成本遥测上线，**阶段二/三每个接入都必须记** | 待处理 | `integrations/cost/`（CLI `$PY -m integrations.cost`），账本 `integrations/COST.jsonl`，报表 `integrations/COST.md`（生成，勿手改）。用法见 `integrations/README.md` 的「接入成本怎么记」一节。**动手接一个系统之前先 `begin`** —— 它记下的 HEAD 就是后面算 LOC 的基线；漏了 `begin` 只能靠 `--at` 补时刻 + `loc --base <sha>` 补基线。收口代理请在阶段验收时确认 `COST.md` 里每个已接系统都有一行且 `outcome` 非空。 |
+| N-? | `COST.jsonl` 是共享文件，只许追加 | 已处理 | 追加走 `fcntl.flock` 锁**文件本身**（不另立锁文件：多一个锁文件就多一条「有人没拿这把锁」的路径）。读坏行**当场报错带行号**，不跳过 —— 跳过的表现是下游每个数都偏小，而偏小和「这个接入很省事」在表上长得一模一样。 |
+| N-? | `COST.md` 与账本的漂被**做没了**，不是靠纪律 | 已处理 | 每次追加事件都在同一把锁里重算 `COST.md`；`report` 的日常用途只剩「把手改过的改回去」。`ops/test_integration_cost.py::test_the_real_md_is_in_sync_with_the_real_ledger` 盯着两者一致 —— **它红了不是回归，跑一次 `$PY -m integrations.cost report` 即可**。若有代理直接用编辑器改了 `COST.jsonl` 而没跑工具，这条会红，那正是它该红的时候。 |
+| N-? | `ops/test_c41.py:366` 的 `len(REG.CONFIGS) == 3` 本卡**没动** | 待处理 | 卡 2.5 不新增任何 `config.yaml`，没触发它。仍按 W-0 的 N-? 处理：第一个把 `enabled` 翻成 `true` 的代理负责把断言改成「内置三条 ⊆ CONFIGS 且 `config_id` 互异」。这里只是重申，不是第二张票。 |
+| N-? | 净工时的口径需要收口时统一口径确认 | 待裁定 | 当前口径：`pause` 之后没 `resume` 就 `end` 的，那段暂停算到 `end` 为止（**照实记**，不为了好看算成在干活）；一个系统多段 `begin..end` 相加；`end` 时 `--rework` 额外记一次返工。三条都有断言（`test_ending_while_paused_counts_the_pause_up_to_the_end` / `test_multiple_sessions_add_up` / `test_end_rework_flag_adds_one`）。需裁定：发布材料里引用「接入成本」时用**净工时**还是「净工时 + 返工次数」两个数并列。倾向**两个数并列** —— 单一分钟数会让「一次做对」和「返工三次凑出同样分钟数」看起来一样。 |

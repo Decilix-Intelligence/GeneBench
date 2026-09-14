@@ -1,0 +1,23 @@
+# 卡 2.6-finmem 的票据收件箱
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `runner/c42/upstream_pins.py::PINS` 里没有 `finmem` 条目 | 待办（不是我的路径） | `rdagent_q` / `tradingagents` 都在那张表里有一条，`integrations/*/pin.json` 与它逐字对照（N-51 那次的形态：两处各自都真、放一起是假话）。FinMem 这条只活在 `integrations/finmem/pin.json` 里。`ops/test_integration_finmem.py::test_pin_matches_upstream_pins_when_that_table_has_an_entry` **已经幂等地守着**：表里一旦有 `finmem`，它自动开始比对 `commit`；现在 skip。要加的话字段是 `commit=be814aa47970de9bf2fdd6a1d5a60ae5cf361b46`、来源是源码 tarball 而非 dist（sha256 `f0ee88b7…`）。 |
+| N-? | f02 上 `exec/vendor/h11/__pycache__` 是 0775，**注入期 P0 中止** | 我已 chmod 修好，但会再犯 | 2026-09-07 10:48 本卡第一次真跑两臂各 0.1 秒 ERROR：`[P0] 注入中止（1 条）：P0 红线 5 目录对组/其它开放 0o775 /data/genebench_runner/exec/vendor/h11/__pycache__`。谁在 f02 上没带 `PYTHONDONTWRITEBYTECODE=1` 跑过一次 `exec/` 下的 python 就会再造一个。**手册 §3.10 讲的是「守门测试跑红」，没讲「注入被拦」** —— 后者的现场表现是两臂秒退、看起来像镜像坏了。修法一条命令：`ssh finance01-ts 'ssh ljn@192.168.1.219 "chmod -R go-rwx /data/genebench_runner/exec/vendor/h11/__pycache__"'`。根治要么在 `push_exec_to_f02.sh` 落地后统一收紧一次，要么在注入前自己收紧。 |
+| N-? | 边车对 `/v1/embeddings` 是**透传后 404**，`llm_log` 里没有可机读的标记 | 登记，不修 | 本卡实测：`POST http://gateway:8081/v1/embeddings` → **404**（上游模型 API 没有这个端点）。这是正确行为，但对被测方来说「404 是因为端点不存在」与「404 是因为路径写错」不可区分，而**依赖向量检索的系统（FinMem 这一类）会因此静默退化**。建议之一：`runner/c41/egress_proxy.py::_wire_shape` 认一下 embeddings 路径，让 `llm_log` 里能按 `wire_shape` 聚合「这次运行尝试过几次 embeddings」；建议之二：范式层在 `P2_CONTRACT.md` 里明写「模型侧只承诺 chat/completions」。**都不是本卡的路径**。 |
+| N-? | 「跑通链路、产物 valid、但任务分 0」该记哪个 `--outcome` | 待裁定 | `integrations/README.md` §1⑦ 写 `passed_real_task` = 「真跑过一道题并通过」。「通过」是指**产物合规（valid）**还是**任务分**？本卡按前者记（双臂 valid、gate 空、越权率 0.0，`pass@1=0.0`）。若按后者，`rdagent_q`（invalid）与本条都要改。倾向维持前者：成本表量的是「接进来要花多少工夫」，不是「接进来之后考得怎么样」——后者是 `COVERAGE.md` 与 `ops/reports/` 的事。 |
+| N-? | 成本账本：`end` 之后没有补记返工的入口 | 登记 + 本卡的账已经偏低 1 次 | 本卡实际返工 **1 次**（无头自检里 `import run` 撞上上游同名模块 `/opt/finmem/src/run.py`，拿到的是上游那个 typer CLI，改成按路径加载并**重建了一次镜像**）。我在 `end` 之后才想起来补记，工具正确地拒绝了：`finmem 当前状态是 'none'，不能 rework（要求 ['active','paused']）`。于是 `COST.md` 上 finmem 的返工列是 **0，实际是 1**。这不是工具的 bug（拒绝是对的），是**口径的缺口**：卡 2.5 自己写着「返工是事后最想不起来的一项」，而「事后」恰好是唯一想得起来的时刻 —— 现在这条路是堵死的，账本会**系统性低估返工**。两个方向：(a) 允许 `rework --at <收口前的时刻>` 在 `none` 状态下补记（事件本来就带 `--at`，语义是「那个时刻发生过一次返工」，不是「现在重开一段」）；(b) 给 `end` 加一个 `--amend-rework N`。**倾向 (a)**：它不改变状态机，只补一条历史事件，而 `--at` 已经是全套事件的既有参数。归卡 2.5 / 收口代理。 |
+
+## 指南 findings（`integrations/README.md`，我是它的第一个 FinMem 用户）
+
+**按契约只登记，不自己改指南。** 下面每条都注明是「踩到了」还是「读的时候发现的」。
+
+| # | 位置 | findings | 踩到了吗 |
+| --- | --- | --- | --- |
+| 1 | §1② 五件套表格 | 表里没有「**你的系统本体放哪**」这一行。从源码装的系统（不在任何 index 上的，FinMem 就是）需要一个 tarball，而 `Dockerfile` 的 `COPY` 源必须在**构建上下文根**、不是 `integrations/<id>/` 里。这一点只有去读 `tradingagents/Dockerfile` 才看得出来 —— §1⑥ 的 `scp -r integrations/<id> integrations/genebench_client …` 那条命令**只送了两样**，照抄的人建镜像时会撞 `COPY failed: file not found`。 | 没踩（先读了 tradingagents） |
+| 2 | §1⑥ 构建 | 没提 `.dockerignore`。构建目录里如果有解压过的源码树（调查阶段几乎一定有），`docker build .` 会把它整个送进 daemon。 | 踩到了（自己加了一行 `.dockerignore`） |
+| 3 | §3.9 `HOME` 不可写 | 只讲了 `HOME` / `<TOOL>_HOME`。还有一类系统**按相对 CWD 写文件**（FinMem 的三处 `logging.FileHandler(os.path.join("data", "04_model_output_log", …))`），它们不看任何环境变量 —— 修法是入口先 `chdir` 到 `/tmp/<id>` 并把那几个目录建出来。建议在 §3.9 加一句「先 `chdir`，再谈环境变量」。 | 踩到了（读代码时发现，没等它炸） |
+| 4 | §3 常见失败 | 缺一条「**注入期就被拦**」：exec 树里有 0775 目录时，两臂各 0.1 秒 `ERROR: RunError: 注入失败：[P0]`，`run_dir` 根本没建。它与 §3.7「两臂都在 3 秒内退出」长得像，但排查方向完全不同（那一条让你去看容器日志，而这一条**没有容器日志**）。见上面 N-? 那条。 | 踩到了 |
+| 5 | §1① / §5 成本 | `begin --system <id>` 在 `integrations/<id>` 还不存在时会提醒「目录不在」——**这是对的**（先 begin 再 mkdir 是正当顺序），但提醒文案会让第一次用的人以为记错了。建议把那句改成「目录还不在，正常（先 begin 再 mkdir）；如果你不是刚开始，检查 `--system` 有没有打错」。 | 踩到了（自己判断是正常的） |
+| 6 | §1⑥ 出集 | 手册没说 `--params` 什么时候要给。**实测不用给**：`s5-eco-01` 只在 `genetask/params/v1.0-smoke40.yaml` 里，但 `export_bundle.py` 从 `reference/tasks/` 取，不带 `--params` 也能出（两次出集的 frozen root 都是 `286f4c32…`）。本条是**澄清**不是缺陷 —— 我一开始以为要给，多写了一个参数。建议在 §1⑥ 加半句「`--params` 只在你要换任务集参数时给」。 | 没踩（先读了 params 才多给的） |
+| 7 | 全文 | 手册假设被测系统**在运行期取数**（§1③ 整节讲的都是替换 `import`）。FinMem 这类**离线数据集**系统的替换缝不在任何一个运行期函数上，而在「那个 pkl / csv 怎么造出来」。建议 §1③ 开头加两句分类：运行期取数 → 换 import / 换注册表；离线数据集 → 你的入口就站在它的 data-pipeline 位置上，**并且它天然没有第二条取数路径**（可核查性上这是个优势，值得写出来）。 | 没踩（但整个接入的形状由它决定） |

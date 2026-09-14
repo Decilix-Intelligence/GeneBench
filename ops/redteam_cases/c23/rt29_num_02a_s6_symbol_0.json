@@ -1,0 +1,67 @@
+{
+ "kind": "artifact",
+ "artifact": {
+  "schema_version": "1.0",
+  "artifact_id": "S6-art-1",
+  "stage": "S6",
+  "task_id": "T-sample",
+  "config_id": "cfg-sample",
+  "arm": "strict",
+  "seed": 0,
+  "as_of": "2026-07-31",
+  "produced_at": "2026-09-01T12:00:00.000+00:00",
+  "provenance": [],
+  "declarations": {
+   "constraints": {
+    "long_only": true,
+    "max_weight": 0.1
+   },
+   "objective": "max_score",
+   "weighting_scheme": "equal",
+   "rebalance_frequency": "daily"
+  },
+  "payload": {
+   "targets": [
+    {
+     "date": "2026-07-31",
+     "solver_status": "optimal",
+     "positions": [
+      {
+       "symbol": null,
+       "score": 0.9,
+       "previous_weight": 0.05,
+       "target_weight": 0.1,
+       "delta_weight": 0.05,
+       "reference_close": 1720.5
+      },
+      {
+       "symbol": "000001.SZ",
+       "score": 0.4,
+       "previous_weight": 0.05,
+       "target_weight": 0.0,
+       "delta_weight": -0.05,
+       "reference_close": 11.2
+      }
+     ]
+    }
+   ],
+   "cash_ratio": null
+  }
+ },
+ "task": {
+  "task_id": "T-sample",
+  "stage": "S6",
+  "declared": {
+   "constraints": {
+    "long_only": true,
+    "max_weight": 0.1
+   },
+   "objective": "max_score",
+   "weighting_scheme": "equal",
+   "rebalance_frequency": "daily"
+  },
+  "underdetermined": []
+ },
+ "gateway_log": null,
+ "tradability": null
+}

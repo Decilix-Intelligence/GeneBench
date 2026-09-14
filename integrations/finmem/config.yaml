@@ -1,0 +1,12 @@
+# FinMem 的被测配置。
+#
+# 三条判据（`runner/registry.py` 在 import 期核）：
+#   ① base_url 必须 https；② api_key_env 以 _API_KEY 结尾；
+#   ③ host 不在 MARKET_DATA_HOSTS 里（行情/新闻源域名一律不得入表 —— 红线 5）。
+config_id: cfg-finmem-deepseek
+harness: finmem
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: FinMem 的分层记忆逐日交易循环，模型经边车（httpx → OpenAI 兼容口）
+enabled: true

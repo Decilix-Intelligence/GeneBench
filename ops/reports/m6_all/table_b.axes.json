@@ -1,0 +1,91 @@
+{
+ "filters": {
+  "batch": [
+   "m6",
+   "m6b"
+  ]
+ },
+ "n_records": 29,
+ "axis_values": {
+  "set_version": [
+   "1.0.7",
+   "1.0.9"
+  ],
+  "reference_version": [
+   "r1.0.14",
+   "r1.0.8"
+  ],
+  "protocol_version": [
+   "geneprotocol_v1@7e8ad97d1f7a",
+   "geneprotocol_v1@none"
+  ],
+  "channel": [
+   "private"
+  ]
+ },
+ "mixed_axes": {
+  "set_version": [
+   "1.0.7",
+   "1.0.9"
+  ],
+  "reference_version": [
+   "r1.0.14",
+   "r1.0.8"
+  ]
+ },
+ "allow_mixed_axes": true,
+ "version_combos": [
+  {
+   "set_version": "1.0.7",
+   "reference_version": "r1.0.8",
+   "protocol_version": "geneprotocol_v1@7e8ad97d1f7a",
+   "channel": "private",
+   "n_runs": 11,
+   "batches": [
+    "m6"
+   ],
+   "tracks": [
+    "main"
+   ]
+  },
+  {
+   "set_version": "1.0.7",
+   "reference_version": "r1.0.8",
+   "protocol_version": "geneprotocol_v1@none",
+   "channel": "private",
+   "n_runs": 10,
+   "batches": [
+    "m6"
+   ],
+   "tracks": [
+    "main"
+   ]
+  },
+  {
+   "set_version": "1.0.9",
+   "reference_version": "r1.0.14",
+   "protocol_version": "geneprotocol_v1@7e8ad97d1f7a",
+   "channel": "private",
+   "n_runs": 4,
+   "batches": [
+    "m6b"
+   ],
+   "tracks": [
+    "main"
+   ]
+  },
+  {
+   "set_version": "1.0.9",
+   "reference_version": "r1.0.14",
+   "protocol_version": "geneprotocol_v1@none",
+   "channel": "private",
+   "n_runs": 4,
+   "batches": [
+    "m6b"
+   ],
+   "tracks": [
+    "main"
+   ]
+  }
+ ]
+}

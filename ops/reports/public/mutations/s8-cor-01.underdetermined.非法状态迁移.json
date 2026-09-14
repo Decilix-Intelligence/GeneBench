@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s8-cor-01",
+  "probe": "underdetermined",
+  "name": "非法状态迁移",
+  "why": "状态机迁移表之外的迁移不得出现在事件链里",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "s8_illegal_transition"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:s8_illegal_transition [underdetermined] @$.payload.state_transitions[0] — 非法状态迁移 ('filled', 'ordered')"
+ ]
+}

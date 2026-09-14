@@ -1,0 +1,127 @@
+{
+ "scorer_output": {
+  "schema_version": "1.0",
+  "validity": "valid",
+  "gate_failed": [],
+  "unobservable": [],
+  "correctness": {
+   "n_cells": 166800,
+   "n_gold_rows": 41700,
+   "n_rows_missing": 44,
+   "Align": 1.0,
+   "Adj": 1.0,
+   "Cal": 1.0,
+   "CellAgree": 0.9989448441247002
+  },
+  "effect": {
+   "score": 99.9736,
+   "raw_metric": 0.999736211031175,
+   "anchor_floor": 0.0,
+   "anchor_ceiling": 1.0
+  },
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/v1.0-smoke/s2-cor-01/gold",
+   "clamped": false,
+   "metric_kind": "align"
+  }
+ },
+ "record": {
+  "task_id": "s2-cor-01",
+  "stage": "S2",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "strict",
+  "seq": 2,
+  "run_id": "s2-cor-01.strict.cfg-codex-deepseek.r02",
+  "set_version": "1.0.12",
+  "reference_version": "r1.0.19",
+  "runner_version": "d5f43d81a8cd568bd0a1b2bf318af26aada4c6ada48ff88233a66070a542a3f3",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "ok",
+  "sr_bucket": "scorable",
+  "validity": "valid",
+  "malformed": false,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {
+   "adjust_fingerprint": "clean",
+   "attribution_conservation": "clean",
+   "calendar": "clean",
+   "declared_reads": "clean",
+   "factor_degeneracy": "clean",
+   "fetch_clock": "clean",
+   "input_ablation": "clean",
+   "ledger_conservation": "clean",
+   "lookahead": "clean",
+   "nonfinite_propagation": "clean",
+   "optimizer_failure": "clean",
+   "pit_universe": "clean",
+   "source_status": "clean",
+   "underdetermined": "clean",
+   "unsupported_operator": "clean",
+   "warmup_boundary": "clean"
+  },
+  "findings": [],
+  "l3_kind": "align",
+  "l3_pass": false,
+  "l3_score": 0.999736211031175,
+  "effect": 99.9736,
+  "effect_withheld_reason": null,
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/v1.0-smoke/s2-cor-01/gold",
+   "clamped": false,
+   "metric_kind": "align"
+  },
+  "correctness": {
+   "n_cells": 166800,
+   "n_gold_rows": 41700,
+   "n_rows_missing": 44,
+   "Align": 1.0,
+   "Adj": 1.0,
+   "Cal": 1.0,
+   "CellAgree": 0.9989448441247002
+  },
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "",
+  "steps": 37,
+  "tokens_prompt": 1754320,
+  "tokens_completion": 50123,
+  "cost_usd": 0.83806316,
+  "cost_model": "deepseek-chat",
+  "latency_s": 449.05,
+  "validator_rejections": 0,
+  "overreach": {
+   "denied": 9,
+   "total": 111,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "open_range_would_cross_asof": 2,
+    "adjustment_mode_not_in_v1": 7
+   },
+   "malformed_requests": 61,
+   "malformed_reasons": {
+    "asof_missing": 13,
+    "unclassified": 39,
+    "param_malformed": 8,
+    "unknown_universe": 1
+   }
+  },
+  "unbounded_requests": 2,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": []
+ }
+}

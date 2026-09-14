@@ -1,0 +1,50 @@
+{
+ "freq": "daily",
+ "unpriced_cells": 48981,
+ "factor_present_on_unpriced_in_frozen": 2716,
+ "impls": {
+  "B1": {
+   "blanked_diff": {},
+   "perturbed_diff_keys": [
+    "ann_return_gross",
+    "ann_return_net",
+    "ann_vol_net",
+    "max_drawdown_net",
+    "sharpe_net",
+    "total_cost",
+    "turnover_one_way_mean",
+    "turnover_two_way_mean"
+   ],
+   "n_metrics": 9
+  },
+  "B2": {
+   "blanked_diff": {},
+   "perturbed_diff_keys": [
+    "ann_return_gross",
+    "ann_return_net",
+    "ann_vol_net",
+    "max_drawdown_net",
+    "sharpe_net",
+    "total_cost",
+    "turnover_one_way_mean",
+    "turnover_two_way_mean"
+   ],
+   "n_metrics": 9
+  },
+  "B3": {
+   "blanked_diff": {},
+   "perturbed_diff_keys": [
+    "ann_return_gross",
+    "ann_return_net",
+    "ann_vol_net",
+    "max_drawdown_net",
+    "sharpe_net",
+    "total_cost",
+    "turnover_one_way_mean",
+    "turnover_two_way_mean"
+   ],
+   "n_metrics": 9
+  }
+ },
+ "ok": true
+}

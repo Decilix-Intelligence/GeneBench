@@ -1,0 +1,58 @@
+{
+  "window": {
+    "start": "20090105",
+    "end": "20260731"
+  },
+  "codes": 3575,
+  "public_daily_rows": 10948502,
+  "private_daily_rows_union_codes": 10948507,
+  "rows_in_both": 10948502,
+  "rows_only_public": 0,
+  "rows_only_private": 5,
+  "open": {
+    "comparable": 10948502,
+    "agree": 10948500,
+    "agree_rate": 0.9999998173266078,
+    "max_rel": 0.03284671532846726,
+    "p999_rel": 0.0
+  },
+  "high": {
+    "comparable": 10948502,
+    "agree": 10948500,
+    "agree_rate": 0.9999998173266078,
+    "max_rel": 0.04339440694310505,
+    "p999_rel": 0.0
+  },
+  "low": {
+    "comparable": 10948502,
+    "agree": 10948501,
+    "agree_rate": 0.9999999086633039,
+    "max_rel": 0.012244897959183593,
+    "p999_rel": 0.0
+  },
+  "close": {
+    "comparable": 10948502,
+    "agree": 10948492,
+    "agree_rate": 0.9999990866330389,
+    "max_rel": 0.010967098703888279,
+    "p999_rel": 0.0
+  },
+  "volume": {
+    "comparable": 10948502,
+    "agree": 10948470,
+    "agree_rate": 0.9999970772257246,
+    "max_rel": 0.02675787491686748,
+    "p999_rel": 9.198596116272577e-09
+  },
+  "amount": {
+    "comparable": 10948502,
+    "agree": 10948044,
+    "agree_rate": 0.999958167793183,
+    "max_rel": 0.46872299952680974,
+    "p999_rel": 1.5339678141509327e-07
+  },
+  "public_suspend_rows": 379055,
+  "only_public_rows_that_are_suspend": 0,
+  "private_suspend_S_rows_union_codes": 347873,
+  "seconds": 23.1
+}

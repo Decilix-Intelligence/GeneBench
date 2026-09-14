@@ -1,0 +1,390 @@
+[
+ {
+  "file": "rt01_tristate_01.json",
+  "n": 1,
+  "class": "A",
+  "lens": "three_state",
+  "name": "枚举字段用非标量包装（{\"value\": \"post\"} / [\"post\"]）绕过 DECLARATION_ENUMS：任务未提或 task=None 时静默通过",
+  "kind": "artifact",
+  "stage": "S2",
+  "codes_before": []
+ },
+ {
+  "file": "rt02_tristate_02.json",
+  "n": 2,
+  "class": "A",
+  "lens": "three_state",
+  "name": "DECLARED_VALUE_VIOLATIONS 同样被非标量包装绕过：missing_policy: [\"fill_zero\"] 不报 missing_filled_as_zero",
+  "kind": "artifact",
+  "stage": "S5",
+  "codes_before": []
+ },
+ {
+  "file": "rt03_tristate_03.json",
+  "n": 3,
+  "class": "B",
+  "lens": "three_state",
+  "name": "任务已声明 adjust=post，artifact 写 [\"post\"]：只报 violation:declaration_mismatch，malformed=false",
+  "kind": "artifact",
+  "stage": "S2",
+  "codes_before": [
+   "declaration_mismatch"
+  ]
+ },
+ {
+  "file": "rt04_tristate_05.json",
+  "n": 4,
+  "class": "C",
+  "lens": "three_state",
+  "name": "集合语义的列表字段（required_fields / holding_periods）只是顺序不同就被判 declaration_mismatch（误拒）",
+  "kind": "artifact",
+  "stage": "S3",
+  "codes_before": [
+   "declaration_mismatch"
+  ]
+ },
+ {
+  "file": "rt05_tristate_07.json",
+  "n": 5,
+  "class": "A",
+  "lens": "three_state",
+  "name": "artifact 自报 task_id 决定网关日志切片：改一个 task_id 就让 S8 越权核对 / S3 读取集核对整体失效",
+  "kind": "artifact",
+  "stage": "S8",
+  "codes_before": []
+ },
+ {
+  "file": "rt06_s5sig_01.json",
+  "n": 6,
+  "class": "A",
+  "lens": "s5_signals",
+  "name": "S5 fillna 探针靠精确串键：symbol 改大小写就绕过（no_data 格子写 0.0 静默通过）",
+  "kind": "artifact",
+  "stage": "S5",
+  "codes_before": []
+ },
+ {
+  "file": "rt07_s5sig_02.json",
+  "n": 7,
+  "class": "A",
+  "lens": "s5_signals",
+  "name": "S5 signals 行的 date 不校格式：写 '20260731' 即脱离视图键，no_data 格子填 0.0 静默通过",
+  "kind": "artifact",
+  "stage": "S5",
+  "codes_before": []
+ },
+ {
+  "file": "rt08_s5sig_05.json",
+  "n": 8,
+  "class": "B",
+  "lens": "s5_signals",
+  "name": "rank 语义下 0 的判定读的是 artifact 自报的 value_semantics，改口径为 score 即从 malformed 降级为 violation",
+  "kind": "artifact",
+  "stage": "S5",
+  "codes_before": [
+   "declaration_mismatch"
+  ]
+ },
+ {
+  "file": "rt09_s3reads_01.json",
+  "n": 9,
+  "class": "A",
+  "lens": "s3_reads",
+  "name": "artifact 自报 task_id 决定网关日志切片，与 TaskSpec.task_id 不交叉核 —— 改一个字母就把 2.3-c 与 S8 越权核对整体关掉",
+  "kind": "artifact",
+  "stage": "S3",
+  "codes_before": []
+ },
+ {
+  "file": "rt10_s3reads_03.json",
+  "n": 10,
+  "class": "A",
+  "lens": "s3_reads",
+  "name": "required_fields 非列表（字符串/对象）时 2.3-c 探针整体跳过，读全表也 ok",
+  "kind": "artifact",
+  "stage": "S3",
+  "codes_before": []
+ },
+ {
+  "file": "rt11_s3reads_05.json",
+  "n": 11,
+  "class": "A",
+  "lens": "s3_reads",
+  "name": "degeneracy 缺 alert 字段静默通过（payload 必含项未校验）",
+  "kind": "artifact",
+  "stage": "S3",
+  "codes_before": []
+ },
+ {
+  "file": "rt12_s3reads_04.json",
+  "n": 12,
+  "class": "C",
+  "lens": "s3_reads",
+  "name": "fields 显式带键列 code/date 被算成「超读」，而 * 展开却不含键列 —— BARS_KEY_COLUMNS 定义了但从未使用",
+  "kind": "artifact",
+  "stage": "S3",
+  "codes_before": [
+   "undeclared_reads"
+  ]
+ },
+ {
+  "file": "rt13_numeric_01_ledger_residual_negative.json",
+  "n": 13,
+  "class": "A",
+  "lens": "s6_s7_arith",
+  "name": "S7 ledger_check.max_abs_residual 为负数时守恒探针失效",
+  "kind": "artifact",
+  "stage": "S7",
+  "codes_before": []
+ },
+ {
+  "file": "rt14_numeric_02_turnover_null_double.json",
+  "n": 14,
+  "class": "A",
+  "lens": "s6_s7_arith",
+  "name": "S7 turnover 两个键都在但值为 null，「双记」冻结项被绕过",
+  "kind": "artifact",
+  "stage": "S7",
+  "codes_before": []
+ },
+ {
+  "file": "rt15_numeric_03_optimizer_carry_epsilon.json",
+  "n": 15,
+  "class": "A",
+  "lens": "s6_s7_arith",
+  "name": "S6 不收敛沿用上期持仓：把 delta_weight 写成 5e-10 就绕过 S6-ROB-02",
+  "kind": "artifact",
+  "stage": "S6",
+  "codes_before": []
+ },
+ {
+  "file": "rt16_env_01_version_float_artifact.json",
+  "n": 16,
+  "class": "A",
+  "lens": "scorer_telemetry_version",
+  "name": "schema_version 为 JSON 数字 1.0 时三个入口全部静默接受（与落盘 JSON Schema 的 const \"1.0\" 矛盾）",
+  "kind": "artifact",
+  "stage": "S1",
+  "codes_before": []
+ },
+ {
+  "file": "rt17_env_02_taskid_log_bypass_S8.json",
+  "n": 17,
+  "class": "A",
+  "lens": "scorer_telemetry_version",
+  "name": "artifact 自报的 task_id 决定网关日志切片：写一个不同的 task_id 就能让 S8 越权核对 / S1 时钟核对整体跳过",
+  "kind": "artifact",
+  "stage": "S8",
+  "codes_before": []
+ },
+ {
+  "file": "rt18_env_02c_empty_log_S8.json",
+  "n": 18,
+  "class": "A",
+  "lens": "scorer_telemetry_version",
+  "name": "gateway_log 为空列表（有日志、零请求）被当作「没有日志」：S8 自报 3 次越权、日志 0 次 deny 仍 ok",
+  "kind": "artifact",
+  "stage": "S8",
+  "codes_before": []
+ },
+ {
+  "file": "rt19_env_07_scorer_gate_unhashable.json",
+  "n": 19,
+  "class": "B",
+  "lens": "scorer_telemetry_version",
+  "name": "scorer gate_failed 含不可哈希元素时校验器抛 TypeError 而非返回 malformed（S1 fetched_at / S3 required_fields 同根）",
+  "kind": "scorer",
+  "stage": "S7",
+  "codes_before": [
+   "EXCEPTION: TypeError: unhashable type: 'list' @ reference/artifact_schema.py:751"
+  ]
+ },
+ {
+  "file": "rt20_misreject_01.json",
+  "n": 20,
+  "class": "C",
+  "lens": "false_positives",
+  "name": "S1 同一 ts 下多条网关日志：状态核对只取 m[0]，把合法 artifact 判成 source_status_mismatch",
+  "kind": "artifact",
+  "stage": "S1",
+  "codes_before": [
+   "source_status_mismatch"
+  ],
+  "note": "2026-09-02 S1 加 data_version 后补字段（schema 变更，非重写攻击者意图）"
+ },
+ {
+  "file": "rt21_misreject_02.json",
+  "n": 21,
+  "class": "C",
+  "lens": "false_positives",
+  "name": "S3 nonfinite 三个计数的键名：规格写 {inf,nan,replaced}，校验器要 inf_count/nan_count/replaced_count，按规格写的 artifact 被判 malformed",
+  "kind": "artifact",
+  "stage": "S3",
+  "codes_before": [
+   "s3_nonfinite_missing"
+  ]
+ },
+ {
+  "file": "rt22_threestate_01_hp_bool_declared.json",
+  "n": 22,
+  "class": "A",
+  "lens": "three_state",
+  "name": "holding_periods 里的 JSON true 被当成 1：绕过「持有期 ⊆ {1,5,20}」与 declaration_mismatch",
+  "kind": "artifact",
+  "stage": "S4",
+  "codes_before": []
+ },
+ {
+  "file": "rt23_threestate_02_nested_bool_eq_int.json",
+  "n": 23,
+  "class": "A",
+  "lens": "three_state",
+  "name": "任务已声明的值与 artifact 值「Python 相等、JSON 不等」（false vs 0 / true vs 1）静默通过 declaration_mismatch",
+  "kind": "artifact",
+  "stage": "S7",
+  "codes_before": []
+ },
+ {
+  "file": "rt24_threestate_03_reads_keyed_on_selfdecl.json",
+  "n": 24,
+  "class": "B",
+  "lens": "three_state",
+  "name": "2.3-c 读取集探针读的是 artifact 自报的 required_fields，不是 TaskSpec 已声明的：改口径后超读只落 underdetermined 族，declared_reads 族不响",
+  "kind": "artifact",
+  "stage": "S3",
+  "codes_before": [
+   "declaration_mismatch"
+  ]
+ },
+ {
+  "file": "rt25_threestate_04_calendar_keyed_on_selfdecl.json",
+  "n": 25,
+  "class": "B",
+  "lens": "three_state",
+  "name": "S2 静默补行探针读的是 artifact 自报的 missing_row_policy：任务声明 keep_missing、artifact 改口 drop 并报 0 缺行，calendar 族不响",
+  "kind": "artifact",
+  "stage": "S2",
+  "codes_before": [
+   "declaration_mismatch"
+  ]
+ },
+ {
+  "file": "rt26_s5sem_01_bigint_value.json",
+  "n": 26,
+  "class": "B",
+  "lens": "s5_signals",
+  "name": "S5 signals[].value / coverage 写超大整数（>1e308 的 JSON 整数）→ 校验器抛 OverflowError 而非返回 malformed（_num 的 math.isfinite 对 int 溢出）",
+  "kind": "artifact",
+  "stage": "S5",
+  "codes_before": []
+ },
+ {
+  "file": "rt27_s5sem_02_decl_list.json",
+  "n": 27,
+  "class": "B",
+  "lens": "s5_signals",
+  "name": "S5 declarations 为非对象（list/非空 str）时 _s5 里 `a.get('declarations') or {}` 放过真值非 dict，随后 .get 抛 AttributeError 而非 malformed 结局",
+  "kind": "artifact",
+  "stage": "S5",
+  "codes_before": []
+ },
+ {
+  "file": "rt28_s3reads2_05_negative_counts.json",
+  "n": 28,
+  "class": "A",
+  "lens": "s3_reads",
+  "name": "S3 计数字段接受负数：replaced_count=-1、nonnull_before_warmup=-1 静默通过",
+  "kind": "artifact",
+  "stage": "S3",
+  "codes_before": []
+ },
+ {
+  "file": "rt29_num_02a_s6_symbol_0.json",
+  "n": 29,
+  "class": "A",
+  "lens": "s6_s7_arith",
+  "name": "S6 台账行 symbol 为 null / 数字 / 空串静默通过——六字段里唯一不校类型的键",
+  "kind": "artifact",
+  "stage": "S6",
+  "codes_before": []
+ },
+ {
+  "file": "rt30_num_05_s7_declarations_string.json",
+  "n": 30,
+  "class": "B",
+  "lens": "s6_s7_arith",
+  "name": "declarations 为字符串/列表时 S2/S3/S5/S7 校验器抛 AttributeError 而非返回 malformed",
+  "kind": "artifact",
+  "stage": "S7",
+  "codes_before": [
+   "(无结果：AttributeError: 'str' object has no attribute 'get' —— 校验器未返回 Verdict)"
+  ]
+ },
+ {
+  "file": "rt31_num_06_s4_ci_not_number.json",
+  "n": 31,
+  "class": "A",
+  "lens": "s6_s7_arith",
+  "name": "S4 ic_stats 的 ci_low / ci_high 只查键在不查是数：null 与字符串 \"0.05\" 静默通过",
+  "kind": "artifact",
+  "stage": "S4",
+  "codes_before": []
+ },
+ {
+  "file": "rt32_env2_01_decl_list_S7.json",
+  "n": 32,
+  "class": "B",
+  "lens": "scorer_telemetry_version",
+  "name": "declarations 为非空的非对象（列表/字符串）时校验器抛 AttributeError 而非返回 malformed（S7/S3/S5/S2 四个入口，同一根因：`a.get(\"declarations\") or {}` 只挡住空值）",
+  "kind": "artifact",
+  "stage": "S7",
+  "codes_before": [
+   "<uncaught AttributeError: 'list' object has no attribute 'get' — 未返回 Verdict>"
+  ]
+ },
+ {
+  "file": "rt33_env2_02_S1_fetch_no_fetched_at_no_rows_nolog.json",
+  "n": 33,
+  "class": "A",
+  "lens": "scorer_telemetry_version",
+  "name": "S1 fetches 的必含项 fetched_at / rows 从不做结构校验：无日志时两者同时缺失静默通过，rows 为字符串在有日志时也通过；有日志时 fetched_at 缺失被当成 fetch_clock 违例而不是畸形",
+  "kind": "artifact",
+  "stage": "S1",
+  "codes_before": []
+ },
+ {
+  "file": "rt34_env2_03_S8_ts_mixed_precision_false_reject.json",
+  "n": 34,
+  "class": "C",
+  "lens": "scorer_telemetry_version",
+  "name": "S8 事件链 ts 单调性按字符串比较：同一时刻不同精度/时区写法把按时间单调的链判成畸形（误拒），而混用时区偏移的真乱序链却通过",
+  "kind": "artifact",
+  "stage": "S8",
+  "codes_before": [
+   "s8_events_not_ordered"
+  ],
+  "patch_note": "2026-09-03 S8 契约加 slippage_reference_price（schema 变更，非改写攻击者意图），夹具同步补该字段"
+ },
+ {
+  "file": "rt35_env2_04_asof_trailing_newline.json",
+  "n": 35,
+  "class": "A",
+  "lens": "scorer_telemetry_version",
+  "name": "as_of 带尾随换行或用 Unicode 数字（阿拉伯-印度数字）写出时仍被接受 —— Python re 的 `$` 与 `\\d` 语义使校验器比落盘 JSON Schema 的同一 pattern 宽松",
+  "kind": "artifact",
+  "stage": "S1",
+  "codes_before": []
+ },
+ {
+  "file": "rt36_falsereject_02b_S3_other_config_reads.json",
+  "n": 36,
+  "class": "C",
+  "lens": "false_positives",
+  "name": "同根：网关日志不按 config_id 过滤，另一条 arm 读的字段被反推成本 artifact 的「超读」，声明与实际完全一致的 S3 被判 violation（declared_reads 探针）",
+  "kind": "artifact",
+  "stage": "S3",
+  "codes_before": [
+   "undeclared_reads"
+  ]
+ }
+]

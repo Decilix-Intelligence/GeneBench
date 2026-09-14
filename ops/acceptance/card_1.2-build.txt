@@ -1,0 +1,20 @@
+[tradability] year=2009 rows=395,463 -> /data/shared/genebench/snapshots/v1/tradability/year=2009/part-0.parquet
+[tradability] year=2010 rows=453,281 -> /data/shared/genebench/snapshots/v1/tradability/year=2010/part-0.parquet
+[tradability] year=2011 rows=537,327 -> /data/shared/genebench/snapshots/v1/tradability/year=2011/part-0.parquet
+[tradability] year=2012 rows=587,432 -> /data/shared/genebench/snapshots/v1/tradability/year=2012/part-0.parquet
+[tradability] year=2013 rows=588,262 -> /data/shared/genebench/snapshots/v1/tradability/year=2013/part-0.parquet
+[tradability] year=2014 rows=621,169 -> /data/shared/genebench/snapshots/v1/tradability/year=2014/part-0.parquet
+[tradability] year=2015 rows=670,955 -> /data/shared/genebench/snapshots/v1/tradability/year=2015/part-0.parquet
+[tradability] year=2016 rows=716,117 -> /data/shared/genebench/snapshots/v1/tradability/year=2016/part-0.parquet
+[tradability] year=2017 rows=814,075 -> /data/shared/genebench/snapshots/v1/tradability/year=2017/part-0.parquet
+[tradability] year=2018 rows=867,289 -> /data/shared/genebench/snapshots/v1/tradability/year=2018/part-0.parquet
+[tradability] year=2019 rows=901,119 -> /data/shared/genebench/snapshots/v1/tradability/year=2019/part-0.parquet
+[tradability] year=2020 rows=975,765 -> /data/shared/genebench/snapshots/v1/tradability/year=2020/part-0.parquet
+[tradability] year=2021 rows=1,097,123 -> /data/shared/genebench/snapshots/v1/tradability/year=2021/part-0.parquet
+[tradability] year=2022 rows=1,197,939 -> /data/shared/genebench/snapshots/v1/tradability/year=2022/part-0.parquet
+[tradability] year=2023 rows=1,270,475 -> /data/shared/genebench/snapshots/v1/tradability/year=2023/part-0.parquet
+[tradability] year=2024 rows=1,297,286 -> /data/shared/genebench/snapshots/v1/tradability/year=2024/part-0.parquet
+[tradability] year=2025 rows=1,317,402 -> /data/shared/genebench/snapshots/v1/tradability/year=2025/part-0.parquet
+[tradability] year=2026 rows=765,127 -> /data/shared/genebench/snapshots/v1/tradability/year=2026/part-0.parquet
+[tradability] acceptance 2026-08-28 rows=5,551 -> /data/shared/genebench/snapshots/v1/tradability_acceptance/date=2026-08-28/part-0.parquet
+[tradability] 完成:15,073,606 行 / status=trade=14,214,117, suspend=472,920, limit_up=246,248, limit_down=121,612, no_data=18,709

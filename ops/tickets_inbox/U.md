@@ -1,0 +1,18 @@
+# 卡 U（修掉 venv 陷阱 + 四条外部用户会撞的，然后重打树推上去）收件箱
+
+来源：`ops/tickets_inbox/Tfin.md`（终核卡在**全新外部 clone** 上的逐条实测）。
+本卡**六条全修**（N-818 ~ N-823）、新登记一条（N-824）。
+三条版本轴 `v1.0.16` / `r1.0.23` / `p1.0.0` **一个值没改**，没重算 τ / ε，
+没重打任何包、没传任何附件、没新建 Release。逐条实测输出在 `$GB/scratch/U/`
+（`venv_fix.txt` / `test_U_has_teeth.txt` / `selfcheck_candidates.txt` / `tests.log` /
+`manifest_check.txt` / `scan_mentions.txt` / `scan_stale.txt` / `push.log`）。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| **N-818** | **照 README 建 venv，网关就永远起不来，而文档给的修法是空转** | **已修（block）** | `ops/guard_modes.py` 的 `check()` 与 `harden()` **对符号链接口径相反**：`check()` 走 `_walk_stat`，`mode` 来自 `e.stat()`（**跟随链接**，读到的是目标的位）；`harden()` 在同一趟遍历里 `if islink: continue`（**跳过链接**）。于是「跟随着判、跳过着修」—— 链接指向根外一个 `0755` 的东西时，这道门**结构上不可能被 harden 修好**。而 `python3.12 -m venv $GB/env`（README §2.1、手册 §1.2 那一行）默认把 `bin/python*` 三条建成软链、最终指向系统解释器（`0755` root 所有）→ 网关拒绝启动 → 提示语让人跑 `--harden` → 「收紧 0 个条目」退 1 → 死循环。**修法**：`check()` 对答案面根**之外**的符号链接不再按模式判（符号链接自身的模式恒为 `lrwxrwxrwx`、没有意义；目标在根内会以自己的真实路径被同一趟单独判，目标在根外归答案面那道门管）；新增 `fix_hint()`，提示语按违例类别分岔，`--harden` 修不好的三类**明说修不好**。**判别力一个字没降**（`ops/test_U.py` 13 条，含拿旧版跑一遍的反面判别）。**实测四样**在 `$GB/scratch/U/venv_fix.txt`：真 venv → 新版 check 退 0、软链原样留在盘上；同一棵树起网关 `/healthz` **200**；造 `0644` 文件 + `0775` 目录 → check 退 1 → `--harden` 收紧 2 条 → 退 0；答案面断链 → 提示语不再说「修：`--harden`」。**`--copies` 判了不加**：它能绕开（实测有效），但代码修好之后那个开关没有活的理由，写进文档只会变成一句没人知道为什么存在的咒语。 出处：卡 Tfin，卡 U 执行。 |
+| **N-819** | `ops/test_pack_release.py` 三条在「**照文档做对了**的外部 clone」上恒红 | **已修（major）** | `_need()` 只守**落位产物**，三件附件落位之后守卫全部放行，接着去调打包器 —— 而打包器要的是**打包前的发布方中间件** `$GENEBENCH_ROOT/scratch/v1_union.txt`（附件里那份在 `snapshots/public_v1/universe/v1_union.txt`，**路径不同**）。于是落位前 skip、落位后 3 failed。改成 `_need_packager_inputs()`，清单**从 `PP.components()` 现算**（写死一张表的话，组件加一件就又回到同一个坑）。**判别力不变，两面都实测**：f01 `ops/test_pack_release.py` **21 passed / 0 skipped**，三条逐名 `PASSED`；`GENEBENCH_ROOT` 指到外部落位根时三条 `SKIPPED` 并逐字打出缺的是哪一件。断言一个字没放宽。 出处：卡 Tfin，卡 U 执行。 |
+| **N-820** | `DATA_LICENSE` §3 末段三处现在时假话 | **已修（minor）** | 标题链「数据许可与来源声明 › `## 3. 发布形态（两条都走通）`」整条链上没有时点，正文却现在时说「地址已定不等于已推送」「`_staging_unpublished/` 里那份旧包的 README 还写着占位符」「推完要重打一次公开包」—— 三处都不是现状。已改成带显式时点的现状（`2026-09-13：两个地址都已推送`，公开包是重打之后那一份，`_staging_unpublished/` 按 N-714 已整棵删除）。同源的一句在 `ops/mk_release_manifest.py` 的 `closes_when` 里，**已由卡 V 登记为 N-793**，本卡不另开号。 出处：卡 Tfin，卡 U 执行。 |
+| **N-821** | `ops/selfcheck_public.py` 找附件的候选目录，README 与手册里一次都没写过 | **已修（minor）** | 三处候选（`cwd/downloads`、`$GENEBENCH_ROOT/downloads`、仓库父目录 `/downloads`）在两份文档里 `grep downloads` = 0 命中，而 README §2.1a 的 `curl -L -O` 紧接在 §2.1 的 `cd $REPO` 之后 —— 包落在**仓库根**下，三处一处都不是它。**两边取齐**：仓库根与 `$GENEBENCH_ROOT` 本身进候选（`_downloads_candidates`），README §2.1a 的 curl 块前写明落点，提示语也改了。顺带把「找过：…」按**解析后的真实路径**去重（`$GENEBENCH_ROOT` 与仓库父目录重合是常态，重合时同一路径打印两遍）。实测输出 `$GB/scratch/U/selfcheck_candidates.txt`。 出处：卡 Tfin，卡 U 执行。 |
+| **N-822** | 只缺一个包时，自检第 5 项给出的**诊断是错的** | **已修（minor）** | 只缺 `pyyaml` 时第 5 项说「说明这棵树不完整，或者你不是在仓库根下跑的」，真因是 `genetask/packager.py:29` 的 `import yaml` 抛 `ModuleNotFoundError` —— **树是完整的、目录也是对的**，用户被支去查一件没坏的事。改成打子进程输出的**最后一行**（真正的异常）而不是第一行 `Traceback (most recent call last):`；识出 `ModuleNotFoundError` / `ImportError` 时直接指回第 2 项。反面那一半（不是 import 错误时保留原诊断）也有门。 出处：卡 Tfin，卡 U 执行。 |
+| **N-823** | `ops/test_env.py:16` 文件头仍写「两个附件落位与 sha256」 | **已修（minor，Tfin 原判「登记不修」）** | N-810 修了四处，这是漏掉的第五处。与前四处同口径改成「发布附件落位与 sha256」。 出处：卡 Tfin，卡 U 执行。 |
+| **N-824** | 修完 N-819 之后，打包器那三条在**任何外部机器**上都是 `skip` | **登记不修** | 这是**有意的落点**：重打 provider 包是发布方的操作，外部用户手里没有打包前的中间件（`scratch/v1_union.txt`），也不该有；外部要验包验的是附件自己的 `sha256`（README §2.1a）与包内 `files.sha256`。**代价**：外部 clone 上这三条的判别力等于零 —— 它们只在发布方机器上有牙。记下来，不修。 出处：卡 U。 |

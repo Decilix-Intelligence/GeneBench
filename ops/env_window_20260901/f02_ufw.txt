@@ -1,0 +1,24 @@
+# finance02 ufw 规则原文 —— 人工窗口 2026-09-01 后
+# 主机 finance02  LAN 192.168.1.219
+# 采集 2026-09-01T11:24:04+00:00
+
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), allow (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW IN    192.168.1.0/24             # LAN SSH
+80/tcp                     ALLOW IN    192.168.1.0/24             # LAN HTTP
+443/tcp                    ALLOW IN    192.168.1.0/24             # LAN HTTPS
+2222/tcp                   ALLOW IN    192.168.1.0/24             # Forgejo SSH
+6443/tcp                   ALLOW IN    192.168.1.0/24             # K3s API
+10250/tcp                  ALLOW IN    192.168.1.0/24             # Kubelet
+8472/udp                   ALLOW IN    192.168.1.0/24             # K3s VXLAN
+Anywhere                   ALLOW IN    10.42.0.0/16               # k3s pod cidr
+Anywhere                   ALLOW IN    10.43.0.0/16               # k3s service cidr
+2049                       ALLOW IN    192.168.1.48              
+8472/udp                   ALLOW IN    192.168.1.48               # k3s flannel vxlan
+10250/tcp                  ALLOW IN    192.168.1.48               # k3s kubelet
+

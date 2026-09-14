@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\caption{主表（固定十九列） — GeneBench 结果库（筛选：batch=v1demo；superseded=None）；构造验收 / 接入验证，**不是实验数据**　脚注（N-348，2026-09-10 用户裁定）：适配赛道 v1.0-adapt 的题源是**出集规定题的 oracle 产物**（探针题不入），这些产物随适配 bundle 进入执行面。**跑过适配赛道的被测方，主赛道这些题算「可能已见过答案」**；口径与逐题清单见 ops/specs/fairness\_protocol.md §7 与 ops/reports/known\_limits\_v1.md。}
+\label{tab:main-v1demo}
+\begin{tabular}{lllrrrrrrrrrrrrrrrrrrrrr}
+\toprule
+config\_id & arm & arm\_kind & n\_tasks & n\_runs & SR & P@1 & \$ & Cov & Prov & Cell\% & Adj & Fid & Decl & IC-agr & Set & Sig & ρ̄ & W-agr & Cons & ε-agr & Ledger & Audit & Ovr \\
+\midrule
+\multicolumn{24}{l}{\textit{参照臂（baseline）}} \\
+cfg-codex-deepseek & open & baseline & 4 & 4 & 0.250 & 0.250 & 0.303 & 1.000 & 1.000 & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\midrule
+\multicolumn{24}{l}{\textit{协议臂（protocol）—— 与参照臂的差异是投放的工件}} \\
+cfg-codex-deepseek & strict & protocol & 4 & 4 & 0.250 & 0.250 & 0.284 & --- & --- & --- & --- & --- & --- & --- & --- & \textit{unobservable} & \textit{unobservable} & --- & --- & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% set_version = 1.0.13
+% reference_version = r1.0.20
+% protocol_version = geneprotocol_v1@d6fbcaa08302（裸臂在协议轴上记 `geneprotocol_v1@none` —— 它们不投放协议工件，与协议臂并排不算混轴）
+% channel = private
+% 记录数 8；筛选 batch=v1demo；superseded=None

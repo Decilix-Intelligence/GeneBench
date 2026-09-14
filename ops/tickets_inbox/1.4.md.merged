@@ -1,0 +1,12 @@
+# 卡 1.4（发布形态两条都走通）要登记的票
+
+沿用 `ops/tickets.md` 的表格格式；编号先写 `N-?`，由阶段收口代理统一编号并入。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `PUBLIC_FROZEN_ARTIFACTS` 里有 3 个冻结件在仓库中不存在 | **挡发布** | `factor_library/compiled/{qlib_native,qlib_panel,blocked}.jsonl` —— 整个 `factor_library/` 目录都没有。它们是 gold 的**定义面**（N-58⑥「τ 标定于此实现对」），少了它们拿到包的人复现不了 τ。打包已把它们记进 `MANIFEST.json` 的 `missing_declared_artifacts`（不静默丢），但 `license.published` 翻 `true` 之前**必须补齐，或者改物料清单并说明为什么不需要**。`snapshots/public/manifest.py` 不在卡 1.4 的路径内，未改。 |
+| N-? | 公开包里的 `instruments/` 不在 baostock 许可的射程内 | 待裁定 | 宇宙定义面（`csi300/500/1000/all.txt`）来自私有 `universe_pit`，而它是 tushare `index_member_all` 派生的；baostock 没有指数成分历史，公开源**推不出来**，所以形态 B 也只能随包发。已写进 `MANIFEST.json` 的 `data_source.universe_definition_note`。**发布前须单独确认再分发依据**（与 baostock 那份书面许可是两回事）。 |
+| N-? | `test_env` 那条「pending 时不得存在已发布 provider 包」的射程盖不到 `$GB/release/` | 已缓解，建议扩 | 那条测试扫的是 `$GB/snapshots/public`，而包实际落在 `$GB/release/`。卡 1.4 已在 `ops/release/pack_public_provider.py` 里补 `assert_nothing_published_while_pending()`（同一套判据搬到 `$GB/release/`）并由 `ops/test_release_forms.py` 盯着 —— **没有放宽既有那条**。建议把 `test_env.py` 那条的扫描根也加上 `$GB/release`，两处判据就不会分叉。`ops/test_env.py` 不在本卡路径内，未改。 |
+| N-? | `ops/build_public_channel.py` 的 `verify` 步在用户机器上跑不了 | v1.1 | 它比对**私有**快照的 mtime（「两条通道并列不覆盖」）。用户机器上没有私有通道 → 形态 B **跳过并说明**，不当作「验证通过」（形态 B 的验收由逐文件 sha256 比对承担，判据更强）。建议给公开通道补一条自足的 `verify`（冻结线上界、日历、无 `day_future.txt`、`files.sha256` 自洽），它不需要私有通道。`ops/build_public_channel.py` 不在本卡路径内，未改。 |
+| N-? | 反投影的 `universe_pit` 丢掉 `ambiguous` 列 | 已知可接受 | `instruments/*.txt` 只有三列，`ambiguous` 反投影不回来。它**只被 `build_instruments` 用来计数**，不影响 txt 字节（排练里重建的四个 txt 与包里逐字节相同）。表现：用户机器上重建树的 `manifest.json` 里 `instruments.*.ambiguous_rows` 是 0，而包里的不是。已在 `universe_from_instruments.py` 的返回值与 docstring 里显式记账，不假装是原值。 |
+| N-? | 整包可复现要显式给 `--built-at` | 已实现，需写进发布说明 | 包里唯一带构建时刻的是 `MANIFEST.json` 的 `built_at`。不给 `--built-at` 时同一棵树两次打出的 `tar.gz` 不同（只差那一个字段）。对外承诺「你自己打一遍能得到同一个包」时**必须同时给出那次发布用的 `--built-at`**，否则第三方复现不了包体 sha256（数据字节仍然逐个可验，那条不依赖 `--built-at`）。 |

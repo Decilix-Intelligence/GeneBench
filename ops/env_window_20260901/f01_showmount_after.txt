@@ -1,0 +1,4 @@
+# finance01 导出表实测（showmount -e 127.0.0.1）
+# 空 = 零导出
+
+Export list for 127.0.0.1:

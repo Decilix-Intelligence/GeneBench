@@ -1,0 +1,11 @@
+# 被测配置（数据驱动，W-0）。echo-min 不调模型 —— 但 base_url / api_key_env 仍要
+# 过那三条判据（https / `_API_KEY` 结尾 / host 不在 MARKET_DATA_HOSTS），
+# 因为翻开关的那一刻没有人会重新审一遍 base_url 指到哪（harnesses/README.md §1.3）。
+# model 必须与其它已启用配置同一个：assert_registry_sane 要求「同一模型 × 多种 harness」。
+config_id: cfg-echo-min-deepseek
+harness: Echo Min
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: 不调模型的最小 harness，用来验证 harnesses/README.md 的启动契约
+enabled: true

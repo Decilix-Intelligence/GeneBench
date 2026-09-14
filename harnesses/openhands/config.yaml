@@ -1,0 +1,9 @@
+# 被测配置（数据驱动，W-0）。**enabled: false —— 内置配置已覆盖。**
+# 理由与 harnesses/codex/config.yaml 同：模板 + 重名即红的哨兵。
+config_id: cfg-openhands-deepseek
+harness: OpenHands
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: 通用软件工程 agent —— 自带工具循环与文件系统操作（内置配置已覆盖，本文件不生效）
+enabled: false

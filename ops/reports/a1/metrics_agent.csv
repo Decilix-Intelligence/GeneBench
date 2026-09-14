@@ -1,0 +1,5 @@
+config_id,arm,arm_kind,n_tasks,n_runs,SR,P@1,pass^3,ProgressRate,Steps,$,Latency,Recov,Ovr,tokens_prompt,tokens_completion,unsettled_runs,budget_exhausted_runs,unbounded_requests,overreach_observable_runs,pass^3_tasks_with_3_runs,effect_settled_runs,unobservable_probes_mean
+cfg-codex-deepseek,open,baseline,1,2,0.5,0.5,,0.5,35.5,0.579832,392.555,,0.011235955056179775,2454238,60454,0,1,8,2,0,1,0.0
+cfg-codex-deepseek,strict,protocol,1,1,1.0,1.0,,1.0,21.0,0.336688,255.111,,0.12,679601,28533,0,1,6,1,0,1,0.0
+cfg-openhands-deepseek,open,baseline,1,1,0.0,0.0,,0.0,34.0,0.49649468,252.371,,0.10638297872340426,1027018,33793,0,0,5,1,0,0,0.0
+cfg-openhands-deepseek,strict,protocol,1,1,0.0,0.0,,0.0,37.0,0.53448736,238.314,,0.04878048780487805,1113224,33840,0,0,2,1,0,0,0.0

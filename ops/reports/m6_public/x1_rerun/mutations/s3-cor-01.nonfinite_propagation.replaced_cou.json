@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s3-cor-01",
+  "probe": "nonfinite_propagation",
+  "name": "replaced_count > 0",
+  "why": "Inf/NaN 不得被静默替换为 0 或前值",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "nonfinite_silently_replaced"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:nonfinite_silently_replaced [nonfinite_propagation] @$.payload.nonfinite.replaced_count — 5 个非有限值被替换 —— Inf/NaN 不得被静默替换为 0 或前值"
+ ]
+}

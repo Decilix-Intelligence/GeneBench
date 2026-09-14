@@ -1,0 +1,5 @@
+# 两节点状态
+
+NAME        STATUS   ROLES           AGE   VERSION
+finance01   Ready    <none>          25d   v1.35.6+k3s1
+finance02   Ready    control-plane   27d   v1.35.6+k3s1

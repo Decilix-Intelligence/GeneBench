@@ -1,0 +1,59 @@
+{
+ "scorer_output": null,
+ "record": {
+  "task_id": "s3-cor-01",
+  "stage": "S3",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "open",
+  "seq": 1,
+  "run_id": "s3-cor-01.open.cfg-codex-deepseek.r01",
+  "set_version": "1.0.13",
+  "reference_version": "r1.0.20",
+  "runner_version": "9089e489123a3f02602e4f334a6397f78970913d25f4a7698a641a9b85ad05b6",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "identity_mismatch",
+  "sr_bucket": "unscorable_agent",
+  "validity": null,
+  "malformed": null,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {},
+  "findings": [],
+  "l3_kind": null,
+  "l3_pass": null,
+  "l3_score": null,
+  "effect": null,
+  "effect_withheld_reason": null,
+  "anchor": null,
+  "correctness": {},
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "",
+  "steps": 22,
+  "tokens_prompt": 734792,
+  "tokens_completion": 26004,
+  "cost_usd": 0.35763376,
+  "cost_model": "deepseek-chat",
+  "latency_s": 235.187,
+  "validator_rejections": null,
+  "overreach": {
+   "denied": 2,
+   "total": 26,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "open_range_would_cross_asof": 2
+   },
+   "malformed_requests": 14,
+   "malformed_reasons": {
+    "asof_missing": 5,
+    "unclassified": 5,
+    "param_malformed": 4
+   }
+  },
+  "unbounded_requests": 2,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": []
+ }
+}

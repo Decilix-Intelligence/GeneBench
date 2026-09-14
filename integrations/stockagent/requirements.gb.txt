@@ -1,0 +1,13 @@
+# 本接入实际装的依赖。**不是**上游 requirements.txt 逐字照抄，两处不同、各有理由：
+#   * pandas==1.3.5 / protobuf==3.20.3 —— 上游钉的是 Python 3.9 时代的轮子，
+#     统一基座是 3.12，装不上；pandas/numpy 基座里已有，直接用基座那一份。
+#   * google-generativeai —— 上游 agent.py 顶层 import 它，而 requirements.txt 里
+#     根本没有（上游自己的缺口）。**故意不装**：它是另一家模型 API 的客户端，
+#     装了等于在镜像里留一条通向边车之外的路。接线层顶替成「访问即抛」的陷阱模块。
+# 版本以构建时解析出来的 resolved_deps.txt 为准（那一份是 pip freeze 的实测结果）。
+colorama
+openai>=1.30
+tiktoken
+requests
+openpyxl
+roman

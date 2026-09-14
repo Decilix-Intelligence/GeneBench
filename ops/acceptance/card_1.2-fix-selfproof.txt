@@ -1,0 +1,44 @@
+# 卡 1.2-fix 自证:故意改坏判据,新测试必须变红
+# 2026-08-31T14:50:10Z
+
+############################################################
+# 自证 A:只把 NO_PRICE_LIMIT_UP_MIN 改回 100000.0
+#   三条腿仍在,所以哨兵总数不变 —— 但 up 侧与另两条腿不再同集,
+#   test_sentinel_legs_agree_on_the_lake 必须红(这就是报警口)。
+############################################################
+344:NO_PRICE_LIMIT_UP_MIN: float = 100000.0
+        )
+E       AssertionError: 三条腿不再同集:并集 7107 行,交集 6089 行 —— up 侧 6089 / down 侧 7107 / band 侧 7107。湖里出现了只满足一部分腿的编码,哨兵判据必须回去重读数据
+E       assert 7107 == 6089
+
+ops/test_tradability.py:364: AssertionError
+=========================== short test summary info ============================
+FAILED ops/test_tradability.py::test_sentinel_legs_agree_on_the_lake - Assert...
+1 failed, 44 passed in 17.48s
+
+############################################################
+# 自证 B:把整个判据退回卡 1.2 第一版(up_limit >= 100000.0 一条腿)
+#   —— 也就是被验收判 FAIL 的那版实现。多条测试必须红。
+#   对照:旧的 test_no_price_limit_sentinel_is_recognised 在这版下是**绿**的,
+#   那正是复核 D3 说的自证循环。
+############################################################
+[自证] no_price_limit_mask 已退化成第一版
+E           assert False
+E            +  where False = bool(False)
+
+ops/test_tradability.py:1056: AssertionError
+=========================== short test summary info ============================
+FAILED ops/test_tradability.py::test_sentinel_population_is_exactly_what_domain_bounds_say
+FAILED ops/test_tradability.py::test_the_old_threshold_would_be_caught_by_these_tests
+FAILED ops/test_tradability.py::test_an_unseen_sentinel_encoding_is_still_caught
+FAILED ops/test_tradability.py::test_negative_control_dropping_the_sentinel_guard_would_misjudge
+4 failed, 41 passed in 16.84s
+
+############################################################
+# 还原并校验
+############################################################
+genebench_config.py: OK
+snapshots/tradability.py: OK
+# 还原后复跑:
+.............................................                            [100%]
+45 passed in 17.43s

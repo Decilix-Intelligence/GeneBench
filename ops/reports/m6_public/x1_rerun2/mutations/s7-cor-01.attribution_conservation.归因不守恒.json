@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s7-cor-01",
+  "probe": "attribution_conservation",
+  "name": "归因不守恒",
+  "why": "alpha + beta + cost = total",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "attribution_not_conserved"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:attribution_not_conserved [attribution_conservation] @$.payload.attribution — alpha+beta+cost−total 残差 0.01"
+ ]
+}

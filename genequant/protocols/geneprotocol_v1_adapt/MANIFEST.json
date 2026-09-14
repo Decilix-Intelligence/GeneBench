@@ -1,0 +1,13 @@
+{
+ "protocol_id": "geneprotocol_v1_adapt",
+ "status": "released",
+ "_what_this_is": "适配赛道的**干预工件**：挂在 /task/adaptation/，只发给 adapt 臂。内容是规则（缺失保持缺失、翻译要声明、可接纳性由协议裁决）+ 两张表，**不含任何一道题的答案**。",
+ "_closed_set": "artifacts 是封闭集合，每条带 sha256 —— 与 geneprotocol_v1 同一条判据：「协议工件 = 某个目录里当时有的东西」不可接受。",
+ "_placement": "被动存在于 /task/adaptation/；题面只说「若存在」，不说里面有什么。",
+ "_released": "2026-09-10（卡 Y2）：内容自 2026-09-07 一字未改，三条 sha 与当时相同；改的只有 status —— 用户裁定 N-348 放行本赛道真跑，而 draft 状态下注入器 P7 会拒绝投放，adapt 臂就成了裸臂（实测：22.7 s 中止、零次模型调用）。",
+ "artifacts": {
+  "adaptation.md": "c1f4d300de3f6c73b5c6481dcb8c518bb60ca62697c2265d963a796df2b544d8",
+  "field_map.json": "5fadd1912d9e42eb13df813bfc3c7920188e2ba8a4356b3b192890e3035271b5",
+  "unit_table.json": "c5ad575d7e77a0e190bffe1bd37ed4c58596ba2b2fc9f6bf0214c902ea3814d1"
+ }
+}

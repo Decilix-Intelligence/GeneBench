@@ -1,0 +1,12 @@
+# 卡 6.1 票据收件箱（README 对外入口）
+
+编号一律先写 `N-?`，收口时由收口卡统一编号并合进 `ops/tickets.md`。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | README §2.1 与 §5 第 2 条的 `git clone <地址>` 是**占位符** | 待用户 | 仓库 `git remote` 为空。拿到一个外部用户能访问的地址之后：README §2.1 的注释行与 §5 第 2 条各改一句，`RELEASE_MANIFEST.json` 的 blocker `no_clone_url` 自动闭合，然后**重打一次公开包**（包里那份 README 是旧文本）。判据 `ops/test_readme.py::test_every_open_blocker_is_visible_in_the_readme` 会跟着变绿。 |
+| N-? | README §6「代码许可未定」与 `LICENSE` 联动 | 待用户 | 选定许可后只改 `LICENSE` 一处 + 重跑 `ops/mk_release_manifest.py`；README §6 那两段（「没有替所有者选」）要一并改成实际许可，否则 `test_every_open_blocker_is_visible_in_the_readme` 会因为关键词还在而误绿。**该测试盯的是 blocker 列表，不是 README 的措辞** —— 闭合时人要看一眼这一节。 |
+| N-? | README §2.3「形态 ① 未端到端验证」那段待卡 6.4 回填 | 待卡 6.4 | 现在写的是「网络前提实测、整条链路没跑过」，与手册 §1.3 同口径。卡 6.4 若真把单机形态跑通，README §2.3 的告示框与手册 §1.3 的自标要**同时**改；只改一处会让两份文档分叉。前置仍然是那条要 root 的 `ufw` 放行（卡 6.2 已登记）。 |
+| N-? | 本卡改 README 连带重新生成了 `RELEASE_MANIFEST.json` | 已做，登记 | `README.md` 是发布件，sha 在清单里；不重生成会让 `ops/test_release_manifest.py::test_every_recorded_sha_of_a_handwritten_item_is_the_real_one` 恒红。`RELEASE_MANIFEST.json` 不在本卡的路径清单内，按卡 6.3 的交接指令（「每次改发布件都要重跑」）执行，只跑了生成器、没有手改任何字段。 |
+| N-? | 仓库根 `tasks/` 只剩一个 `.gitkeep` | 登记不修 | 真正的题目根在仓库之外的答案面目录（`reference/tasks/<set>/`）。README §3 如实写成「历史占位」。要么下次重构时删掉它，要么给它一个明确职责 —— 今天两者都不挡外部用户。 |
+| N-? | README 与手册有三处刻意重复（两种形态的对照表、`/healthz` 三样、空≠0） | 登记不修 | 重复是**故意**的：README 的读者可能不会点进手册。代价是改口径时要改两处。判据没有钉住这三处的一致性（钉住会让手册的正常演进恒红）—— 改这三条口径时人要记得两边都改。 |

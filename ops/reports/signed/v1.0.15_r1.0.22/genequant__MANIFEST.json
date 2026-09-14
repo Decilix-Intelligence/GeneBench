@@ -1,0 +1,137 @@
+{
+ "manifest_version": 1,
+ "protocol_suite": "genequant",
+ "version": "v1",
+ "protocols": [
+  "geneprotocol_v1",
+  "geneprotocol_v1_doc",
+  "geneprotocol_v1_adapt"
+ ],
+ "repository": "https://github.com/Decilix-Intelligence/GeneQuant.git",
+ "benchmark_repository": "https://github.com/Decilix-Intelligence/GeneBench.git",
+ "_what_this_is": "GeneQuant 协议 v1 的可独立发布副本：三条协议的规格与契约、artifact 自检 validator、适配模块、结构层 schema、投放说明。**不含任何一道题、任何答案、任何 gold** —— 那些是 GeneBench 本体的东西。",
+ "_closed_set": "copies + own + 本文件 = 整棵树，一个不多一个不少。ops/test_genequant_subtree.py 两个方向都查（多一个文件也红）。",
+ "_copies_are_copies": "copies 里每一件与 GeneBench 仓库里 source 那一份**逐字节相同**；改协议内容要改原件再 --rebuild，改副本会被测试抓到。",
+ "generated_by": "ops/test_genequant_subtree.py --rebuild",
+ "copies": {
+  "LICENSE": {
+   "sha256": "6717c2fe3b14e0fa488a2a7bb06d6083678321897bac23fff3f6bed7fc515ea7",
+   "bytes": 15674,
+   "source_in_genebench": "LICENSE"
+  },
+  "placement/arms.yaml": {
+   "sha256": "b873299c0df83f2cc9dea7117f719d74cc854dc5c419cd66aa590f477fcea04e",
+   "bytes": 5595,
+   "source_in_genebench": "genetask/arms.yaml"
+  },
+  "protocols/geneprotocol_v1/MANIFEST.json": {
+   "sha256": "dc4164bd053e2faaee28864d1b6d2e82812f166bc1adf50f2bb23e33637981f8",
+   "bytes": 1312,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1/MANIFEST.json"
+  },
+  "protocols/geneprotocol_v1/README.md": {
+   "sha256": "95e6bc508c1a677c89d8ad8f7245649a0bcf853debe581bb69fa85447f05846c",
+   "bytes": 2495,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1/README.md"
+  },
+  "protocols/geneprotocol_v1/contract.md": {
+   "sha256": "83307155756096c6225aaccdd0851b01457cd2bcccd079478659fac9d30d22e3",
+   "bytes": 1920,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1/contract.md"
+  },
+  "protocols/geneprotocol_v1/validate_artifact.py": {
+   "sha256": "ca26c78fe79cc254c6bf35fbb4482a44174fdbb7fa186bd6897d6822072250b7",
+   "bytes": 18588,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1/validate_artifact.py"
+  },
+  "protocols/geneprotocol_v1_adapt/MANIFEST.json": {
+   "sha256": "df342abb2c79c5e3959e1da1094a4c6156d2214980fc10d684a1964d234e1c6b",
+   "bytes": 1185,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1_adapt/MANIFEST.json"
+  },
+  "protocols/geneprotocol_v1_adapt/adaptation.md": {
+   "sha256": "c1f4d300de3f6c73b5c6481dcb8c518bb60ca62697c2265d963a796df2b544d8",
+   "bytes": 3464,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1_adapt/adaptation.md"
+  },
+  "protocols/geneprotocol_v1_adapt/field_map.json": {
+   "sha256": "5fadd1912d9e42eb13df813bfc3c7920188e2ba8a4356b3b192890e3035271b5",
+   "bytes": 3590,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1_adapt/field_map.json"
+  },
+  "protocols/geneprotocol_v1_adapt/unit_table.json": {
+   "sha256": "c5ad575d7e77a0e190bffe1bd37ed4c58596ba2b2fc9f6bf0214c902ea3814d1",
+   "bytes": 1604,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1_adapt/unit_table.json"
+  },
+  "protocols/geneprotocol_v1_doc/MANIFEST.json": {
+   "sha256": "2717025ea9a9f9bbb0b5af5f15118bd3b04846a9edf33d06fe49e76efe7716ad",
+   "bytes": 1291,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1_doc/MANIFEST.json"
+  },
+  "protocols/geneprotocol_v1_doc/README.md": {
+   "sha256": "95e6bc508c1a677c89d8ad8f7245649a0bcf853debe581bb69fa85447f05846c",
+   "bytes": 2495,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1_doc/README.md"
+  },
+  "protocols/geneprotocol_v1_doc/contract.md": {
+   "sha256": "83307155756096c6225aaccdd0851b01457cd2bcccd079478659fac9d30d22e3",
+   "bytes": 1920,
+   "source_in_genebench": "ops/protocol/geneprotocol_v1_doc/contract.md"
+  },
+  "schema/artifact_schema/v1.0/S1.json": {
+   "sha256": "4c8c374dd31cfdd2b9f5fbd91a30c4bf0e6fd7ab0f81a99c020fa804619f9a1e",
+   "bytes": 4658,
+   "source_in_genebench": "ops/specs/artifact_schema/v1.0/S1.json"
+  },
+  "schema/artifact_schema/v1.0/S2.json": {
+   "sha256": "1b1be8fd780c37039ed1fa6da9ebea9c5afe58f0b4d2855ba48ded6c7ff1c9d8",
+   "bytes": 5156,
+   "source_in_genebench": "ops/specs/artifact_schema/v1.0/S2.json"
+  },
+  "schema/artifact_schema/v1.0/S3.json": {
+   "sha256": "bfc7e08a370ee8d60539c03f100fa613a7e175d421c46be604bd5c6c8c97046f",
+   "bytes": 7052,
+   "source_in_genebench": "ops/specs/artifact_schema/v1.0/S3.json"
+  },
+  "schema/artifact_schema/v1.0/S4.json": {
+   "sha256": "e0c43ca6a0783105d975c7e761791eec47e5827fe0ef0d8bf07faaab52a084e0",
+   "bytes": 5027,
+   "source_in_genebench": "ops/specs/artifact_schema/v1.0/S4.json"
+  },
+  "schema/artifact_schema/v1.0/S5.json": {
+   "sha256": "2d2c7d47564154145ded37f5a9cfabacc88e9a77bb1c56f2af7a25953686af04",
+   "bytes": 5523,
+   "source_in_genebench": "ops/specs/artifact_schema/v1.0/S5.json"
+  },
+  "schema/artifact_schema/v1.0/S6.json": {
+   "sha256": "2f90f299ac132966b8f8e70063238bda3562dd14fe02214d5865eb7aedc678ba",
+   "bytes": 4730,
+   "source_in_genebench": "ops/specs/artifact_schema/v1.0/S6.json"
+  },
+  "schema/artifact_schema/v1.0/S7.json": {
+   "sha256": "9fb584b7a7bd6909a65bc432fcb8d00ad7734a7ad3618ab693597ebb63d7aec1",
+   "bytes": 9016,
+   "source_in_genebench": "ops/specs/artifact_schema/v1.0/S7.json"
+  },
+  "schema/artifact_schema/v1.0/S8.json": {
+   "sha256": "c54d38580c3abc56223a43418357d3738c6a55e063c30305540c6b91937df214",
+   "bytes": 9187,
+   "source_in_genebench": "ops/specs/artifact_schema/v1.0/S8.json"
+  }
+ },
+ "own": {
+  "CITATION.cff": {
+   "sha256": "dda4085c6f4fd577c9670e22e219b57c68c83c10c826a1f13a70821a73e7887a",
+   "bytes": 1981
+  },
+  "PLACEMENT.md": {
+   "sha256": "08b5fd152fd8686e900ff8807025b7ee1189ae11754762d059d868a4937a3b51",
+   "bytes": 4633
+  },
+  "README.md": {
+   "sha256": "0f5d03c45d86959d43c91dab3e261f170c1ff3411f8227083d7b4cb49c6f3e05",
+   "bytes": 6115
+  }
+ }
+}

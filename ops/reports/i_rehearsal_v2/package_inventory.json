@@ -1,0 +1,76 @@
+{
+ "parts": [
+  {
+   "part": "代码树（git archive HEAD）",
+   "path": "repo",
+   "bytes": 19763200,
+   "ship": "必发",
+   "note": "未压缩 tar；gzip 后约三分之一"
+  },
+  {
+   "part": "公开通道行情表 snapshots/public_v1/tables",
+   "ship": "必发（网关只读这一棵）",
+   "path": "snapshots/public_v1/tables",
+   "bytes": 468016569
+  },
+  {
+   "part": "公开通道 qlib_provider",
+   "ship": "必发（注入器按 sha 根核）",
+   "path": "snapshots/public_v1/qlib_provider",
+   "bytes": 369118133
+  },
+  {
+   "part": "公开通道 tradability",
+   "ship": "必发",
+   "path": "snapshots/public_v1/tradability",
+   "bytes": 153540937
+  },
+  {
+   "part": "公开通道 epsilon（含 S7 信号源面板）",
+   "ship": "必发",
+   "path": "snapshots/public_v1/epsilon",
+   "bytes": 11245846
+  },
+  {
+   "part": "公开通道 universe / calibration / crosscheck",
+   "ship": "必发",
+   "path": "snapshots/public_v1/{universe,calibration.json,crosscheck}",
+   "bytes": 2139649
+  },
+  {
+   "part": "gold 因子面板 **全量**",
+   "ship": "**不发**（超 5 GB 线）",
+   "path": "snapshots/public_v1/gold_factors",
+   "bytes": 16001931863
+  },
+  {
+   "part": "gold 因子面板 **子集**（本卡新增）",
+   "ship": "发这一份",
+   "path": "gold_subset.json 列出的 41 件",
+   "bytes": 159357698
+  },
+  {
+   "part": "答案面 reference/（gold 产物 + 夹具）",
+   "ship": "发给**运行者**，绝不进容器",
+   "path": "reference",
+   "bytes": 448012120
+  },
+  {
+   "part": "已打好的公开数据包（形态 A，今天 publishable=false）",
+   "ship": "许可到位后发",
+   "path": "release/_staging_unpublished/public_v1",
+   "bytes": 788422669
+  },
+  {
+   "part": "harness 镜像",
+   "ship": "**不发**（本机 `harnesses/build.sh` 构建）",
+   "path": "—",
+   "bytes": 0
+  }
+ ],
+ "totals": {
+  "必发合计_bytes": 1183182032,
+  "必发_加答案面_bytes": 1631194152,
+  "若发全量gold_bytes": 17025756197
+ }
+}

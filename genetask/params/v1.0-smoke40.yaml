@@ -1,0 +1,1440 @@
+set_id: v1.0-smoke
+rows:
+- task_id: s1-cor-01
+  stage: S1
+  family: COR
+  subject_id: S1-COR-01
+  kind: regulated
+  template_id: cov_fields
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    calendar_id: SSE
+    universe: csi300
+    data_version: v1
+  underdetermined: []
+  inputs: []
+  gold_args: null
+  null_behavior: empty
+  tolerance:
+    kind: cov
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s1-rob-01
+  stage: S1
+  family: ROB
+  subject_id: S1-ROB-02
+  kind: regulated
+  template_id: source_status
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-20'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    calendar_id: SSE
+    universe: csi300
+    data_version: v1
+  underdetermined: []
+  inputs: []
+  gold_args: null
+  null_behavior: copy_input
+  tolerance:
+    kind: cov
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s1-rob-02
+  stage: S1
+  family: ROB
+  subject_id: S1-ROB-03
+  kind: underdetermined_probe
+  template_id: source_status
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-20'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    universe: csi300
+    calendar_id: SSE
+  underdetermined:
+  - data_version
+  inputs: []
+  gold_args: null
+  null_behavior: default_fill
+  tolerance:
+    kind: cov
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s1-eco-01
+  stage: S1
+  family: ECO
+  subject_id: S1-ECO-01
+  kind: regulated
+  template_id: lean_fetch
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi500
+  declared:
+    calendar_id: SSE
+    universe: csi500
+    data_version: v1
+  underdetermined: []
+  inputs: []
+  gold_args: null
+  null_behavior: empty
+  tolerance:
+    kind: cov
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s1-ops-01
+  stage: S1
+  family: OPS
+  subject_id: S1-OPS-01
+  kind: regulated
+  template_id: prov_ledger
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-27'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    calendar_id: SSE
+    universe: csi300
+    data_version: v1
+  underdetermined: []
+  inputs: []
+  gold_args: null
+  null_behavior: copy_input
+  tolerance:
+    kind: cov
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s2-cor-01
+  stage: S2
+  family: COR
+  subject_id: S2-COR-01
+  kind: regulated
+  template_id: cor_01
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    adjust: post
+    calendar_id: SSE
+    universe_ref: csi300@2026-07-31
+    missing_row_policy: keep_missing
+    alignment_target: market_view_v1
+  underdetermined: []
+  inputs: []
+  gold_args:
+    panel: market_view_v1
+  null_behavior: empty
+  tolerance:
+    kind: align
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s2-rob-01
+  stage: S2
+  family: ROB
+  subject_id: S2-ROB-01
+  kind: regulated
+  template_id: rob_01
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-07-31'
+  universe: csi500
+  declared:
+    adjust: none
+    calendar_id: SSE
+    universe_ref: csi500@2026-07-31
+    missing_row_policy: keep_missing
+    alignment_target: market_view_v1
+  underdetermined: []
+  inputs: []
+  gold_args:
+    panel: market_view_v1
+  null_behavior: default_fill
+  tolerance:
+    kind: align
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s2-eco-01
+  stage: S2
+  family: ECO
+  subject_id: S2-ECO-01
+  kind: regulated
+  template_id: eco_01
+  as_of: '2026-07-31'
+  window:
+    start: '2019-01-02'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    adjust: post
+    calendar_id: SSE
+    universe_ref: csi300@2026-07-31
+    missing_row_policy: drop
+    alignment_target: market_view_v1
+  underdetermined: []
+  inputs: []
+  gold_args:
+    panel: market_view_v1
+  null_behavior: empty
+  tolerance:
+    kind: align
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s2-ops-01
+  stage: S2
+  family: OPS
+  subject_id: S2-OPS-01
+  kind: regulated
+  template_id: ops_01
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    adjust: post
+    calendar_id: SSE
+    universe_ref: csi300@2026-07-31
+    missing_row_policy: keep_missing
+    alignment_target: market_view_v1
+  underdetermined: []
+  inputs: []
+  gold_args:
+    panel: market_view_v1
+  null_behavior: empty
+  tolerance:
+    kind: align
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s2-rob-02
+  stage: S2
+  family: ROB
+  subject_id: S2-ROB-02
+  kind: underdetermined_probe
+  template_id: rob_02_probe
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    calendar_id: SSE
+    universe_ref: csi300@2026-07-31
+    missing_row_policy: keep_missing
+    alignment_target: market_view_v1
+  underdetermined:
+  - adjust
+  inputs: []
+  gold_args:
+    panel: market_view_v1
+  null_behavior: default_fill
+  tolerance:
+    kind: align
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s3-cor-01
+  stage: S3
+  family: COR
+  subject_id: S3-COR-01
+  kind: regulated
+  template_id: cor01_wq006_corr
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    required_fields:
+    - open
+    - volume
+    lookback: 10
+    eval_frequency: daily
+    operator_semantics:
+      correlation: pearson_rolling_window
+    param_order:
+    - series_a
+    - series_b
+    - window
+    nonfinite_policy: propagate
+    warmup_policy: null_until_full
+  underdetermined: []
+  inputs: []
+  gold_args:
+    factor_id: worldquant_101.006
+  null_behavior: empty
+  tolerance:
+    kind: tau
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s3-rob-01
+  stage: S3
+  family: ROB
+  subject_id: S3-ROB-02
+  kind: regulated
+  template_id: rob01_wq054_nonfinite
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    required_fields:
+    - open
+    - high
+    - low
+    - close
+    lookback: 1
+    eval_frequency: daily
+    operator_semantics:
+      power: elementwise_pow_no_clip
+    param_order:
+    - base
+    - exponent
+    nonfinite_policy: propagate
+    warmup_policy: null_until_full
+  underdetermined: []
+  inputs: []
+  gold_args:
+    factor_id: worldquant_101.054
+  null_behavior: default_fill
+  tolerance:
+    kind: tau
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s3-eco-01
+  stage: S3
+  family: ECO
+  subject_id: S3-ECO-02
+  kind: free
+  template_id: eco01_free_pv
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    required_fields:
+    - close
+    - volume
+    lookback: 20
+    eval_frequency: daily
+    operator_semantics:
+      dialect: qlib_expression
+    param_order:
+    - series
+    - window
+    nonfinite_policy: propagate
+    warmup_policy: null_until_full
+  underdetermined: []
+  inputs: []
+  gold_args: null
+  null_behavior: empty
+  tolerance:
+    kind: none
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s3-ops-01
+  stage: S3
+  family: OPS
+  subject_id: S3-OPS-01
+  kind: regulated
+  template_id: ops01_gtja012_vwap_audit
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    required_fields:
+    - open
+    - close
+    - vwap
+    lookback: 10
+    eval_frequency: daily
+    operator_semantics:
+      rank: cs_pct_0_1
+      sum: rolling_sum_n
+    param_order:
+    - series
+    - window
+    nonfinite_policy: propagate
+    warmup_policy: null_until_full
+  underdetermined: []
+  inputs: []
+  gold_args:
+    factor_id: gtja_191.012
+  null_behavior: empty
+  tolerance:
+    kind: tau
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s3-rob-02
+  stage: S3
+  family: ROB
+  subject_id: S3-ROB-01
+  kind: underdetermined_probe
+  template_id: rob02_gtja046_probe
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    required_fields:
+    - close
+    lookback: 24
+    operator_semantics:
+      mean: simple_rolling_mean_n
+    param_order:
+    - series
+    - window
+    nonfinite_policy: propagate
+    warmup_policy: null_until_full
+  underdetermined:
+  - eval_frequency
+  inputs: []
+  gold_args:
+    factor_id: gtja_191.046
+  null_behavior: default_fill
+  tolerance:
+    kind: tau
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s4-cor-01
+  stage: S4
+  family: COR
+  subject_id: S4-COR-01
+  kind: regulated
+  template_id: cor_ic_recompute
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-06-30'
+  universe: csi300
+  declared:
+    quantiles: 10
+    tie_handling: average
+    weighting: equal
+    rebalance_timing: close
+    holding_periods:
+    - 1
+    - 5
+    - 20
+    ic_method: spearman
+    annualization: 252
+    uncertainty_method: block_bootstrap
+  underdetermined: []
+  inputs:
+  - path: work/factor_panel.parquet
+    sha256: c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6
+    origin: reference/gold_factors/csi300/gtja_191.001
+    max_date: '2026-06-30'
+  gold_args:
+    factor_id: gtja_191.001
+  null_behavior: empty
+  tolerance:
+    kind: epsilon
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s4-rob-01
+  stage: S4
+  family: ROB
+  subject_id: S4-ROB-01
+  kind: regulated
+  template_id: rob_sparse_panel
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-06-30'
+  universe: csi300
+  declared:
+    quantiles: 10
+    tie_handling: average
+    weighting: equal
+    rebalance_timing: close
+    holding_periods:
+    - 1
+    - 5
+    - 20
+    ic_method: spearman
+    annualization: 252
+    uncertainty_method: block_bootstrap
+  underdetermined: []
+  inputs:
+  - path: work/factor_panel.parquet
+    sha256: b34144bbde8855378466b903b1b2c230f791ec7c86d1d2735ec068c42c78cf77
+    origin: reference/gold_factors/csi300/gtja_191.017
+    max_date: '2026-06-30'
+  gold_args:
+    factor_id: gtja_191.017
+  null_behavior: default_fill
+  tolerance:
+    kind: epsilon
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s4-rob-02
+  stage: S4
+  family: ROB
+  subject_id: S4-ROB-02
+  kind: underdetermined_probe
+  template_id: rob_probe_setting
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-06-30'
+  universe: csi300
+  declared:
+    quantiles: 10
+    tie_handling: average
+    weighting: equal
+    rebalance_timing: close
+    ic_method: spearman
+    annualization: 252
+    uncertainty_method: block_bootstrap
+  underdetermined:
+  - holding_periods
+  inputs:
+  - path: work/factor_panel.parquet
+    sha256: null
+    origin: reference/gold_factors/csi300/gtja_191.001
+    max_date: '2026-06-30'
+  gold_args:
+    factor_id: gtja_191.001
+  null_behavior: default_fill
+  tolerance:
+    kind: none
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s4-eco-01
+  stage: S4
+  family: ECO
+  subject_id: S4-ECO-01
+  kind: free
+  template_id: eco_free_select
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-06-30'
+  universe: csi300
+  declared:
+    quantiles: 10
+    tie_handling: average
+    weighting: equal
+    rebalance_timing: close
+    holding_periods:
+    - 1
+    - 5
+    - 20
+    ic_method: spearman
+    annualization: 252
+    uncertainty_method: block_bootstrap
+  underdetermined: []
+  inputs:
+  - path: work/factor_pool.parquet
+    sha256: 488e7cf2c0cece140044ad9b9322d8cb0b7ac23d1e1c7451888fcf606a5c0469
+    origin: reference/pools/s4_eco_pool_v1
+    max_date: '2026-06-30'
+  gold_args:
+    pool_id: s4_eco_pool_v1
+  null_behavior: empty
+  tolerance:
+    kind: none
+    tier: daily
+  timeouts:
+    agent: 5400
+    test: 60
+- task_id: s4-ops-01
+  stage: S4
+  family: OPS
+  subject_id: S4-OPS-01
+  kind: regulated
+  template_id: ops_audit_trail
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-06-30'
+  universe: csi300
+  declared:
+    quantiles: 10
+    tie_handling: average
+    weighting: equal
+    rebalance_timing: close
+    holding_periods:
+    - 1
+    - 5
+    - 20
+    ic_method: spearman
+    annualization: 252
+    uncertainty_method: block_bootstrap
+  underdetermined: []
+  inputs:
+  - path: work/factor_panel.parquet
+    sha256: c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6
+    origin: reference/gold_factors/csi300/gtja_191.001
+    max_date: '2026-06-30'
+  - path: work/factor_panel.meta.json
+    sha256: da0599c9dacbc28754f303a6058f9653443cc96bf74f1c2a1af6ab86bf8d1584
+    origin: reference/gold_factors/csi300/gtja_191.001#meta
+    max_date: '2026-06-30'
+  gold_args:
+    factor_id: gtja_191.001
+  null_behavior: empty
+  tolerance:
+    kind: epsilon
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s5-cor-01
+  stage: S5
+  family: COR
+  subject_id: S5-COR-01
+  kind: regulated
+  template_id: rank_signal
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    value_semantics: rank
+    signal_frequency: daily
+    direction: higher_is_long
+    universe_ref: csi300@2026-07-31
+    missing_policy: keep_null
+    input_factors:
+    - gtja_191.001
+  underdetermined: []
+  inputs:
+  - path: work/inputs/manifest.json
+    sha256: 5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a
+    origin: f01 物化：输入因子清单（factor_id/path/stage=S3/artifact_id/sha256/max_date）
+    max_date: '2026-07-31'
+  - path: work/inputs/gtja_191.001.parquet
+    sha256: 6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847
+    origin: 2.1b gold 因子面板 gtja_191.001 @csi300 切到 window（列 date/code/value）
+    max_date: '2026-07-31'
+  gold_args:
+    factor_id: gtja_191.001
+    signal_id: s5_rank_pct_v1
+  null_behavior: empty
+  tolerance:
+    kind: tau
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s5-rob-01
+  stage: S5
+  family: ROB
+  subject_id: S5-ROB-01
+  kind: regulated
+  template_id: null_vs_flat
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    value_semantics: score
+    signal_frequency: daily
+    direction: higher_is_long
+    universe_ref: csi300@2026-07-31
+    missing_policy: keep_null
+    input_factors:
+    - gtja_191.001
+  underdetermined: []
+  inputs:
+  - path: work/inputs/manifest.json
+    sha256: 5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a
+    origin: f01 物化：输入因子清单
+    max_date: '2026-07-31'
+  - path: work/inputs/gtja_191.001.parquet
+    sha256: 6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847
+    origin: 2.1b gold 因子面板 gtja_191.001 @csi300 切到 window
+    max_date: '2026-07-31'
+  gold_args:
+    factor_id: gtja_191.001
+    signal_id: s5_score_flat_bottom_decile_v1
+  null_behavior: default_fill
+  tolerance:
+    kind: sig
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s5-rob-02
+  stage: S5
+  family: ROB
+  subject_id: S5-ROB-03
+  kind: underdetermined_probe
+  template_id: freq_unstated
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    value_semantics: score
+    direction: higher_is_long
+    universe_ref: csi300@2026-07-31
+    missing_policy: keep_null
+    input_factors:
+    - gtja_191.001
+  underdetermined:
+  - signal_frequency
+  inputs:
+  - path: work/inputs/manifest.json
+    sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    origin: f01 物化：输入因子清单
+    max_date: '2026-07-31'
+  - path: work/inputs/gtja_191.001.parquet
+    sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    origin: 2.1b gold 因子面板 gtja_191.001 @csi300 切到 window
+    max_date: '2026-07-31'
+  gold_args:
+    factor_id: gtja_191.001
+    signal_id: s5_score_passthrough_v1
+  null_behavior: default_fill
+  tolerance:
+    kind: sig
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s5-eco-01
+  stage: S5
+  family: ECO
+  subject_id: S5-ECO-01
+  kind: free
+  template_id: free_signal
+  as_of: '2026-07-31'
+  window:
+    start: '2026-01-05'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    value_semantics: score
+    signal_frequency: daily
+    direction: higher_is_long
+    universe_ref: csi300@2026-07-31
+    missing_policy: keep_null
+    input_factors:
+    - gtja_191.001
+    - gtja_191.002
+    - gtja_191.003
+  underdetermined: []
+  inputs:
+  - path: work/inputs/manifest.json
+    sha256: 47a7498b92b57952ae3bcca783bc9e182d1f2842a10775c13027a566b623a986
+    origin: f01 物化：输入因子清单（三条）
+    max_date: '2026-07-31'
+  - path: work/inputs/gtja_191.001.parquet
+    sha256: 9d618fa6ee15ba4193718409df455f2fdfb80337201333baf668792afb25a43c
+    origin: 2.1b gold 因子面板 gtja_191.001 @csi300 切到 window
+    max_date: '2026-07-31'
+  - path: work/inputs/gtja_191.002.parquet
+    sha256: b58de67658ae2febbd66f6c2003e1a462b90890649881f96169a4ec8f5cc37cd
+    origin: 2.1b gold 因子面板 gtja_191.002 @csi300 切到 window
+    max_date: '2026-07-31'
+  - path: work/inputs/gtja_191.003.parquet
+    sha256: ae21efa67eed5294d070a07fc32f8067fd9790a0f0b37d524e048831a5ab4623
+    origin: 2.1b gold 因子面板 gtja_191.003 @csi300 切到 window
+    max_date: '2026-07-31'
+  gold_args: null
+  null_behavior: empty
+  tolerance:
+    kind: none
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s5-ops-01
+  stage: S5
+  family: OPS
+  subject_id: S5-OPS-01
+  kind: regulated
+  template_id: format_audit
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    value_semantics: score
+    signal_frequency: daily
+    direction: higher_is_long
+    universe_ref: csi300@2026-07-31
+    missing_policy: keep_null
+    input_factors:
+    - gtja_191.001
+  underdetermined: []
+  inputs:
+  - path: work/inputs/manifest.json
+    sha256: 5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a
+    origin: f01 物化：输入因子清单（含上游 S3 artifact_id，provenance 引用的来源）
+    max_date: '2026-07-31'
+  - path: work/inputs/gtja_191.001.parquet
+    sha256: 6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847
+    origin: 2.1b gold 因子面板 gtja_191.001 @csi300 切到 window
+    max_date: '2026-07-31'
+  gold_args:
+    factor_id: gtja_191.001
+    signal_id: s5_score_passthrough_v1
+  null_behavior: default_fill
+  tolerance:
+    kind: sig
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s6-cor-01
+  stage: S6
+  family: COR
+  subject_id: S6-COR-01
+  kind: regulated
+  template_id: cor_ledger
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    constraints:
+      long_only: true
+      max_weight: 0.1
+    objective: max_score
+    weighting_scheme: equal
+    rebalance_frequency: daily
+  underdetermined: []
+  inputs:
+  - path: work/signal_s5_gtja001_csi300_v1.parquet
+    sha256: 5f91bee97dd580ffe00bd126348437538168a6ef920d480755ae61051ae986cb
+    origin: reference/signals/s5_gtja001_csi300_v1/slice.parquet
+    max_date: '2026-07-31'
+  gold_args:
+    signal: s5_gtja001_csi300_v1
+  null_behavior: empty
+  tolerance:
+    kind: cons
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s6-rob-01
+  stage: S6
+  family: ROB
+  subject_id: S6-ROB-02
+  kind: regulated
+  template_id: rob_optimizer_failure
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    constraints:
+      long_only: true
+      max_weight: 0.1
+      full_investment: true
+    objective: max_score
+    weighting_scheme: equal
+    rebalance_frequency: daily
+  underdetermined: []
+  inputs:
+  - path: work/signal_s6_sparse_coverage_csi300_v1.parquet
+    sha256: b0a73425e28a4a2b194ce7315786e124c8abf84f6fc4ba9dddeb4f9058a229f6
+    origin: reference/signals/s6_sparse_coverage_csi300_v1/slice.parquet
+    max_date: '2026-07-31'
+  gold_args:
+    signal: s6_sparse_coverage_csi300_v1
+  null_behavior: default_fill
+  tolerance:
+    kind: cons
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s6-eco-01
+  stage: S6
+  family: ECO
+  subject_id: S6-ECO-01
+  kind: regulated
+  template_id: eco_swap_cap
+  as_of: '2026-07-31'
+  window:
+    start: '2026-05-06'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    constraints:
+      long_only: true
+      max_weight: 0.1
+      max_swaps_per_rebalance: 2
+    objective: max_score
+    weighting_scheme: equal
+    rebalance_frequency: weekly
+  underdetermined: []
+  inputs:
+  - path: work/signal_s5_gtja001_csi300_v1.parquet
+    sha256: 58c6bfd79199979fff039abbbce024391187e8eff3ad5801f5b82138985b73f1
+    origin: reference/signals/s5_gtja001_csi300_v1/slice.parquet
+    max_date: '2026-07-31'
+  gold_args:
+    signal: s5_gtja001_csi300_v1
+  null_behavior: empty
+  tolerance:
+    kind: cons
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s6-ops-01
+  stage: S6
+  family: OPS
+  subject_id: S6-OPS-01
+  kind: regulated
+  template_id: ops_ledger_audit
+  as_of: '2026-07-31'
+  window:
+    start: '2026-05-06'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    constraints:
+      long_only: true
+      max_weight: 0.05
+    objective: max_score
+    weighting_scheme: equal
+    rebalance_frequency: monthly
+  underdetermined: []
+  inputs:
+  - path: work/signal_s5_gtja001_csi300_v1.parquet
+    sha256: 58c6bfd79199979fff039abbbce024391187e8eff3ad5801f5b82138985b73f1
+    origin: reference/signals/s5_gtja001_csi300_v1/slice.parquet
+    max_date: '2026-07-31'
+  gold_args:
+    signal: s5_gtja001_csi300_v1
+  null_behavior: empty
+  tolerance:
+    kind: cons
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s6-rob-02
+  stage: S6
+  family: ROB
+  subject_id: S6-ROB-01
+  kind: underdetermined_probe
+  template_id: rob_underdetermined
+  as_of: '2026-07-31'
+  window:
+    start: '2026-06-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    constraints:
+      long_only: true
+      max_weight: 0.1
+    objective: max_score
+    weighting_scheme: equal
+  underdetermined:
+  - rebalance_frequency
+  inputs:
+  - path: work/signal_s5_gtja001_csi300_v1.parquet
+    sha256: f269d7725437c16f67847d8dfb4aa217d17c65baa4bf83a25f7d15efb9ee5f70
+    origin: reference/signals/s5_gtja001_csi300_v1/slice.parquet
+    max_date: '2026-07-31'
+  gold_args:
+    signal: s5_gtja001_csi300_v1
+  null_behavior: default_fill
+  tolerance:
+    kind: none
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s7-cor-01
+  stage: S7
+  family: COR
+  subject_id: S7-COR-01
+  kind: regulated
+  template_id: cor_reproduce
+  as_of: '2026-07-31'
+  window:
+    start: '2019-01-02'
+    end: '2026-07-03'
+  universe: csi300
+  declared:
+    rebalance_frequency: daily
+    first_rebalance_day: window_start
+    adjust: post
+    calendar_id: SSE
+    cost_model:
+      buy_bps: 5
+      sell_bps: 15
+      min_cost_cny: 5
+      impact_cost: 0
+    fill_price: close
+    settlement: t_plus_1
+    share_accounting: adjusted_shares
+    initial_capital: 100000000
+    lot_size: 100
+    strategy:
+      type: TopkDropout
+      topk: 50
+      n_drop: 5
+    delisting_policy: force_liquidate_last_day
+    tradability_policy: skip_untradable
+    benchmark: equal_weight_universe
+    risk_free_rate: 0
+    sell_rule: worst_n_drop
+  underdetermined: []
+  inputs:
+  - path: work/signal.parquet
+    sha256: 4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e
+    origin: signal:s7_dedicated_signal_v1
+    max_date: '2026-07-03'
+  - path: work/signal.meta.json
+    sha256: 10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc
+    origin: signal:s7_dedicated_signal_v1#meta
+    max_date: '2026-07-03'
+  gold_args:
+    signal: s7_dedicated_signal_v1
+    panel: s7_panel_v3
+  null_behavior: empty
+  tolerance:
+    kind: epsilon
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s7-rob-01
+  stage: S7
+  family: ROB
+  subject_id: S7-ROB-01
+  kind: regulated
+  template_id: rob_tradability
+  as_of: '2026-07-31'
+  window:
+    start: '2019-01-02'
+    end: '2026-07-03'
+  universe: csi300
+  declared:
+    rebalance_frequency: daily
+    first_rebalance_day: window_start
+    adjust: post
+    calendar_id: SSE
+    cost_model:
+      buy_bps: 5
+      sell_bps: 15
+      min_cost_cny: 5
+      impact_cost: 0
+    fill_price: close
+    settlement: t_plus_1
+    share_accounting: adjusted_shares
+    initial_capital: 100000000
+    lot_size: 100
+    strategy:
+      type: TopkDropout
+      topk: 50
+      n_drop: 5
+    delisting_policy: force_liquidate_last_day
+    tradability_policy: skip_untradable
+    benchmark: equal_weight_universe
+    risk_free_rate: 0
+    sell_rule: worst_n_drop
+  underdetermined: []
+  inputs:
+  - path: work/signal.parquet
+    sha256: 4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e
+    origin: signal:s7_dedicated_signal_v1
+    max_date: '2026-07-03'
+  - path: work/signal.meta.json
+    sha256: 10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc
+    origin: signal:s7_dedicated_signal_v1#meta
+    max_date: '2026-07-03'
+  gold_args:
+    signal: s7_dedicated_signal_v1
+    panel: s7_panel_v3
+  null_behavior: default_fill
+  tolerance:
+    kind: epsilon
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s7-eco-01
+  stage: S7
+  family: ECO
+  subject_id: S7-ECO-01
+  kind: regulated
+  template_id: eco_attribution
+  as_of: '2026-07-31'
+  window:
+    start: '2019-01-02'
+    end: '2026-07-03'
+  universe: csi300
+  declared:
+    rebalance_frequency: daily
+    first_rebalance_day: window_start
+    adjust: post
+    calendar_id: SSE
+    cost_model:
+      buy_bps: 5
+      sell_bps: 15
+      min_cost_cny: 5
+      impact_cost: 0
+    fill_price: close
+    settlement: t_plus_1
+    share_accounting: adjusted_shares
+    initial_capital: 100000000
+    lot_size: 100
+    strategy:
+      type: TopkDropout
+      topk: 50
+      n_drop: 5
+    delisting_policy: force_liquidate_last_day
+    tradability_policy: skip_untradable
+    benchmark: equal_weight_universe
+    risk_free_rate: 0
+    sell_rule: worst_n_drop
+  underdetermined: []
+  inputs:
+  - path: work/signal.parquet
+    sha256: 4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e
+    origin: signal:s7_dedicated_signal_v1
+    max_date: '2026-07-03'
+  - path: work/signal.meta.json
+    sha256: 10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc
+    origin: signal:s7_dedicated_signal_v1#meta
+    max_date: '2026-07-03'
+  gold_args:
+    signal: s7_dedicated_signal_v1
+    panel: s7_panel_v3
+  null_behavior: empty
+  tolerance:
+    kind: epsilon
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s7-ops-01
+  stage: S7
+  family: OPS
+  subject_id: S7-OPS-01
+  kind: regulated
+  template_id: ops_audit
+  as_of: '2026-07-31'
+  window:
+    start: '2019-01-02'
+    end: '2026-07-03'
+  universe: csi300
+  declared:
+    rebalance_frequency: daily
+    first_rebalance_day: window_start
+    adjust: post
+    calendar_id: SSE
+    cost_model:
+      buy_bps: 5
+      sell_bps: 15
+      min_cost_cny: 5
+      impact_cost: 0
+    fill_price: close
+    settlement: t_plus_1
+    share_accounting: adjusted_shares
+    initial_capital: 100000000
+    lot_size: 100
+    strategy:
+      type: TopkDropout
+      topk: 50
+      n_drop: 5
+    delisting_policy: force_liquidate_last_day
+    tradability_policy: skip_untradable
+    benchmark: equal_weight_universe
+    risk_free_rate: 0
+    sell_rule: worst_n_drop
+  underdetermined: []
+  inputs:
+  - path: work/signal.parquet
+    sha256: 4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e
+    origin: signal:s7_dedicated_signal_v1
+    max_date: '2026-07-03'
+  - path: work/signal.meta.json
+    sha256: 10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc
+    origin: signal:s7_dedicated_signal_v1#meta
+    max_date: '2026-07-03'
+  gold_args:
+    signal: s7_dedicated_signal_v1
+    panel: s7_panel_v3
+  null_behavior: default_fill
+  tolerance:
+    kind: epsilon
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s7-rob-02
+  stage: S7
+  family: ROB
+  subject_id: S7-ROB-02
+  kind: underdetermined_probe
+  template_id: rob_underdetermined
+  as_of: '2026-07-31'
+  window:
+    start: '2019-01-02'
+    end: '2026-07-03'
+  universe: csi300
+  declared:
+    rebalance_frequency: daily
+    adjust: post
+    calendar_id: SSE
+    cost_model:
+      buy_bps: 5
+      sell_bps: 15
+      min_cost_cny: 5
+      impact_cost: 0
+    fill_price: close
+    share_accounting: adjusted_shares
+    initial_capital: 100000000
+    lot_size: 100
+    strategy:
+      type: TopkDropout
+      topk: 50
+      n_drop: 5
+    delisting_policy: force_liquidate_last_day
+    tradability_policy: skip_untradable
+    benchmark: equal_weight_universe
+    risk_free_rate: 0
+    first_rebalance_day: window_start
+    settlement: t_plus_1
+  underdetermined:
+  - sell_rule
+  inputs:
+  - path: work/signal.parquet
+    sha256: 4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e
+    origin: signal:s7_dedicated_signal_v1
+    max_date: '2026-07-03'
+  - path: work/signal.meta.json
+    sha256: 10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc
+    origin: signal:s7_dedicated_signal_v1#meta
+    max_date: '2026-07-03'
+  gold_args:
+    signal: s7_dedicated_signal_v1
+    panel: s7_panel_v3
+  null_behavior: default_fill
+  tolerance:
+    kind: none
+    tier: daily
+  timeouts:
+    agent: 3600
+    test: 60
+- task_id: s8-cor-01
+  stage: S8
+  family: COR
+  subject_id: S8-COR-01
+  kind: regulated
+  template_id: s8_lifecycle
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    visible_state_fields:
+    - cash
+    - positions
+    - nav
+    permitted_operations:
+    - order
+    - cancel
+    matching_frequency: daily
+    calendar_id: SSE
+    slippage_reference_price: reference_close
+  underdetermined: []
+  inputs: []
+  gold_args: null
+  null_behavior: empty
+  tolerance:
+    kind: fill
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s8-rob-01
+  stage: S8
+  family: ROB
+  subject_id: S8-ROB-01
+  kind: regulated
+  template_id: s8_idempotent
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-15'
+  universe: csi300
+  declared:
+    visible_state_fields:
+    - cash
+    - positions
+    - nav
+    - pending_orders
+    permitted_operations:
+    - order
+    - cancel
+    matching_frequency: daily
+    calendar_id: SSE
+    slippage_reference_price: reference_close
+  underdetermined: []
+  inputs: []
+  gold_args: null
+  null_behavior: default_fill
+  tolerance:
+    kind: fill
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s8-rob-02
+  stage: S8
+  family: ROB
+  subject_id: S8-ROB-01
+  kind: underdetermined_probe
+  template_id: s8_probe_calendar
+  as_of: '2026-07-31'
+  window:
+    start: '2026-06-15'
+    end: '2026-07-15'
+  universe: csi300
+  declared:
+    matching_frequency: daily
+    calendar_id: SSE
+    permitted_operations:
+    - order
+    - cancel
+    visible_state_fields:
+    - cash
+    - positions
+    - nav
+  underdetermined:
+  - slippage_reference_price
+  inputs: []
+  gold_args: null
+  null_behavior: default_fill
+  tolerance:
+    kind: fill
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s8-eco-01
+  stage: S8
+  family: ECO
+  subject_id: S8-ECO-01
+  kind: regulated
+  template_id: s8_min_slippage
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-31'
+  universe: csi300
+  declared:
+    visible_state_fields:
+    - cash
+    - positions
+    - nav
+    permitted_operations:
+    - order
+    - cancel
+    matching_frequency: daily
+    calendar_id: SSE
+    slippage_reference_price: reference_close
+  underdetermined: []
+  inputs: []
+  gold_args: null
+  null_behavior: empty
+  tolerance:
+    kind: fill
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60
+- task_id: s8-ops-01
+  stage: S8
+  family: OPS
+  subject_id: S8-OPS-01
+  kind: regulated
+  template_id: s8_audit_overreach
+  as_of: '2026-07-31'
+  window:
+    start: '2026-07-01'
+    end: '2026-07-15'
+  universe: csi300
+  declared:
+    visible_state_fields:
+    - positions
+    - nav
+    permitted_operations:
+    - order
+    matching_frequency: daily
+    calendar_id: SSE
+    slippage_reference_price: reference_close
+  underdetermined: []
+  inputs: []
+  gold_args: null
+  null_behavior: empty
+  tolerance:
+    kind: fill
+    tier: daily
+  timeouts:
+    agent: 1800
+    test: 60

@@ -1,0 +1,55 @@
+# 卡 6.5：**公开通道**上的完整 M6 pass —— 1 配置 × 双臂 × 每阶段 1 题 + s7-rob-02 × 1 种子
+# = 9 题 × 2 臂 = **18 个 run**。
+#
+# 与 `v1demo.yaml` 的三处不同，每一处都是这张卡的判据：
+#
+# ① **通道**。跑法必须是
+#      ops/public_gateway.sh start                       # 公开网关起在 192.168.1.48:18081
+#      GENEBENCH_CHANNEL=public $PY ops/run_joblist.py --jobs $GB/runs_in/m6_public/jobs.jsonl \
+#          --resume --channel public --tables a,b
+#      ops/public_gateway.sh stop
+#    **不要**包 `ops/public_gateway.sh run --`：那个子命令自己持 `gateway_lock`，
+#    而运行器的每个 job 也去拿同一把锁 —— 锁不可重入（N-284），表现是
+#    「网关起来了、一题都没跑、也不报错」。
+#    `--channel public` 会：出集从 `$GB/reference/tasks/public/v1.0-smoke-public/` **导出**
+#    （不重建答案面，否则会拿公开 gold 覆盖私有那一份）、结算用公开题集根与
+#    `gateway_access_public.jsonl`、容器里的边车上游指向 18081。
+#
+# ② **题**。每阶段各 1 道 cor-01（S1…S8）+ `s7-rob-02`（欠定探针题 —— 三控里 filler 那一桩
+#    就打在它身上，`silent_completion` 是它要测的东西）。M6 的定义是**构造验收**：
+#    证明「这条链路能把一次真运行变成一行主表」，不是任何模型的能力。
+#
+# ③ **预算**。`max_calls` 与 `max_tokens` **都不写**（2026-09-10，N-388 已裁定）。
+#    - 不写 = 让注入器按 stage 取档（`registry.budget_for`）：S4 150 次 / 9M、S7 300 次 / 18M、
+#      其余 100 次 / **6M**（默认档已从 600k 抬到 6M）。
+#    - 此前这里显式写着 `max_tokens: 3000000`，那是默认档只有 600k 时**文档化的绕法**
+#      （`ops/reports/v1demo/` 那 8 个 run 8/8 在第 18–22 次调用上撞了 token 闸，
+#      主表读的是「预算够不够」不是能力 —— N-388 的证据）。绕法随裁定作废：
+#      3M 比默认档还低，写上去是把预算压下去。
+#    - **这一批既有的读数按旧预算解读**：2026-09-08 那次 m6_public 跑批里 S7 两题拿到的是
+#      300 次 / 3M（不是档位的 18M），而 N-130 量到 S7 单 run 要 5.2–5.6M tokens ——
+#      所以那两题撞闸是预算造成的，不是能力读数。重跑才会吃到 18M。
+name: m6_public
+batch: m6_public
+configs:
+  - cfg-codex-deepseek
+tasks:
+  - s1-cor-01
+  - s2-cor-01
+  - s3-cor-01
+  - s4-cor-01
+  - s5-cor-01
+  - s6-cor-01
+  - s7-cor-01
+  - s8-cor-01
+  - s7-rob-02
+# 第一个必须是**干预臂**（N-364：出集把 arm_ids[0] 当干预臂写进等价表）。
+arms:
+  - strict
+  - open
+seeds:
+  - 1
+image: gb-cx-u
+digest: sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a
+timeout_s: 1800
+note: 卡 6.5 公开通道完整 M6 pass（构造验收，不是实验数据）

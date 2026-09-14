@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s2-cor-01",
+  "probe": "adjust_fingerprint",
+  "name": "申报的复权口径与声明不符",
+  "why": "复权指纹：申报可造假，行为不能",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "adjust_applied_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:adjust_applied_mismatch [adjust_fingerprint] @$.payload.adjust_applied — 声明的复权口径是 post，产出报的是 none"
+ ]
+}

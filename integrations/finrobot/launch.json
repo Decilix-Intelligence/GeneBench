@@ -1,0 +1,8 @@
+{
+  "harness": "finrobot",
+  "paradigm": "P2",
+  "image": "gb-finrobot-u:r1",
+  "command": ["sh", "-c", "export HOME=/tmp/h XDG_CACHE_HOME=/tmp/h/.cache MPLCONFIGDIR=/tmp/h/.mpl; mkdir -p $$HOME /tmp/fr && cd /task && exec python3 /opt/finrobot_glue/run.py"],
+  "env_required": ["GENEBENCH_GATEWAY", "OPENAI_BASE_URL", "OPENAI_API_KEY"],
+  "notes": "AI4Finance-Foundation/FinRobot 0.1.5 接成 P2 被测方：data_source 层整层换成经网关的实现（对不上的退成 NoData 并留痕），LLM 经边车（AutoGen config_list 的 base_url 取自 OPENAI_BASE_URL），产物经 emit。落盘全在 /tmp（不进 /task，P8 文件集封闭）。命令里的 $$ 是两个美元号（N-101）。"
+}

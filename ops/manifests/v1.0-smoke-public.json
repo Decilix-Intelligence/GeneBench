@@ -1,0 +1,3582 @@
+{
+ "set_id": "v1.0-smoke-public",
+ "set_version": "p1.0.0",
+ "root_scope": {
+  "root_fields": [
+   "set_id",
+   "set_version",
+   "code",
+   "templates",
+   "released_tasks",
+   "instruction_fingerprint",
+   "instances_fingerprint",
+   "channel_fixtures"
+  ],
+  "template_files": [
+   "INSTRUCTION.strict.md",
+   "INSTRUCTION.open.md",
+   "template.yaml",
+   "Dockerfile",
+   "scorer.yaml",
+   "tests/test_outputs.py"
+  ],
+  "excluded_to_reference_axis": [
+   "solve.py"
+  ],
+  "channel_fixtures": "公开树上 inputs[] 声明的夹具真实 sha —— 两条通道唯一不同的东西，所以它在公开根里"
+ },
+ "status": "released",
+ "released_at": "2026-09-04",
+ "revised_at": "2026-09-11",
+ "revisions": [
+  {
+   "version": "p1.0.0",
+   "at": "2026-09-11",
+   "ticket": "N-605（卡 F1，用户裁定 ① 走 B）",
+   "why": "**公开轴的起点。** 在此之前公开通道借用私有的 `set_version`，而两条通道的夹具字节根本不同 —— 于是「公开通道的这两次运行可比吗」只能靠私有轴的号来答，而那个号对公开夹具一无所知。连带后果：公开通道 5 道带 `inputs` 的题（s4-cor-01 / s5-cor-01 / s6-cor-01 / s7-cor-01 / s7-rob-02）**一道都出不了集**。",
+   "what": "公开清单落 `ops/manifests/v1.0-smoke-public.json`，`set_id` = `v1.0-smoke-public`；公开根在私有 `ROOT_FIELDS` 之上多一段 `channel_fixtures`（公开树上夹具的真实 sha）；`frozen_ref(channel=…)` 按通道取根，默认值取 `GENEBENCH_CHANNEL` —— `ops/run_joblist.py` 已经强制 `--channel` 与该环境变量一致，所以出集 / 推送 / 注入三处调用点**一个字都不用改**就按通道走对了根。",
+   "scope": "公开轴自己。**私有轴的根与已发通行证不受影响**：`build_manifest()` 不传通道时逐字段与改前相同。",
+   "gates": "`ops/test_f1.py`：公开 5 道带 inputs 的题出得了集 / 防漏闸（公开夹具字节与私有声明相同即红）/ 私有导出逐字节不变 / 公开根 ≠ 私有根 / 公开清单的 `set_version` 是公开号。"
+  }
+ ],
+ "freeze_line": "2026-07-31",
+ "counts": {
+  "drafted": 40,
+  "released": 34,
+  "held": 6
+ },
+ "note": "冻的是**输入**：模板文件 + 措辞表 + 参数表 + 渲染器/规则代码。canary.control_token 每次打包是新 nonce，所以 instruction[arm].sha256 两次 build 必然不同 —— **不要**拿渲染产物的 sha 当基准。 **公开通道**：题面与私有逐字相同，夹具字节不同；夹具真值进根，所以换一份公开夹具而不重冻，通行证当场对不上。",
+ "instruction_fingerprint": "9a011b7d8bb6d81e7aba550bbf91cbad6c5f61ffe165d68251bb310e17ec79d6",
+ "code": {
+  "genetask/render.py": "83d10487fcf3b9ef485a3e872e6b17f9e718017cfd8192e3eec906d0df377906",
+  "genetask/packager.py": "960a1450da8fdd262ee31737b1a0b426ea92a884a1b64ec0b4e7efb1a6628bb1",
+  "genetask/schema.py": "c10b28f7d42f3e1fefda610d16ea295afa21c922f4345c668b884c23d0416570",
+  "genetask/pin.py": "74ec8a6816bf73074da0cc9ff972dc3691ebd7de084156cb650a02816a96ccba",
+  "genetask/bundle.py": "41ed8860c4b9b79c097b25335fbc0440fd8a8d24b70be5ebaa2c6c194f145729",
+  "genetask/mk_templates.py": "fcbcc08ddd89e5bfa2585b932d47c9d6e33320d8031be9fe308b57b05ef8b09a",
+  "genetask/params/v1.0-smoke40.yaml": "d6951a705ed692624fce38e791e1d62350584d02bca7b5cfaf79e171f6084651",
+  "genetask/phrasebook.yaml": "5c3f60af6587b344754f68cf3b7acbe5bd8d50e17bfe01a3f8f15a221d5870b8",
+  "genetask/arms.yaml": "b873299c0df83f2cc9dea7117f719d74cc854dc5c419cd66aa590f477fcea04e",
+  "genetask/params/v1.0-instances.yaml": "399f231b773ffd5e86df5f8c8afaa1f60723488d16a9545cfc9f52d6d58341c3",
+  "genetask/s8_contract.py": "0f911bb163763b076a91e269b473afff7eb7ca1609fb244a347c850922308832",
+  "ops/specs/artifact_schema/v1.0/S1.json": "4c8c374dd31cfdd2b9f5fbd91a30c4bf0e6fd7ab0f81a99c020fa804619f9a1e",
+  "ops/specs/artifact_schema/v1.0/S2.json": "1b1be8fd780c37039ed1fa6da9ebea9c5afe58f0b4d2855ba48ded6c7ff1c9d8",
+  "ops/specs/artifact_schema/v1.0/S3.json": "bfc7e08a370ee8d60539c03f100fa613a7e175d421c46be604bd5c6c8c97046f",
+  "ops/specs/artifact_schema/v1.0/S4.json": "e0c43ca6a0783105d975c7e761791eec47e5827fe0ef0d8bf07faaab52a084e0",
+  "ops/specs/artifact_schema/v1.0/S5.json": "2d2c7d47564154145ded37f5a9cfabacc88e9a77bb1c56f2af7a25953686af04",
+  "ops/specs/artifact_schema/v1.0/S6.json": "2f90f299ac132966b8f8e70063238bda3562dd14fe02214d5865eb7aedc678ba",
+  "ops/specs/artifact_schema/v1.0/S7.json": "9fb584b7a7bd6909a65bc432fcb8d00ad7734a7ad3618ab693597ebb63d7aec1",
+  "ops/specs/artifact_schema/v1.0/S8.json": "c54d38580c3abc56223a43418357d3738c6a55e063c30305540c6b91937df214",
+  "genetask/arms/hint.md": "6d4678e8acbd8660a3a1474ee4a9c188b1599452c25b03bc248bdb2aab54b2d1"
+ },
+ "templates": {
+  "S1/cov_fields": {
+   "INSTRUCTION.strict.md": "43b636f2201232abd82292c56b5942ffb4a5e0b8dde1116e6494ab88455eec15",
+   "INSTRUCTION.open.md": "08bdfdf039e271366918e13e9e2707a2e0dd89d165d8c94e12bf1d4a10cef161",
+   "template.yaml": "38dee90330d7ccfca1dada77a86164605c6200bc87c734b5c310437f6d378d2b",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S1/source_status": {
+   "INSTRUCTION.strict.md": "d12f3dace3cf511e9ca45a2dc9b86e7ab0e7c9e0c72aeb363b2929437d8f66cd",
+   "INSTRUCTION.open.md": "5d4904acb37ef445606df125f76814fa4fea55b3ff152b7afb61381efbbb1f93",
+   "template.yaml": "38dee90330d7ccfca1dada77a86164605c6200bc87c734b5c310437f6d378d2b",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S1/lean_fetch": {
+   "INSTRUCTION.strict.md": "054dc8eb15d7874715238497c7d627667f2727a07ac13b8c52b87616bd0452f7",
+   "INSTRUCTION.open.md": "842ed2c8fc176199d5ca162dd6fc65a1f9e6b9bd98cad3180fd271a8cded7ed3",
+   "template.yaml": "38dee90330d7ccfca1dada77a86164605c6200bc87c734b5c310437f6d378d2b",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S1/prov_ledger": {
+   "INSTRUCTION.strict.md": "172089d9469c308894e1c4c73f05d438a6b994684774fee387d1ef3e0ca72def",
+   "INSTRUCTION.open.md": "9fc1615a7105bae43445af215f2af8383638be0a05ea518c948ce0db3ef5c26e",
+   "template.yaml": "38dee90330d7ccfca1dada77a86164605c6200bc87c734b5c310437f6d378d2b",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S2/cor_01": {
+   "INSTRUCTION.strict.md": "c86b816b6a8d07c4d574173c4f00e14f0626f4cebb262650e546b75fa6b30412",
+   "INSTRUCTION.open.md": "1db517ddad3b4e85412be49c165cf99f7f5798be8e7eae17e7b28636fffd3bdb",
+   "template.yaml": "bd47b4fd0a4fc4b62442a66fbadddf452142afaaed4826be086804cfb79ee224",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S2/rob_01": {
+   "INSTRUCTION.strict.md": "86f957a6bf5356f3874151e7f6654b33454f662dc915b6352b7c94a6cf8b4d0c",
+   "INSTRUCTION.open.md": "667a31fac61ce7393687ddb4e3a2adf0cfd17a06937b374b4e079a20d19c3912",
+   "template.yaml": "bd47b4fd0a4fc4b62442a66fbadddf452142afaaed4826be086804cfb79ee224",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S2/eco_01": {
+   "INSTRUCTION.strict.md": "90c3ee0efa374ac35da9085d833630102b51b3e7cf4ae8ad1c7ab97502b83d78",
+   "INSTRUCTION.open.md": "cc7720a4e714e8c152ec0322635a165e9612d11d228d84f6458ac31d48e21c47",
+   "template.yaml": "bd47b4fd0a4fc4b62442a66fbadddf452142afaaed4826be086804cfb79ee224",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S2/ops_01": {
+   "INSTRUCTION.strict.md": "288c4860732ba374f4c47daa1cfc0516e45c1873ddf1dac5693e664c133f73e6",
+   "INSTRUCTION.open.md": "0ecef09b09ad3dd2820b9e019e984363418b8d1f30525ef049d32d3d88bfcca9",
+   "template.yaml": "bd47b4fd0a4fc4b62442a66fbadddf452142afaaed4826be086804cfb79ee224",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S2/rob_02_probe": {
+   "INSTRUCTION.strict.md": "c3b06354bf0391ac78809f4cc01bef508af4f344ca4a1e1a632a2ffc6b08d662",
+   "INSTRUCTION.open.md": "fc0d94da7d0a9042c401cf815131c6b1f2876c342e2f0fa1c60925f18321047b",
+   "template.yaml": "bd47b4fd0a4fc4b62442a66fbadddf452142afaaed4826be086804cfb79ee224",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S3/cor01_wq006_corr": {
+   "INSTRUCTION.strict.md": "205374e9ff7b9c3f32020c3c92a5724462b64a60b649414b8d8786c39afc83d9",
+   "INSTRUCTION.open.md": "9e2a1ab3986e69289cea3b374c84c1601f4a6c3b04e9e974375cdf983f766f41",
+   "template.yaml": "8d13cd4218ed2802b898351a817f63390f990bb6da33df5403de50ed89d2a139",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S3/rob01_wq054_nonfinite": {
+   "INSTRUCTION.strict.md": "880267d78e9dce695ea2ba3fe21e7697606259a97c4a005f99439ff5111df7c5",
+   "INSTRUCTION.open.md": "0eab09bbc9a3e9afaafa5d15141944bfc219b2b5367090c8cff3ff21a6f411d5",
+   "template.yaml": "8d13cd4218ed2802b898351a817f63390f990bb6da33df5403de50ed89d2a139",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S3/eco01_free_pv": {
+   "INSTRUCTION.strict.md": "81c16d687d07522c730d518450172000387617979705a74567bdfa6928a979b4",
+   "INSTRUCTION.open.md": "fcfada3f12c534a20f9aed77db304c94eb7f2d35ee71060c265a0a022bb15688",
+   "template.yaml": "8d13cd4218ed2802b898351a817f63390f990bb6da33df5403de50ed89d2a139",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S3/ops01_gtja012_vwap_audit": {
+   "INSTRUCTION.strict.md": "78df84aba87bd1f5635b6cf1c02ba81a728e70c9418a6b83de08727766b2a1ea",
+   "INSTRUCTION.open.md": "d0924b5cf473374246551a67cea07d737e95ed95432369c1075f2a4bd8930afa",
+   "template.yaml": "8d13cd4218ed2802b898351a817f63390f990bb6da33df5403de50ed89d2a139",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S3/rob02_gtja046_probe": {
+   "INSTRUCTION.strict.md": "c98c92d0ebf6dcfa86e8ec99b0c7230f35a24a2799e031b8cc523a0ac44b4e85",
+   "INSTRUCTION.open.md": "c2e59171efe0f39cc1e3b38b055aed64a21185a910eb8ffd3a48d56fc2725321",
+   "template.yaml": "8d13cd4218ed2802b898351a817f63390f990bb6da33df5403de50ed89d2a139",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S4/cor_ic_recompute": {
+   "INSTRUCTION.strict.md": "25df6bdf4417006ed2361e1cc8e06111ddd27c98c6e5eca47b4f4bbfacfada53",
+   "INSTRUCTION.open.md": "7eb182169237f8702c80cab8cc5e5992098c48eccdb0b5f8167ea3b172936404",
+   "template.yaml": "b93259c630e93a700618bbcf45ecc8d2502fed40d83fa70208ecd3741cc716df",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S4/rob_sparse_panel": {
+   "INSTRUCTION.strict.md": "fb267606a1dd6d46175fee3da5a754a7394cf199d3de71391f05589caa8e43d8",
+   "INSTRUCTION.open.md": "cc8ad5cb45de81cfc3e7dc74d88de31ad4056288ffd5467546ba42cc017c9926",
+   "template.yaml": "b93259c630e93a700618bbcf45ecc8d2502fed40d83fa70208ecd3741cc716df",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S4/rob_probe_setting": {
+   "INSTRUCTION.strict.md": "2a8af27cf45520e22d765005f5ffaae6a0d10b3714f74be1ec52bcded815e8c5",
+   "INSTRUCTION.open.md": "a49500ba91a6f4972e4ad26b59df3d304822f956aa3f0ddbdad1ec375604a7f4",
+   "template.yaml": "b93259c630e93a700618bbcf45ecc8d2502fed40d83fa70208ecd3741cc716df",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S4/eco_free_select": {
+   "INSTRUCTION.strict.md": "922692f3034ef25f83884085554383c260c9e781d278adb9a6e71975cb236be3",
+   "INSTRUCTION.open.md": "ba2bb9d894c6e658f58c9bf37b7177d11c88392897c421803f5e53b0fa3d58be",
+   "template.yaml": "b93259c630e93a700618bbcf45ecc8d2502fed40d83fa70208ecd3741cc716df",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S4/ops_audit_trail": {
+   "INSTRUCTION.strict.md": "67560a927083e58140106d8d914c075053815258f0676d33edf88f14864a10df",
+   "INSTRUCTION.open.md": "73e041b9903aeb51aba119b677fd17d5b138abb9f2a7120c29b921dd0e840eda",
+   "template.yaml": "b93259c630e93a700618bbcf45ecc8d2502fed40d83fa70208ecd3741cc716df",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S5/rank_signal": {
+   "INSTRUCTION.strict.md": "b34414b908185a014ee7ebd4924d06333bf1e0eb6463048d147b129a70bc0eae",
+   "INSTRUCTION.open.md": "ffee63e17c9f68abc32bf550ea9da69b154010d8c19c6d0dbf6753ade288e857",
+   "template.yaml": "888de0e28a68805d7e12c1329e63e499b086c23f0e565bf52790bb07889c30d1",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S5/null_vs_flat": {
+   "INSTRUCTION.strict.md": "cd21f7619fc27c071ddd242a385ada43e44076c0208365197e34556f5e9f9e4f",
+   "INSTRUCTION.open.md": "05574c1800a49fb30952bc9106d632f6707c7a905e5f15f58e3b38650e5a3785",
+   "template.yaml": "888de0e28a68805d7e12c1329e63e499b086c23f0e565bf52790bb07889c30d1",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S5/freq_unstated": {
+   "INSTRUCTION.strict.md": "936363e4988aafcdf9209c9a55c72c4bec21954f47eb651a198bf5957a4f3fcf",
+   "INSTRUCTION.open.md": "4c07c615c59175f32fd0345c974a278b516684cbd6586b4e4bb8fa2822150845",
+   "template.yaml": "888de0e28a68805d7e12c1329e63e499b086c23f0e565bf52790bb07889c30d1",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S5/free_signal": {
+   "INSTRUCTION.strict.md": "5cea16ecf39c9c4b23b886a5c2459cd1878af215246eafe5a18057d85518fd41",
+   "INSTRUCTION.open.md": "5f6e9a555e3d0ba5cba52da07da9e987b5b995b9e83ee0e84d855483ba6ec67c",
+   "template.yaml": "888de0e28a68805d7e12c1329e63e499b086c23f0e565bf52790bb07889c30d1",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S5/format_audit": {
+   "INSTRUCTION.strict.md": "06f90dc999e284ee69e3823378af768edf8fe60fa4f68be4fb07891be202d3f1",
+   "INSTRUCTION.open.md": "0674c49787f202d02af31eb0743f47c56cf9ea7bbfc940434a249f4236773e05",
+   "template.yaml": "888de0e28a68805d7e12c1329e63e499b086c23f0e565bf52790bb07889c30d1",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S6/cor_ledger": {
+   "INSTRUCTION.strict.md": "3adf39d35897847888f760bf8ace55a7c9854f5a2ff1648476bbfbe7729d6dd2",
+   "INSTRUCTION.open.md": "6c65bc74d2e0c2c030056d9c35b29c167a5f9ca65fbe8bacd1cb54e02a5d4f40",
+   "template.yaml": "4387ab8300f609f5e55113a00439c284731b9b885d92a79e2e84ddb70084a20d",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S6/rob_optimizer_failure": {
+   "INSTRUCTION.strict.md": "0faecf334b09360c479cddc767659b3c8ca533827605167096fc2d1cebb24f50",
+   "INSTRUCTION.open.md": "2def6ad18db701cd99a35363b4211b2c947a5095b5e854aa03f7beec50da2135",
+   "template.yaml": "4387ab8300f609f5e55113a00439c284731b9b885d92a79e2e84ddb70084a20d",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S6/eco_swap_cap": {
+   "INSTRUCTION.strict.md": "43bbd1b51016a96dfa6ed640807db662f0cf8f848b5c1888d19bd3dbaba9bce3",
+   "INSTRUCTION.open.md": "f7f2326f22143ce440c73954609b4aaa32e81529267765f26ad0562e7cc3793f",
+   "template.yaml": "4387ab8300f609f5e55113a00439c284731b9b885d92a79e2e84ddb70084a20d",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S6/ops_ledger_audit": {
+   "INSTRUCTION.strict.md": "c98d5b65dcf7abe5c46edf55730dbecae483eb6140fba85072f296a17bad5800",
+   "INSTRUCTION.open.md": "f64891c7ee25eb9e3fb9521f410ee5c1a3d3bb109e34fc1ae7f00126a16ce413",
+   "template.yaml": "4387ab8300f609f5e55113a00439c284731b9b885d92a79e2e84ddb70084a20d",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S6/rob_underdetermined": {
+   "INSTRUCTION.strict.md": "aab1bea3e38740354557358e685ddb92d5795d4291f44d6a24f64059a80c6e79",
+   "INSTRUCTION.open.md": "6311fdb732307ccf24019a2f50271716c9384fa6f0dd2f3d728ffb0b9dc5a68c",
+   "template.yaml": "4387ab8300f609f5e55113a00439c284731b9b885d92a79e2e84ddb70084a20d",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S7/cor_reproduce": {
+   "INSTRUCTION.strict.md": "6d2f3592f803ee15faecd860143f894ed66013285600029926f30d024cd44e48",
+   "INSTRUCTION.open.md": "48334c80df6704e62a1e04a91baa312c7f4dc5bffa0e498878919ebe2aa3601a",
+   "template.yaml": "8e2f57eb9ce2e18310dc1076d992faf734682eee87c548b2f96dd8ec05d93547",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S7/rob_tradability": {
+   "INSTRUCTION.strict.md": "7803ba10ca33db3ec01311df2080c03ec71e03d89cd3dfc85c52e36e1357b9e2",
+   "INSTRUCTION.open.md": "1276c1d02033e8d6e18346a0f3e3cf66f5eeaf7c1c596f0fa31e979d4cbc2b34",
+   "template.yaml": "8e2f57eb9ce2e18310dc1076d992faf734682eee87c548b2f96dd8ec05d93547",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S7/eco_attribution": {
+   "INSTRUCTION.strict.md": "ad4179b8bb15db93029d16b738aff369b89cacace47e0ced4422d72fbf4f6bda",
+   "INSTRUCTION.open.md": "0a6c8d7a3b094e378f1448c25f76f3c12ad3cbe0f1c36b5c73a29dc41f27e044",
+   "template.yaml": "8e2f57eb9ce2e18310dc1076d992faf734682eee87c548b2f96dd8ec05d93547",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S7/ops_audit": {
+   "INSTRUCTION.strict.md": "024bfc0aebab8a35c3029d383db9154ca4dc5e60526120d0a00d4af0c263212f",
+   "INSTRUCTION.open.md": "e561bd9be098742382647226e0762ec8c1b18ad729d1de85a94887b99d654392",
+   "template.yaml": "8e2f57eb9ce2e18310dc1076d992faf734682eee87c548b2f96dd8ec05d93547",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S7/rob_underdetermined": {
+   "INSTRUCTION.strict.md": "b34f80da5279e13da1767bad29baadfa30ed2e4df1ece967dd0c450c7210370e",
+   "INSTRUCTION.open.md": "40c25620c96fa139d6de8321d2ff11860ff7ccebcc227dbf9ab6c7d7a7003e06",
+   "template.yaml": "8e2f57eb9ce2e18310dc1076d992faf734682eee87c548b2f96dd8ec05d93547",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S8/s8_lifecycle": {
+   "INSTRUCTION.strict.md": "dd364f5239ea4586205f43f26233c6a3c1c93ebecf77f6e994e290ab7443c1ce",
+   "INSTRUCTION.open.md": "b688293d9637245aa363d77eb717674c00b91991d7c64ebddccd3db40114034d",
+   "template.yaml": "2713414f5ff6db928bcfbb60fbbe00769f7239cf78de08ba875f18c09b985404",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S8/s8_idempotent": {
+   "INSTRUCTION.strict.md": "f4dca4072b88b3f28ed1cd9c48e0bc4fe57210e64557b47934a67cfb575d12d5",
+   "INSTRUCTION.open.md": "10fbeb6d4ceea48e8ee44b99453b8caff8df6530fcf9d5a29f08118d1886f5d2",
+   "template.yaml": "2713414f5ff6db928bcfbb60fbbe00769f7239cf78de08ba875f18c09b985404",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S8/s8_probe_calendar": {
+   "INSTRUCTION.strict.md": "4773a75d2f06d9b61714cbdc0be5a40ef652ffb7e03b4125a1896f63629f4da1",
+   "INSTRUCTION.open.md": "68bdc2c9adde6b21668ec75221f32370c4473037c3462a55507879bfd27f1c65",
+   "template.yaml": "2713414f5ff6db928bcfbb60fbbe00769f7239cf78de08ba875f18c09b985404",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S8/s8_min_slippage": {
+   "INSTRUCTION.strict.md": "f4f5d0e1607c96701f2b515eae995d7529bbc9c9adf9443b7d71c1b594979796",
+   "INSTRUCTION.open.md": "72f9e964de0909841186b1922add55184f2dbbcce4deb70b522e2638fd1903e1",
+   "template.yaml": "2713414f5ff6db928bcfbb60fbbe00769f7239cf78de08ba875f18c09b985404",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  },
+  "S8/s8_audit_overreach": {
+   "INSTRUCTION.strict.md": "cce69892efdbc3d67a850e586d9f2360dbef332260c6a72dee925b8335b8a0a0",
+   "INSTRUCTION.open.md": "f6e2b38cb790e9431518fe645e7c8cac7bbe7a0734756afda5d9122e1fe88d78",
+   "template.yaml": "2713414f5ff6db928bcfbb60fbbe00769f7239cf78de08ba875f18c09b985404",
+   "Dockerfile": "153687fe162f574c43bb81899c402a1440a815dcb69a098f6fb69f060ba3d092",
+   "scorer.yaml": "a6d8209a349166748e813fff1c5e2f7ff541127221c51fa733e4202069e06414",
+   "tests/test_outputs.py": "6ef1e426ee3cb481fed5bf35fb0c6e5cef80424504a3f3ff7ec694e951d4de97"
+  }
+ },
+ "released_tasks": [
+  {
+   "task_id": "s1-cor-01",
+   "stage": "S1",
+   "family": "COR",
+   "subject_id": "S1-COR-01",
+   "kind": "regulated",
+   "template_id": "cov_fields",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "成分不得手写，一律经 /universe 取"
+   ]
+  },
+  {
+   "task_id": "s1-eco-01",
+   "stage": "S1",
+   "family": "ECO",
+   "subject_id": "S1-ECO-01",
+   "kind": "regulated",
+   "template_id": "lean_fetch",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s1-ops-01",
+   "stage": "S1",
+   "family": "OPS",
+   "subject_id": "S1-OPS-01",
+   "kind": "regulated",
+   "template_id": "prov_ledger",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s1-rob-01",
+   "stage": "S1",
+   "family": "ROB",
+   "subject_id": "S1-ROB-02",
+   "kind": "regulated",
+   "template_id": "source_status",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "重试后不得只保留成功的那次"
+   ]
+  },
+  {
+   "task_id": "s2-cor-01",
+   "stage": "S2",
+   "family": "COR",
+   "subject_id": "S2-COR-01",
+   "kind": "regulated",
+   "template_id": "cor_01",
+   "payload_profile": "s2_adjust_report",
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s2-eco-01",
+   "stage": "S2",
+   "family": "ECO",
+   "subject_id": "S2-ECO-01",
+   "kind": "regulated",
+   "template_id": "eco_01",
+   "payload_profile": "s2_adjust_report",
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s2-ops-01",
+   "stage": "S2",
+   "family": "OPS",
+   "subject_id": "S2-OPS-01",
+   "kind": "regulated",
+   "template_id": "ops_01",
+   "payload_profile": "s2_adjust_report",
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s2-rob-01",
+   "stage": "S2",
+   "family": "ROB",
+   "subject_id": "S2-ROB-01",
+   "kind": "regulated",
+   "template_id": "rob_01",
+   "payload_profile": "s2_adjust_report",
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s3-cor-01",
+   "stage": "S3",
+   "family": "COR",
+   "subject_id": "S3-COR-01",
+   "kind": "regulated",
+   "template_id": "cor01_wq006_corr",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s3-eco-01",
+   "stage": "S3",
+   "family": "ECO",
+   "subject_id": "S3-ECO-02",
+   "kind": "free",
+   "template_id": "eco01_free_pv",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s3-ops-01",
+   "stage": "S3",
+   "family": "OPS",
+   "subject_id": "S3-OPS-01",
+   "kind": "regulated",
+   "template_id": "ops01_gtja012_vwap_audit",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s3-rob-01",
+   "stage": "S3",
+   "family": "ROB",
+   "subject_id": "S3-ROB-02",
+   "kind": "regulated",
+   "template_id": "rob01_wq054_nonfinite",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s4-cor-01",
+   "stage": "S4",
+   "family": "COR",
+   "subject_id": "S4-COR-01",
+   "kind": "regulated",
+   "template_id": "cor_ic_recompute",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s4-eco-01",
+   "stage": "S4",
+   "family": "ECO",
+   "subject_id": "S4-ECO-01",
+   "kind": "free",
+   "template_id": "eco_free_select",
+   "payload_profile": "s4_free_select",
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s4-ops-01",
+   "stage": "S4",
+   "family": "OPS",
+   "subject_id": "S4-OPS-01",
+   "kind": "regulated",
+   "template_id": "ops_audit_trail",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s4-rob-01",
+   "stage": "S4",
+   "family": "ROB",
+   "subject_id": "S4-ROB-01",
+   "kind": "regulated",
+   "template_id": "rob_sparse_panel",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s5-cor-01",
+   "stage": "S5",
+   "family": "COR",
+   "subject_id": "S5-COR-01",
+   "kind": "regulated",
+   "template_id": "rank_signal",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "无观点的格子不得补 0",
+    "本题不得出现 flat"
+   ]
+  },
+  {
+   "task_id": "s5-eco-01",
+   "stage": "S5",
+   "family": "ECO",
+   "subject_id": "S5-ECO-01",
+   "kind": "free",
+   "template_id": "free_signal",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "主动空仓不得写 0"
+   ]
+  },
+  {
+   "task_id": "s5-ops-01",
+   "stage": "S5",
+   "family": "OPS",
+   "subject_id": "S5-OPS-01",
+   "kind": "regulated",
+   "template_id": "format_audit",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "本题不得出现 flat"
+   ]
+  },
+  {
+   "task_id": "s5-rob-01",
+   "stage": "S5",
+   "family": "ROB",
+   "subject_id": "S5-ROB-01",
+   "kind": "regulated",
+   "template_id": "null_vs_flat",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "无观点的格子不得补 0",
+    "无观点的格子不得写 flat",
+    "无观点的格子不得用前值填充"
+   ]
+  },
+  {
+   "task_id": "s6-cor-01",
+   "stage": "S6",
+   "family": "COR",
+   "subject_id": "S6-COR-01",
+   "kind": "regulated",
+   "template_id": "cor_ledger",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "值为 null 或 flat 的标的不得入选"
+   ]
+  },
+  {
+   "task_id": "s6-eco-01",
+   "stage": "S6",
+   "family": "ECO",
+   "subject_id": "S6-ECO-01",
+   "kind": "regulated",
+   "template_id": "eco_swap_cap",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "值为 null 或 flat 的标的不得入选"
+   ]
+  },
+  {
+   "task_id": "s6-ops-01",
+   "stage": "S6",
+   "family": "OPS",
+   "subject_id": "S6-OPS-01",
+   "kind": "regulated",
+   "template_id": "ops_ledger_audit",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "值为 null 或 flat 的标的不得入选"
+   ]
+  },
+  {
+   "task_id": "s6-rob-01",
+   "stage": "S6",
+   "family": "ROB",
+   "subject_id": "S6-ROB-02",
+   "kind": "regulated",
+   "template_id": "rob_optimizer_failure",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "值为 null 或 flat 的标的不得入选",
+    "求解失败不得把上期持仓抄成当日目标，也不得标 optimal",
+    "求解失败不得放宽约束凑出一个解"
+   ]
+  },
+  {
+   "task_id": "s6-rob-02",
+   "stage": "S6",
+   "family": "ROB",
+   "subject_id": "S6-ROB-01",
+   "kind": "underdetermined_probe",
+   "template_id": "rob_underdetermined",
+   "payload_profile": null,
+   "underdetermined": [
+    "rebalance_frequency"
+   ],
+   "prohibitions": [
+    "值为 null 或 flat 的标的不得入选"
+   ]
+  },
+  {
+   "task_id": "s7-cor-01",
+   "stage": "S7",
+   "family": "COR",
+   "subject_id": "S7-COR-01",
+   "kind": "regulated",
+   "template_id": "cor_reproduce",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "不得自造或改算信号"
+   ]
+  },
+  {
+   "task_id": "s7-eco-01",
+   "stage": "S7",
+   "family": "ECO",
+   "subject_id": "S7-ECO-01",
+   "kind": "regulated",
+   "template_id": "eco_attribution",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "不得自造或改算信号"
+   ]
+  },
+  {
+   "task_id": "s7-ops-01",
+   "stage": "S7",
+   "family": "OPS",
+   "subject_id": "S7-OPS-01",
+   "kind": "regulated",
+   "template_id": "ops_audit",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "provenance 的两个值不得手写",
+    "不得自造或改算信号"
+   ]
+  },
+  {
+   "task_id": "s7-rob-01",
+   "stage": "S7",
+   "family": "ROB",
+   "subject_id": "S7-ROB-01",
+   "kind": "regulated",
+   "template_id": "rob_tradability",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "不得自造或改算信号"
+   ]
+  },
+  {
+   "task_id": "s7-rob-02",
+   "stage": "S7",
+   "family": "ROB",
+   "subject_id": "S7-ROB-02",
+   "kind": "underdetermined_probe",
+   "template_id": "rob_underdetermined",
+   "payload_profile": null,
+   "underdetermined": [
+    "sell_rule"
+   ],
+   "prohibitions": [
+    "不得自造或改算信号"
+   ]
+  },
+  {
+   "task_id": "s8-cor-01",
+   "stage": "S8",
+   "family": "COR",
+   "subject_id": "S8-COR-01",
+   "kind": "regulated",
+   "template_id": "s8_lifecycle",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": [
+    "不得在本地伪造成交"
+   ]
+  },
+  {
+   "task_id": "s8-eco-01",
+   "stage": "S8",
+   "family": "ECO",
+   "subject_id": "S8-ECO-01",
+   "kind": "regulated",
+   "template_id": "s8_min_slippage",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s8-ops-01",
+   "stage": "S8",
+   "family": "OPS",
+   "subject_id": "S8-OPS-01",
+   "kind": "regulated",
+   "template_id": "s8_audit_overreach",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s8-rob-01",
+   "stage": "S8",
+   "family": "ROB",
+   "subject_id": "S8-ROB-01",
+   "kind": "regulated",
+   "template_id": "s8_idempotent",
+   "payload_profile": null,
+   "underdetermined": [],
+   "prohibitions": []
+  }
+ ],
+ "held_tasks": [
+  {
+   "task_id": "s1-rob-02",
+   "stage": "S1",
+   "family": "ROB",
+   "subject_id": "S1-ROB-03",
+   "kind": "underdetermined_probe",
+   "template_id": "source_status",
+   "payload_profile": null,
+   "underdetermined": [
+    "data_version"
+   ],
+   "prohibitions": [
+    "重试后不得只保留成功的那次"
+   ]
+  },
+  {
+   "task_id": "s2-rob-02",
+   "stage": "S2",
+   "family": "ROB",
+   "subject_id": "S2-ROB-02",
+   "kind": "underdetermined_probe",
+   "template_id": "rob_02_probe",
+   "payload_profile": null,
+   "underdetermined": [
+    "adjust"
+   ],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s3-rob-02",
+   "stage": "S3",
+   "family": "ROB",
+   "subject_id": "S3-ROB-01",
+   "kind": "underdetermined_probe",
+   "template_id": "rob02_gtja046_probe",
+   "payload_profile": null,
+   "underdetermined": [
+    "eval_frequency"
+   ],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s4-rob-02",
+   "stage": "S4",
+   "family": "ROB",
+   "subject_id": "S4-ROB-02",
+   "kind": "underdetermined_probe",
+   "template_id": "rob_probe_setting",
+   "payload_profile": null,
+   "underdetermined": [
+    "holding_periods"
+   ],
+   "prohibitions": []
+  },
+  {
+   "task_id": "s5-rob-02",
+   "stage": "S5",
+   "family": "ROB",
+   "subject_id": "S5-ROB-03",
+   "kind": "underdetermined_probe",
+   "template_id": "freq_unstated",
+   "payload_profile": null,
+   "underdetermined": [
+    "signal_frequency"
+   ],
+   "prohibitions": [
+    "本题不得出现 flat"
+   ]
+  },
+  {
+   "task_id": "s8-rob-02",
+   "stage": "S8",
+   "family": "ROB",
+   "subject_id": "S8-ROB-01",
+   "kind": "underdetermined_probe",
+   "template_id": "s8_probe_calendar",
+   "payload_profile": null,
+   "underdetermined": [
+    "slippage_reference_price"
+   ],
+   "prohibitions": []
+  }
+ ],
+ "packager_version": "0.1",
+ "instances": {
+  "set_id": "v1.0-instances",
+  "base_set_id": "v1.0-smoke",
+  "spec_file": "genetask/params/v1.0-instances.yaml",
+  "note": "**两层**：基点（= 出集参数表的 40 行）→ 实例。报告口径「40 模板 / N 实例」的 40 指的是参数表的 40 **行**；模板目录只有 39 个，S1/source_status 被两行复用。实例题面由 render_arm + 现有 phrasebook 生成，E1–E15 全过，**不重签**。",
+  "instance_id_rule": "<stage>/<template_id>@<base_task_id>#<sha256(规范化参数)[:10]> —— base_task_id 不可省：S1/source_status 被两行复用",
+  "normalization": [
+   "只收维度参数（window / universe / factor_pool）",
+   "剔除等于基点现值的维度（不含默认值）—— 基准实例的参数字典是 {}",
+   "取值过 genetask.render.value_key（与 phrasebook 取键同一个函数）",
+   "json.dumps(sort_keys=True, separators=(',',':'), ensure_ascii=False) 后 sha256，取前 10 位"
+  ],
+  "task_id_rule": "基准实例沿用基点 task_id；变体在 (stage, family) 内按 (template_id, fingerprint) 排序，从该组最大编号 +1 顺序发号",
+  "counts": {
+   "bases": 40,
+   "instances": 130,
+   "per_stage": {
+    "S1": 17,
+    "S2": 17,
+    "S3": 17,
+    "S4": 17,
+    "S5": 17,
+    "S6": 15,
+    "S7": 15,
+    "S8": 15
+   }
+  },
+  "bases": {
+   "s1-cor-01": {
+    "stage": "S1",
+    "family": "COR",
+    "template_id": "cov_fields",
+    "template_key": "S1/cov_fields",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S1/cov_fields@s1-cor-01#44136fa355",
+      "task_id": "s1-cor-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "222e09807b82e0b6866e1ef463b0e1e31b684dc3119a85973922e30c89840d92"
+     },
+     {
+      "instance_id": "S1/cov_fields@s1-cor-01#0b0d39a2c6",
+      "task_id": "s1-cor-02",
+      "fingerprint": "0b0d39a2c6",
+      "is_base": false,
+      "params": {
+       "universe": "csi500"
+      },
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "8e9925abdd32e952439e17b1bd4724eeadd1a8842d70aeac124c181e9724c9cb"
+     },
+     {
+      "instance_id": "S1/cov_fields@s1-cor-01#9a9d633fc3",
+      "task_id": "s1-cor-03",
+      "fingerprint": "9a9d633fc3",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-07-20\"}"
+      },
+      "window": {
+       "start": "2026-07-20",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "f02bf83c3acf138807a14744b6a50a324d0e17a925cb08190db752265c576809"
+     },
+     {
+      "instance_id": "S1/cov_fields@s1-cor-01#cf724e2f35",
+      "task_id": "s1-cor-04",
+      "fingerprint": "cf724e2f35",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-07-20\"}"
+      },
+      "window": {
+       "start": "2026-07-20",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "f26d43f15fc19c3853c646dbeb42ed054bcbb5ab01760e3b52a62ff813a3e6c7"
+     }
+    ]
+   },
+   "s1-eco-01": {
+    "stage": "S1",
+    "family": "ECO",
+    "template_id": "lean_fetch",
+    "template_key": "S1/lean_fetch",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S1/lean_fetch@s1-eco-01#44136fa355",
+      "task_id": "s1-eco-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "58b10e9decbc8a388b8bb049c6c1595def16d69924ea92930fa7c06cc0656dc3"
+     },
+     {
+      "instance_id": "S1/lean_fetch@s1-eco-01#1a7afd3c8d",
+      "task_id": "s1-eco-02",
+      "fingerprint": "1a7afd3c8d",
+      "is_base": false,
+      "params": {
+       "universe": "csi300",
+       "window": "{\"end\":\"2026-07-17\",\"start\":\"2026-07-06\"}"
+      },
+      "window": {
+       "start": "2026-07-06",
+       "end": "2026-07-17"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "4d1bcc3ba6260e8300c2b29498eb7a7cdf81636b9daf01144a7614075cf74727"
+     },
+     {
+      "instance_id": "S1/lean_fetch@s1-eco-01#522bb9f4fc",
+      "task_id": "s1-eco-03",
+      "fingerprint": "522bb9f4fc",
+      "is_base": false,
+      "params": {
+       "universe": "csi300",
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-07-20\"}"
+      },
+      "window": {
+       "start": "2026-07-20",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "cb0606e64751e8122ca47949a06b6d58ab5c53e75b6f1275707633ddba11f5e6"
+     },
+     {
+      "instance_id": "S1/lean_fetch@s1-eco-01#9a9d633fc3",
+      "task_id": "s1-eco-04",
+      "fingerprint": "9a9d633fc3",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-07-20\"}"
+      },
+      "window": {
+       "start": "2026-07-20",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "d516dbb807eb54f6e7579ee9b99d0b711c2106ef0c48e538b7e58395666cda5b"
+     }
+    ]
+   },
+   "s1-ops-01": {
+    "stage": "S1",
+    "family": "OPS",
+    "template_id": "prov_ledger",
+    "template_key": "S1/prov_ledger",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S1/prov_ledger@s1-ops-01#44136fa355",
+      "task_id": "s1-ops-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-27",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "1e36f902b426481870eb3600986bcfeb34e12c705a9da33f06a59a72db0dcb96"
+     },
+     {
+      "instance_id": "S1/prov_ledger@s1-ops-01#5dc3931adf",
+      "task_id": "s1-ops-02",
+      "fingerprint": "5dc3931adf",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-17\",\"start\":\"2026-07-06\"}"
+      },
+      "window": {
+       "start": "2026-07-06",
+       "end": "2026-07-17"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "33d0d39078e5995580d59bd611042459162d3a261fa8dcf7b56dea66adb02613"
+     },
+     {
+      "instance_id": "S1/prov_ledger@s1-ops-01#cf724e2f35",
+      "task_id": "s1-ops-03",
+      "fingerprint": "cf724e2f35",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-07-20\"}"
+      },
+      "window": {
+       "start": "2026-07-20",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "d5f98d492fe3df3ead2cba391f6a5f5624f92e5f635b05ced5c6cd872b7c6544"
+     }
+    ]
+   },
+   "s1-rob-01": {
+    "stage": "S1",
+    "family": "ROB",
+    "template_id": "source_status",
+    "template_key": "S1/source_status",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S1/source_status@s1-rob-01#44136fa355",
+      "task_id": "s1-rob-07",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-20",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "1abe4fe5b0488ad5773e9cba0c056b7e83f1a2a0558c992bd8368ca015aa08e4"
+     },
+     {
+      "instance_id": "S1/source_status@s1-rob-01#5dc3931adf",
+      "task_id": "s1-rob-03",
+      "fingerprint": "5dc3931adf",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-17\",\"start\":\"2026-07-06\"}"
+      },
+      "window": {
+       "start": "2026-07-06",
+       "end": "2026-07-17"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "5a17079d2a3c79260f57f2f0efc47b0e510bc4c7c192fca39ba4742c0e2a3525"
+     },
+     {
+      "instance_id": "S1/source_status@s1-rob-01#e606de531e",
+      "task_id": "s1-rob-05",
+      "fingerprint": "e606de531e",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-07-17\",\"start\":\"2026-07-06\"}"
+      },
+      "window": {
+       "start": "2026-07-06",
+       "end": "2026-07-17"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "5468a3dbb395043a11c7fbf031a8eca2af42c612754bf92ce817fa69d13b801a"
+     }
+    ]
+   },
+   "s1-rob-02": {
+    "stage": "S1",
+    "family": "ROB",
+    "template_id": "source_status",
+    "template_key": "S1/source_status",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S1/source_status@s1-rob-02#44136fa355",
+      "task_id": "s1-rob-08",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-20",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "ca41ea3654f37b528fb44ce4396c06ecc18726c87b6ee1ab98c01958e58068b0"
+     },
+     {
+      "instance_id": "S1/source_status@s1-rob-02#8651587ec8",
+      "task_id": "s1-rob-04",
+      "fingerprint": "8651587ec8",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "faa7284dd4c0e5c84dd26ad354e151354ab45c71390acd11f140e8295c776490"
+     },
+     {
+      "instance_id": "S1/source_status@s1-rob-02#e606de531e",
+      "task_id": "s1-rob-06",
+      "fingerprint": "e606de531e",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-07-17\",\"start\":\"2026-07-06\"}"
+      },
+      "window": {
+       "start": "2026-07-06",
+       "end": "2026-07-17"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "746b2c97418143c6974e59201dadf539580ce42aae4914963e0dd588f5558c25"
+     }
+    ]
+   },
+   "s2-cor-01": {
+    "stage": "S2",
+    "family": "COR",
+    "template_id": "cor_01",
+    "template_key": "S2/cor_01",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S2/cor_01@s2-cor-01#44136fa355",
+      "task_id": "s2-cor-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "9572540d62f1a35cfd4a0170723159d51f0db8ff336eb85c05f1d6e531f6d7e2"
+     },
+     {
+      "instance_id": "S2/cor_01@s2-cor-01#0b0d39a2c6",
+      "task_id": "s2-cor-02",
+      "fingerprint": "0b0d39a2c6",
+      "is_base": false,
+      "params": {
+       "universe": "csi500"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "8fdd7591d9fd44f84aa3f0984ba05fc6da5a392ee6ae9786713f8d3733ad9fb1"
+     },
+     {
+      "instance_id": "S2/cor_01@s2-cor-01#2c12388ef5",
+      "task_id": "s2-cor-03",
+      "fingerprint": "2c12388ef5",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "768ac8c66449612144aa671f7589e39b552c3793461bf8004acdbb3f1d24aec4"
+     },
+     {
+      "instance_id": "S2/cor_01@s2-cor-01#d8f9b9b820",
+      "task_id": "s2-cor-04",
+      "fingerprint": "d8f9b9b820",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "78e637559d8e9159f105b162907caac0256296c43afcd425f3abbba9dc672bbd"
+     }
+    ]
+   },
+   "s2-eco-01": {
+    "stage": "S2",
+    "family": "ECO",
+    "template_id": "eco_01",
+    "template_key": "S2/eco_01",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S2/eco_01@s2-eco-01#44136fa355",
+      "task_id": "s2-eco-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2019-01-02",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "ea896401a06e27b8102e7b864595340dc515162ea7d9ee70e366612b873d4cbe"
+     },
+     {
+      "instance_id": "S2/eco_01@s2-eco-01#2c12388ef5",
+      "task_id": "s2-eco-02",
+      "fingerprint": "2c12388ef5",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "56a65f4c31a5acce2ae2e2d6cde276689a4f8a94d8b2553726b3feefd9fb430b"
+     },
+     {
+      "instance_id": "S2/eco_01@s2-eco-01#b5537c3109",
+      "task_id": "s2-eco-03",
+      "fingerprint": "b5537c3109",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2025-07-01\"}"
+      },
+      "window": {
+       "start": "2025-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "d5222c4da2c19e3dcf31b04606e894ad1b4ffa10f5a91198f07524ac90057956"
+     },
+     {
+      "instance_id": "S2/eco_01@s2-eco-01#d8f9b9b820",
+      "task_id": "s2-eco-04",
+      "fingerprint": "d8f9b9b820",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "dc2783ee33dbe60e9cdc06f5e9024bceaa4d6fcff31b3d31150bebf472d27037"
+     }
+    ]
+   },
+   "s2-ops-01": {
+    "stage": "S2",
+    "family": "OPS",
+    "template_id": "ops_01",
+    "template_key": "S2/ops_01",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S2/ops_01@s2-ops-01#44136fa355",
+      "task_id": "s2-ops-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "f4952ba7955062e905e4ae28c66d25cccab996228cce5b99d6adc97886e410fa"
+     },
+     {
+      "instance_id": "S2/ops_01@s2-ops-01#2c12388ef5",
+      "task_id": "s2-ops-02",
+      "fingerprint": "2c12388ef5",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "498fadceecced0ec81546bea716c31cb85c519d1b21484563bb4878332d7bdd3"
+     },
+     {
+      "instance_id": "S2/ops_01@s2-ops-01#b5537c3109",
+      "task_id": "s2-ops-03",
+      "fingerprint": "b5537c3109",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2025-07-01\"}"
+      },
+      "window": {
+       "start": "2025-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "3c946dfbb71a3e5f99606a36636d8a88bdc8a8c4df68b63ca6afe6e9c0bce8fa"
+     }
+    ]
+   },
+   "s2-rob-01": {
+    "stage": "S2",
+    "family": "ROB",
+    "template_id": "rob_01",
+    "template_key": "S2/rob_01",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S2/rob_01@s2-rob-01#44136fa355",
+      "task_id": "s2-rob-07",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "20cd5502dce1cfa5152a6f8d3c50cd485a80cf718d2e3fe95f889cad1f7bdeeb"
+     },
+     {
+      "instance_id": "S2/rob_01@s2-rob-01#959192a52b",
+      "task_id": "s2-rob-03",
+      "fingerprint": "959192a52b",
+      "is_base": false,
+      "params": {
+       "universe": "csi300",
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2025-07-01\"}"
+      },
+      "window": {
+       "start": "2025-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "2fc0e2be91d6122778696f6c64cf163829879135ab979a6532074e3c85cd913e"
+     },
+     {
+      "instance_id": "S2/rob_01@s2-rob-01#b5537c3109",
+      "task_id": "s2-rob-04",
+      "fingerprint": "b5537c3109",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2025-07-01\"}"
+      },
+      "window": {
+       "start": "2025-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "1fa189d5cf52b28deed0bfbb85b3d52b7887e8ce374f5a63eea8d65e705c662e"
+     }
+    ]
+   },
+   "s2-rob-02": {
+    "stage": "S2",
+    "family": "ROB",
+    "template_id": "rob_02_probe",
+    "template_key": "S2/rob_02_probe",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S2/rob_02_probe@s2-rob-02#44136fa355",
+      "task_id": "s2-rob-08",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "941d142adae7d38df8eff9da77f9e9de485d5b8cca46c0879337a73c1f7cf59b"
+     },
+     {
+      "instance_id": "S2/rob_02_probe@s2-rob-02#53d394212c",
+      "task_id": "s2-rob-05",
+      "fingerprint": "53d394212c",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-07-01\"}"
+      },
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "cd1e2464f34efcc037ba0f137c07af316923a2b143acc20c5e7d6d92fe0f46b2"
+     },
+     {
+      "instance_id": "S2/rob_02_probe@s2-rob-02#b1cfba288c",
+      "task_id": "s2-rob-06",
+      "fingerprint": "b1cfba288c",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2025-07-01\"}"
+      },
+      "window": {
+       "start": "2025-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "2379a25918546175fab6cf8977427b85c4dd4bea7e008af58de71eefdd26ace4"
+     }
+    ]
+   },
+   "s3-cor-01": {
+    "stage": "S3",
+    "family": "COR",
+    "template_id": "cor01_wq006_corr",
+    "template_key": "S3/cor01_wq006_corr",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S3/cor01_wq006_corr@s3-cor-01#44136fa355",
+      "task_id": "s3-cor-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "e875ecaf63e2ec68742f79eeab8362a55265294bb2acddba6be7c28fa5247349"
+     },
+     {
+      "instance_id": "S3/cor01_wq006_corr@s3-cor-01#0b0d39a2c6",
+      "task_id": "s3-cor-02",
+      "fingerprint": "0b0d39a2c6",
+      "is_base": false,
+      "params": {
+       "universe": "csi500"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "cf8443552c30120877b471f484d268d48501da71ef9776db504f584ad8af85c1"
+     },
+     {
+      "instance_id": "S3/cor01_wq006_corr@s3-cor-01#764bd5aea8",
+      "task_id": "s3-cor-03",
+      "fingerprint": "764bd5aea8",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "541e36cc156c355ccf70845df8e6d935caed41f02f8cab990641fa2b67767eef"
+     },
+     {
+      "instance_id": "S3/cor01_wq006_corr@s3-cor-01#f436d8670e",
+      "task_id": "s3-cor-04",
+      "fingerprint": "f436d8670e",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "1e1e50e2b2c772c3651860cbf465d95ac3f6646497731e3904594328bf720b13"
+     }
+    ]
+   },
+   "s3-eco-01": {
+    "stage": "S3",
+    "family": "ECO",
+    "template_id": "eco01_free_pv",
+    "template_key": "S3/eco01_free_pv",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S3/eco01_free_pv@s3-eco-01#44136fa355",
+      "task_id": "s3-eco-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "a507f235bfe406aabe0160bf324b786b8055381fce5b7d11332dd956bb08ac70"
+     },
+     {
+      "instance_id": "S3/eco01_free_pv@s3-eco-01#49625d8724",
+      "task_id": "s3-eco-02",
+      "fingerprint": "49625d8724",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "51864c25352c0414dacab9ff775f8551ef4b83fb4f5221a95ae2aed766a93d05"
+     },
+     {
+      "instance_id": "S3/eco01_free_pv@s3-eco-01#764bd5aea8",
+      "task_id": "s3-eco-03",
+      "fingerprint": "764bd5aea8",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "e207a8e8ee17c54dc570cdbf11028cdda9a5fe8df4de7aa785a713f02a8964b2"
+     },
+     {
+      "instance_id": "S3/eco01_free_pv@s3-eco-01#f436d8670e",
+      "task_id": "s3-eco-04",
+      "fingerprint": "f436d8670e",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "1935ee60ae96826f7ee1f90db9b04680cca1b50104b4098c7157d40748e3204d"
+     }
+    ]
+   },
+   "s3-ops-01": {
+    "stage": "S3",
+    "family": "OPS",
+    "template_id": "ops01_gtja012_vwap_audit",
+    "template_key": "S3/ops01_gtja012_vwap_audit",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S3/ops01_gtja012_vwap_audit@s3-ops-01#44136fa355",
+      "task_id": "s3-ops-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "0d31b183fd652034a825577be99d1b549642e9acaee6be1ecf2f4d4e437bbe67"
+     },
+     {
+      "instance_id": "S3/ops01_gtja012_vwap_audit@s3-ops-01#49625d8724",
+      "task_id": "s3-ops-02",
+      "fingerprint": "49625d8724",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "44b3f6b34d74584413322ccfe9ce0f8326c56acc154a5691889bbf504d5b1bf2"
+     },
+     {
+      "instance_id": "S3/ops01_gtja012_vwap_audit@s3-ops-01#764bd5aea8",
+      "task_id": "s3-ops-03",
+      "fingerprint": "764bd5aea8",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "92e5ca24b15f8806f6a55d2509a2d15c269d707dd062cc6739172bf61d2deb0c"
+     }
+    ]
+   },
+   "s3-rob-01": {
+    "stage": "S3",
+    "family": "ROB",
+    "template_id": "rob01_wq054_nonfinite",
+    "template_key": "S3/rob01_wq054_nonfinite",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S3/rob01_wq054_nonfinite@s3-rob-01#44136fa355",
+      "task_id": "s3-rob-07",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "0e7ec5ae432e475d02fba0e2e0025694707b11de1a50f61b006fbb8de3288b0f"
+     },
+     {
+      "instance_id": "S3/rob01_wq054_nonfinite@s3-rob-01#49625d8724",
+      "task_id": "s3-rob-03",
+      "fingerprint": "49625d8724",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "e4631fa62fee9daed8fdef96f3bab1294d91a2097da751e91d1337e440aa00d6"
+     },
+     {
+      "instance_id": "S3/rob01_wq054_nonfinite@s3-rob-01#fcb48409e9",
+      "task_id": "s3-rob-04",
+      "fingerprint": "fcb48409e9",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "54ce38d958d5072145e8dda16d26636164a426b1fc57da2e19d6202a4cfdddfb"
+     }
+    ]
+   },
+   "s3-rob-02": {
+    "stage": "S3",
+    "family": "ROB",
+    "template_id": "rob02_gtja046_probe",
+    "template_key": "S3/rob02_gtja046_probe",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S3/rob02_gtja046_probe@s3-rob-02#44136fa355",
+      "task_id": "s3-rob-08",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "53440fbd7d0fa6889c1c1b0cff54c16a3bf020bbaa6217d0b9adc21157ee0c56"
+     },
+     {
+      "instance_id": "S3/rob02_gtja046_probe@s3-rob-02#bc9824ce3e",
+      "task_id": "s3-rob-05",
+      "fingerprint": "bc9824ce3e",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2025-07-01\"}"
+      },
+      "window": {
+       "start": "2025-07-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "cb1d9260554bff42d04f82337959054835e907d09f9eeade766d1ca145fb0c68"
+     },
+     {
+      "instance_id": "S3/rob02_gtja046_probe@s3-rob-02#fcb48409e9",
+      "task_id": "s3-rob-06",
+      "fingerprint": "fcb48409e9",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {},
+      "instruction_fingerprint": "371fc48a2ff9232d3bfe0107ab01d0604b73d0060cce0f3b581fa3189da8a36c"
+     }
+    ]
+   },
+   "s4-cor-01": {
+    "stage": "S4",
+    "family": "COR",
+    "template_id": "cor_ic_recompute",
+    "template_key": "S4/cor_ic_recompute",
+    "axes": [
+     "window",
+     "universe",
+     "factor_pool"
+    ],
+    "instances": [
+     {
+      "instance_id": "S4/cor_ic_recompute@s4-cor-01#44136fa355",
+      "task_id": "s4-cor-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_panel.parquet": "c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6"
+      },
+      "instruction_fingerprint": "80c5f248896f9d4c335c3729a0d2f3592dd89d3798e583cd31f1452161692325"
+     },
+     {
+      "instance_id": "S4/cor_ic_recompute@s4-cor-01#0b0d39a2c6",
+      "task_id": "s4-cor-02",
+      "fingerprint": "0b0d39a2c6",
+      "is_base": false,
+      "params": {
+       "universe": "csi500"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-06-30"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/factor_panel.parquet": "7687dd89be0bcddf643c767336cb377d6f2734f6904e0faf4bf4e7ca19430099"
+      },
+      "instruction_fingerprint": "a093c17c6ca4817bc504d76455ce398a0fb54b6c19cf465840223f2e3cf3c566"
+     },
+     {
+      "instance_id": "S4/cor_ic_recompute@s4-cor-01#a10c40daae",
+      "task_id": "s4-cor-03",
+      "fingerprint": "a10c40daae",
+      "is_base": false,
+      "params": {
+       "factor_pool": "gtja_191.017"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_panel.parquet": "b34144bbde8855378466b903b1b2c230f791ec7c86d1d2735ec068c42c78cf77"
+      },
+      "instruction_fingerprint": "80c5f248896f9d4c335c3729a0d2f3592dd89d3798e583cd31f1452161692325"
+     },
+     {
+      "instance_id": "S4/cor_ic_recompute@s4-cor-01#f436d8670e",
+      "task_id": "s4-cor-04",
+      "fingerprint": "f436d8670e",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_panel.parquet": "d155747d1340c05b43538be79801a5dea97ac4c215206af92f1795493eb996bf"
+      },
+      "instruction_fingerprint": "de0d61c306e6102b30c6f2f9d1d377c0fbe559eed6855202d989b8646a8161e6"
+     }
+    ]
+   },
+   "s4-eco-01": {
+    "stage": "S4",
+    "family": "ECO",
+    "template_id": "eco_free_select",
+    "template_key": "S4/eco_free_select",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S4/eco_free_select@s4-eco-01#44136fa355",
+      "task_id": "s4-eco-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_pool.parquet": "488e7cf2c0cece140044ad9b9322d8cb0b7ac23d1e1c7451888fcf606a5c0469"
+      },
+      "instruction_fingerprint": "2e1f122d8741e84255c1a2b52982c8e906e78034060b31835389fe6de02dedfa"
+     },
+     {
+      "instance_id": "S4/eco_free_select@s4-eco-01#764bd5aea8",
+      "task_id": "s4-eco-02",
+      "fingerprint": "764bd5aea8",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/factor_pool.parquet": "68feadcace31febd54e3cf5f3aec09111234a9732d37aa741f85e963dee26fbb"
+      },
+      "instruction_fingerprint": "62c4ea5e763d9bdeae56daff972c26d8a90c35c8dbe2bda3a86c67ebf05fd538"
+     },
+     {
+      "instance_id": "S4/eco_free_select@s4-eco-01#d8f9b9b820",
+      "task_id": "s4-eco-03",
+      "fingerprint": "d8f9b9b820",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_pool.parquet": "09bd461c35b6e3a0f8d21f50c9f8ebc6027c83343431f8803dac5c528c544a24"
+      },
+      "instruction_fingerprint": "086a9cfa5b5dcf24a7be7d6be4ab8912abc3d616ef4ed47e1ba9c99be0435345"
+     },
+     {
+      "instance_id": "S4/eco_free_select@s4-eco-01#f436d8670e",
+      "task_id": "s4-eco-04",
+      "fingerprint": "f436d8670e",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_pool.parquet": "6d51d5505606f779a41d539ac3a571013665a6c9f7e1b7a9f5996fe882e73535"
+      },
+      "instruction_fingerprint": "983bb3b4bf93315b95ea7ac697a764af67b5334f037c33014fabd0535bd94be3"
+     }
+    ]
+   },
+   "s4-ops-01": {
+    "stage": "S4",
+    "family": "OPS",
+    "template_id": "ops_audit_trail",
+    "template_key": "S4/ops_audit_trail",
+    "axes": [
+     "window",
+     "universe",
+     "factor_pool"
+    ],
+    "instances": [
+     {
+      "instance_id": "S4/ops_audit_trail@s4-ops-01#44136fa355",
+      "task_id": "s4-ops-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_panel.meta.json": "da0599c9dacbc28754f303a6058f9653443cc96bf74f1c2a1af6ab86bf8d1584",
+       "work/factor_panel.parquet": "c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6"
+      },
+      "instruction_fingerprint": "ed88496b1ad71bb54110cef727d6f236efc37a2754ea5fdd17ad5865ee8a715e"
+     },
+     {
+      "instance_id": "S4/ops_audit_trail@s4-ops-01#1084b1fe5c",
+      "task_id": "s4-ops-02",
+      "fingerprint": "1084b1fe5c",
+      "is_base": false,
+      "params": {
+       "factor_pool": "gtja_191.017",
+       "universe": "csi500"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-06-30"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/factor_panel.meta.json": "83699f0742e0d4e2784ffec5b2615342c39d78749283dee6ef80b3d5f83828f8",
+       "work/factor_panel.parquet": "5bc11eb08f23f2ca84acf304f3296e45891962b4ffe620a571586f32cfd9617d"
+      },
+      "instruction_fingerprint": "1691e10756c0aa06d7c3c6a840f7d3a98d4de85b0b0fbc39efb23eee74acbffc"
+     },
+     {
+      "instance_id": "S4/ops_audit_trail@s4-ops-01#f436d8670e",
+      "task_id": "s4-ops-03",
+      "fingerprint": "f436d8670e",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_panel.meta.json": "99f5c248c3e6109602b9affa1de4998c1c5eb117ebb0e897866f4101d931522f",
+       "work/factor_panel.parquet": "d155747d1340c05b43538be79801a5dea97ac4c215206af92f1795493eb996bf"
+      },
+      "instruction_fingerprint": "8b94ddb439e6f674223b1e6d8b213fa7587bf1ad5a59ef341a36f6a3233db26a"
+     }
+    ]
+   },
+   "s4-rob-01": {
+    "stage": "S4",
+    "family": "ROB",
+    "template_id": "rob_sparse_panel",
+    "template_key": "S4/rob_sparse_panel",
+    "axes": [
+     "window",
+     "universe",
+     "factor_pool"
+    ],
+    "instances": [
+     {
+      "instance_id": "S4/rob_sparse_panel@s4-rob-01#44136fa355",
+      "task_id": "s4-rob-08",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_panel.parquet": "b34144bbde8855378466b903b1b2c230f791ec7c86d1d2735ec068c42c78cf77"
+      },
+      "instruction_fingerprint": "94711bbad9f02ec740ed76febc149c1637fbc2bb6db8c39d3ad02106f7468b87"
+     },
+     {
+      "instance_id": "S4/rob_sparse_panel@s4-rob-01#0b0d39a2c6",
+      "task_id": "s4-rob-05",
+      "fingerprint": "0b0d39a2c6",
+      "is_base": false,
+      "params": {
+       "universe": "csi500"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-06-30"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/factor_panel.parquet": "5bc11eb08f23f2ca84acf304f3296e45891962b4ffe620a571586f32cfd9617d"
+      },
+      "instruction_fingerprint": "18a8ef6e9db068c1205fad87bb861e871ffe22028226d4fd45c0cbc0c33abc91"
+     },
+     {
+      "instance_id": "S4/rob_sparse_panel@s4-rob-01#f436d8670e",
+      "task_id": "s4-rob-06",
+      "fingerprint": "f436d8670e",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_panel.parquet": "52215e4b121bb874add265d7e25a5c7504fafa14ee5394f606c0ab00ee5d75ac"
+      },
+      "instruction_fingerprint": "a816d130573fbab6f9add8fac051dd3360dcbb9abe00f7ee8548e4cbed2cabfc"
+     }
+    ]
+   },
+   "s4-rob-02": {
+    "stage": "S4",
+    "family": "ROB",
+    "template_id": "rob_probe_setting",
+    "template_key": "S4/rob_probe_setting",
+    "axes": [
+     "window",
+     "universe",
+     "factor_pool"
+    ],
+    "instances": [
+     {
+      "instance_id": "S4/rob_probe_setting@s4-rob-02#44136fa355",
+      "task_id": "s4-rob-07",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_panel.parquet": "c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6"
+      },
+      "instruction_fingerprint": "23ad81acf86ee3693547f4a47e1bd229ed54bae389ad24d3d1160ef76cdc8c74"
+     },
+     {
+      "instance_id": "S4/rob_probe_setting@s4-rob-02#764bd5aea8",
+      "task_id": "s4-rob-03",
+      "fingerprint": "764bd5aea8",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/factor_panel.parquet": "d0925e62e192550ed0181f29aecadad351f623df51438f29b91ffcac46c25cb2"
+      },
+      "instruction_fingerprint": "e2757cee373561ed7912218f2d3f87a53455f176fc773ae3e004cbe8b40f080b"
+     },
+     {
+      "instance_id": "S4/rob_probe_setting@s4-rob-02#8aabd7c9df",
+      "task_id": "s4-rob-04",
+      "fingerprint": "8aabd7c9df",
+      "is_base": false,
+      "params": {
+       "factor_pool": "gtja_191.017",
+       "window": "{\"end\":\"2026-03-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-03-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/factor_panel.parquet": "52215e4b121bb874add265d7e25a5c7504fafa14ee5394f606c0ab00ee5d75ac"
+      },
+      "instruction_fingerprint": "852640d3131a1f7909aa6ca9d220a021ba56d461987f4290ac29e0d2929671f3"
+     }
+    ]
+   },
+   "s5-cor-01": {
+    "stage": "S5",
+    "family": "COR",
+    "template_id": "rank_signal",
+    "template_key": "S5/rank_signal",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S5/rank_signal@s5-cor-01#44136fa355",
+      "task_id": "s5-cor-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847",
+       "work/inputs/manifest.json": "5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a"
+      },
+      "instruction_fingerprint": "9347aa63236d619525d09ffda3a7d6390ce8aaa313605214437b4db841b8a91e"
+     },
+     {
+      "instance_id": "S5/rank_signal@s5-cor-01#0b0d39a2c6",
+      "task_id": "s5-cor-02",
+      "fingerprint": "0b0d39a2c6",
+      "is_base": false,
+      "params": {
+       "universe": "csi500"
+      },
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "50cb548261cbb38ae91ff5e3776af31c08b3e9131ad2343b07b4825bd34ae9ee",
+       "work/inputs/manifest.json": "ecf85eed16872467c7ed0903beda47ad52072f150d58b1afd89e34d4f8896576"
+      },
+      "instruction_fingerprint": "821280be1c8fc03d74fdc5bcadd51b30927ad16dcbb5f8c0aef8fe1f51836c9c"
+     },
+     {
+      "instance_id": "S5/rank_signal@s5-cor-01#7212df62b9",
+      "task_id": "s5-cor-03",
+      "fingerprint": "7212df62b9",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "c9cd6c4c32cb5fc0eca89069c4049274711220396504f1059b704e2faa1d582b",
+       "work/inputs/manifest.json": "68af7cf304dfde6edb435d7f50aec0091754cddf2fdb63f389bc07caf9f47b94"
+      },
+      "instruction_fingerprint": "73e51ba82f4d200d65f9ac86dcd3c6d2df9f7b3a5eeccc28cc51226341b5d544"
+     },
+     {
+      "instance_id": "S5/rank_signal@s5-cor-01#8651587ec8",
+      "task_id": "s5-cor-04",
+      "fingerprint": "8651587ec8",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "28dcd34a147395fc7b869968ee0b49f965cd6bea6516f4ace00a89b6415d140b",
+       "work/inputs/manifest.json": "fcd1bd3566d3e04b5b8bd6e423b88afeab1f02593f7f96ccd1565510e6d8a130"
+      },
+      "instruction_fingerprint": "baa2780ed896fd953761547a92fa9cd4e8957a2ad0a00df10d781f1145d6d88a"
+     }
+    ]
+   },
+   "s5-eco-01": {
+    "stage": "S5",
+    "family": "ECO",
+    "template_id": "free_signal",
+    "template_key": "S5/free_signal",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S5/free_signal@s5-eco-01#44136fa355",
+      "task_id": "s5-eco-05",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "9d618fa6ee15ba4193718409df455f2fdfb80337201333baf668792afb25a43c",
+       "work/inputs/gtja_191.002.parquet": "b58de67658ae2febbd66f6c2003e1a462b90890649881f96169a4ec8f5cc37cd",
+       "work/inputs/gtja_191.003.parquet": "ae21efa67eed5294d070a07fc32f8067fd9790a0f0b37d524e048831a5ab4623",
+       "work/inputs/manifest.json": "47a7498b92b57952ae3bcca783bc9e182d1f2842a10775c13027a566b623a986"
+      },
+      "instruction_fingerprint": "60af104e4f455358bcd4b59b8eaac678b42aa9b7cbeb5da37ef611b9635940c6"
+     },
+     {
+      "instance_id": "S5/free_signal@s5-eco-01#19f220c346",
+      "task_id": "s5-eco-02",
+      "fingerprint": "19f220c346",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-05-06\"}"
+      },
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "4d513a7c6655f580fd86b2d242af620134700501c336727e2b3c2da92646b8df",
+       "work/inputs/gtja_191.002.parquet": "b827f1d12bd9f067075c1f2f9eeefae1935e165ce5eb12fdfd51b2f2a84f184f",
+       "work/inputs/gtja_191.003.parquet": "a9384d629784f89bed2dc81391dd1c14865153988a3b37203d9a0e53ea539a64",
+       "work/inputs/manifest.json": "aa840edb8d3a248acd4bef2609d4d32e5f49758ad473cdb69c35f695b2957a3a"
+      },
+      "instruction_fingerprint": "9be285f1996d550f321436d4e62ab94821adb2c13a7923412adf6171a586ea7e"
+     },
+     {
+      "instance_id": "S5/free_signal@s5-eco-01#7212df62b9",
+      "task_id": "s5-eco-03",
+      "fingerprint": "7212df62b9",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "c9cd6c4c32cb5fc0eca89069c4049274711220396504f1059b704e2faa1d582b",
+       "work/inputs/gtja_191.002.parquet": "c77f2d45e097497f465b15682847fdf4b1487688daa288d399bbf083fb88b987",
+       "work/inputs/gtja_191.003.parquet": "ee71d2fa392d8eb505a072889feb280ce2eb1e77ecc89b6feab24e5ceace9700",
+       "work/inputs/manifest.json": "b74714bb2bdbe81bc7bd7b6f5b7e9d0d3f899e62f21e4fd90f436b336f2197c4"
+      },
+      "instruction_fingerprint": "4ee929a129e70d649df6bd79b882248d03bd5fe7097c15bf10b903170a5a297a"
+     },
+     {
+      "instance_id": "S5/free_signal@s5-eco-01#8651587ec8",
+      "task_id": "s5-eco-04",
+      "fingerprint": "8651587ec8",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "28dcd34a147395fc7b869968ee0b49f965cd6bea6516f4ace00a89b6415d140b",
+       "work/inputs/gtja_191.002.parquet": "95f12bfeae0a85d569270f2f11621d5e079b957f4806950fc760f8805d9181a2",
+       "work/inputs/gtja_191.003.parquet": "7e19f576d2b9bda336af6879468c6a4ad68e9ab26d4873ba8b2c92f76cd8a038",
+       "work/inputs/manifest.json": "ba099d048b0d19aa5e092720fb4f4b75dfee125f600cbf7b66921c24da18a86e"
+      },
+      "instruction_fingerprint": "fa36acdb889534ba955d58048c3d9361b226c0be2b3f48322c315736429d2b41"
+     }
+    ]
+   },
+   "s5-ops-01": {
+    "stage": "S5",
+    "family": "OPS",
+    "template_id": "format_audit",
+    "template_key": "S5/format_audit",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S5/format_audit@s5-ops-01#44136fa355",
+      "task_id": "s5-ops-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847",
+       "work/inputs/manifest.json": "5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a"
+      },
+      "instruction_fingerprint": "1d75ed622859eaf514874d6905f87d20a1a7e1438350a7680cefc8349b4b8340"
+     },
+     {
+      "instance_id": "S5/format_audit@s5-ops-01#19f220c346",
+      "task_id": "s5-ops-02",
+      "fingerprint": "19f220c346",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-05-06\"}"
+      },
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "4d513a7c6655f580fd86b2d242af620134700501c336727e2b3c2da92646b8df",
+       "work/inputs/manifest.json": "7c9eae087b5b381e649bc38a11bd3823174f627c77ee43210cd88b98c3fa2a08"
+      },
+      "instruction_fingerprint": "8a32c85db71843e8cf6890b3d827bee74820a87666328e395a5decfc910f5454"
+     },
+     {
+      "instance_id": "S5/format_audit@s5-ops-01#7212df62b9",
+      "task_id": "s5-ops-03",
+      "fingerprint": "7212df62b9",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "c9cd6c4c32cb5fc0eca89069c4049274711220396504f1059b704e2faa1d582b",
+       "work/inputs/manifest.json": "68af7cf304dfde6edb435d7f50aec0091754cddf2fdb63f389bc07caf9f47b94"
+      },
+      "instruction_fingerprint": "8786eab581ff92baad4a8edf9049f9279da018cb85dcba652a03b9178649126f"
+     }
+    ]
+   },
+   "s5-rob-01": {
+    "stage": "S5",
+    "family": "ROB",
+    "template_id": "null_vs_flat",
+    "template_key": "S5/null_vs_flat",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S5/null_vs_flat@s5-rob-01#44136fa355",
+      "task_id": "s5-rob-08",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847",
+       "work/inputs/manifest.json": "5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a"
+      },
+      "instruction_fingerprint": "ff5d8098a68b78dc01b7a0f4a6b0885a952b056f800cff0b4b6a4baae5ae74d8"
+     },
+     {
+      "instance_id": "S5/null_vs_flat@s5-rob-01#19f220c346",
+      "task_id": "s5-rob-05",
+      "fingerprint": "19f220c346",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-05-06\"}"
+      },
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "4d513a7c6655f580fd86b2d242af620134700501c336727e2b3c2da92646b8df",
+       "work/inputs/manifest.json": "7c9eae087b5b381e649bc38a11bd3823174f627c77ee43210cd88b98c3fa2a08"
+      },
+      "instruction_fingerprint": "bf4cd3b9a7076c4ac51d8a7ab40337f3df7f5e805af34eea93b492c08b70f0c6"
+     },
+     {
+      "instance_id": "S5/null_vs_flat@s5-rob-01#b196347a80",
+      "task_id": "s5-rob-06",
+      "fingerprint": "b196347a80",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-05-06\"}"
+      },
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "4cfbcea5a6517a2f1be193856be7333246a7c429d0bf852fdb16fffff029923f",
+       "work/inputs/manifest.json": "9a96f72db8437e6e8c9a4f40208e5ca0c9099ae9686b2bef5de9f62f25322ad7"
+      },
+      "instruction_fingerprint": "fd184fd3845771366fba774cfca1057ad202831c1c4920df4e69f25fa09f66d3"
+     }
+    ]
+   },
+   "s5-rob-02": {
+    "stage": "S5",
+    "family": "ROB",
+    "template_id": "freq_unstated",
+    "template_key": "S5/freq_unstated",
+    "axes": [
+     "window",
+     "universe"
+    ],
+    "instances": [
+     {
+      "instance_id": "S5/freq_unstated@s5-rob-02#44136fa355",
+      "task_id": "s5-rob-07",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847",
+       "work/inputs/manifest.json": "5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a"
+      },
+      "instruction_fingerprint": "df6b43b7ca5d7bbd48932e1463f3b72d12da020f1ef83d15e5fb3036784dc69a"
+     },
+     {
+      "instance_id": "S5/freq_unstated@s5-rob-02#b196347a80",
+      "task_id": "s5-rob-03",
+      "fingerprint": "b196347a80",
+      "is_base": false,
+      "params": {
+       "universe": "csi500",
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-05-06\"}"
+      },
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi500",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "4cfbcea5a6517a2f1be193856be7333246a7c429d0bf852fdb16fffff029923f",
+       "work/inputs/manifest.json": "9a96f72db8437e6e8c9a4f40208e5ca0c9099ae9686b2bef5de9f62f25322ad7"
+      },
+      "instruction_fingerprint": "f8d7cf50c1656f85332bac0870468fb851bcbeeb32bbeb382aa94a4254687bb6"
+     },
+     {
+      "instance_id": "S5/freq_unstated@s5-rob-02#c22c297f5c",
+      "task_id": "s5-rob-04",
+      "fingerprint": "c22c297f5c",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-01-05\"}"
+      },
+      "window": {
+       "start": "2026-01-05",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {
+       "work/inputs/gtja_191.001.parquet": "9d618fa6ee15ba4193718409df455f2fdfb80337201333baf668792afb25a43c",
+       "work/inputs/manifest.json": "f9510e4e9b5ad8e0dae0a64ed1bc036e78e731673ab134e702e9e7c937d680b8"
+      },
+      "instruction_fingerprint": "c1ee97491959e4d51a1bdf958dd5b5ef8444a7c9e2c2901fa86cee9822e2429d"
+     }
+    ]
+   },
+   "s6-cor-01": {
+    "stage": "S6",
+    "family": "COR",
+    "template_id": "cor_ledger",
+    "template_key": "S6/cor_ledger",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S6/cor_ledger@s6-cor-01#44136fa355",
+      "task_id": "s6-cor-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "51c684bbca12255b86047460a2c9ded0e4d51808778b9785d2a5781f8f23fc18"
+     },
+     {
+      "instance_id": "S6/cor_ledger@s6-cor-01#19f220c346",
+      "task_id": "s6-cor-02",
+      "fingerprint": "19f220c346",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-05-06\"}"
+      },
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "d4316d459073c11f13a41f5c001a51ca7377c8eb69579c3caeaeff064ad703eb"
+     },
+     {
+      "instance_id": "S6/cor_ledger@s6-cor-01#287a399f81",
+      "task_id": "s6-cor-03",
+      "fingerprint": "287a399f81",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "1354d387ab8fcf3c4be3760bdb480709d9eed618a9e0031abfc30310e66c95cc"
+     }
+    ]
+   },
+   "s6-eco-01": {
+    "stage": "S6",
+    "family": "ECO",
+    "template_id": "eco_swap_cap",
+    "template_key": "S6/eco_swap_cap",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S6/eco_swap_cap@s6-eco-01#44136fa355",
+      "task_id": "s6-eco-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "ca35395a2d28b87c4846b6a974743a270f4e153489c7e413d231f4978304ed71"
+     },
+     {
+      "instance_id": "S6/eco_swap_cap@s6-eco-01#287a399f81",
+      "task_id": "s6-eco-02",
+      "fingerprint": "287a399f81",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "3307a315c2982702e35d70125963426a437d6aae021985d6288cdec2ce4dd228"
+     },
+     {
+      "instance_id": "S6/eco_swap_cap@s6-eco-01#d8f9b9b820",
+      "task_id": "s6-eco-03",
+      "fingerprint": "d8f9b9b820",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "ac35ad62452f24e599be0648042f89838a86791c12d5a15613f423617a1744f1"
+     }
+    ]
+   },
+   "s6-ops-01": {
+    "stage": "S6",
+    "family": "OPS",
+    "template_id": "ops_ledger_audit",
+    "template_key": "S6/ops_ledger_audit",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S6/ops_ledger_audit@s6-ops-01#44136fa355",
+      "task_id": "s6-ops-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "9de24f9c5945b0f4a1f71d4d767a0e6ce815b05704b58484a56d1a4d22162205"
+     },
+     {
+      "instance_id": "S6/ops_ledger_audit@s6-ops-01#287a399f81",
+      "task_id": "s6-ops-02",
+      "fingerprint": "287a399f81",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "5889b44e6852ae206c901ff0523ecaf5377b89c434e32019fa956b827a7f191f"
+     },
+     {
+      "instance_id": "S6/ops_ledger_audit@s6-ops-01#d8f9b9b820",
+      "task_id": "s6-ops-03",
+      "fingerprint": "d8f9b9b820",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "53f9f38e2f9fee3ef7799f77403ca27da9745fa6b273deccf73dd34540ab2960"
+     }
+    ]
+   },
+   "s6-rob-01": {
+    "stage": "S6",
+    "family": "ROB",
+    "template_id": "rob_optimizer_failure",
+    "template_key": "S6/rob_optimizer_failure",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S6/rob_optimizer_failure@s6-rob-01#44136fa355",
+      "task_id": "s6-rob-07",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "597c6d512bc2eb0a06d093eebb3f5e1f598634bc3db9c10294d10aa7aa99f85e"
+     },
+     {
+      "instance_id": "S6/rob_optimizer_failure@s6-rob-01#19f220c346",
+      "task_id": "s6-rob-03",
+      "fingerprint": "19f220c346",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-05-06\"}"
+      },
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "5de3bd71df3443d9ea997d1410a1eee1ef01a5a48198b101115736af675dd655"
+     },
+     {
+      "instance_id": "S6/rob_optimizer_failure@s6-rob-01#287a399f81",
+      "task_id": "s6-rob-04",
+      "fingerprint": "287a399f81",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "e9c8a28257516e3093c3ab27fae9c739c390e6d485b4f2720faf53a1c9b3e558"
+     }
+    ]
+   },
+   "s6-rob-02": {
+    "stage": "S6",
+    "family": "ROB",
+    "template_id": "rob_underdetermined",
+    "template_key": "S6/rob_underdetermined",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S6/rob_underdetermined@s6-rob-02#44136fa355",
+      "task_id": "s6-rob-08",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "3e8d9012a49869ce6afdfa0d6ccfed34acacb4de8f3302081b48c75d9787fa3c"
+     },
+     {
+      "instance_id": "S6/rob_underdetermined@s6-rob-02#19f220c346",
+      "task_id": "s6-rob-05",
+      "fingerprint": "19f220c346",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-31\",\"start\":\"2026-05-06\"}"
+      },
+      "window": {
+       "start": "2026-05-06",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "7e79a6425809969ac6e07566451d94066c361e0912d0eb16941160e04270b3cb"
+     },
+     {
+      "instance_id": "S6/rob_underdetermined@s6-rob-02#d8f9b9b820",
+      "task_id": "s6-rob-06",
+      "fingerprint": "d8f9b9b820",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-04-01\"}"
+      },
+      "window": {
+       "start": "2026-04-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "634d140d0a6b5254bc352dc0fe770c6181d2802b265ad049d5956d1d90eb1222"
+     }
+    ]
+   },
+   "s7-cor-01": {
+    "stage": "S7",
+    "family": "COR",
+    "template_id": "cor_reproduce",
+    "template_key": "S7/cor_reproduce",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S7/cor_reproduce@s7-cor-01#44136fa355",
+      "task_id": "s7-cor-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2019-01-02",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "f30ea34d3bdec672d5ab464ebfc97fd55380d0257105f3e1d092e7ad20ab915e"
+     },
+     {
+      "instance_id": "S7/cor_reproduce@s7-cor-01#64150974fc",
+      "task_id": "s7-cor-02",
+      "fingerprint": "64150974fc",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-03\",\"start\":\"2024-01-02\"}"
+      },
+      "window": {
+       "start": "2024-01-02",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "c771d4bc9d3987c8f809f80ee41ccdbc510f11c532999c05f2e4ae017ed0883b"
+     },
+     {
+      "instance_id": "S7/cor_reproduce@s7-cor-01#9010b12bf6",
+      "task_id": "s7-cor-03",
+      "fingerprint": "9010b12bf6",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-03\",\"start\":\"2022-01-04\"}"
+      },
+      "window": {
+       "start": "2022-01-04",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "5b6c0b7c3536620898b0b26d37cd15af0fea0f756409c291c41f356c62d88893"
+     }
+    ]
+   },
+   "s7-eco-01": {
+    "stage": "S7",
+    "family": "ECO",
+    "template_id": "eco_attribution",
+    "template_key": "S7/eco_attribution",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S7/eco_attribution@s7-eco-01#44136fa355",
+      "task_id": "s7-eco-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2019-01-02",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "c2ee91230a9e8c018a7282ea6befc54253f6097a723979c7c2e1371deda7523a"
+     },
+     {
+      "instance_id": "S7/eco_attribution@s7-eco-01#64150974fc",
+      "task_id": "s7-eco-02",
+      "fingerprint": "64150974fc",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-03\",\"start\":\"2024-01-02\"}"
+      },
+      "window": {
+       "start": "2024-01-02",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "e95776babe2993bdc966a96f0a63ddb83e6f99c8eaf6459045e9730915d0bdda"
+     },
+     {
+      "instance_id": "S7/eco_attribution@s7-eco-01#7aa54c75eb",
+      "task_id": "s7-eco-03",
+      "fingerprint": "7aa54c75eb",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2023-12-29\",\"start\":\"2019-01-02\"}"
+      },
+      "window": {
+       "start": "2019-01-02",
+       "end": "2023-12-29"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "24a15e2e16789b0314cde22456ac7b5fb1ad578bacf5c798ca0d696d069d1992"
+     }
+    ]
+   },
+   "s7-ops-01": {
+    "stage": "S7",
+    "family": "OPS",
+    "template_id": "ops_audit",
+    "template_key": "S7/ops_audit",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S7/ops_audit@s7-ops-01#44136fa355",
+      "task_id": "s7-ops-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2019-01-02",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "96844bebf995226aa686589fe02afeabe093f7e83e146653c7f5c3b0f0a00286"
+     },
+     {
+      "instance_id": "S7/ops_audit@s7-ops-01#7aa54c75eb",
+      "task_id": "s7-ops-02",
+      "fingerprint": "7aa54c75eb",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2023-12-29\",\"start\":\"2019-01-02\"}"
+      },
+      "window": {
+       "start": "2019-01-02",
+       "end": "2023-12-29"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "047691c29756277fff27450854f315ea33427116751d50dc892c38bf07040b1c"
+     },
+     {
+      "instance_id": "S7/ops_audit@s7-ops-01#9010b12bf6",
+      "task_id": "s7-ops-03",
+      "fingerprint": "9010b12bf6",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-03\",\"start\":\"2022-01-04\"}"
+      },
+      "window": {
+       "start": "2022-01-04",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "5b45a115f0af1df30e9644ce5f2c43974b552bc018cf58624f853bc62e80e5fb"
+     }
+    ]
+   },
+   "s7-rob-01": {
+    "stage": "S7",
+    "family": "ROB",
+    "template_id": "rob_tradability",
+    "template_key": "S7/rob_tradability",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S7/rob_tradability@s7-rob-01#44136fa355",
+      "task_id": "s7-rob-07",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2019-01-02",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "ca3be0362dbd981aae0fbeb7b93b84fa1ddcd807513bc96328e7a1890e8924f1"
+     },
+     {
+      "instance_id": "S7/rob_tradability@s7-rob-01#64150974fc",
+      "task_id": "s7-rob-03",
+      "fingerprint": "64150974fc",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-03\",\"start\":\"2024-01-02\"}"
+      },
+      "window": {
+       "start": "2024-01-02",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "4f0a2d7c7d8fe637586a950ad6895b05a7f4f13d637acc8556a84df2114d8fa8"
+     },
+     {
+      "instance_id": "S7/rob_tradability@s7-rob-01#9010b12bf6",
+      "task_id": "s7-rob-04",
+      "fingerprint": "9010b12bf6",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-03\",\"start\":\"2022-01-04\"}"
+      },
+      "window": {
+       "start": "2022-01-04",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "7232d79ef8cd60aace75c5379e2626826115c16bdc0b4c4b8686ac007f64103b"
+     }
+    ]
+   },
+   "s7-rob-02": {
+    "stage": "S7",
+    "family": "ROB",
+    "template_id": "rob_underdetermined",
+    "template_key": "S7/rob_underdetermined",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S7/rob_underdetermined@s7-rob-02#44136fa355",
+      "task_id": "s7-rob-08",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2019-01-02",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "f981b14ab87328283c3c8c532868277d17caaa227c7af73302566192ac26e8f9"
+     },
+     {
+      "instance_id": "S7/rob_underdetermined@s7-rob-02#64150974fc",
+      "task_id": "s7-rob-05",
+      "fingerprint": "64150974fc",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-03\",\"start\":\"2024-01-02\"}"
+      },
+      "window": {
+       "start": "2024-01-02",
+       "end": "2026-07-03"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "dd1094aa9ac2f5a055d320102bac55a771a91fe41bcd58684aba44c9724f7e0e"
+     },
+     {
+      "instance_id": "S7/rob_underdetermined@s7-rob-02#7aa54c75eb",
+      "task_id": "s7-rob-06",
+      "fingerprint": "7aa54c75eb",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2023-12-29\",\"start\":\"2019-01-02\"}"
+      },
+      "window": {
+       "start": "2019-01-02",
+       "end": "2023-12-29"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "d75e3409294611e5c3e8390c8b46fd46cde600376d95bd4fbdb44cf1f657c767"
+     }
+    ]
+   },
+   "s8-cor-01": {
+    "stage": "S8",
+    "family": "COR",
+    "template_id": "s8_lifecycle",
+    "template_key": "S8/s8_lifecycle",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S8/s8_lifecycle@s8-cor-01#44136fa355",
+      "task_id": "s8-cor-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "751bd5fe24beef9baa9c07c5ee6dd94c65a645235cb83f5a5869b4603d1347a7"
+     },
+     {
+      "instance_id": "S8/s8_lifecycle@s8-cor-01#c4d54059aa",
+      "task_id": "s8-cor-02",
+      "fingerprint": "c4d54059aa",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-15\",\"start\":\"2026-06-15\"}"
+      },
+      "window": {
+       "start": "2026-06-15",
+       "end": "2026-07-15"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "7ab9e1a6dc25573c82bb886564b1eb224c6524338b009d94f1bc9da0119f3177"
+     },
+     {
+      "instance_id": "S8/s8_lifecycle@s8-cor-01#f882f75187",
+      "task_id": "s8-cor-03",
+      "fingerprint": "f882f75187",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-15\",\"start\":\"2026-07-01\"}"
+      },
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-15"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "09cfac42288aeffc37d2eec3ab555fb1b140d69e5dccf6de4728cb75b87c6c63"
+     }
+    ]
+   },
+   "s8-eco-01": {
+    "stage": "S8",
+    "family": "ECO",
+    "template_id": "s8_min_slippage",
+    "template_key": "S8/s8_min_slippage",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S8/s8_min_slippage@s8-eco-01#44136fa355",
+      "task_id": "s8-eco-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-31"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "02affeafa692a3f8011d06239bb8e944f64db410d5784fecf3dc4090f6372aee"
+     },
+     {
+      "instance_id": "S8/s8_min_slippage@s8-eco-01#8651587ec8",
+      "task_id": "s8-eco-02",
+      "fingerprint": "8651587ec8",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "e00933b375a14beaff632d8cd319a4e3fe084c1a92d7fd9d9ba24b9ea6fe3479"
+     },
+     {
+      "instance_id": "S8/s8_min_slippage@s8-eco-01#c4d54059aa",
+      "task_id": "s8-eco-03",
+      "fingerprint": "c4d54059aa",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-15\",\"start\":\"2026-06-15\"}"
+      },
+      "window": {
+       "start": "2026-06-15",
+       "end": "2026-07-15"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "6e614e4b9b281bd22e6b068e42e05356d2d309eadd7ea2e45546bb0df6dbeda0"
+     }
+    ]
+   },
+   "s8-ops-01": {
+    "stage": "S8",
+    "family": "OPS",
+    "template_id": "s8_audit_overreach",
+    "template_key": "S8/s8_audit_overreach",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S8/s8_audit_overreach@s8-ops-01#44136fa355",
+      "task_id": "s8-ops-04",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-15"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "df95022af52bce5bf43d6596ec683003e3d41d969ee0e5e8789904c369259590"
+     },
+     {
+      "instance_id": "S8/s8_audit_overreach@s8-ops-01#8651587ec8",
+      "task_id": "s8-ops-02",
+      "fingerprint": "8651587ec8",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "1983561f1fda917e9f38b08955ccfeab25839c06cf56d3fc1a6a1e4ea54d70eb"
+     },
+     {
+      "instance_id": "S8/s8_audit_overreach@s8-ops-01#c4d54059aa",
+      "task_id": "s8-ops-03",
+      "fingerprint": "c4d54059aa",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-15\",\"start\":\"2026-06-15\"}"
+      },
+      "window": {
+       "start": "2026-06-15",
+       "end": "2026-07-15"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "62b16b3e38f5fe9c8f2e262b148cf974fd87aa3e821bd79af45f589e9f22ec0f"
+     }
+    ]
+   },
+   "s8-rob-01": {
+    "stage": "S8",
+    "family": "ROB",
+    "template_id": "s8_idempotent",
+    "template_key": "S8/s8_idempotent",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S8/s8_idempotent@s8-rob-01#44136fa355",
+      "task_id": "s8-rob-07",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-15"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "a929708d227bb542fcfdfad40a384074ebd30f951e8c79f844998fef35ebf935"
+     },
+     {
+      "instance_id": "S8/s8_idempotent@s8-rob-01#8651587ec8",
+      "task_id": "s8-rob-03",
+      "fingerprint": "8651587ec8",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "c67019aab7c7423b4bab171ca669e3b04f9077b952f440d4f847af360e064180"
+     },
+     {
+      "instance_id": "S8/s8_idempotent@s8-rob-01#c4d54059aa",
+      "task_id": "s8-rob-04",
+      "fingerprint": "c4d54059aa",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-15\",\"start\":\"2026-06-15\"}"
+      },
+      "window": {
+       "start": "2026-06-15",
+       "end": "2026-07-15"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "132490502537c430b550d31207548864c38cdd065d1f971887923cf9bc813970"
+     }
+    ]
+   },
+   "s8-rob-02": {
+    "stage": "S8",
+    "family": "ROB",
+    "template_id": "s8_probe_calendar",
+    "template_key": "S8/s8_probe_calendar",
+    "axes": [
+     "window"
+    ],
+    "instances": [
+     {
+      "instance_id": "S8/s8_probe_calendar@s8-rob-02#44136fa355",
+      "task_id": "s8-rob-08",
+      "fingerprint": "44136fa355",
+      "is_base": true,
+      "params": {},
+      "window": {
+       "start": "2026-06-15",
+       "end": "2026-07-15"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "5da24e68a649b7c12afe4c003c99960d9f0b0c96637649ee40e418c1136dec17"
+     },
+     {
+      "instance_id": "S8/s8_probe_calendar@s8-rob-02#8651587ec8",
+      "task_id": "s8-rob-05",
+      "fingerprint": "8651587ec8",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-06-30\",\"start\":\"2026-06-01\"}"
+      },
+      "window": {
+       "start": "2026-06-01",
+       "end": "2026-06-30"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "66b79b32f347893a987ccc7384ae739929fc48709b596e2d66bee8779b8c30dc"
+     },
+     {
+      "instance_id": "S8/s8_probe_calendar@s8-rob-02#f882f75187",
+      "task_id": "s8-rob-06",
+      "fingerprint": "f882f75187",
+      "is_base": false,
+      "params": {
+       "window": "{\"end\":\"2026-07-15\",\"start\":\"2026-07-01\"}"
+      },
+      "window": {
+       "start": "2026-07-01",
+       "end": "2026-07-15"
+      },
+      "universe": "csi300",
+      "fixtures": {},
+      "instruction_fingerprint": "26c1aaf4d99707b7b5ee7bf682baa4598a0b8e05387be5db58fd488a3f44fab6"
+     }
+    ]
+   }
+  }
+ },
+ "instances_fingerprint": "969f698618eaaaae7bb319ef31d5ade997c2ddfd649bdd3a1b18cd469c0eccba",
+ "channel": "public",
+ "channel_fixtures": {
+  "s4-cor-01": {
+   "work/factor_panel.parquet": "034c4526ad20d25675dee361869a60cd3d8c6a427a008e1f9051dfaa9ccf4e92"
+  },
+  "s4-eco-01": {
+   "work/factor_pool.parquet": "53d681ea216425ab21bcd275a606e454a4713570ed79625bb6edccd81df61412"
+  },
+  "s4-ops-01": {
+   "work/factor_panel.meta.json": "2b0f609b1deb1cf076bcf32cafdf4ae1fa6b90cbe9a6fba60b53d714519abe1b",
+   "work/factor_panel.parquet": "034c4526ad20d25675dee361869a60cd3d8c6a427a008e1f9051dfaa9ccf4e92"
+  },
+  "s4-rob-01": {
+   "work/factor_panel.parquet": "cef4c743ff796622f560e650d181c222c6f698c9e80c7d078c5dd012f793429d"
+  },
+  "s5-cor-01": {
+   "work/inputs/gtja_191.001.parquet": "1cc3497b2baf5ac01bb8f4dd99fb235778f5eb9090b28f8b5cfe3db86a488271",
+   "work/inputs/manifest.json": "ac18cf7ed2626ce777e874eba9b8e6a249ec637787f85646b378f695ccafe537"
+  },
+  "s5-eco-01": {
+   "work/inputs/gtja_191.001.parquet": "94f82859a459b768bc630aae50c4a2eb412acc37f3f6c0e21ef28b0a3cf634c9",
+   "work/inputs/gtja_191.002.parquet": "128f4128e3c0c1134ff8de69c88f77868e6e07b85e90eb8c14c69c609692b434",
+   "work/inputs/gtja_191.003.parquet": "dde35e80901d3febbe47865bbd3ccc910287e6cc0c37e9029fd35bdc630a34cd",
+   "work/inputs/manifest.json": "3da4065c21331fb93be83e758991cdffb59bea6890fb7ad32949557601c0c79c"
+  },
+  "s5-ops-01": {
+   "work/inputs/gtja_191.001.parquet": "1cc3497b2baf5ac01bb8f4dd99fb235778f5eb9090b28f8b5cfe3db86a488271",
+   "work/inputs/manifest.json": "ac18cf7ed2626ce777e874eba9b8e6a249ec637787f85646b378f695ccafe537"
+  },
+  "s5-rob-01": {
+   "work/inputs/gtja_191.001.parquet": "1cc3497b2baf5ac01bb8f4dd99fb235778f5eb9090b28f8b5cfe3db86a488271",
+   "work/inputs/manifest.json": "ac18cf7ed2626ce777e874eba9b8e6a249ec637787f85646b378f695ccafe537"
+  },
+  "s6-cor-01": {
+   "work/signal_s5_gtja001_csi300_v1.parquet": "4bfb0ed5b3cd79c7feb816f815d9b4556ed8d3e40e2fe943fa7b281e51fbbfed"
+  },
+  "s6-eco-01": {
+   "work/signal_s5_gtja001_csi300_v1.parquet": "7b84f279b2aa7f4241aeb5534fe2a4f32fc33ee8bbfdff78c1f6ba53578458d0"
+  },
+  "s6-ops-01": {
+   "work/signal_s5_gtja001_csi300_v1.parquet": "7b84f279b2aa7f4241aeb5534fe2a4f32fc33ee8bbfdff78c1f6ba53578458d0"
+  },
+  "s6-rob-01": {
+   "work/signal_s6_sparse_coverage_csi300_v1.parquet": "d355abdcebd58a4af5ac7d84b15c4790612c07f1d0f58606c26751a2119c8e40"
+  },
+  "s6-rob-02": {
+   "work/signal_s5_gtja001_csi300_v1.parquet": "de075f57ad07930dcfbfddd089038d588ebc34c8eac27bc264a09cc08f49c60d"
+  },
+  "s7-cor-01": {
+   "work/signal.meta.json": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "work/signal.parquet": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325"
+  },
+  "s7-eco-01": {
+   "work/signal.meta.json": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "work/signal.parquet": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325"
+  },
+  "s7-ops-01": {
+   "work/signal.meta.json": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "work/signal.parquet": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325"
+  },
+  "s7-rob-01": {
+   "work/signal.meta.json": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "work/signal.parquet": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325"
+  },
+  "s7-rob-02": {
+   "work/signal.meta.json": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "work/signal.parquet": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325"
+  }
+ },
+ "root": "3e5ab441a991c4115a6c0fb988715f583e22ee303f582f1302fd3197fb183538"
+}

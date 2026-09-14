@@ -1,0 +1,255 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.20, pytest-9.1.1, pluggy-1.6.0 -- /data/shared/genebench/env/bin/python
+cachedir: .pytest_cache
+rootdir: /data/shared/genebench/repo
+plugins: anyio-4.14.2
+collecting ... collected 48 items
+
+ops/test_env.py::test_data_stack_importable[duckdb] 
+    [env] duckdb     1.4.3                <- /data/shared/genebench/env/lib/python3.10/site-packages/duckdb/__init__.py
+
+ops/test_env.py::test_data_stack_importable[duckdb] PASSED               [  2%]
+ops/test_env.py::test_data_stack_importable[pandas] 
+    [env] pandas     2.2.3                <- /data/shared/genebench/env/lib/python3.10/site-packages/pandas/__init__.py
+
+ops/test_env.py::test_data_stack_importable[pandas] PASSED               [  4%]
+ops/test_env.py::test_data_stack_importable[pyarrow] 
+    [env] pyarrow    20.0.0               <- /data/shared/genebench/env/lib/python3.10/site-packages/pyarrow/__init__.py
+
+ops/test_env.py::test_data_stack_importable[pyarrow] PASSED              [  6%]
+ops/test_env.py::test_data_stack_importable[qlib] 
+    [env] qlib       0.9.8.dev32          <- /data/shared/genebench/env/lib/python3.10/site-packages/qlib/__init__.py
+
+ops/test_env.py::test_data_stack_importable[qlib] PASSED                 [  8%]
+ops/test_env.py::test_gateway_stack_importable[fastapi] 
+    [env] fastapi    0.141.1              <- /data/shared/genebench/env/lib/python3.10/site-packages/fastapi/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[fastapi] PASSED           [ 10%]
+ops/test_env.py::test_gateway_stack_importable[uvicorn] 
+    [env] uvicorn    0.52.1               <- /data/shared/genebench/env/lib/python3.10/site-packages/uvicorn/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[uvicorn] PASSED           [ 12%]
+ops/test_env.py::test_gateway_stack_importable[pydantic] 
+    [env] pydantic   2.13.4               <- /data/shared/genebench/env/lib/python3.10/site-packages/pydantic/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[pydantic] PASSED          [ 14%]
+ops/test_env.py::test_gateway_stack_importable[httpx] 
+    [env] httpx      0.28.1               <- /data/shared/genebench/env/lib/python3.10/site-packages/httpx/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[httpx] PASSED             [ 16%]
+ops/test_env.py::test_gateway_stack_importable[pytest] 
+    [env] pytest     9.1.1                <- /data/shared/genebench/env/lib/python3.10/site-packages/pytest/__init__.py
+
+ops/test_env.py::test_gateway_stack_importable[pytest] PASSED            [ 18%]
+ops/test_env.py::test_running_interpreter_is_genebench_env 
+    [env] python     = /data/shared/genebench/env/bin/python3.10
+    [env] cfg.PYTHON = /data/shared/genebench/env/bin/python  (exists=True)
+
+ops/test_env.py::test_running_interpreter_is_genebench_env PASSED        [ 20%]
+ops/test_env.py::test_data_partition_has_headroom 
+    [env] /data: total=2750G used=75G free=2535G
+
+ops/test_env.py::test_data_partition_has_headroom PASSED                 [ 22%]
+ops/test_env.py::test_genebench_root_lives_on_data 
+    [env] st_dev: root=2049 /data=2049 home=64512
+
+ops/test_env.py::test_genebench_root_lives_on_data PASSED                [ 25%]
+ops/test_env.py::test_gateway_port_is_free 
+    [env] bind ok  192.168.1.48:18080 (已释放)
+
+ops/test_env.py::test_gateway_port_is_free PASSED                        [ 27%]
+ops/test_env.py::test_genebench_root_exists_and_is_dir 
+    [env] GENEBENCH_ROOT = /data/shared/genebench
+
+ops/test_env.py::test_genebench_root_exists_and_is_dir PASSED            [ 29%]
+ops/test_env.py::test_genebench_root_mode_is_0700 
+    [env] mode = 0o700 (要求 0o700)
+
+ops/test_env.py::test_genebench_root_mode_is_0700 PASSED                 [ 31%]
+ops/test_env.py::test_every_dir_under_root_blocks_group_and_world 
+    [env] 目录权限审计:24 个目录 <- /data/shared/genebench (不下钻:/data/shared/genebench/env, /data/shared/genebench/repo/.git)
+
+ops/test_env.py::test_every_dir_under_root_blocks_group_and_world PASSED [ 33%]
+ops/test_env.py::test_answer_dirs_are_exactly_0700[reference] 
+    [env] reference  /data/shared/genebench/repo/reference  mode=0o700
+
+ops/test_env.py::test_answer_dirs_are_exactly_0700[reference] PASSED     [ 35%]
+ops/test_env.py::test_answer_dirs_are_exactly_0700[scorer] 
+    [env] scorer     /data/shared/genebench/repo/scorer  mode=0o700
+
+ops/test_env.py::test_answer_dirs_are_exactly_0700[scorer] PASSED        [ 37%]
+ops/test_env.py::test_answer_artifacts_are_not_group_world_readable[reference] 
+    [env] reference  文件权限审计:1 个文件
+
+ops/test_env.py::test_answer_artifacts_are_not_group_world_readable[reference] PASSED [ 39%]
+ops/test_env.py::test_answer_artifacts_are_not_group_world_readable[scorer] 
+    [env] scorer     文件权限审计:1 个文件
+
+ops/test_env.py::test_answer_artifacts_are_not_group_world_readable[scorer] PASSED [ 41%]
+ops/test_env.py::test_genebench_root_is_writable 
+    [env] write probe ok -> .gb_write_probe_2r1tng6o.tmp
+
+ops/test_env.py::test_genebench_root_is_writable PASSED                  [ 43%]
+ops/test_env.py::test_subdirs_exist[REPO] 
+    [env] REPO       /data/shared/genebench/repo  exists=True
+
+ops/test_env.py::test_subdirs_exist[REPO] PASSED                         [ 45%]
+ops/test_env.py::test_subdirs_exist[ENV] 
+    [env] ENV        /data/shared/genebench/env  exists=True
+
+ops/test_env.py::test_subdirs_exist[ENV] PASSED                          [ 47%]
+ops/test_env.py::test_subdirs_exist[LOGS] 
+    [env] LOGS       /data/shared/genebench/logs  exists=True
+
+ops/test_env.py::test_subdirs_exist[LOGS] PASSED                         [ 50%]
+ops/test_env.py::test_subdirs_exist[SNAPSHOTS] 
+    [env] SNAPSHOTS  /data/shared/genebench/snapshots  exists=True
+
+ops/test_env.py::test_subdirs_exist[SNAPSHOTS] PASSED                    [ 52%]
+ops/test_env.py::test_subdirs_exist[RESULTS] 
+    [env] RESULTS    /data/shared/genebench/results  exists=True
+
+ops/test_env.py::test_subdirs_exist[RESULTS] PASSED                      [ 54%]
+ops/test_env.py::test_subdirs_exist[WHEELS] 
+    [env] WHEELS     /data/shared/genebench/wheels  exists=True
+
+ops/test_env.py::test_subdirs_exist[WHEELS] PASSED                       [ 56%]
+ops/test_env.py::test_subdirs_exist[OPS] 
+    [env] OPS        /data/shared/genebench/repo/ops  exists=True
+
+ops/test_env.py::test_subdirs_exist[OPS] PASSED                          [ 58%]
+ops/test_env.py::test_config_importable_and_paths_derive_from_root 
+    [env] genebench_config <- /data/shared/genebench/repo/genebench_config.py
+
+ops/test_env.py::test_config_importable_and_paths_derive_from_root PASSED [ 60%]
+ops/test_env.py::test_harden_umask_sets_required_umask PASSED            [ 62%]
+ops/test_env.py::test_create_dir_is_0700_at_every_level_even_under_loose_umask 
+    [env] create_dir 三级全 0700(umask=002 下)-> /data/shared/genebench/.gb_mkdir_probe_im64n8qh/a/b/c
+
+ops/test_env.py::test_create_dir_is_0700_at_every_level_even_under_loose_umask PASSED [ 64%]
+ops/test_env.py::test_create_dir_rejects_group_or_world_readable_mode PASSED [ 66%]
+ops/test_env.py::test_wildcard_bind_0_0_0_0_raises PASSED                [ 68%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[0.0.0.0] PASSED   [ 70%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[] PASSED          [ 72%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[::] PASSED        [ 75%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[*] PASSED         [ 77%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[[::]] PASSED      [ 79%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[  0.0.0.0  ] PASSED [ 81%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[::0] PASSED       [ 83%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[0] PASSED         [ 85%]
+ops/test_env.py::test_wildcard_bind_variants_all_raise[None] PASSED      [ 87%]
+ops/test_env.py::test_non_wildcard_bind_passes[192.168.1.48] PASSED      [ 89%]
+ops/test_env.py::test_non_wildcard_bind_passes[127.0.0.1] PASSED         [ 91%]
+ops/test_env.py::test_non_wildcard_bind_passes[localhost] PASSED         [ 93%]
+ops/test_env.py::test_catalog_opens_read_only 
+    [env] catalog  /home/ljn/projects/data/market_lake/catalog/market.duckdb  access_mode=read_only  views=150
+    [env] catalog  size=536576 mtime_moved_during_test=False  (外部 ETL 在写,非本测试所为)
+
+ops/test_env.py::test_catalog_opens_read_only PASSED                     [ 95%]
+ops/test_env.py::test_every_duckdb_connect_in_repo_is_read_only 
+    [env] 扫了 12 个 .py,可写 duckdb 连接 0 处
+
+ops/test_env.py::test_every_duckdb_connect_in_repo_is_read_only PASSED   [ 97%]
+ops/test_env.py::test_gold_and_qlib_release_are_readable 
+    [env] gold datasets = 147  <- /home/ljn/projects/data/market_lake/gold
+    [env] qlib release  <- /home/ljn/projects/data/qlib/releases/2026-08-26
+
+ops/test_env.py::test_gold_and_qlib_release_are_readable PASSED          [100%]
+
+============================== 48 passed in 0.58s ==============================
+
+================================================================================
+card 0.1-fix 补充取证（2026-08-30 13:40 UTC）
+================================================================================
+上面这一份是 `git commit b3aedfa` **之后**重跑的，PYTEST_EXIT=0，日志里 "xfail"
+出现 0 次。以下是三条不在 pytest 输出里、但独立验收点名要看的证据。
+
+--------------------------------------------------------------------------------
+[证据 1] 目录权限现状：$GENEBENCH_ROOT 下 22 个受审目录（含根）全部 0700
+--------------------------------------------------------------------------------
+$ R=/data/shared/genebench
+$ find "$R" -mindepth 1 -type d \( -path "$R/env" -o -path "$R/repo/.git" \) \
+      -prune -o -type d -printf "%m %p\n" | sort
+700 /data/shared/genebench/logs
+700 /data/shared/genebench/repo
+700 /data/shared/genebench/repo/gateway
+700 /data/shared/genebench/repo/ops
+700 /data/shared/genebench/repo/ops/acceptance
+700 /data/shared/genebench/repo/ops/env_baseline
+700 /data/shared/genebench/repo/ops/__pycache__
+700 /data/shared/genebench/repo/ops/recon
+700 /data/shared/genebench/repo/ops/recon/probes
+700 /data/shared/genebench/repo/__pycache__
+700 /data/shared/genebench/repo/.pytest_cache
+700 /data/shared/genebench/repo/.pytest_cache/v
+700 /data/shared/genebench/repo/.pytest_cache/v/cache
+700 /data/shared/genebench/repo/reference
+700 /data/shared/genebench/repo/runner
+700 /data/shared/genebench/repo/scorer
+700 /data/shared/genebench/repo/snapshots
+700 /data/shared/genebench/repo/tasks
+700 /data/shared/genebench/results
+700 /data/shared/genebench/snapshots
+700 /data/shared/genebench/wheels
+
+$ stat -c "%a %n" "$R" "$R/env" "$R/repo/.git"     # 两个豁免子树的根，仍被硬断言
+700 /data/shared/genebench
+700 /data/shared/genebench/env
+700 /data/shared/genebench/repo/.git
+
+（测试报的是 24 个 = 上表 21 个 + 根 + env + .git；find 的 -prune 不打印那两个。）
+
+$ find "$R/repo" -type f -printf "%m %p\n" | awk '$1 !~ /^[0-7]00$/'
+（空 —— repo 下没有任何文件对组/其它开放）
+
+--------------------------------------------------------------------------------
+[证据 2] 豁免 .git/ 内部不是偷懒：commit 一次就冒出 9 个 0775 目录
+--------------------------------------------------------------------------------
+$ cd /data/shared/genebench/repo && find .git -type d -printf "%m " \
+      | tr " " "\n" | sort | uniq -c
+     51 700
+      9 775
+
+git 的 adjust_shared_perm 按 `0o777 & ~umask` 建 objects/xx，本机 umask=002
+→ 0775，且每次 commit/gc/fetch 都会再冒新的。逐个 chmod 追不上。
+安全论证不靠"里面也 700"，靠 **.git/ 这个根是 0700、旁人穿不进去**；
+而这个根就在审计范围内（见证据 1）。env/（约 2 万条目、conda 随时重建）同理。
+
+--------------------------------------------------------------------------------
+[证据 3] 负例：护栏确实会红，不是摆设
+--------------------------------------------------------------------------------
+负例 1 —— 人为造一个组可写目录（模拟"下一张卡裸 mkdir 建 scorer 子目录"）：
+
+$ mkdir -m 775 -p /data/shared/genebench/repo/scorer/.gb_neg_probe
+$ python -m pytest ops/test_env.py -q -k "blocks_group_and_world or answer_"
+E   AssertionError: 1 个目录对组/其它开放（红线 5）; 建目录请用 cfg.create_dir()，别裸 mkdir。
+E     0o775  /data/shared/genebench/repo/scorer/.gb_neg_probe
+E     修：chmod -R go-rwx /data/shared/genebench/repo
+1 failed, 4 passed, 43 deselected
+（探针已 rmdir 清理，见证据 1 中 scorer/ 下无残留）
+
+负例 2 —— 隔离环境不存在（模拟 conda clone 丢失）。修复前这里是 xfail + exit 0：
+
+$ GENEBENCH_ROOT=/data/shared/genebench/.gb_absent_root \
+    python -m pytest ops/test_env.py -q -k "running_interpreter or subdirs_exist"
+FAILED ops/test_env.py::test_running_interpreter_is_genebench_env
+FAILED ops/test_env.py::test_subdirs_exist[REPO]
+FAILED ops/test_env.py::test_subdirs_exist[ENV]
+FAILED ops/test_env.py::test_subdirs_exist[LOGS]
+FAILED ops/test_env.py::test_subdirs_exist[SNAPSHOTS]
+FAILED ops/test_env.py::test_subdirs_exist[RESULTS]
+FAILED ops/test_env.py::test_subdirs_exist[WHEELS]
+FAILED ops/test_env.py::test_subdirs_exist[OPS]
+8 failed, 40 deselected      ← 硬失败，0 xfail
+（该路径只被 stat，未被创建；跑完 $GENEBENCH_ROOT 下无 .gb_* 残留）
+
+--------------------------------------------------------------------------------
+[附] 已知副作用取证（独立验收的第 5 条）
+--------------------------------------------------------------------------------
+$ stat -c "%y %n" /home/ljn/.conda/environments.txt /home/ljn/.condarc
+2026-08-30 13:07:00.657861157 +0000 /home/ljn/.conda/environments.txt   ← 被追加
+2026-08-02 14:42:04.556231569 +0000 /home/ljn/.condarc                  ← 未被触碰
+
+environments.txt 现有 4 行，前 3 行（miniconda3 / qlib_env /
+qlib_env_broken_20260802）原样未动，第 4 行是新追加的
+/data/shared/genebench/env。详见 ops/tickets.md 附录 B。

@@ -1,0 +1,20 @@
+# 卡 A9 票据（2026-09-14）—— 单机形态实现成一条不含跨机步骤的路径
+
+本卡落地的是用户 2026-09-14 的裁定 ①②：单机路径**不调** `ops/push_exec_to_f02.sh` 与
+`ops/push_bundle_to_f02.sh`（单机没有「推」这件事），两步换成本地落位；单机路径上的根
+全部从 `cfg.GENEBENCH_ROOT` 现算。**双机路径一个字节都没动**（含 N-842 那道 timer 核查，
+也没有加任何 `--force` 之类的绕过开关）。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-838 | `ops/gateway_lock.py` 的锁根写死发布方绝对路径 | **已修** | `lock_path()` 从 `cfg.GENEBENCH_ROOT` 现算，另留 `GENEBENCH_GATEWAY_LOCK` 覆盖。**互斥语义逐条核过并写进 docstring**：同机同根仍互斥（`ops/test_A9.py` 真起两个进程量）、不同根互不干扰（两套独立部署）、同机两套根共用一个网关实例时用那个环境变量指同一个文件。发布方取值逐字不变。 |
+| N-841 | `ops/run_joblist.py::RUNNER_ROOT` 写死、`push_bundle_to_f02.sh` 把「目标必须在 `/data/genebench_runner/` 下」写成硬判据 | **已修（单机侧）** | `runner_root()` 现算；落点判据在单机分支里保留，只是根现算（`runner/placement.place_bundle` ②）。`push_bundle_to_f02.sh` 本身**一字未动** —— 它是双机形态的真判据。 |
+| N-840 | `ops/push_exec_to_f02.sh:29/:32` 的 `GENEBENCH_PY` / `GENEBENCH_EXEC_STAGE` 默认发布方绝对路径 → rc=127 | **单机侧消解** | 单机路径根本不调这个脚本（裁定 ①），改走 `python -m runner.placement --topology single --place-exec --with-launch-data`。**双机侧仍在**，见 N-851。 |
+| N-842 | `ops/push_bundle_to_f02.sh:36-42` 推前 ssh 核 `genebench-answer-plane-scan.timer`，Mac 上过不去且无开关 | **单机侧消解** | 单机不推、不核远端 timer；答案面纪律改用**落位即扫**（push_guard + 容器边界 + 落地树扫，同一份实现）。少了什么见 N-849。 |
+| N-848 | 单机形态的 exec 树落位入口要进文档 | 待卡 C | README §2.4 ③ 与手册 §1.3 那张表：单机把 `ops/push_exec_to_f02.sh --with-launch-data` 换成 `GENEBENCH_TOPOLOGY=single $PY -m runner.placement --place-exec --with-launch-data`；④ 真跑加 `--topology single`。 |
+| N-849 | 单机形态没有「每小时兜底扫描」的等价物 | 登记不修 | 双机那条核的是 f02 上 systemd 的 `genebench-answer-plane-scan.timer`（N-61）。单机用落位即扫替代；差别是「落完了、还没跑」那段时间窗里没有第二次周期复查。要不要给单机形态一个 cron/launchd 等价物，请裁定。 |
+| N-850 | `ops/mk_tables.py:295` 表脚渲染的「复现命令」写死发布方解释器与仓库路径 | 登记不修 | 外部单机用户照抄不到（`PY=/data/shared/genebench/env/bin/python; cd /data/shared/genebench/repo`）。它不改变本进程取任何路径，故不挡单机链路；`ops/mk_tables.py` 不在本卡可改路径内。 |
+| N-851 | N-840 在**双机**路径上仍在 | 登记不修 | 裁定 ① 要求双机路径逐字节不变，本卡因此没动那个脚本。外部**双机**用户仍会撞 rc=127，且这两个变量在 README / 手册 / HANDOFF 里 grep 命中 0 次。 |
+| N-852 | `runner/f02/answer_plane_guard.py::DEFAULT_ROOT` / `DEFAULT_LOG` 仍是发布方绝对路径 | 登记不修 | f02 上那个每小时的 systemd timer 正吃这两个默认，动它等于悄悄改掉「兜底扫描扫哪棵树」。单机路径**永远显式传 `--root` / `--log`**，有一条测试钉住。 |
+| N-853 | 单机真跑的 inner 用 `umask 077`（双机是 022） | 已实现，记因 | 单机执行面根落在 `$GENEBENCH_ROOT` 下，而红线 5 要求那棵树下每个目录 go-rwx；077 比 022 更严，B7 要挡的「0775 的 `__pycache__`」被一并挡住。容器以 `run_uid:run_gid`（= 起它的那个用户）跑，0700 读得到。将来若有容器以别的 uid 跑，要重审这一条。 |
+| N-854 | `$GB/staging/` 里的旧 bundle 通行证已过期 | 登记不修 | 本卡实测：`v1demo_s1-cor-01` 的通行证是 `v1.0-smoke / 1.0.13`，当前是 `v1.0-smoke-public / p1.0.0`，`push_guard` 正确拒绝。这是暂存目录陈旧，不是缺陷；复用暂存的 `reuse` 分支靠 `frozen_manifest.root` 比对，行为正确。 |

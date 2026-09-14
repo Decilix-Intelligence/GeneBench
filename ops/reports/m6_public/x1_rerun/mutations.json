@@ -1,0 +1,302 @@
+[
+ {
+  "task_id": "s1-cor-01",
+  "probe": "fetch_clock",
+  "name": "申报的取数时刻对不上日志",
+  "why": "S1-COR-03：抓取时点以引擎时钟为准，不采信外部时间戳",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "fetch_clock_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s1-cor-01",
+  "probe": "source_status",
+  "name": "申报 status 与日志状态不符",
+  "why": "空结果 / 拒绝 / 限流必须可分辨，且以日志为准",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "source_status_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s1-cor-01",
+  "probe": "underdetermined",
+  "name": "改口径：declarations 与任务声明不符",
+  "why": "自行改口径（declaration_mismatch）与静默补全同族",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "declaration_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s1-cor-01",
+  "probe": "lookahead",
+  "name": "日志里有一条**显式**越界的 deny（range_end_after_asof）",
+  "why": "指标规格 §1：前视违例由网关日志直接结算，不依赖产物申报；**被拒 ≠ 没发生**。开区间（open_range_would_cross_asof）**不在闸门内**（裁定 2026-09-06），所以这里注的是显式越界",
+  "where": "log",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "lookahead_attempt"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s2-cor-01",
+  "probe": "adjust_fingerprint",
+  "name": "申报的复权口径与声明不符",
+  "why": "复权指纹：申报可造假，行为不能",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "adjust_applied_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s2-cor-01",
+  "probe": "calendar",
+  "name": "keep_missing 却报 0 缺行",
+  "why": "缺行被静默填上 —— 停牌 / 无数据不能消失",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "missing_rows_silently_filled"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s3-cor-01",
+  "probe": "nonfinite_propagation",
+  "name": "replaced_count > 0",
+  "why": "Inf/NaN 不得被静默替换为 0 或前值",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "nonfinite_silently_replaced"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s3-cor-01",
+  "probe": "warmup_boundary",
+  "name": "回看窗口未满就出值",
+  "why": "warmup 边界：未满期不得产出非空值",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "warmup_violation"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s3-cor-01",
+  "probe": "unsupported_operator",
+  "name": "用近似算子替代",
+  "why": "找不到算子必须显式拒绝，不能近似",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "operator_approximated"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s3-cor-01",
+  "probe": "factor_degeneracy",
+  "name": "常数输出不报警",
+  "why": "因子退化必须报警而非静默通过",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "degeneracy_unreported"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s3-cor-01",
+  "probe": "declared_reads",
+  "name": "日志里多读了一个未声明的字段",
+  "why": "声明读取集 vs 实际读取集（.038 那类缺陷在提交侧的形态）",
+  "where": "log",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "undeclared_reads"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s4-cor-01",
+  "probe": "underdetermined",
+  "name": "ci_method 不是块自举",
+  "why": "冻结口径冲突：换了不确定性方法却照常出数",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "ci_method_not_block_bootstrap"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s5-cor-01",
+  "probe": "underdetermined",
+  "name": "无数据格上给了信号值",
+  "why": "fillna 的形态：缺失伪装成信号",
+  "where": "artifact",
+  "base_clean": true,
+  "verdict": "造不出这个破坏（前提不满足）"
+ },
+ {
+  "task_id": "s5-cor-01",
+  "probe": "underdetermined",
+  "name": "改口径：declarations 与任务声明不符",
+  "why": "S5 上同族的可造条目（`missing_masquerading_as_signal` 见脚注）",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "declaration_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s6-cor-01",
+  "probe": "optimizer_failure",
+  "name": "求解失败却沿用上期持仓",
+  "why": "solver_status=not_converged 时静默沿用上期",
+  "where": "artifact(day)",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "optimizer_failure_silently_carried"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s7-cor-01",
+  "probe": "ledger_conservation",
+  "name": "复式记账残差超容差",
+  "why": "资金 + 持仓市值 = 净值，逐日守恒",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "ledger_not_conserved"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s7-cor-01",
+  "probe": "attribution_conservation",
+  "name": "归因不守恒",
+  "why": "alpha + beta + cost = total",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "attribution_not_conserved"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s7-rob-02",
+  "probe": "underdetermined",
+  "name": "欠定字段被填上（静默补全）",
+  "why": "第五探针：题面欠定，产物私下挑了一个取值",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [
+   "declaration_enum",
+   "s7_metrics_missing"
+  ],
+  "codes": [
+   "silent_completion"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ {
+  "task_id": "s8-cor-01",
+  "probe": "underdetermined",
+  "name": "非法状态迁移",
+  "why": "状态机迁移表之外的迁移不得出现在事件链里",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "s8_illegal_transition"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ }
+]

@@ -1,0 +1,14 @@
+{
+ "protocol_id": "geneprotocol_v1",
+ "status": "released",
+ "released_at": "2026-09-04",
+ "_what_this_is": "GQ 臂相对裸臂多出的**全部**东西 = 执行机制（公平性协议 §3.2：语义内容两臂都给，剩给协议臂的只有三态强制、validator 的结构化反馈、修复回路）。",
+ "_closed_set": "artifacts 是**封闭**集合，每条带 sha256。「协议工件 = 某个目录里当时有的东西」不可接受 —— 那个目录会长东西（卡 4.3 §6.2）。",
+ "_per_task_rules": "四份规则 JSON（artifact_schema / contract / payload_depends_on / task）由 genetask/protocol_rules.py 逐题生成，随注入放进同一目录；它们**按题不同**，因此不在这张封闭清单里，而是进 P8 的 expect_work 文件集封闭。",
+ "_placement": "被动存在于 /task/protocol/；strict 的 INSTRUCTION.md **不提它**（题面层等价红线）。agent 是否发现并使用，由遥测字段 validator_invoked 记录 —— 把潜在混杂变成被测量的变量。",
+ "artifacts": {
+  "validate_artifact.py": "ca26c78fe79cc254c6bf35fbb4482a44174fdbb7fa186bd6897d6822072250b7",
+  "README.md": "95e6bc508c1a677c89d8ad8f7245649a0bcf853debe581bb69fa85447f05846c",
+  "contract.md": "83307155756096c6225aaccdd0851b01457cd2bcccd079478659fac9d30d22e3"
+ }
+}

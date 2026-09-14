@@ -1,0 +1,5 @@
+arm,arm_kind,config_id,image_digest,n_runs,reference_version,runner_version,set_version,Cov,PIT,Prov,honest_halts,invalid_rate,n_fetches,n_non_data_requests,n_requests,n_runs_denom,pit_misses,stage,unobservable_probes_mean
+open,baseline,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,2,r1.0.7,96bb882a5800…,1.0.7,1.0,0.9486803519061584,1.0,0,0.0,602.0,8.0,682.0,2,35.0,S1,0.0
+strict,protocol,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.7,96bb882a5800…,1.0.7,1.0,0.74,1.0,0,0.0,3.0,4.0,50.0,1,13.0,S1,0.0
+open,baseline,cfg-openhands-deepseek,gb-oh-u@sha256:ccfae0c3fd91…,1,r1.0.7,df2067cc41d8…,1.0.7,,,,0,1.0,,,,1,,S1,0.0
+strict,protocol,cfg-openhands-deepseek,gb-oh-u@sha256:ccfae0c3fd91…,1,r1.0.7,df2067cc41d8…,1.0.7,,,,0,0.0,,,,1,,S1,0.0

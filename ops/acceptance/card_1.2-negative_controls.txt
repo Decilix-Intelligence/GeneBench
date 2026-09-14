@@ -1,0 +1,25 @@
+
+=== A. 全历史独立复算(不分年,按 code 顺序走)===
+[PASS] 全历史 rows — 产物 15,073,606 vs 独立复算 15,073,606
+[PASS] 全历史 suspend — 产物 472,920 vs 独立复算 472,920
+[PASS] 全历史 no_data — 产物 18,709 vs 独立复算 18,709
+[PASS] 全历史 suspend_d_S — 产物 450,823 vs 独立复算 450,823
+[PASS] 全历史 carried_after_S — 产物 22,097 vs 独立复算 22,097
+
+=== B. 负控:把判定逐条退化,看断言会不会红 ===
+[PASS] B1 去掉顺延会改变结论 — 正确 ['suspend', 'suspend', 'suspend'] vs 退化 ['suspend', 'no_data', 'no_data']
+[PASS] B2 不排哨兵会误判 limit_down
+[PASS] B3 用 high 才看得见炸板
+[PASS] B4 盘中停牌不许判 suspend
+[PASS] B5 洞会切断顺延
+[PASS] B6 carry_in 生效
+
+=== C. 篡改产物 -> 验收测试必须红 ===
+[PASS] C1 篡改 status 后自洽检查变红 — ============ short test summary info ============================
+FAILED ops/test_tradability.py::test_status_is_reproducible_from_its_own_row
+1 failed in 4.23s
+[PASS] C2 还原后恢复绿 —                                                         [100%]
+1 passed in 4.30s
+
+============================================================
+负控 PASS(全部)

@@ -1,0 +1,66 @@
+{
+ "scorer_output": null,
+ "record": {
+  "task_id": "s7-cor-01",
+  "stage": "S7",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "open",
+  "seq": 1,
+  "run_id": "s7-cor-01.open.cfg-codex-deepseek.r01",
+  "set_version": "1.0.7",
+  "reference_version": "r1.0.8",
+  "runner_version": "df2067cc41d87b0783da1b7a929693e6b53276e3d171be43b08fe81a313b9ad9",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "budget_exhausted",
+  "sr_bucket": "unscorable_agent",
+  "validity": null,
+  "malformed": null,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {},
+  "findings": [],
+  "l3_kind": null,
+  "l3_pass": null,
+  "l3_score": null,
+  "effect": null,
+  "effect_withheld_reason": null,
+  "anchor": null,
+  "correctness": {},
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "",
+  "steps": 44,
+  "tokens_prompt": 3015177,
+  "tokens_completion": 54333,
+  "cost_usd": 1.39839744,
+  "cost_model": "deepseek-chat",
+  "latency_s": 1128.14,
+  "validator_rejections": null,
+  "overreach": {
+   "denied": 7,
+   "total": 69,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "open_range_would_cross_asof": 4,
+    "beyond_freeze_line": 3
+   },
+   "malformed_requests": 34,
+   "malformed_reasons": {
+    "asof_missing": 10,
+    "unclassified": 16,
+    "param_malformed": 8
+   }
+  },
+  "unbounded_requests": 4,
+  "budget": {
+   "max_calls": 50,
+   "max_tokens": 3000000,
+   "calls": 44,
+   "tokens": 3069510,
+   "detail": "tokens=3069510 已达上限 3000000"
+  },
+  "anchor_status": "fixed",
+  "unexpected_files": []
+ }
+}

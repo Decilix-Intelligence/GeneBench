@@ -1,0 +1,323 @@
+# 双臂措辞表：字段 → 取值键 → {strict, open}
+# 纪律（2026-09-02 退回后定死）：strict = 记号 + 括注，括注内容与 open 的自然语言**同义同量**；
+# open 不带 strict 没有的义务或解释；情态/量词（最多/至少/恰好/一律/只能/必须/可以/仅）两臂要么都有要么都没有。
+# 欠定字段的全部取值措辞会被 E2 拿去扫两臂（零命中），所以措辞要有辨识度、不要用泛词。
+
+calendar_id:
+  SSE:
+    strict: calendar_id=SSE（交易日按上海证券交易所日历，接口值 SSE）
+    open: 交易日按上海证券交易所日历，接口值 SSE
+data_version:
+  v1:
+    strict: data_version=v1（v1 冻结快照，接口值 v1）
+    open: 数据用 v1 冻结快照，接口值 v1
+universe:
+  csi300:
+    strict: universe=csi300（沪深300成分股，接口值 csi300）
+    open: 标的范围是沪深300成分股，接口值 csi300
+  csi500:
+    strict: universe=csi500（中证500成分股，接口值 csi500）
+    open: 标的范围是中证500成分股，接口值 csi500
+universe_ref:
+  csi300@2026-07-31:
+    strict: universe_ref=csi300@2026-07-31（标的范围是截至 2026-07-31 的沪深300成分股，按 PIT 宇宙，接口值 csi300@2026-07-31）
+    open: 标的范围是截至 2026-07-31 的沪深300成分股，按 PIT 宇宙，接口值 csi300@2026-07-31
+  csi500@2026-07-31:
+    strict: universe_ref=csi500@2026-07-31（标的范围是截至 2026-07-31 的中证500成分股（按 PIT 宇宙），接口值 csi500@2026-07-31）
+    open: 标的范围是截至 2026-07-31 的中证500成分股（按 PIT 宇宙），接口值 csi500@2026-07-31
+adjust:
+  post:
+    strict: adjust=post（价格用后复权口径，接口值 post）
+    open: 价格用后复权口径，接口值 post
+  none:
+    strict: adjust=none（价格用未复权口径，接口值 none）
+    open: 价格用未复权口径，接口值 none
+missing_row_policy:
+  keep_missing:
+    strict: missing_row_policy=keep_missing（缺行保留为缺失，不补行，接口值 keep_missing）
+    open: 缺行保留为缺失，不补行，接口值 keep_missing
+  drop:
+    strict: missing_row_policy=drop（缺行直接从面板里删掉，只留有行情的格子，接口值 drop）
+    open: 缺行直接从面板里删掉，只留有行情的格子，接口值 drop
+alignment_target:
+  market_view_v1:
+    strict: alignment_target=market_view_v1（对齐到 market_view_v1 的字段命名，接口值 market_view_v1）
+    open: 对齐到 market_view_v1 的字段命名，接口值 market_view_v1
+required_fields:
+  close:
+    strict: required_fields=[close]（这个因子只需要收盘价）
+    open: 这个因子只需要收盘价
+  close,volume:
+    strict: required_fields=[close, volume]（这个因子需要收盘价与成交量）
+    open: 这个因子需要收盘价与成交量
+  open,volume:
+    strict: required_fields=[open, volume]（这个因子只需要开盘价与成交量）
+    open: 这个因子只需要开盘价与成交量
+  open,high,low,close:
+    strict: required_fields=[open, high, low, close]（这个因子需要开、高、低、收四个价格）
+    open: 这个因子需要开、高、低、收四个价格
+  open,close,vwap:
+    strict: required_fields=[open, close, vwap]（这个因子需要开盘价、收盘价与成交均价 vwap）
+    open: 这个因子需要开盘价、收盘价与成交均价 vwap
+lookback:
+  '20':
+    strict: lookback=20（回看窗口 20 个交易日）
+    open: 回看窗口 20 个交易日
+  '1':
+    strict: lookback=1（回看窗口 1 个交易日（逐截面即可算出，没有跨日算子））
+    open: 回看窗口 1 个交易日（逐截面即可算出，没有跨日算子）
+  '10':
+    strict: lookback=10（回看窗口 10 个交易日）
+    open: 回看窗口 10 个交易日
+  '24':
+    strict: lookback=24（回看窗口 24 个交易日）
+    open: 回看窗口 24 个交易日
+eval_frequency:
+  daily:
+    strict: eval_frequency=daily（按日频评估，接口值 daily）
+    open: 按日频评估，接口值 daily
+  weekly:
+    strict: eval_frequency=weekly（按周频评估，只取每周最后一个交易日的截面，接口值 weekly）
+    open: 按周频评估，只取每周最后一个交易日的截面，接口值 weekly
+  monthly:
+    strict: eval_frequency=monthly（按月频评估，只取每月最后一个交易日的截面，接口值 monthly）
+    open: 按月频评估，只取每月最后一个交易日的截面，接口值 monthly
+operator_semantics:
+  '{"ts_rank":"pct_0_1"}':
+    strict: 'operator_semantics={ts_rank: pct_0_1}（ts_rank 取 (0,1] 的百分位秩）'
+    open: ts_rank 取 (0,1] 的百分位秩
+  '{"correlation":"pearson_rolling_window"}':
+    strict: 'operator_semantics={correlation: pearson_rolling_window}（correlation 是两条序列在滚动窗口内的 Pearson 相关系数）'
+    open: correlation 是两条序列在滚动窗口内的 Pearson 相关系数
+  '{"power":"elementwise_pow_no_clip"}':
+    strict: 'operator_semantics={power: elementwise_pow_no_clip}（幂运算逐元素原样计算，结果不截断、不夹逼）'
+    open: 幂运算逐元素原样计算，结果不截断、不夹逼
+  '{"dialect":"qlib_expression"}':
+    strict: 'operator_semantics={dialect: qlib_expression}（全部算子按 qlib 表达式引擎的语义解释）'
+    open: 全部算子按 qlib 表达式引擎的语义解释
+  '{"rank":"cs_pct_0_1","sum":"rolling_sum_n"}':
+    strict: 'operator_semantics={rank: cs_pct_0_1, sum: rolling_sum_n}（RANK 是同一截面内的百分位秩（取值落在 (0,1]），SUM 是滚动 n 日求和）'
+    open: RANK 是同一截面内的百分位秩（取值落在 (0,1]），SUM 是滚动 n 日求和
+  '{"mean":"simple_rolling_mean_n"}':
+    strict: 'operator_semantics={mean: simple_rolling_mean_n}（MEAN 是滚动 n 日的简单算术平均）'
+    open: MEAN 是滚动 n 日的简单算术平均
+param_order:
+  window:
+    strict: param_order=[window]（算子参数顺序：只有 window 一个参数）
+    open: 算子参数顺序：只有 window 一个参数
+  series_a,series_b,window:
+    strict: param_order=[series_a, series_b, window]（算子参数顺序：第一条序列、第二条序列、窗口长度）
+    open: 算子参数顺序：第一条序列、第二条序列、窗口长度
+  base,exponent:
+    strict: param_order=[base, exponent]（算子参数顺序：底数在前、指数在后）
+    open: 算子参数顺序：底数在前、指数在后
+  series,window:
+    strict: param_order=[series, window]（算子参数顺序：序列在前、窗口长度在后）
+    open: 算子参数顺序：序列在前、窗口长度在后
+nonfinite_policy:
+  propagate:
+    strict: nonfinite_policy=propagate（Inf/NaN 原样传播，不替换为 0 或前值，接口值 propagate）
+    open: Inf/NaN 原样传播，不替换为 0 或前值，接口值 propagate
+warmup_policy:
+  null_until_full:
+    strict: warmup_policy=null_until_full（回看窗口未满的日期输出空值，接口值 null_until_full）
+    open: 回看窗口未满的日期输出空值，接口值 null_until_full
+quantiles:
+  '10':
+    strict: quantiles=10（分 10 个分位组）
+    open: 分 10 个分位组
+tie_handling:
+  average:
+    strict: tie_handling=average（并列值取平均秩，接口值 average）
+    open: 并列值取平均秩，接口值 average
+weighting:
+  equal:
+    strict: weighting=equal（组内等权，接口值 equal）
+    open: 组内等权，接口值 equal
+rebalance_timing:
+  close:
+    strict: rebalance_timing=close（收盘后调仓，接口值 close）
+    open: 收盘后调仓，接口值 close
+holding_periods:
+  1,5,20:
+    strict: holding_periods=[1, 5, 20]（持有期分别看 1、5、20 个交易日）
+    open: 持有期分别看 1、5、20 个交易日
+  '5':
+    strict: holding_periods=[5]（持有期看 5 个交易日）
+    open: 持有期看 5 个交易日
+ic_method:
+  spearman:
+    strict: ic_method=spearman（IC 用 Spearman 秩相关，接口值 spearman）
+    open: IC 用 Spearman 秩相关，接口值 spearman
+annualization:
+  '252':
+    strict: annualization=252（年化按 252 个交易日）
+    open: 年化按 252 个交易日
+uncertainty_method:
+  block_bootstrap:
+    strict: uncertainty_method=block_bootstrap（区间用 block-bootstrap 算，接口值 block_bootstrap）
+    open: 区间用 block-bootstrap 算，接口值 block_bootstrap
+value_semantics:
+  score:
+    strict: value_semantics=score（信号值是可比的分数，不是秩，接口值 score）
+    open: 信号值是可比的分数，不是秩，接口值 score
+  rank:
+    strict: value_semantics=rank（信号值是秩，只有顺序有意义，接口值 rank）
+    open: 信号值是秩，只有顺序有意义，接口值 rank
+signal_frequency:
+  daily:
+    strict: signal_frequency=daily（信号按日生成，接口值 daily）
+    open: 信号按日生成，接口值 daily
+  weekly:
+    strict: signal_frequency=weekly（信号每周只在最后一个交易日生成一次，接口值 weekly）
+    open: 信号每周只在最后一个交易日生成一次，接口值 weekly
+  monthly:
+    strict: signal_frequency=monthly（信号每月只在最后一个交易日生成一次，接口值 monthly）
+    open: 信号每月只在最后一个交易日生成一次，接口值 monthly
+direction:
+  higher_is_long:
+    strict: direction=higher_is_long（信号越大越看多，接口值 higher_is_long）
+    open: 信号越大越看多，接口值 higher_is_long
+  lower_is_long:
+    strict: direction=lower_is_long（信号越小越看多，接口值 lower_is_long）
+    open: 信号越小越看多，接口值 lower_is_long
+missing_policy:
+  keep_null:
+    strict: missing_policy=keep_null（无观点的格子保持为空，不填 0，接口值 keep_null）
+    open: 无观点的格子保持为空，不填 0，接口值 keep_null
+input_factors:
+  gtja_191.001:
+    strict: input_factors=[gtja_191.001]（输入因子只有 gtja_191.001）
+    open: 输入因子只有 gtja_191.001
+  gtja_191.001,gtja_191.002,gtja_191.003:
+    strict: input_factors=[gtja_191.001, gtja_191.002, gtja_191.003]（输入因子是 gtja_191.001、gtja_191.002、gtja_191.003 三条）
+    open: 输入因子是 gtja_191.001、gtja_191.002、gtja_191.003 三条
+constraints:
+  '{"long_only":true,"max_weight":0.1}':
+    strict: 'constraints={long_only: true, max_weight: 0.1}（只做多，单票权重上限 10%）'
+    open: 只做多，单票权重上限 10%
+  '{"full_investment":true,"long_only":true,"max_weight":0.1}':
+    strict: 'constraints={long_only: true, max_weight: 0.1, full_investment: true}（只做多，单票权重不超过 10%，并且目标权重必须恰好用满 100%（不许留现金））'
+    open: 只做多，单票权重不超过 10%，并且目标权重必须恰好用满 100%（不许留现金）
+  '{"long_only":true,"max_swaps_per_rebalance":2,"max_weight":0.1}':
+    strict: 'constraints={long_only: true, max_weight: 0.1, max_swaps_per_rebalance: 2}（只做多，单票权重不超过 10%，每个调仓日最多换入 2 只新标的（首个调仓日从空仓建仓不受此限））'
+    open: 只做多，单票权重不超过 10%，每个调仓日最多换入 2 只新标的（首个调仓日从空仓建仓不受此限）
+  '{"long_only":true,"max_weight":0.05}':
+    strict: 'constraints={long_only: true, max_weight: 0.05}（只做多，单票权重不超过 5%）'
+    open: 只做多，单票权重不超过 5%
+objective:
+  max_score:
+    strict: objective=max_score（目标是最大化组合总分）
+    open: 目标是最大化组合总分
+weighting_scheme:
+  equal:
+    strict: weighting_scheme=equal（入选标的等权）
+    open: 入选标的等权
+rebalance_frequency:
+  daily:
+    strict: rebalance_frequency=daily（每个交易日调仓一次，接口值 daily）
+    open: 每个交易日调仓一次，接口值 daily
+  weekly:
+    strict: rebalance_frequency=weekly（每周最后一个交易日调仓一次，接口值 weekly）
+    open: 每周最后一个交易日调仓一次，接口值 weekly
+  monthly:
+    strict: rebalance_frequency=monthly（每月最后一个交易日调仓一次，接口值 monthly）
+    open: 每月最后一个交易日调仓一次，接口值 monthly
+first_rebalance_day:
+  window_start:
+    strict: first_rebalance_day=window_start（窗口首日额外建仓一次，接口值 window_start）
+    open: 窗口首日额外建仓一次，接口值 window_start
+  first_period_end:
+    strict: first_rebalance_day=first_period_end（等到第一个周期末再建仓，接口值 first_period_end）
+    open: 等到第一个周期末再建仓，接口值 first_period_end
+cost_model:
+  '{"commission_bps":3,"slippage_bps":0,"stamp_tax_bps":5}':
+    strict: 'cost_model={commission_bps: 3, stamp_tax_bps: 5, slippage_bps: 0}（佣金 3bp、印花税 5bp、滑点 0）'
+    open: 佣金 3bp、印花税 5bp、滑点 0
+  '{"buy_bps":5,"impact_cost":0,"min_cost_cny":5,"sell_bps":15}':
+    strict: 'cost_model={buy_bps: 5, sell_bps: 15, min_cost_cny: 5, impact_cost: 0}（买入按成交额的万分之五收费、卖出按万分之十五（已含印花税），每标的每方向每日一笔最低 5 元，不计滑点与冲击）'
+    open: 买入按成交额的万分之五收费、卖出按万分之十五（已含印花税），每标的每方向每日一笔最低 5 元，不计滑点与冲击
+fill_price:
+  close:
+    strict: fill_price=close（按当日收盘价成交，接口值 close）
+    open: 按当日收盘价成交，接口值 close
+settlement:
+  t_plus_0:
+    strict: settlement=t_plus_0（T+0 结算，当日买入当日可卖，接口值 t_plus_0）
+    open: T+0 结算，当日买入当日可卖，接口值 t_plus_0
+  t_plus_1:
+    strict: settlement=t_plus_1（T+1 结算，当日买入次日才能卖，接口值 t_plus_1）
+    open: T+1 结算，当日买入次日才能卖，接口值 t_plus_1
+share_accounting:
+  adjusted_shares:
+    strict: share_accounting=adjusted_shares（持仓按后复权份额记账，接口值 adjusted_shares）
+    open: 持仓按后复权份额记账，接口值 adjusted_shares
+initial_capital:
+  '100000000':
+    strict: initial_capital=100000000（初始资金一亿元）
+    open: 初始资金一亿元
+lot_size:
+  '100':
+    strict: lot_size=100（按 100 股一手取整）
+    open: 按 100 股一手取整
+strategy:
+  '{"n_drop":5,"topk":50,"type":"TopkDropout"}':
+    strict: 'strategy={type: TopkDropout, topk: 50, n_drop: 5}（持有前 50 名，每期换出 5 只）'
+    open: 策略是 TopkDropout：持有前 50 名，每期换出 5 只
+delisting_policy:
+  force_liquidate_last_day:
+    strict: delisting_policy=force_liquidate_last_day（退市标的在最后交易日强制清仓，接口值 force_liquidate_last_day）
+    open: 退市标的在最后交易日强制清仓，接口值 force_liquidate_last_day
+tradability_policy:
+  skip_untradable:
+    strict: tradability_policy=skip_untradable（不可交易日的委托跳过，接口值 skip_untradable）
+    open: 不可交易日的委托跳过，接口值 skip_untradable
+visible_state_fields:
+  cash,positions,nav:
+    strict: visible_state_fields=[cash, positions, nav]（能看到现金、持仓与净值）
+    open: 能看到现金、持仓与净值
+  cash,positions,nav,pending_orders:
+    strict: visible_state_fields=[cash, positions, nav, pending_orders]（你能看到现金、持仓、净值，以及尚未成交的挂单）
+    open: 你能看到现金、持仓、净值，以及尚未成交的挂单
+  positions,nav:
+    strict: visible_state_fields=[positions, nav]（你只能看到持仓与净值，看不到现金余额）
+    open: 你只能看到持仓与净值，看不到现金余额
+permitted_operations:
+  order,cancel:
+    strict: permitted_operations=[order, cancel]（可用的操作：下单、撤单）
+    open: 可用的操作：下单、撤单
+  order:
+    strict: permitted_operations=[order]（你只能下单，不能撤单）
+    open: 你只能下单，不能撤单
+matching_frequency:
+  daily:
+    strict: matching_frequency=daily（撮合按日进行，接口值 daily）
+    open: 撮合按日进行，接口值 daily
+benchmark:
+  equal_weight_universe:
+    strict: benchmark=equal_weight_universe（超额与 alpha／beta 的基准是本 universe 的等权组合收益，接口值 equal_weight_universe）
+    open: 超额与 alpha／beta 的基准是本 universe 的等权组合收益，接口值 equal_weight_universe
+  csi300_index:
+    strict: benchmark=csi300_index（超额与 alpha／beta 的基准是沪深300 指数收益，接口值 csi300_index）
+    open: 超额与 alpha／beta 的基准是沪深300 指数收益，接口值 csi300_index
+risk_free_rate:
+  '0':
+    strict: risk_free_rate=0（夏普与索提诺的无风险利率取 0，接口值 0）
+    open: 夏普与索提诺的无风险利率取 0，接口值 0
+sell_rule:
+  worst_n_drop:
+    strict: sell_rule=worst_n_drop（每期从持仓里卖掉信号最差的那几只，接口值 worst_n_drop）
+    open: 每期从持仓里卖掉信号最差的那几只，接口值 worst_n_drop
+  dropped_from_target:
+    strict: sell_rule=dropped_from_target（每期卖掉已经跌出当日目标组合的那些，接口值 dropped_from_target）
+    open: 每期卖掉已经跌出当日目标组合的那些，接口值 dropped_from_target
+slippage_reference_price:
+  reference_close:
+    strict: slippage_reference_price=reference_close（滑点以委托里带的提交时价为基准，接口值 reference_close）
+    open: 滑点以委托里带的提交时价为基准，接口值 reference_close
+  close:
+    strict: slippage_reference_price=close（滑点以成交当日收盘价为基准，接口值 close）
+    open: 滑点以成交当日收盘价为基准，接口值 close
+  open:
+    strict: slippage_reference_price=open（滑点以成交当日开盘价为基准，接口值 open）
+    open: 滑点以成交当日开盘价为基准，接口值 open

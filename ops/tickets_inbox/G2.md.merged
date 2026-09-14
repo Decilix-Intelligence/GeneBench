@@ -1,0 +1,11 @@
+# 卡 G2 的票据（④ N-627 走 B：公开树带全部答案面 + 红线 2 改写为容器边界）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | 红线 2 口径改写为**容器边界**：答案面永不挂进 agent 容器；单机形态下位于 `/task` 之外 | 已做 | `runner/f02/answer_plane_guard.py` 新增 `--mode container`（读 compose 三种 bind 写法 + run dir，**拒绝启动、不删**）；README §4 ①、`docs/OPERATOR_MANUAL.md`、`ops/specs/fairness_protocol.md`、`ops/HANDOFF.md` 各处改写并保留旧表述的历史说明。提交 3ed93f6 |
+| N-? | 公开树按新口径重打：**带全部答案面**，只剔四类 | 已做 | `$GB/release/trees/genebench/`；剔除清单 `EXCLUDED.txt`；证据 `$GB/release/trees/scan_genebench_container.txt`（正例绿 + 两个反例红）与 `scan_genebench_tree.txt`（树口径 95 条命中，**预期内**） |
+| N-? | 公开树能跑结算 —— 上一轮「65 个模块 import 断链」已消除 | 已做 | `ops/reports/g2_public_tree_scoring.md`：import 闭包 141 个候选、**断链 0**；树内跑 scorer/genetask/标定测试 **320 passed** |
+| N-? | oracle 源码公开带来的污染风险 | 登记不修 | 设计性限制，`ops/reports/known_limits_v1.md`「G2（2026-09-12）」；v1.1 以**留出集**处理。公开树 README 首屏已写明「答案就在这个包里」 |
+| N-? | **我的五处文档改动让 `RELEASE_MANIFEST.json` 的手写件 sha 全部对不上** | 待别的卡 | `ops/test_release_manifest.py::test_every_recorded_sha_of_a_handwritten_item_is_the_real_one` 因此红（README.md / OPERATOR_MANUAL.md / HANDOFF.md / known_limits_v1.md / fairness_protocol.md 五件）。**修法是重跑 `$PY ops/mk_release_manifest.py`**，但它现在**跑不动** —— 它先要求 `VERSIONS.md` 的正文与 axes 段一致，而 `VERSIONS.md` 还停在 1.0.15 / r1.0.22（F1 推号后没跟改）。`VERSIONS.md` 与 `RELEASE_MANIFEST.json` 都不在本卡路径内。**顺序**：先把 `VERSIONS.md` 改到 1.0.16 / r1.0.23（根 `d9ebd541…` / `dddabe44…`），再 `$PY ops/mk_release_manifest.py`，这一条与 README §5 那三条一起就绿了 |
+| N-? | `answer_plane_guard` 的 `identity` 基线没重写 | 登记不修 | 改了门的源码，`OWN_FILES` 的 sha 变了。f02 上那份 `answer_plane_guard.identity.json` 会报 drift（**设计如此**：drift 照常扫、只是多一条黄）。下一次 `ops/push_exec_to_f02.sh` 之后在 f02 上跑一次 `python3 <guard> --write-identity` 即可。本卡没推 exec 树（G1 正在改 `inject.py` / `run_f02_a1.py`，推了会把别人的半成品带过去） |
+| N-? | `runner/inject.py` 的 P9 门还是「树口径 + 一句字符串断言」 | 登记不修 | `inject.py:765` 只查 `f"{run_dir/'work'}:/task" not in text`。新口径下它**应该**直接调 `answer_plane_guard.scan_container(compose, run_dir=run_dir)` —— 那是判据本体，而字符串断言只覆盖「有没有挂对」不覆盖「有没有多挂」。`runner/inject.py` 不在本卡路径内，且 G1 正在改它。v1.1 或交接给改 inject 的人 |

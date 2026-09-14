@@ -1,0 +1,58 @@
+# 阶段五 红队一轮（5.rt）—— 修了什么、登记了什么
+
+红队这一轮报了 11 条：1 block + 3 major + 7 minor。**block 与 major 已修**（见下「已修」），
+**minor 一条不修，全部登记在这张表里**（按契约：不改判据、不放宽测试、边缘问题登记不修）。
+
+红队自己的结论要照抄一遍，因为它决定了这些 minor 的读法：
+**没有一条 finding 是「表上的数算错了」**。SR / pass@1 / 越权率 / `$` / effect / Steps /
+Latency / tokens 八类格子，加 L3 层的 Cov / PIT / Prov，都被独立重算过、两臂逐位命中。
+三条 major 是「表上的数**说错了话**」，七条 minor 是「表上的话**不够准**」。
+
+## 待办（编号先写 N-?，并表时由维护者定号）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `$` 列缺「成本上界」那句必写的脚注 | 待办（minor，红队 finding 5） | `scorer/report.py` 模块头与 `runner/pricing.yaml` 都写死了这条义务（DeepSeek 分高峰/低谷两档而边车不记档位，表里取高峰价 —— **这一列是成本上界，不是账单实数**），而 `ops/mk_tables.py::axes_notes` 只产出四条版本轴 + 记录数。修法：表含 `$` 列时在 md 脚注 / latex 的 `%` 注释 / CSV 旁的 `.axes.json` 三处各加一行。红队按高峰价手算 `615369×0.44/1M + 26763×1.32/1M = 0.30608952`，与记录逐位相同 —— **数是对的，缺的是那句话** |
+| N-? | 两张表对「认不出的 `run_status`」的纪律相反 | 待办（minor，红队 finding 6） | `scorer/report.py::_in_denominator`（只被 table_b 用）明写「认不出的状态**留在分母**」，而 `table_a` 里 `FM.sr_bucket(...)` 是裸调、未知状态直接抛。实测把一条记录改成旧名 `budget_exceeded`：table_b 正常出 8 行，table_a 抛 `TaxonomyError`。**主表恰好是那张画不出旧数据的表**。修法二选一：table_a 改用 `_in_denominator`（`FM.sr_denominator` 同样加一层容错），或者反过来让两张表都抛并在 HANDOFF 写明「改过名的 `run_status` 要先迁移记录」 |
+| N-? | 「四条版本轴」在同一张表里指两组不同的四条 | 待办（minor，红队 finding 7） | 表**列**是 `scorer.report.VERSION_AXES`（set / reference / runner / image_digest，注入面），表**脚注**是 `results_db.AXES`（set / reference / protocol / channel，可比性）。两处注释都自称「四条版本轴」。修法：改名成 `INJECT_AXES` / `COMPARABILITY_AXES`，并在 `axes_notes()` 第一行写明脚注这四条与表列那四条不是同一组。**本轮已在 HANDOFF §16.4 把这件事写给读者**，但代码里的同名没动 |
+| N-? | tau 题的 `effect.raw_metric` 是 `fid_day_rate`，标签却写 `metric_kind: "tau"` | 待办（minor，红队 finding 8） | `s5-cor-01.strict` 的 `effect.raw_metric = 1.0` 与 `anchor.metric_kind = "tau"` 并排，读起来就是「τ=1.0」，而 Table B 同一个 run 的 `tau` 列是 `0.984…`。effect=100 本身是对的，错的是标签。修法：`compare_tau` 带出 `score_name='fid_day_rate'`，或在 effect 里加 `raw_metric_name` |
+| N-? | Table B 说不出「这一格根本没有可结算的 run」 | 待办（minor，红队 finding 9） | v1demo 的 6 个 `budget_exhausted` run 在 Table B 上是 `n_runs=1, invalid_rate=0.0` —— 8 行 8 个 `0.0` 读成「一条违规都没有」，实际是 6 行连产物都没有。修法：加 `scorable_runs` / `unscorable_runs` 两列，`scorable_runs == 0` 时 `invalid_rate` 出 None 而不是 0.0（与「算不出就是 None」同一条纪律） |
+| N-? | `ops/joblist.py` 的 CLI 与 `run_joblist.py` 不同形 | 待办（minor，红队 finding 10） | `run_joblist.py` 用 `--jobs <path>`，`joblist.py stat/list/reset` 用位置参数，照抄会得到 `unrecognized arguments: --jobs`；`gen` 的每个开关都没有 help 文本；`gen` 的合法性检查失败时抛未捕获的 `JoblistError`，用户看到整段 traceback（错误信息本身写得很好）。修法：`stat/list/reset` 加 `--jobs` 作为位置参数的别名（保留向后兼容）、每个开关补一句 help（尤其 `--digest` 去哪儿取）、`main()` 外包一层 `except JoblistError as e: raise SystemExit(...)`。**本轮已在 HANDOFF §16.5 §1 把这个坑写出来**，代码没动 |
+| N-? | 默认预算档 600k tokens 够不够 —— **待用户裁定** | 待办（minor，红队 finding 11；与 `ops/tickets_inbox/5.3.md` 第一条同源） | `runner/registry.py` 的 `BUDGET_TIERS` 注释把 tokens 定义成「档位调用数 × 60k/次」，据此默认档应是 `100×60k=6M`，写的是 600k（= 10 次调用的量）；而 Codex 每次 prompt 实测 43k–68k。后果：`ops/reports/v1demo/` 8 个 run **8/8** 撞 token 闸，主表上的 SR=0.25 / pass@1=0.25 读的是「预算够不够」，不是能力。抬档只往上抬，不触发 `assert_registry_sane`。**本轮已把这一句写进 HANDOFF §16.5 §3**，档位本身没动（改判据要用户点头） |
+| N-? | `doc` 臂在协议轴上记 `none`，而它其实拿到了三件里的两件 | 待办（minor，本轮实测发现） | 逐 run 协议轴落地后实测：`a4` 的 `doc` 臂注进去的是 `work/protocol/{README.md,contract.md}`，**没有** `validate_artifact.py`；`hint` 臂一件都没有。两者都记 `geneprotocol_v1@none`，因为这条轴量的是「拿到的是哪一版**封闭清单**」而半份清单不构成一个版本（`protocol_digest` 缺件即抛）。逐件的投放差异在 `arm` / `arm_kind` 两列上看。要更细的话，加一列 `protocol_files`（遥测，逐件 sha）比放松这条轴安全 |
+
+## 已修（本轮，代码 + 事后重出表）
+
+| 红队编号 | 严重度 | 改了哪 | 判据 |
+| --- | --- | --- | --- |
+| finding 1 | **block** | `ops/HANDOFF.md` 新增 §16（四个入口 / 跑法照抄 / 矩阵字段表 / 口径 / 坑 / 证据落点）、`README.md` 新增「跑一批」一节 | `ops/test_5rt.py` 的双向判据：四个入口文件真的在 + HANDOFF/README 真的点了它们的名 |
+| finding 2 | major | `scorer/report.py::table_a` 的 `budget_exhausted_runs` 改读 `budget`（边车真的发过 429），旧记录没有该键时退回 `run_status` 口径 | `test_budget_exhausted_runs_*` 三条 + `test_v1demo_reports_four_of_four_budget_capped_runs`（真数据 4/4） |
+| finding 3 | major | 同文件 `unbounded_requests` 去掉 `or None`，按有没有可用样本判三态 | `test_unbounded_requests_*` 四条（含「0 落到 CSV 还是 `0`」那一跳） |
+| finding 4 | major | `ops/results_db.py`：新增 `NO_PROTOCOL` 与 `protocol_by_run()`，`enrich` 逐 run 写协议轴，`mixed_axes` 按 arm_kind 分组判协议轴，`backfill_batch` 收纯裸臂的批；`ops/mk_tables.py::axes_notes` 与回填报告的「已知限制」跟着改 | `test_protocol_axis_is_per_run` / `test_filter_by_protocol_digest_excludes_bare_arms` / `test_none_beside_a_digest_is_not_mixed_axes` / `test_two_digests_are_still_mixed_axes` / `test_pure_baseline_batch_can_enter_the_db` / 两条恒红不绕过的拒绝判据 |
+
+## 事后重出（口径变了，既有产物跟着重出，不留两套口径）
+
+- **11 个批的 `ops/reports/<batch>/table_a.csv`** 按新口径重出：差异**只有**两列 ——
+  `budget_exhausted_runs`（a1 `0→1`、m6 与 m6_all `4→5`）与 `unbounded_requests`
+  （8 个接入批的 `''→0`）。脚本 `$GB/scratch/5.rt/regen_tables.py` 断言了「差异不出这两列」。
+  `.tex` **逐字节未变**：这两列都不在 LaTeX 的 11 列选择里。
+- **结果库整棵重建**（`$GB/results/v1/results.jsonl`，74 条）：协议轴的语义变了，
+  而库只追加不覆盖，所以旧库挪到 `$GB/scratch/5.rt/results.jsonl.bak_before_5rt`
+  之后 `$PY ops/results_db.py backfill` 重收。**记录条数与判据字段一字未变**，
+  变的只有裸臂那 40 条的 `protocol_version`（批级摘要 → `geneprotocol_v1@none`）
+  与 `axes_source.protocol_version` 的来源串。
+- `ops/reports/v1demo/` 的六张表从库重出（`table_a` 的 `budget_exhausted_runs` 两臂
+  `3 → 4`，`unbounded_requests` 12 / 10 不变），`ops/reports/results_db_backfill.md` 重出：
+  **15 个批的 Table A / Table B 与既有 CSV 全部「逐格相同」**。
+
+## 一处规格冲突（按保守方向做，标 CONFLICT）
+
+`ops/results_db.py` 模块头原文写着协议轴**按批取值**的理由：「裸臂（`open`）不发协议工件，
+所以**协议轴按批取值**……按臂取值会让每一批都变成混轴、每张表都出不来，而那不是事实 ——
+事实是两个臂跑在同一次发布上。」而红队 finding 4 要求逐 run 写轴。
+
+两者都对了一半：逐 run 写轴是对的（否则 `--filter protocol_version=<摘要>` 会选出没见过该协议的 run），
+「每一批都变成混轴」这个后果也是真的。本轮的做法是**同时满足两条**：逐 run 写轴 +
+`mixed_axes` 对协议轴按 arm_kind 分组判（裸臂那一组恒为 `none`，与协议臂并排不算混轴），
+于是既切得开又出得来表。模块头那段话已按这个口径改写。**没有放宽任何一条判据**：
+协议臂之间出现两个摘要仍然是混轴、仍然拒绝出表（`test_two_digests_are_still_mixed_axes`）。

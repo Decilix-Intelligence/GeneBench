@@ -1,0 +1,8 @@
+{
+  "harness": "stockagent",
+  "paradigm": "P2",
+  "image": "gb-stockagent-u:r1",
+  "command": ["sh", "-c", "export HOME=/tmp/h XDG_CACHE_HOME=/tmp/h/.cache; mkdir -p $$HOME && cd /task && python3 /opt/stockagent/run.py"],
+  "env_required": ["GENEBENCH_GATEWAY", "OPENAI_BASE_URL", "OPENAI_API_KEY"],
+  "notes": "StockAgent（arXiv:2407.18957，ACM TIST）：LLM 交易员在模拟市场里逐日逐时段下单；本接入把它虚构的参考价与写死的财报换成网关来的 PIT 数据，把逐日决策翻成 S5 分数信号。"
+}

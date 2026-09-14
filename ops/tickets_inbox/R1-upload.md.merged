@@ -1,0 +1,9 @@
+# 卡 R1 的票据（写给 ops/tickets.md 的收件箱，编号待编排方定）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | Release v1.0.16 两个附件上传完成 | 已闭合 | 2026-09-13。`POST /releases` 201、两次 asset 上传 201 / `state=uploaded`；从 `browser_download_url` 下回来重算 sha256 两件都与本地一致。记录见 `ops/reports/push_result.md` §7。此条即卡 D §2 那条 BLOCKED 的闭合。 |
+| N-? | 大附件上传要能重试：782 MB 那件第一次 `BrokenPipeError` | 已闭合（脚本在 scratch） | `scratch/D/d_release.py` 没有重试，断流后附件卡在 `state=starter`（字节数看着对、其实没传完），再跑一次它会因为「size 一致」误判为已在而跳过 —— 幂等判据要连 `state` 一起看。`scratch/R1/r1_release.py` 是补了重试 + `state` 判据的版本；下次再打 Release 用它，或把这两点合回 `d_release.py`。 |
+| N-? | f01 → GitHub 下行只有 ~300 KB/s（上行 9.5 MB/s） | 登记不修 | 上传 782 MB 用 82 s，下载同一件要 ~45 min。发布验收里的「下回来核一遍」要按小时排，不是分钟。 |
+| N-? | 「阈值与当前 gold 名单不同源，重算排 v1.0.17」两处说明 | 半闭合 | README §2.1a 那一条已写明（卡 R1）；**`DATA_LICENSE` 那一处不在本卡路径内，还没写** —— 见 notes_for_orchestrator。 |
+| N-? | `snapshots/public_v1/gold_factors/csi1000`（8.9 GB）保留在 f01、不入包 | 待另一张卡 | 打包脚本确实没收它（上传前扫描 `csi1000` 那一项为零、README §2.1a 已写明「不在包里」）；**「保留但不发」这句话要落到数据卡 / `known_limits_v1.md`**，那两处不在本卡路径内。 |

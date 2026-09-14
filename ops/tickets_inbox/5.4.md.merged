@@ -1,0 +1,11 @@
+# 卡 5.4（结果库单一来源）票据
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `ops/protocol/geneprotocol_v1/MANIFEST.json` **没有 `version` 键** | 已绕开，建议补 | 卡面把协议轴写成「MANIFEST.json 的 version」，实物里只有 `protocol_id` / `status` / `released_at` / `artifacts`。本卡改用**封闭清单三件的内容摘要**：`geneprotocol_v1@sha256(名:sha 排序)[:12]`。建议 `ops/mk_protocol_manifest.py` 在重算时顺手把这个摘要写进清单的 `version` 字段 —— 那样协议轴就有了一个人能读的出处，不必每次现算。出处：5.4。 |
+| N-? | 协议内容**已经动过一次**，而且没有任何版本号记录它 | 如实记录 | a1 / m6 / m6b 那三批注进容器的 `work/protocol/validate_artifact.py` 是 `f8b8ad26…`，今天清单里写的是 `ca26c78f…`（对应轴值 `7e8ad97d1f7a` → `d6fbcaa08302`）。也就是说 **strict 臂拿到的协议工件在 m6 与 a4 之间换过一版**，而两批的记录里没有一个字段说得出这件事 —— 本卡的协议轴就是补这个洞。凡是把 m6 与 a4 并排读的地方都要知道这一条。出处：5.4。 |
+| N-? | `run_id` **跨批重名**：`s2-cor-01.strict.cfg-codex-deepseek.r01` 在 `a4` 与 `m6` 里各有一条 | 已绕开（主键带 batch） | `run_id = task.arm.config.rNN`，不含批次，跨批必撞。结果库主键取 `(batch, run_id)`，重名在 `index.json::run_id_reused_across_batches` 里单列。**别的地方（例如按 run_id 建索引的脚本）也会撞** —— 要么带批次，要么给 run_id 加批次前缀，属 runner 侧的裁定。出处：5.4。 |
+| N-? | `scorer.score_run` 的记录里**没有** `protocol_version` / `channel` | 建议后续卡补 | 记录里现在带的四条是**注入面**的（set / reference / runner / image）；N-207 的四个「版本字段」里的后两条一条都没有。本卡靠 `results_db` 从 `runs_in/<batch>/*/inject.json` 反算协议轴、由回填**声明**通道 —— 反算依赖 `runs_in` 还在本机。正解是 `ops/score_runs.py` 加 `--channel` 并让 `scorer/score_run.py` 直接把两条轴盖进记录（两个都是共享文件，本卡没有路径授权）。出处：5.4。 |
+| N-? | 适配赛道的记录进不了结果库 | 登记不修 | `scorer.adaptation.AdaptationResult.as_record` 出的记录没有四条版本轴，也没有 `task_id` / `seq`（身份键走 `IDENTITY_ADAPT`：`example_id` + config + arm + run_id）。库的适配赛道通路已经通（`--table adaptation` 出得来表），但 `ops/reports/adapt/records.json` 现在是空的（真跑被红线 B2 闸住），所以一条都没收。要收，得先让 `ops/reports/adapt/adapt_report.py` 把四条轴写进记录。出处：5.4。 |
+| N-? | `ops/reports/<batch>/table_*.csv` 现在有**两条**生成路径 | 建议收口时并成一条 | `ops/score_runs.py` 自己出一份，`ops/mk_tables.py` 从结果库出一份 —— 本卡核过 14 个 batch 的 Table A / Table B **逐字节相同**（`ops/reports/results_db_backfill.md`），但两条路并存迟早会漂。收口时建议把 `score_runs` 出表那几行换成 `mk_tables.write_table`（`score_runs` 是共享文件，本卡没有授权改）。出处：5.4。 |
+| N-? | 结果库里 `channel` 只有 `private` 一个取值 | 如实记录 | `ops/reports/public/` 里只有三控与对账，没有 `records.json` —— 公开通道到今天为止**没有可结算的 run**。所以通道轴现在是「声明」出来的（`axes_source.channel = backfill:declared`），不是从记录里读出来的。公开通道一旦有真跑，`ingest --channel public` 就能分开。出处：5.4。 |

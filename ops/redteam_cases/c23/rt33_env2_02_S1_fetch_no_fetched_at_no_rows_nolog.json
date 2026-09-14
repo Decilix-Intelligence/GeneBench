@@ -1,0 +1,45 @@
+{
+ "kind": "artifact",
+ "artifact": {
+  "schema_version": "1.0",
+  "artifact_id": "S1-art-1",
+  "stage": "S1",
+  "task_id": "T-sample",
+  "config_id": "cfg-sample",
+  "arm": "strict",
+  "seed": 0,
+  "as_of": "2026-07-31",
+  "produced_at": "2026-09-01T12:00:00.000+00:00",
+  "provenance": [],
+  "declarations": {
+   "calendar_id": "SSE",
+   "universe": "csi300"
+  },
+  "payload": {
+   "fetches": [
+    {
+     "endpoint": "/bars",
+     "params": {
+      "code": "600519.SH",
+      "fields": "close"
+     },
+     "status": "ok"
+    }
+   ],
+   "fields_obtained": [
+    "close"
+   ]
+  }
+ },
+ "task": {
+  "task_id": "T-sample",
+  "stage": "S1",
+  "declared": {
+   "calendar_id": "SSE",
+   "universe": "csi300"
+  },
+  "underdetermined": []
+ },
+ "gateway_log": null,
+ "tradability": null
+}

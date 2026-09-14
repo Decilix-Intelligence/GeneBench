@@ -1,0 +1,10 @@
+{
+  "paper_url": "",
+  "repo_url": "https://github.com/Aurora-73/QuantAgent",
+  "commit": "4027f572f348ed7794c32e7401048ee259f2fcc5",
+  "dist": "",
+  "dist_repo_url": "",
+  "license": "MIT",
+  "tarball_sha256": "abd4184bff8b59e236ebffbbf2cc6ca248f29115f1b92ab1b5c3d3aaefea4f1f",
+  "runnable_check": "python3 -c \"import sys;sys.path.insert(0,'/opt/quantagent/upstream');import data.provider as p;print(p.DataProvider)\""
+}

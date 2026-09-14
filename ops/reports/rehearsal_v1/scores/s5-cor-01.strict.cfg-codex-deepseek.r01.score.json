@@ -1,0 +1,107 @@
+{
+ "scorer_output": {
+  "schema_version": "1.0",
+  "validity": "valid",
+  "gate_failed": [],
+  "unobservable": [],
+  "correctness": {},
+  "effect": null,
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/v1.0-smoke/s5-cor-01/work"
+  },
+  "effect_withheld_reason": "anchor_degenerate"
+ },
+ "record": {
+  "task_id": "s5-cor-01",
+  "stage": "S5",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "strict",
+  "seq": 1,
+  "run_id": "s5-cor-01.strict.cfg-codex-deepseek.r01",
+  "set_version": "1.0.13",
+  "reference_version": "r1.0.20",
+  "runner_version": "9089e489123a3f02602e4f334a6397f78970913d25f4a7698a641a9b85ad05b6",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "ok",
+  "sr_bucket": "scorable",
+  "validity": "valid",
+  "malformed": false,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {
+   "adjust_fingerprint": "clean",
+   "attribution_conservation": "clean",
+   "calendar": "clean",
+   "declared_reads": "clean",
+   "factor_degeneracy": "clean",
+   "fetch_clock": "clean",
+   "input_ablation": "clean",
+   "ledger_conservation": "clean",
+   "lookahead": "clean",
+   "nonfinite_propagation": "clean",
+   "optimizer_failure": "clean",
+   "pit_universe": "clean",
+   "source_status": "clean",
+   "underdetermined": "clean",
+   "unsupported_operator": "clean",
+   "warmup_boundary": "clean"
+  },
+  "findings": [],
+  "l3_kind": "tau",
+  "l3_pass": null,
+  "l3_score": null,
+  "effect": null,
+  "effect_withheld_reason": "anchor_degenerate",
+  "anchor": {
+   "floor": 0.0,
+   "ceiling": 1.0,
+   "kind": "two_rung",
+   "floor_source": "null_agent",
+   "ceiling_source": "oracle",
+   "formula": "100 × (agent − null) / (oracle − null)，夹 [0, 100]",
+   "ceiling_payload_dir": "/data/shared/genebench/reference/tasks/v1.0-smoke/s5-cor-01/work"
+  },
+  "correctness": {},
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "没有可比的交易日（共同网格为空或每日截面太薄）",
+  "steps": 55,
+  "tokens_prompt": 2973672,
+  "tokens_completion": 49068,
+  "cost_usd": 1.37318544,
+  "cost_model": "deepseek-chat",
+  "latency_s": 435.448,
+  "validator_rejections": 0,
+  "overreach": {
+   "denied": 4,
+   "total": 252,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "open_range_would_cross_asof": 4
+   },
+   "malformed_requests": 42,
+   "malformed_reasons": {
+    "asof_missing": 8,
+    "unclassified": 18,
+    "param_malformed": 16
+   }
+  },
+  "unbounded_requests": 4,
+  "budget": {
+   "max_calls": 100,
+   "max_tokens": 3000000,
+   "calls": 55,
+   "tokens": 3022740,
+   "detail": "tokens=3022740 已达上限 3000000"
+  },
+  "anchor_status": "fixed",
+  "unexpected_files": []
+ }
+}

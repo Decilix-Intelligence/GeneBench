@@ -1,0 +1,14 @@
+# 卡 3.3 票据收件箱（llm_log 的 usage 在五个 harness 上完整）
+
+编号先写 N-?，由维护 `ops/tickets.md` 的人统一分配。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `harnesses/README.md` §4④ 的 `--remote` 少一层 `runs` | **本卡已修** | run 目录是 `runner/inject.py:381` 的 `run_root / "runs" / rid`，`--remote` 要比 `--run-root` 多一层。照旧手册抄会退 0 并打印 `runs: 0；问题: 0` —— 不报错的错。3.2-gemini-cli 撞过。已加 `ops/test_harness_contract.py::test_readme_scoring_remote_has_the_extra_runs_layer`，判据取自手册字面与 `inject.py` 两处、必须一致。 |
+| N-? | 各 harness 的结算报告**不可复现**：重跑一次就丢掉整列 `$` | **本卡已修** | `scorer/score_run.py::model_of` 只走 `REG.by_id`，而 `by_id` 对 `enabled: false` 抛 `RegistryError`。3.2 的代理真跑时按手册把 `config.yaml` 临时翻成 `enabled: true`、跑完翻回 false —— 于是当时算得出价、今天再算算不出。任何人重跑结算都会静默洗掉 `ops/reports/h_grok-cli/table_a.csv` 的 `$` 列。修法：`model_of` 回落到 `REG.PENDING_CONFIGS`（不进主表切片，只影响各 harness 自己那张接入验证表）。修完重结算四个 batch，`git diff ops/reports/` 为空。 |
+| N-? | 流式响应的 usage 会被响应体副本的上限**截掉** | **本卡已修** | 旧实现整段缓存响应体、超上限丢尾巴，而流式的 usage 恰在最后一个事件里 —— 抽出来是 `{}`，与「上游没给 usage」不可分。新实现同时留头与尾两份有界副本（`egress_proxy._capture_head_tail`），并边收边去 chunked 框架（`_ChunkedDecoder`）；转发始终先于留副本。 |
+| N-? | Anthropic Messages 流式：usage **跨两个事件**，旧的「取最后一个」会丢 prompt | **本卡已修** | `message_start` 给 `input_tokens` + `cache_read_input_tokens`，`message_delta` 只给最终 `output_tokens`（有的版本还带 `input_tokens: 0`）。旧的 SSE 逻辑从后往前取第一个带 usage 的事件 → `prompt_tokens` 丢失、`total_tokens` 只剩半个。改成从前往后逐事件合并、**非零值赢**（`_merge_raw`）。 |
+| N-? | OpenAI Responses API 的缓存命中数**到不了算价** | **未修，登记** | 归一后缓存命中统一叫 `cached_prompt_tokens`，而 `runner/pricing.py::CACHE_HIT_KEYS` 认的是 `prompt_cache_hit_tokens` / `cached_tokens` / `cache_read_input_tokens` 三个原始名。Chat Completions（DeepSeek 平铺 `prompt_cache_hit_tokens`）与 Anthropic（平铺 `cache_read_input_tokens`）都直接命中，唯独 Responses API 把它嵌在 `input_tokens_details.cached_tokens` 里，平铺不到。后果：**codex 的 `$` 按整价算**，是成本上界而不是账单实数（与 `pricing.py` 顶注「价档取上界」同向，不是新的错，只是又宽了一格）。修法一行：把 `cached_prompt_tokens` 加进 `CACHE_HIT_KEYS`。**没在本卡改**：那会改动 m6/m6b 已发布的 `$` 数（27.0056 会降），属于主表口径变更，该由掌管 `runner/pricing.py`（卡 1.5）与 M7 的人裁。 |
+| N-? | m6/m6b 的历史 llm_log 里 `cached_prompt_tokens` **补不回来** | **不修，记因** | Responses API 的缓存数嵌在 `usage.input_tokens_details.cached_tokens`，而旧的 `_norm_usage` 只搬平铺的数值键 —— 嵌套那一份在**落盘时**就丢了。读取侧的兼容层（`llm_trace.normalize_usage`）补不回没写下来的东西。新跑的记录才有这一列。不建议为此重跑 m6（29 个 run、5800 万 token）。 |
+| N-? | 预算闸的 token 口径不含缓存命中 | 已由 3.2-claude-code 登记，本卡复核为真 | 本卡机器统计：claude-code 两个 run 闸计 247 055，同批 llm_log 的 `cache_read_input_tokens` 合计 5 387 136 —— `--max-tokens` 在该 harness 上比它以为的宽约 22 倍。grok-cli / opencode 同向（`prompt_cache_hit_tokens` 占 prompt 的 98%、97%）。这是**闸门口径**问题不是抽取问题，改它要连带重新掂量所有 harness 的 `--max-tokens` 默认值，留给 registry 的主人。 |
+| N-? | codex 有 38 条 allow 无 usage —— 已归因，不是抽取器的锅 | 记录在案 | 16 条 `upstream_error`（agent 自己乱试的探路请求：`/bars`、`/calendar`、`/healthz` 等，非模型端点，上游 404）+ 22 条 `no_usage_in_body`（`/v1/responses` 与 `/v1/models` 上游 200 但体里确实没有）。新增的 `usage_absent` 字段让后人不必再查一遍。 |

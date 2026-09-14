@@ -1,0 +1,3 @@
+config_id,arm,arm_kind,n_tasks,n_runs,SR,P@1,pass^3,ProgressRate,Steps,$,Latency,Recov,Ovr,tokens_prompt,tokens_completion,unsettled_runs,budget_exhausted_runs,unbounded_requests,overreach_observable_runs,pass^3_tasks_with_3_runs,effect_settled_runs,unobservable_probes_mean
+cfg-finmem-deepseek,open,baseline,1,1,1.0,0.0,,1.0,35.0,0.02307976,69.639,,0.0,37706,4916,0,0,0,1,0,0,0.0
+cfg-finmem-deepseek,strict,protocol,1,1,1.0,0.0,,1.0,36.0,0.0247016,76.832,,0.0,40012,5376,0,0,0,1,0,0,0.0

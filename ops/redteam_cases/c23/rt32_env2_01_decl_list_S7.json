@@ -1,0 +1,74 @@
+{
+ "kind": "artifact",
+ "artifact": {
+  "schema_version": "1.0",
+  "artifact_id": "S7-art-1",
+  "stage": "S7",
+  "task_id": "T-sample",
+  "config_id": "cfg-sample",
+  "arm": "strict",
+  "seed": 0,
+  "as_of": "2026-07-31",
+  "produced_at": "2026-09-01T12:00:00.000+00:00",
+  "provenance": [],
+  "declarations": [
+   "rebalance_frequency"
+  ],
+  "payload": {
+   "metrics": {
+    "ann_return_gross": 0.184,
+    "ann_return_net": 0.121,
+    "ann_vol_net": 0.22,
+    "max_drawdown_net": -0.31,
+    "sharpe_gross": 0.84,
+    "sharpe_net": 0.55,
+    "sortino_net_mar0": 0.71,
+    "calmar_net": 0.39,
+    "total_cost": 0.471,
+    "turnover_one_way_mean": 0.043,
+    "turnover_two_way_mean": 0.086
+   },
+   "n_days": 1818,
+   "rebalance_frequency": "daily",
+   "ledger_check": {
+    "max_abs_residual": 1e-09
+   },
+   "attribution": {
+    "alpha": 0.06,
+    "beta": 0.124,
+    "cost": -0.063,
+    "total": 0.121
+   }
+  }
+ },
+ "task": {
+  "task_id": "T-sample",
+  "stage": "S7",
+  "declared": {
+   "rebalance_frequency": "daily",
+   "first_rebalance_day": "window_start",
+   "adjust": "post",
+   "calendar_id": "SSE",
+   "cost_model": {
+    "commission_bps": 3,
+    "stamp_tax_bps": 5,
+    "slippage_bps": 0
+   },
+   "fill_price": "close",
+   "settlement": "t_plus_1",
+   "share_accounting": "adjusted_shares",
+   "initial_capital": 100000000,
+   "lot_size": 100,
+   "strategy": {
+    "type": "TopkDropout",
+    "topk": 50,
+    "n_drop": 5
+   },
+   "delisting_policy": "force_liquidate_last_day",
+   "tradability_policy": "skip_untradable"
+  },
+  "underdetermined": []
+ },
+ "gateway_log": null,
+ "tradability": null
+}

@@ -1,0 +1,1934 @@
+{
+  "meta": {
+    "report": "GeneBench readiness recon round 2",
+    "scanned_at_utc": "2026-08-30T11:55/12:35",
+    "mode": "read-only",
+    "write_scope": "~/genebench_inventory/ on finance01",
+    "timebox_min": 45,
+    "downsampled": false,
+    "revision": {
+      "id": "R1",
+      "at_utc": "2026-08-30T12:35",
+      "trigger": "user supplied sudo; finance01 ufw rules read directly",
+      "changes": [
+        "OVERTURNED the initial claim that finance01's ufw allows tailscale by interface - there is no such rule; tailscale bypasses ufw entirely",
+        "W1 mount address settled: must use the LAN IP, not tailscale",
+        "W0 executed and verified",
+        "added W5 (tailnet exposure)",
+        "narrowed D evidence limits"
+      ]
+    }
+  },
+  "incident": {
+    "id": "W0",
+    "severity": "redline-violation",
+    "what": "lxd snap auto-installed on finance02",
+    "trigger": "`lxc list` invoked the Ubuntu lxd-installer wrapper which installs the snap on demand",
+    "package": "lxd 5.21.7-1018661 rev 40585 (122MB)",
+    "installed_at_utc": "2026-08-30T12:07",
+    "evidence": [
+      "/var/lib/snapd/snaps/lxd_40585.snap ctime 2026-08-30 12:07",
+      "/var/snap/lxd/ created 12:07",
+      "snap info lxd: refresh-date today at 12:07 UTC"
+    ],
+    "post_state": "daemon active, NOT initialised (no lxd init, 0 instances, no storage pool)",
+    "remediation": "user decision - keep as isolation substrate, or `sudo snap remove --purge lxd`",
+    "note": "finance01 had lxd pre-installed; unrelated to this incident"
+  },
+  "executive_summary": {
+    "docker_compose_on_finance02": {
+      "verdict": "no",
+      "reason": "docker not installed on either host; only k3s-bundled containerd with root-only socket; ljn's sudo requires a password",
+      "alternatives": [
+        "k3s Job/Pod (zero install, usable now)",
+        "install docker manually + add ljn to docker group",
+        "LXD"
+      ]
+    },
+    "pit_universe": {
+      "verdict": "3 of 4 complete",
+      "missing": "index constituent add/drop records - only monthly index_weight snapshots, and only CSI300/500/1000",
+      "workaround": "qlib provider instruments/{csi300,csi500,csi800,csi1000}.txt carry PIT date ranges, but come from a community source"
+    },
+    "factor_library_as_reference": {
+      "verdict": "yes",
+      "reason": "818 JSONL records / 792 executable, each carrying source-dialect expression + compiled qlib expression + required_fields + structured blocking_reasons"
+    }
+  },
+  "A_environment": {
+    "finance01": {
+      "role": "data plane",
+      "os": "Ubuntu 24.04.4 LTS",
+      "kernel": "6.8.0-138-generic",
+      "cpu": {
+        "model": "AMD Ryzen 5 5600G",
+        "sockets": 1,
+        "cores": 6,
+        "threads": 12,
+        "nproc": 12
+      },
+      "mem_gib": {
+        "total": 30,
+        "available": 28
+      },
+      "disks": {
+        "/": {
+          "size": "232G",
+          "used": "150G",
+          "avail": "71G",
+          "pct": 68
+        },
+        "/data": {
+          "size": "2.7T",
+          "used": "73G",
+          "avail": "2.5T",
+          "pct": 3
+        }
+      },
+      "docker": {
+        "cli": false,
+        "daemon": false,
+        "sock": false,
+        "compose": false
+      },
+      "containerd": {
+        "present": true,
+        "flavour": "k3s 2.2.5-k3s2",
+        "sock": "/run/k3s/containerd/containerd.sock",
+        "sock_perm": "root:root 0660",
+        "user_access": false
+      },
+      "crictl": {
+        "present": true,
+        "usable": false
+      },
+      "sudo": {
+        "in_sudo_group": true,
+        "nopasswd": false,
+        "password_verified_by_user": true
+      },
+      "lxd": {
+        "installed": true,
+        "pre_existing": true,
+        "daemon": "active",
+        "user_usable": true,
+        "instances": 0
+      },
+      "python": {
+        "system": "3.12.3",
+        "system_has_duckdb": false,
+        "conda_envs": [
+          "qlib_env",
+          "qlib_env_broken_20260802"
+        ],
+        "venvs": [],
+        "qlib_env": {
+          "python": "3.10.20",
+          "duckdb": "1.4.3",
+          "pandas": "2.2.3",
+          "pyarrow": "20.0.0",
+          "numpy": "1.26.4",
+          "scipy": "1.13.1",
+          "scikit-learn": "1.7.2",
+          "statsmodels": "0.14.6",
+          "lightgbm": "4.6.0",
+          "pyqlib": "0.9.8.dev32",
+          "torch": null,
+          "xgboost": null
+        }
+      },
+      "egress": {
+        "github.com": {
+          "code": 200,
+          "connect_s": 0.109,
+          "total_s": 8.698
+        },
+        "pypi.org/simple/": {
+          "code": 200,
+          "connect_s": 0.179,
+          "total_s": 25.0,
+          "note": "hit -m 25 ceiling; index effectively unusable"
+        },
+        "files.pythonhosted.org": {
+          "code": 200,
+          "connect_s": 0.137,
+          "total_s": 1.121
+        },
+        "api.anthropic.com": {
+          "code": 403,
+          "connect_s": 0.229,
+          "total_s": 0.674,
+          "note": "403 = normal unauthenticated GET; reachable"
+        }
+      },
+      "gpu": null,
+      "k3s_role": "agent (k3s-agent active)",
+      "timers_excluding_premium_daily": [
+        "quant-datahub-daily",
+        "quant-datahub-morning",
+        "quant-datahub-intraday-close",
+        "quant-datahub-realtime-market",
+        "quant-datahub-public-documents",
+        "quant-datahub-public-news",
+        "quant-datahub-aux-close",
+        "quant-datahub-aux-events",
+        "quant-datahub-aux-margin",
+        "quant-datahub-aux-monthly",
+        "quant-datahub-aux-quarterly",
+        "quant-datahub-fees",
+        "quant-datahub-coverage-audit",
+        "quant-datahub-qlib-candidate",
+        "quant-datahub-index-minute-backfill",
+        "quant-datahub-premium-financial-refresh",
+        "quant-data-update",
+        "quant-paper",
+        "quantlab-systemd-exporter",
+        "launchpadlib-cache-clean"
+      ],
+      "failed_units": [
+        "quant-datahub-index-minute-backfill.service"
+      ]
+    },
+    "finance02": {
+      "role": "execution plane (proposed)",
+      "os": "Ubuntu 24.04.4 LTS",
+      "kernel": "6.8.0-138-generic",
+      "cpu": {
+        "model": "AMD Ryzen 5 5600G",
+        "threads": 12
+      },
+      "mem_gib": {
+        "total": 30,
+        "available": 27
+      },
+      "disks": {
+        "/": {
+          "size": "232G",
+          "used": "84G",
+          "avail": "137G",
+          "pct": 38,
+          "note": "40GB duplicate lake copy still present"
+        },
+        "/data": {
+          "size": "2.7T",
+          "used": "40G",
+          "avail": "2.6T",
+          "pct": 2
+        }
+      },
+      "k3s": {
+        "role": "server / control-plane",
+        "version": "v1.35.6+k3s1",
+        "kubectl": true,
+        "kubeconfig": "$HOME/.kube/config (/etc/rancher/k3s/k3s.yaml is 0600 root)",
+        "nodes": [
+          {
+            "name": "finance01",
+            "role": "<none>",
+            "cpu": 12,
+            "mem": "32212588Ki",
+            "allocatable_equals_capacity": true,
+            "taints": [
+              "dedicated=quant:NoSchedule"
+            ]
+          },
+          {
+            "name": "finance02",
+            "role": "control-plane",
+            "cpu": 12,
+            "mem": "32212596Ki",
+            "allocatable_equals_capacity": true,
+            "taints": []
+          }
+        ],
+        "namespaces": 11,
+        "pods": 27,
+        "unhealthy": [
+          {
+            "ns": "prismquant",
+            "pod": "prismquant-65b7bb9574-sf7mj",
+            "state": "Init:CrashLoopBackOff",
+            "age": "92m"
+          }
+        ]
+      },
+      "docker": {
+        "cli": false,
+        "daemon": false,
+        "sock": false
+      },
+      "containerd": {
+        "present": true,
+        "flavour": "k3s 2.2.5-k3s2",
+        "ctr_binary": true,
+        "user_access": false
+      },
+      "sudo": {
+        "in_sudo_group": true,
+        "nopasswd": false,
+        "password_verified_by_user": true
+      },
+      "lxd": {
+        "installed": true,
+        "pre_existing": false,
+        "see": "incident W0"
+      },
+      "gpu": null,
+      "egress": {
+        "github.com": {
+          "code": 200,
+          "connect_s": 1.114,
+          "total_s": 7.713
+        },
+        "pypi.org/simple/": {
+          "code": 200,
+          "connect_s": 0.165,
+          "total_s": 25.0,
+          "note": "hit ceiling"
+        },
+        "api.anthropic.com": {
+          "code": 403,
+          "connect_s": 0.182,
+          "total_s": 0.56
+        }
+      },
+      "local_proxy": "mihomo listening on 127.0.0.1:9090 and 127.0.0.1:9097",
+      "ssh_02_to_01": {
+        "works": false,
+        "reason": "no private key in ~/.ssh (only authorized_keys, known_hosts); observed 'Host key verification failed'"
+      },
+      "ports": {
+        "01_to_02": {
+          "22": "open",
+          "6443": "open",
+          "2049": "open",
+          "30810": "open",
+          "3000": "closed",
+          "8472": "closed(tcp probe; VXLAN is udp)"
+        },
+        "02_to_01_lan": {
+          "22": "open",
+          "10250": "open",
+          "30810": "open",
+          "6443": "closed",
+          "2049": "closed"
+        },
+        "02_to_01_tailscale": {
+          "22": "open",
+          "2049": "open",
+          "6443": "closed"
+        }
+      },
+      "ufw": "see A_environment.firewall - finance01 rules now read; finance02 still unread"
+    },
+    "docker_compose_k3s_coexistence": {
+      "technical_conflict": "none inherent - k3s uses its own containerd + flannel; dockershim not involved since v1.24",
+      "coupling_points": [
+        {
+          "id": "iptables FORWARD",
+          "detail": "cluster already hit ufw DEFAULT_FORWARD_POLICY=DROP killing flannel VXLAN; fixed to ACCEPT with backup at /etc/default/ufw.bak-quantlab. dockerd inserts DOCKER-USER/FORWARD rules - must re-verify cross-node pod connectivity after install."
+        },
+        {
+          "id": "CIDR overlap",
+          "detail": "k3s holds 10.42.0.0/16 (pod) and 10.43.0.0/16 (svc); finance02 also has 10.88.0.1. docker default 172.17.0.0/16 does not clash, but custom compose networks must avoid all three."
+        }
+      ],
+      "blocking_reality": "neither host has docker installed and ljn cannot sudo non-interactively, so an agent cannot install or use it",
+      "recommendation": "k3s Job/Pod as the baseline (zero install), docker as a later speed-up once a human can enter a sudo password"
+    },
+    "firewall": {
+      "finance01": {
+        "read_at_utc": "2026-08-30T12:31",
+        "status": "active",
+        "rules": [
+          {
+            "n": 1,
+            "to": "22/tcp",
+            "action": "ALLOW IN",
+            "from": "192.168.1.0/24"
+          },
+          {
+            "n": 2,
+            "to": "8472/udp",
+            "action": "ALLOW IN",
+            "from": "192.168.1.219",
+            "comment": "k3s flannel vxlan"
+          },
+          {
+            "n": 3,
+            "to": "10250/tcp",
+            "action": "ALLOW IN",
+            "from": "192.168.1.219",
+            "comment": "k3s kubelet"
+          },
+          {
+            "n": 4,
+            "to": "Anywhere",
+            "action": "ALLOW IN",
+            "from": "10.42.0.0/16",
+            "comment": "k3s pod cidr"
+          },
+          {
+            "n": 5,
+            "to": "Anywhere",
+            "action": "ALLOW IN",
+            "from": "10.43.0.0/16",
+            "comment": "k3s service cidr"
+          }
+        ],
+        "defaults": {
+          "DEFAULT_INPUT_POLICY": "DROP",
+          "DEFAULT_FORWARD_POLICY": "ACCEPT"
+        },
+        "correction_to_initial_report": "the initial report inferred an interface-based tailscale allow rule; NO such rule exists. The observed asymmetry is caused by bypasses, not by an allow rule.",
+        "bypasses": [
+          {
+            "id": "tailscale",
+            "detail": "tailscale inserts its own ACCEPT ahead of ufw (ts-input chain); tailnet traffic never reaches the 5 rules above",
+            "proof": "probed from the Mac at tailnet IP 100.95.238.12, which is NOT in 192.168.1.0/24",
+            "observed": {
+              "100.79.40.76:22": "OPEN (rule 1 restricts to LAN)",
+              "100.79.40.16:111": "OPEN (no rule)",
+              "100.79.40.76:2049": "OPEN (no rule)",
+              "100.79.40.76:10250": "OPEN (rule 3 restricts to .219)",
+              "100.79.40.76:30810": "OPEN",
+              "100.79.40.76:6443": "closed (agent, no apiserver)",
+              "100.79.40.76:5000": "closed (MLflow binds 127.0.0.1 only)"
+            },
+            "conclusion": "every 0.0.0.0 listener on finance01 is fully open to the whole tailnet; ufw stops none of it",
+            "tailnet_membership": "5 nodes across two accounts - wx200.xyz@ (finance01, finance02, one Mac) and jiningluan@ (two Macs)",
+            "how_to_restrict": "tailscale ACLs in the admin console; adding ufw rules will not help"
+          },
+          {
+            "id": "nodeport_forward_policy",
+            "detail": "k8s NodePort traffic is DNATed in nat PREROUTING and lands in FORWARD, not INPUT, so ufw INPUT rules never see it",
+            "evidence": "192.168.1.48:30810 open from finance02 while no ufw rule permits 30810; DEFAULT_FORWARD_POLICY=ACCEPT",
+            "origin": "the ACCEPT was set to fix flannel VXLAN being dropped; backup at /etc/default/ufw.bak-quantlab",
+            "confidence": "inferred - not verified by reading iptables chains (needs sudo iptables -t nat -L PREROUTING -n)"
+          }
+        ],
+        "mitigating_factors": [
+          "NFS access is also gated by the export ACL (client IP), so a 100.x tailnet peer can reach 2049 but its mount is refused",
+          "k3s kubelet disables anonymous auth and requires client certs by default"
+        ],
+        "exports": "/data 192.168.1.219(rw,sync,no_subtree_check,root_squash)",
+        "exports_note": "finance01 also exports /data (the 2.7TB disk holding ChinaScope) READ-WRITE to finance02; /proc/fs/nfsd/exports shows no active client, i.e. neither direction is currently mounted",
+        "extra_listeners": [
+          "mihomo on 127.0.0.1:7897 and 127.0.0.1:9097 (same as finance02 - explains the identical egress behaviour)",
+          "MLflow on 127.0.0.1:5000 (5 python workers)",
+          "0.0.0.0:5001 (unidentified)",
+          "100.79.40.76:45310 (bound to the tailscale IP only)"
+        ]
+      },
+      "finance02": {
+        "status": "STILL UNREAD",
+        "how": "ssh -t ljn@finance02.tail642a54.ts.net 'sudo ufw status numbered'"
+      }
+    }
+  },
+  "B_data": {
+    "B1_pit_universe": {
+      "verdict": "partial (3 of 4)",
+      "index_constituents": {
+        "verdict": "partial",
+        "table": "index_weight",
+        "fields": [
+          "index_code",
+          "con_code",
+          "trade_date",
+          "weight",
+          "source",
+          "first_seen_at"
+        ],
+        "indices": {
+          "000300.SH": {
+            "rows": 63298,
+            "min": "20090123",
+            "max": "20260731",
+            "distinct_dates": 211
+          },
+          "000905.SH": {
+            "rows": 105500,
+            "min": "20090123",
+            "max": "20260731",
+            "distinct_dates": 211
+          },
+          "000852.SH": {
+            "rows": 142000,
+            "min": "20141031",
+            "max": "20260731",
+            "distinct_dates": 142
+          }
+        },
+        "cadence": "month-end snapshots (2026 dates: 0130,0227,0331,0430,0529,0630,0731; exactly 300 rows each for CSI300)",
+        "gaps": [
+          "no official add/drop record table - changes must be diffed between adjacent month-ends; intra-month changes are erased",
+          "only CSI300/CSI500/CSI1000 - no SSE50 (000016.SH), no ChiNext (399006.SZ), no CSI800",
+          "frozen at 20260731"
+        ],
+        "sample": [
+          "000300.SH",
+          "300750.SZ",
+          "20260731",
+          4.012,
+          "tushare",
+          "2026-08-05T05:40:43Z"
+        ],
+        "alternatives": [
+          {
+            "table": "index_member_all",
+            "note": "REAL in/out dates but for Shenwan INDUSTRY membership, not index membership",
+            "fields": [
+              "l1_code",
+              "l1_name",
+              "l2_code",
+              "l2_name",
+              "l3_code",
+              "l3_name",
+              "ts_code",
+              "name",
+              "in_date",
+              "out_date",
+              "is_new"
+            ],
+            "sample": [
+              "801010.SI",
+              "农林牧渔",
+              "801016.SI",
+              "种植业",
+              "850111.SI",
+              "种子",
+              "000998.SZ",
+              "隆平高科",
+              "20000629",
+              null,
+              "Y"
+            ]
+          },
+          {
+            "source": "qlib provider instruments/",
+            "files": [
+              "all.txt",
+              "csi300.txt",
+              "csi500.txt",
+              "csi800.txt",
+              "csi1000.txt",
+              "csiall.txt"
+            ],
+            "format": "code \\t start_date \\t end_date",
+            "sample": "BJ430017\\t2023-05-31\\t2025-09-30",
+            "caveat": "comes from the community channel (chenditc/investment_data), not the local lake"
+          }
+        ]
+      },
+      "delisting": {
+        "verdict": "yes",
+        "table": "stock_basic",
+        "fields": [
+          "ts_code",
+          "symbol",
+          "name",
+          "area",
+          "industry",
+          "market",
+          "exchange",
+          "list_status",
+          "list_date",
+          "delist_date",
+          "is_hs"
+        ],
+        "partitioning": "snapshot_date=YYYY-MM-DD, 18 partitions 2026-08-05..2026-08-28",
+        "counts": {
+          "L": {
+            "rows": 99807,
+            "codes": 5551
+          },
+          "D": {
+            "rows": 6102,
+            "codes": 339
+          },
+          "with_delist_date_codes": 339
+        },
+        "sample": [
+          "920305.BJ",
+          "云创退",
+          "20210826",
+          "20260730",
+          "D"
+        ],
+        "caveats": [
+          "multi-snapshot table: pick a snapshot_date before querying",
+          "snapshots only start 2026-08-05, so historical list_status cannot be reconstructed from snapshots"
+        ]
+      },
+      "list_date": {
+        "verdict": "yes",
+        "field": "stock_basic.list_date",
+        "range": [
+          "19901201",
+          "20260828"
+        ],
+        "cross_check": [
+          "new_share (4229 rows)",
+          "stock_company (7014 rows)"
+        ]
+      },
+      "st_marks": {
+        "verdict": "yes",
+        "daily_table": "stock_st",
+        "fields": [
+          "ts_code",
+          "name",
+          "trade_date",
+          "type",
+          "type_name",
+          "trade_month"
+        ],
+        "rows": 337072,
+        "range": [
+          "20160809",
+          "20260825"
+        ],
+        "caveat": "type has a single observed value ('ST','风险警示板', 337687 rows) - ST vs *ST must be read off the name prefix",
+        "sample": [
+          "002650.SZ",
+          "ST加加",
+          "20260828",
+          "ST",
+          "风险警示板",
+          "202608"
+        ],
+        "event_table": {
+          "name": "st_history",
+          "rows": 1221,
+          "fields": [
+            "ts_code",
+            "name",
+            "pub_date",
+            "imp_date",
+            "st_tpye",
+            "st_reason",
+            "st_explain",
+            "event_id",
+            "published_month"
+          ],
+          "note": "the only ST source with announce/effective dual timestamps",
+          "sample": [
+            "002485.SZ",
+            "*ST雪发",
+            "20220430",
+            "20220506",
+            "*ST",
+            "最近一个会计年度经审计的净利润为负值且营业收入低于一亿元…"
+          ]
+        },
+        "aux": [
+          "namechange (14156 rows, ts_code/name/start_date/end_date/ann_date/change_reason, from 19901201)",
+          "stk_alert (257 rows, start_date/end_date/type)",
+          "stock_name_pit derived view (20046 rows, end_date=99991231 means still in force)"
+        ]
+      },
+      "suspension": {
+        "verdict": "yes",
+        "table": "suspend_d",
+        "fields": [
+          "ts_code",
+          "trade_date",
+          "suspend_timing",
+          "suspend_type"
+        ],
+        "rows": 482290,
+        "range": [
+          "20090105",
+          "20260828"
+        ],
+        "type_counts": {
+          "S": 457224,
+          "R": 25066
+        },
+        "suspend_timing": "observed NULL",
+        "sample": [
+          [
+            "600491.SH",
+            "2026-08-28",
+            null,
+            "R"
+          ],
+          [
+            "000711.SZ",
+            "2026-08-28",
+            null,
+            "S"
+          ]
+        ]
+      }
+    },
+    "B2_tradability": {
+      "verdict": "yes but split across three tables; suspension is a MISSING ROW",
+      "limit_price_table": {
+        "name": "stk_limit",
+        "fields": [
+          "trade_date",
+          "ts_code",
+          "pre_close",
+          "up_limit",
+          "down_limit"
+        ],
+        "rows": 15003310,
+        "range": [
+          "20090105",
+          "20260828"
+        ],
+        "sample": [
+          "2026-08-28",
+          "000001.SZ",
+          null,
+          12.75,
+          10.43
+        ],
+        "caveat": "pre_close observed entirely NULL - cannot compute pct change from this table"
+      },
+      "daily_has_limit_fields": false,
+      "daily_fields": [
+        "ts_code",
+        "trade_date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "pre_close",
+        "change",
+        "pct_chg",
+        "amount",
+        "volume"
+      ],
+      "hit_limit_markers": [
+        {
+          "table": "limit_list_d",
+          "rows": 158546,
+          "range": [
+            "20200102",
+            "20260805"
+          ],
+          "fields": [
+            "trade_date",
+            "ts_code",
+            "industry",
+            "name",
+            "close",
+            "pct_chg",
+            "amount",
+            "limit_amount",
+            "float_mv",
+            "total_mv",
+            "turnover_ratio",
+            "fd_amount",
+            "first_time",
+            "last_time",
+            "open_times",
+            "up_stat",
+            "limit_times",
+            "limit"
+          ],
+          "sample": [
+            "2026-08-05",
+            "000510.SZ",
+            "化学原料",
+            "新金路",
+            16.12,
+            10.03,
+            901889104,
+            null,
+            9778559519.04,
+            10454522574.08,
+            9.45,
+            57769098.0,
+            "94018",
+            "103721",
+            1,
+            "2/2",
+            2.0,
+            "U"
+          ]
+        },
+        {
+          "table": "limit_step",
+          "rows": 13443
+        },
+        {
+          "table": "limit_cpt_list",
+          "rows": 13274
+        },
+        {
+          "table": "limit_list_ths",
+          "rows": 105049
+        },
+        {
+          "table": "premarket_limit",
+          "rows": 2991034,
+          "from": "20240410"
+        }
+      ],
+      "suspension_representation": {
+        "mode": "missing row, no explicit flag",
+        "evidence_20260828": {
+          "suspend_d_S": 5,
+          "daily_rows": 5547,
+          "stk_limit_rows": 5551,
+          "probe": [
+            [
+              "600491.SH",
+              "R",
+              "present in daily (1 row)"
+            ],
+            [
+              "000711.SZ",
+              "S",
+              "absent from daily (0 rows)"
+            ],
+            [
+              "002586.SZ",
+              "S",
+              "absent from daily (0 rows)"
+            ]
+          ]
+        },
+        "implication": "a missing daily row means BOTH 'suspended' and 'data gap'; must join suspend_d + trade_cal to tell them apart",
+        "note": "stk_limit has MORE rows than daily (5551 > 5547) - limit prices are published even for suspended names"
+      }
+    },
+    "B3_adjustment": {
+      "verdict": "yes, two coexisting conventions",
+      "primary": {
+        "convention": "unadjusted price + adjustment factor",
+        "adj_factor": {
+          "fields": [
+            "ts_code",
+            "trade_date",
+            "adj_factor"
+          ],
+          "rows": 15369639,
+          "symbols": 5834,
+          "range": [
+            "20090105",
+            "20260828"
+          ],
+          "sample": [
+            [
+              "000001.SZ",
+              "2026-08-28",
+              139.008
+            ],
+            [
+              "000002.SZ",
+              "2026-08-28",
+              181.704
+            ]
+          ]
+        },
+        "daily": "unadjusted, 14 cols, no adjusted price"
+      },
+      "secondary": {
+        "table": "stk_factor_pro",
+        "convention": "all three side by side",
+        "price_cols": [
+          "open",
+          "open_hfq",
+          "open_qfq",
+          "high",
+          "high_hfq",
+          "high_qfq",
+          "low",
+          "low_hfq",
+          "low_qfq",
+          "close",
+          "close_hfq",
+          "close_qfq",
+          "pre_close",
+          "adj_factor"
+        ],
+        "caveat": "FROZEN at 20260731 while adj_factor runs to 20260828 - the two conventions are out of sync for 2026-08"
+      },
+      "qlib": "features carry both factor.day.bin and adjclose.day.bin (a third independent convention)",
+      "others": {
+        "fund_adj": "only to 20260514",
+        "hk": "hk_daily_bar (unadjusted) + hk_daily_adj_bar (adjusted) as separate tables"
+      }
+    },
+    "B4_calendars": {
+      "verdict": "yes, but A-share covers a single exchange",
+      "trade_cal": {
+        "fields": [
+          "exchange",
+          "cal_date",
+          "is_open",
+          "pretrade_date"
+        ],
+        "exchanges": [
+          "SSE"
+        ],
+        "rows": 6574,
+        "range": [
+          "20090101",
+          "20261231"
+        ],
+        "sample": [
+          "SSE",
+          "20261231",
+          1,
+          "20261230"
+        ],
+        "notes": [
+          "no SZSE row - using SSE for both is a convention, not a data fact",
+          "already extends to 20261231, so T+N alignment does not break at the sample tail"
+        ]
+      },
+      "hk_trade_calendar": {
+        "fields": [
+          "cal_date",
+          "is_open",
+          "pretrade_date"
+        ],
+        "rows": 6427,
+        "range": [
+          "20090101",
+          "20260806"
+        ],
+        "note": "no exchange column"
+      },
+      "fut_trade_calendar": {
+        "rows": 28201,
+        "exchanges": {
+          "CFFEX": {
+            "rows": 4236,
+            "range": [
+              "20150101",
+              "20260806"
+            ]
+          },
+          "CZCE": {
+            "rows": 6426,
+            "range": [
+              "20090101",
+              "20260806"
+            ]
+          },
+          "DCE": {
+            "rows": 6426,
+            "range": [
+              "20090101",
+              "20260806"
+            ]
+          },
+          "GFEX": {
+            "rows": 1324,
+            "range": [
+              "20221222",
+              "20260806"
+            ]
+          },
+          "INE": {
+            "rows": 3363,
+            "range": [
+              "20170523",
+              "20260806"
+            ]
+          },
+          "SHFE": {
+            "rows": 6426,
+            "range": [
+              "20090101",
+              "20260806"
+            ]
+          }
+        }
+      },
+      "qlib_calendars": {
+        "day.txt": {
+          "lines": 6458,
+          "range": [
+            "2000-01-04",
+            "2026-08-26"
+          ]
+        },
+        "day_future.txt": {
+          "lines": 6543
+        }
+      }
+    },
+    "B5_financial_dual_timestamps": {
+      "verdict": "complete for the three statements, degraded for the indicator table",
+      "tables": {
+        "income": {
+          "period": [
+            "end_date",
+            "end_type"
+          ],
+          "announce": [
+            "ann_date",
+            "f_ann_date"
+          ],
+          "revision": "update_flag",
+          "pit": "full"
+        },
+        "income_vip": {
+          "period": [
+            "end_date",
+            "end_type",
+            "request_period"
+          ],
+          "announce": [
+            "ann_date",
+            "f_ann_date"
+          ],
+          "revision": "update_flag",
+          "pit": "full"
+        },
+        "balancesheet": {
+          "period": [
+            "end_date",
+            "end_type"
+          ],
+          "announce": [
+            "ann_date",
+            "f_ann_date"
+          ],
+          "revision": "update_flag",
+          "pit": "full"
+        },
+        "balancesheet_vip": {
+          "period": [
+            "end_date",
+            "end_type",
+            "request_period"
+          ],
+          "announce": [
+            "ann_date",
+            "f_ann_date"
+          ],
+          "revision": "update_flag",
+          "pit": "full"
+        },
+        "cashflow": {
+          "period": [
+            "end_date",
+            "end_type"
+          ],
+          "announce": [
+            "ann_date",
+            "f_ann_date"
+          ],
+          "revision": "update_flag",
+          "pit": "full"
+        },
+        "cashflow_vip": {
+          "period": [
+            "end_date",
+            "end_type",
+            "request_period"
+          ],
+          "announce": [
+            "ann_date",
+            "f_ann_date"
+          ],
+          "revision": "update_flag",
+          "pit": "full"
+        },
+        "fina_indicator": {
+          "period": [
+            "end_date"
+          ],
+          "announce": [
+            "ann_date"
+          ],
+          "revision": null,
+          "pit": "degraded - no f_ann_date"
+        },
+        "fina_indicator_vip": {
+          "period": [
+            "end_date",
+            "request_period"
+          ],
+          "announce": [
+            "ann_date"
+          ],
+          "revision": "update_flag",
+          "pit": "degraded"
+        },
+        "forecast": {
+          "period": [
+            "end_date"
+          ],
+          "announce": [
+            "ann_date",
+            "first_ann_date"
+          ],
+          "revision": "update_flag",
+          "pit": "full"
+        },
+        "express": {
+          "period": [
+            "end_date"
+          ],
+          "announce": [
+            "ann_date"
+          ],
+          "revision": "update_flag",
+          "pit": "partial"
+        },
+        "fina_mainbz_vip": {
+          "period": [
+            "end_date",
+            "request_period"
+          ],
+          "announce": [],
+          "revision": null,
+          "pit": "NOT POSSIBLE - no announcement date at all"
+        },
+        "disclosure_date": {
+          "period": [
+            "end_date"
+          ],
+          "announce": [
+            "ann_date",
+            "pre_date",
+            "actual_date",
+            "modify_date"
+          ],
+          "pit": "key auxiliary table"
+        }
+      },
+      "samples": {
+        "income_600519": [
+          [
+            "600519.SH",
+            "20260425",
+            "20260425",
+            "20260331",
+            "1",
+            "1",
+            54702912385.23,
+            28153831489.89
+          ],
+          [
+            "600519.SH",
+            "20260425",
+            "20260425",
+            "20260331",
+            "1",
+            "0",
+            54702912385.23,
+            28153831489.89
+          ],
+          [
+            "600519.SH",
+            "20260417",
+            "20260417",
+            "20251231",
+            "4",
+            "1",
+            172054171890.91,
+            85310324833.67
+          ]
+        ],
+        "fina_indicator_600519": [
+          [
+            "600519.SH",
+            "20260425",
+            "20260331",
+            21.76,
+            10.5687,
+            52.2245
+          ]
+        ],
+        "disclosure_date": [
+          [
+            "920125.BJ",
+            "20260805",
+            "20260630",
+            "20260807",
+            null,
+            null
+          ]
+        ]
+      },
+      "guidance": "for strict PIT on the 112 indicators, join (ts_code,end_date) back to income/balancesheet for f_ann_date; fina_mainbz_vip should be replaced by ChinaScope product-level PIT"
+    },
+    "B6_factor_library": {
+      "verdict": "yes - usable as reference implementation and external adapter source",
+      "format": "JSONL, one factor per line",
+      "path": "~/projects/data/market_lake/reference/factor_library/",
+      "record_fields": [
+        "id",
+        "family",
+        "name",
+        "kind",
+        "record_type",
+        "expression",
+        "compiled_expression",
+        "execution_backend",
+        "implementation",
+        "executable",
+        "blocking_reasons",
+        "required_fields",
+        "lookahead_detected",
+        "requires_benchmark",
+        "requires_pit_industry",
+        "custom_ops",
+        "license",
+        "source_id",
+        "source_path",
+        "source_line",
+        "source_revision",
+        "translation_notes",
+        "validation_status",
+        "notes"
+      ],
+      "catalog_counts": {
+        "gtja_191": 191,
+        "qlib_alpha360": 360,
+        "qlib_alpha158": 158,
+        "worldquant_101": 101,
+        "local_core_v1": 6,
+        "qlib_strategy": 2,
+        "total": 818
+      },
+      "compiled_counts": {
+        "_measured_by": "file_line_counts",
+        "_correction_20260901": "这三个数是 compiled/ 下三个文件的行数，不是后端分布；按 execution_backend 字段的分布见 backend_counts",
+        "qlib_native_jsonl": 644,
+        "qlib_panel_jsonl": 148,
+        "blocked_jsonl": 24,
+        "total": 816,
+        "executable": 792
+      },
+      "backends": [
+        "qlib_expression",
+        "qlib_panel_loader",
+        "qlib_kunquant_loader (KunQuant 0.1.11 @ d4b9e61)"
+      ],
+      "integrity": "catalog/index.json carries per-family count + sha256; manifests/ has 13 timestamped snapshots + latest.json",
+      "samples": [
+        {
+          "id": "qlib_alpha158.BETA10",
+          "expression": "Slope($close, 10)/$close",
+          "compiled_expression": "Slope($close, 10)/$close",
+          "execution_backend": "qlib_expression",
+          "required_fields": [
+            "close"
+          ],
+          "validation_status": "candidate"
+        },
+        {
+          "id": "gtja_191.001",
+          "expression": "(-1 * CORR(RANK(DELTA(LOG(VOLUME), 1)), RANK(((CLOSE - OPEN) / OPEN)), 6))",
+          "compiled_expression": "(-1 * CORR(RANK(DELTA(LOG(VOLUME), 1)), RANK(((CLOSE - OPEN) / OPEN)), 6))",
+          "execution_backend": "qlib_panel_loader",
+          "required_fields": [
+            "close",
+            "open",
+            "volume"
+          ],
+          "validation_status": "executable_candidate"
+        },
+        {
+          "id": "worldquant_101.001",
+          "expression": "rank(Ts_ArgMax(SignedPower((returns<0?stddev(returns,20):close), 2), 5))-0.5",
+          "compiled_expression": "KunQuant.predefined.Alpha101.alpha001",
+          "execution_backend": "qlib_kunquant_loader",
+          "required_fields": [
+            "close"
+          ],
+          "validation_status": "executable_candidate"
+        },
+        {
+          "id": "local_core_v1.liquidity_20",
+          "expression": "Log(Mean($amount,20)+1)",
+          "compiled_expression": "Log(Mean($amount,20)+1)",
+          "execution_backend": "qlib_expression",
+          "required_fields": [
+            "amount"
+          ],
+          "validation_status": "research_baseline"
+        },
+        {
+          "id": "gtja_191.030",
+          "executable": false,
+          "compiled_expression": null,
+          "blocking_reasons": [
+            "point_in_time_benchmark_or_fama_french_inputs_unavailable"
+          ],
+          "requires_benchmark": true,
+          "validation_status": "blocked_input_or_semantics"
+        }
+      ],
+      "benchmark_value": [
+        "source-dialect text usable as the prompt",
+        "compiled expression usable as the reference answer",
+        "required_fields yields the data dependency automatically",
+        "24 blocked records are labelled negative samples with reasons",
+        "lookahead_detected / requires_pit_industry are ready-made PIT trap labels"
+      ],
+      "qlib_provider": {
+        "complete": true,
+        "resolved_path": "~/projects/data/qlib/cn_data -> channels/community -> releases/2026-08-26",
+        "calendars": {
+          "day.txt": 6458,
+          "day_future.txt": 6543,
+          "range": [
+            "2000-01-04",
+            "2026-08-26"
+          ]
+        },
+        "instruments": [
+          "all",
+          "csi300",
+          "csi500",
+          "csi800",
+          "csi1000",
+          "csiall"
+        ],
+        "features": {
+          "instruments": 6142,
+          "fields": [
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "amount",
+            "vwap",
+            "change",
+            "factor",
+            "adjclose"
+          ],
+          "size": "859M"
+        },
+        "bin_range": [
+          "2000-01-04",
+          "2026-08-26"
+        ],
+        "warning": {
+          "source": "https://github.com/chenditc/investment_data/releases/latest/download/qlib_bin.tar.gz",
+          "detail": "cn_data currently serves COMMUNITY data, not the local lake build",
+          "channels": {
+            "current_release.txt": "2026-08-04 (local pointer, stale)",
+            "community_release.txt": "2026-08-26 (what cn_data points at)",
+            "local_build": "releases/local-daily-20260805"
+          },
+          "implication": "community data is fresher and ships PIT instruments (fills the B1(a) gap) but is not covered by the local coverage audit or quality gates, and has never been reconciled against the lake"
+        }
+      },
+      "backend_counts": {
+        "_measured_by": "execution_backend_field",
+        "qlib_expression": 644,
+        "qlib_panel_loader": 66,
+        "qlib_kunquant_loader": 82,
+        "blocked": 24,
+        "total": 816,
+        "executable": 792
+      }
+    },
+    "B7_chinascope": {
+      "verdict": "yes - PIT dual timestamps confirmed, stronger than the lake's financial tables",
+      "method": "streamed first 24KB of each zip member via python zipfile (unzip is not installed on either host); no full extraction",
+      "extracted_files": [
+        {
+          "name": "dict_industry.csv",
+          "bytes": 34795
+        },
+        {
+          "name": "concept_dictionary.csv",
+          "bytes": 189803
+        },
+        {
+          "name": "event_dictionary.csv",
+          "bytes": 298505
+        }
+      ],
+      "extract_dir": "~/genebench_inventory/tmp/",
+      "packaging": "one zip = one CSV; semicolon-delimited (news labels are comma-delimited); UTF-8",
+      "sam_pit": {
+        "range": "2014Q2 - 2024Q4",
+        "packages": 10,
+        "compressed": "111MB",
+        "period_pit": {
+          "file": "fin_secu_sam_period_pit.csv",
+          "uncompressed_bytes": 20993433,
+          "fields": [
+            "operation",
+            "id",
+            "report_id",
+            "secu",
+            "publish_date",
+            "report_date",
+            "p",
+            "q",
+            "y",
+            "fy",
+            "currency",
+            "valid",
+            "company_id",
+            "market",
+            "create_time",
+            "update_time"
+          ],
+          "pit_timestamps": [
+            "publish_date",
+            "report_date"
+          ],
+          "restatement_evidence": "002054_SZ_EQ report_date=2014-06-30 appears twice, publish_date 2014-08-27 and 2015-08-29",
+          "sample": "A;201059;S0000622014-06-302014Q212-3162014-08-27;002054_SZ_EQ;2014-08-27;2014-06-30;6;Q2;2014;12-31;CNY;1;CSF0000000712;1002"
+        },
+        "product_pit": {
+          "file": "fin_secu_sam_product_pit.csv",
+          "uncompressed_bytes": 93777895,
+          "fields": [
+            "operation",
+            "id",
+            "report_id",
+            "secu",
+            "report_date",
+            "publish_date",
+            "product_code",
+            "product_cost",
+            "product_income",
+            "product_profit",
+            "company_id",
+            "partial_cost",
+            "market",
+            "create_time",
+            "update_time"
+          ],
+          "granularity": "company x report_period x product",
+          "sample": "A;789200;…;002054_SZ_EQ;2014-06-30;2014-08-27;CC0010060404;76085519.86;95902542.77;19817022.91;CSF0000000712;0;1002"
+        },
+        "product_calc_pit": {
+          "file": "fin_secu_sam_product_calc_pit.csv",
+          "uncompressed_bytes": 470762378,
+          "fields": [
+            "operation",
+            "id",
+            "report_id",
+            "secu",
+            "report_date",
+            "publish_date",
+            "income",
+            "profit",
+            "product_code",
+            "product_path",
+            "product_level",
+            "product_income",
+            "product_income_ratio",
+            "product_profit",
+            "product_profit_ratio",
+            "product_b_income",
+            "product_b_income_ratio",
+            "product_b_profit",
+            "product_b_profit_ratio",
+            "company_id",
+            "market",
+            "partial_calc",
+            "product_partial_calc",
+            "create_time",
+            "update_time"
+          ],
+          "granularity": "company x report_period x product, with full product-tree path and ratios",
+          "sample": "A;631762;…;300433_SZ_EQ;2014-06-30;2015-08-26;5436436613.7;1324678502.6;EC00102003;EC004>EC001>EC00102001>EC001020>EC00102003;5;…",
+          "fills_gap": "fina_mainbz_vip has no announcement date and cannot be used PIT; this can replace it"
+        },
+        "supply_chain": {
+          "file": "supply_chain_relation.csv",
+          "uncompressed_bytes": 28966636,
+          "fields": [
+            "operation",
+            "id",
+            "primary_code",
+            "primary_en",
+            "primary",
+            "primary_type",
+            "related_code",
+            "related_product_en",
+            "related_product",
+            "related_type",
+            "relationship",
+            "importance",
+            "create_time",
+            "update_time"
+          ],
+          "granularity": "PRODUCT / INDUSTRY level, NOT a company-level customer-supplier list",
+          "observed_values": {
+            "relationship": [
+              1,
+              -1
+            ],
+            "importance": [
+              4,
+              2
+            ],
+            "primary_type": [
+              "M",
+              "P"
+            ],
+            "related_type": [
+              "P",
+              "M"
+            ]
+          },
+          "to_stock_level": "needs two hops via dict_product_rs + fin_secu_sam_product_*",
+          "sample": "A;569378df11c0d21d7cd5edae;AC001;Auto Parts and Equipment;机动车零配件与设备;M;AC005;Automobiles;汽车;P;1;4"
+        },
+        "others": {
+          "base_stock": {
+            "bytes": 10318509,
+            "fields": [
+              "code",
+              "ticker",
+              "orgid",
+              "org_en",
+              "org",
+              "abbr",
+              "mkt_code",
+              "mkt",
+              "list_status",
+              "list_dt",
+              "list_edt",
+              "csfid"
+            ]
+          },
+          "base_company": {
+            "bytes": 9267189,
+            "fields": [
+              "company_id",
+              "credit_code",
+              "company",
+              "company_en",
+              "is_bond_issuer",
+              "is_listing",
+              "ref_company_id"
+            ]
+          },
+          "dict_industry": {
+            "bytes": 34795,
+            "fields": [
+              "code",
+              "name",
+              "name_en",
+              "parent",
+              "ancestors",
+              "publisher",
+              "industry_level"
+            ]
+          },
+          "dict_product_rs": {
+            "bytes": 2340047
+          },
+          "dict_product_ind": {
+            "bytes": 2190415
+          },
+          "sam_release_notes_tree": {
+            "bytes": 183321,
+            "note": "version history of the SAM product tree itself - matters for long-horizon PIT",
+            "fields": [
+              "tree_id",
+              "tree_version",
+              "tree_name",
+              "node_code",
+              "node_operation_type",
+              "node_name",
+              "rel_operation_type",
+              "from_parent_code",
+              "to_parent_code",
+              "display_order"
+            ]
+          }
+        }
+      },
+      "smartag": {
+        "dictionaries": {
+          "concept_dictionary": {
+            "bytes": 189803,
+            "fields": [
+              "code",
+              "name",
+              "name_en",
+              "concept_id",
+              "inclusion_date",
+              "def",
+              "create_time",
+              "update_time"
+            ],
+            "sample": "A;CP0001;水利工程;Water Conservancy Project Concept;1;2019-01-17;水利工程是用于控制和调配自然界的地表水和地下水…"
+          },
+          "concept_stock": {
+            "bytes": 6773643,
+            "fields": [
+              "code",
+              "name",
+              "name_en",
+              "concept_code",
+              "inclusion_date",
+              "delete_date"
+            ],
+            "note": "concept membership carries inclusion/removal dual timestamps",
+            "sample": "A;000001_SZ_EQ;平安银行;PING AN BANK;CP0233;2019-01-17;"
+          },
+          "event_dictionary": {
+            "bytes": 298505,
+            "fields": [
+              "code",
+              "name",
+              "name_en",
+              "parent_code",
+              "level",
+              "pos",
+              "importance",
+              "inclusion_date",
+              "delete_date"
+            ],
+            "sample": "A;AA;利润表;Income Statement;A;2"
+          },
+          "region_dictionary": {
+            "bytes": 698236,
+            "fields": [
+              "code",
+              "name",
+              "name_en",
+              "level",
+              "parent_code",
+              "ancestors",
+              "external_code"
+            ]
+          },
+          "dict_product_rs": {
+            "bytes": 2341931
+          },
+          "base_stock": {
+            "bytes": 10416501
+          },
+          "pdfs": [
+            "base_stock.pdf (866621 B)",
+            "dictionary.pdf (866630 B)"
+          ]
+        },
+        "news_labels": {
+          "file_pattern": "news_company_label_<start>-<end>.csv",
+          "delimiter": ",",
+          "ncols": 10,
+          "fields": [
+            "stockCode",
+            "companyId",
+            "chineseName",
+            "englishName",
+            "newsId",
+            "newsTs",
+            "relevance",
+            "emotionIndicator",
+            "emotionWeight",
+            "emotionDetail"
+          ],
+          "timestamp_precision": "ISO8601 to the second with explicit offset, e.g. 2008-02-26T07:39:08+0800",
+          "structure": "one newsId maps to many stocks, each with its own relevance; emotion is a 3-class distribution + main label + confidence",
+          "code_format": "600050_SH_EQ / 02318_HK_EQ (HK included)",
+          "samples": [
+            "02318_HK_EQ,CSF0000001741,中国平安,PINGAN-H,779762,2008-02-26T07:39:08+0800,0.275,0,0.64,\"{0=0.6362, 1=0.128, 2=0.2357}\"",
+            "600050_SH_EQ,CSF0000002615,中国联通,China Unicom (Hong Kong) ADR,779762,2008-02-26T07:39:08+0800,0.325,2,0.99,\"{0=0.0054, 1=0.0024, 2=0.9922}\""
+          ]
+        },
+        "correction_vs_round1": {
+          "finding": "the directory also holds a full news_region_label_* series, latest news_region_label_202601010000-202602010000.zip",
+          "implication": "Smartag actually extends to 2026-02, not 2024-09-01 as the package name suggests; round-1 range should be corrected",
+          "also": "a SmarTag <chinese>.xlsx spec file is present"
+        }
+      }
+    },
+    "B8_strategy_assets": {
+      "verdict": "present but small",
+      "paper_ledger": {
+        "path": "~/projects/outputs/quant_platform/paper/ledger.sqlite3",
+        "bytes": 61440,
+        "tables": {
+          "runs": {
+            "rows": 11,
+            "cols": [
+              "run_id",
+              "asof",
+              "created_at",
+              "status",
+              "equity",
+              "turnover",
+              "simulated_cost",
+              "portfolio_return"
+            ]
+          },
+          "targets": {
+            "rows": 110,
+            "cols": [
+              "run_id",
+              "symbol",
+              "score",
+              "previous_weight",
+              "target_weight",
+              "delta_weight",
+              "reference_close"
+            ]
+          },
+          "positions": {
+            "rows": 10,
+            "cols": [
+              "symbol",
+              "weight",
+              "score",
+              "reference_close",
+              "asof"
+            ]
+          },
+          "meta": {
+            "rows": 1,
+            "content": {
+              "equity": "884621.4660322453"
+            }
+          }
+        },
+        "range": [
+          "2026-07-31",
+          "2026-08-26"
+        ],
+        "holdings": "10 names at equal 0.095 weight",
+        "samples": [
+          [
+            "6c18fc51…",
+            "2026-07-31",
+            "committed",
+            999287.5,
+            0.475,
+            712.5,
+            0.0
+          ],
+          [
+            "339404cd…",
+            "2026-08-04",
+            "committed",
+            966706.35,
+            0.3847,
+            558.14,
+            -0.032
+          ],
+          [
+            "6c18fc51…",
+            "SZ301165",
+            1.2394,
+            0.0,
+            0.095,
+            0.095,
+            6.4557
+          ],
+          [
+            "SH603259",
+            0.095,
+            2.0677,
+            13.2399,
+            "2026-08-26"
+          ]
+        ]
+      },
+      "backtests": {
+        "total_qruns_ever": 2,
+        "paths": [
+          {
+            "path": "~/projects/outputs/quant_platform/backtests/",
+            "mlflow_experiment": "772817035740617735",
+            "runs": 1,
+            "log": "platform_qrun.log (25KB)",
+            "date": "2026-08-02"
+          },
+          {
+            "path": "~/projects/outputs/qlib/official_lightgbm_alpha158/",
+            "mlflow_experiment": "959345642746215903",
+            "runs": 1,
+            "log": "qrun.log",
+            "date": "2026-08-02"
+          }
+        ],
+        "mlflow_backend": "none resident (~/mlruns and mlflow.db absent); cluster has a portal/mlflow-relay pod"
+      },
+      "factor_outputs": [
+        "~/projects/outputs/quant_platform/factors/2025-01-01_2026-07-31",
+        "~/projects/outputs/quant_platform/factors/2026-07-01_2026-07-31"
+      ],
+      "audits": "~/projects/outputs/quant_platform/audits/ - 5 coverage snapshots dated 2026-08-05",
+      "ripple": {
+        "path": "~/projects/ripple",
+        "implementation": "ripple/signal.py - stock-level peer-return factor; explicitly handles missing PIT industry labels by mapping unknowns to a unique '\\x00'+code placeholder",
+        "scripts": 24,
+        "runners": [
+          "run_all.sh",
+          "daily.sh"
+        ],
+        "named_scripts": [
+          "mainline_detector",
+          "next_hop",
+          "intra_industry",
+          "group_compare",
+          "m3f_placebo",
+          "detector_grid",
+          "detector_pr",
+          "incremental_ic",
+          "calibration",
+          "label_hygiene",
+          "flow_fingerprint",
+          "concept_birth_event",
+          "cross_industry_split",
+          "parallel_ladder",
+          "trace_edge",
+          "live_detector"
+        ],
+        "result_tables": [
+          {
+            "file": "h1_topk_by_year.csv",
+            "header": "y,kNone,k10,k20,k40",
+            "sample": "2016,0.20901613,0.17186633,0.18673135,0.20190172"
+          },
+          {
+            "file": "nexthop_by_period.csv",
+            "header": "date,y,base_lim,base_big,hit20,big20,hit5,lift20,lift_big20",
+            "sample": "2016-01-08,2016,0.0017316,0.0021645,0.0,0.0,0.0,0.0,0.0"
+          }
+        ],
+        "cache_gb": 13,
+        "note": "the most complete research-to-conclusion loop on either machine"
+      },
+      "strategy_abstraction": {
+        "in_platform_src": false,
+        "note": "no `class *Strategy` / run_backtest / paper_trade hits under platform/src/quant_platform",
+        "available_elsewhere": [
+          "~/projects/quant/qlib/ (upstream qlib backtest/strategy/workflow source tree)",
+          "spectra: tests/test_s04_backtest_adapter.py, docs/workspace-example/portfolio.py"
+        ]
+      },
+      "finance02": {
+        "copies": [
+          "~/quant-platform (full copy incl. f02run.py)",
+          "~/deploy-staging/{platform-gitops,spectra}",
+          "~/platform (k8s manifests + helm + credentials)"
+        ],
+        "git": [
+          "~/git-mirrors/quant-platform.git",
+          "6 .bundle files dated 2026-08-06/07"
+        ],
+        "independent_assets": null
+      }
+    }
+  },
+  "C_pending_work_orders": [
+    {
+      "id": "W0",
+      "title": "Decide the fate of the accidentally installed LXD snap on finance02",
+      "why": "a red-line violation occurred during this recon; the user must choose",
+      "options": [
+        "keep it (ready-made substrate for isolation option C; uninitialised, no runtime cost)",
+        "sudo snap remove --purge lxd, and consider apt remove lxd-installer to prevent re-triggering"
+      ],
+      "eta_min": 5,
+      "risk": "low; confirm nothing depends on it first",
+      "origin": "this round",
+      "status": "DONE",
+      "completed_at_utc": "2026-08-30T12:32",
+      "action_taken": "sudo snap remove --purge lxd",
+      "verification": [
+        "snap list now shows only core22, core24, snapd",
+        "/var/snap/lxd absent",
+        "/var/lib/snapd/snaps/lxd_40585.snap absent",
+        "k3s unaffected: 2 nodes Ready, 22 pods Running"
+      ],
+      "residual_risk": "lxd-installer package and /usr/sbin/lxc remain - any lxc subcommand on finance02 will trigger the snap install again; optional full fix: sudo apt remove lxd-installer"
+    },
+    {
+      "id": "W1",
+      "title": "Re-mount the NFS bridge between the two lakes",
+      "why": "finance02's export is gated to client IP 192.168.1.48; over tailnet the source IP would be 100.79.40.76 and the mount is refused",
+      "details": [
+        "port 2049 is BLOCKED on the LAN IP (192.168.1.48) but OPEN on the tailscale IP (100.79.40.76) - pick the mount address deliberately",
+        "use ro,soft,timeo=100,retrans=3; a hard mount hangs backtests indefinitely when 02 goes away",
+        "finance02's export was changed from ro,all_squash to rw,root_squash - decide whether to revert to read-only"
+      ],
+      "eta_min": "15-20 (down from 30-45; the firewall half is eliminated)",
+      "risk": "low",
+      "origin": "round 1",
+      "status": "OPEN - scope reduced by R1",
+      "mount_address_RESOLVED": "use the LAN IP 192.168.1.219, NOT the tailscale address",
+      "firewall_work_needed": "none - 01->02:2049 over LAN is already open",
+      "remaining_decision": "finance02's export is currently rw,root_squash - decide whether to revert to ro,all_squash"
+    },
+    {
+      "id": "W2",
+      "title": "Find out why premium-daily's dataset set omits 71 tables",
+      "why": "71 datasets are frozen at 2026-08-05/06, including stk_factor_pro (10.76M rows x 264 cols); any 'latest data' benchmark task would be wrong",
+      "entry_point": "PHASE_DATASETS in platform/src plus the actual arguments of the premium-daily unit",
+      "eta_min": "60-120 (incl. one incremental verification run)",
+      "risk": "medium - a fix triggers heavy backfill; schedule outside trading hours",
+      "origin": "round 1"
+    },
+    {
+      "id": "W3",
+      "title": "Remove the 40GB duplicate copy on finance02",
+      "target": "~/market_lake_f02.pre-hdd.20260818T055940Z",
+      "why": "nearly half of finance02's 84GB used system disk; the execution plane needs headroom",
+      "precondition": "partition-level verification of /data/market_lake_f02 first",
+      "eta_min": "15 (plus 30 for verification)",
+      "risk": "low but IRREVERSIBLE",
+      "origin": "round 1"
+    },
+    {
+      "id": "W4",
+      "title": "Two unhealthy units",
+      "items": [
+        "prismquant pod in Init:CrashLoopBackOff (92m)",
+        "quant-datahub-index-minute-backfill.service failed (exit 2, 2026-08-30 05:36)"
+      ],
+      "why": "both poison the assumption that the cluster and the pipeline are healthy",
+      "eta_min": "20-30 each",
+      "risk": "low",
+      "origin": "this round"
+    },
+    {
+      "id": "W5",
+      "title": "Reduce the tailnet-facing exposure",
+      "origin": "this round R1",
+      "status": "OPEN",
+      "items": [
+        {
+          "n": 1,
+          "what": "tailscale bypasses ufw: 22 / 111 / 2049 / 10250 / 30810 are open to the entire tailnet",
+          "fix": "tailscale ACLs in the admin console - ufw rules will NOT help",
+          "eta_min": 30,
+          "risk": "medium - affects every node"
+        },
+        {
+          "n": 2,
+          "what": "DEFAULT_FORWARD_POLICY=ACCEPT lets every NodePort through regardless of ufw",
+          "fix": "add targeted FORWARD rules; do NOT revert the policy to DROP or flannel breaks again",
+          "eta_min": 20,
+          "risk": "medium"
+        },
+        {
+          "n": 3,
+          "what": "finance01 exports /data (holding ChinaScope) read-WRITE to finance02",
+          "fix": "consider ro",
+          "eta_min": 5,
+          "risk": "low"
+        }
+      ],
+      "why": "the ufw rule list reads as if it is protecting the hosts; on the tailnet side it protects nothing, and the benchmark will add more NodePorts"
+    }
+  ],
+  "D_evidence_limits": [
+    "ufw: finance01's rules are now READ (see A_environment.firewall) and they OVERTURNED the initial mechanism claim. finance02's ufw is still unread - one command closes it: ssh -t ljn@finance02.tail642a54.ts.net 'sudo ufw status numbered'",
+    "the NodePort bypass mechanism (DNAT -> FORWARD skipping ufw INPUT) is INFERRED from DEFAULT_FORWARD_POLICY=ACCEPT plus observed connectivity; iptables chains were not actually read (needs sudo iptables -t nat -L PREROUTING -n)",
+    "unzip is not installed on either host; ChinaScope schemas came from streaming the first 24KB of each zip member - file tails were not verified",
+    "only 1 of 848 Smartag news packages was sampled (2008-2009); the news_region_label_* series was confirmed by directory listing only, schema not read",
+    "fin_secu_sam_product_calc_pit (470MB uncompressed) was read header-only; its actual symbol and period coverage was not counted",
+    "index_weight turnover rate was not computed; only the month-end snapshot cadence was confirmed",
+    "completed inside the 45-minute timebox; no downsampling was triggered"
+  ]
+}

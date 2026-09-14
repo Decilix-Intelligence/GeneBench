@@ -1,0 +1,68 @@
+# 引用信息（Citation File Format 1.2.0）
+# https://citation-file-format.github.io/
+#
+# ⚠ 未定项一律写成 "<待用户填>"，**没有编造任何作者名、机构或地址**。
+#    填之前不要把这份文件随发布包发出去 —— 一个带占位符的 CITATION 比没有更容易被照抄。
+#    还剩一处占位：authors（license 已于 2026-09-10 填为 Apache-2.0；
+#    repository-code / repository 已于 2026-09-11 填为两个真地址，裁定 ㉑ / ⑩；
+#    LICENSE 的版权行已于 2026-09-11 填为 Copyright 2026 Decilix Intelligence，
+#    **那是权利归属，不是 authors** —— 不要拿它填这里）。
+#
+# 还没定的一件事，决定人是谁：
+#   authors        —— 仓库所有者（本文件不代填）
+# 已经定了的：
+#   license        —— Apache-2.0（2026-09-10 用户裁定；LICENSE 已换成全文）
+#   repository-code —— 2026-09-11 用户裁定 ㉑；**地址已定不等于已推送**，
+#                      推送由仓库所有者执行（ops/reports/push_instructions.md）
+
+cff-version: 1.2.0
+message: "如果你用到了 GeneBench，请按下面的信息引用。"
+title: "GeneBench: 面向量化研究 agent 的全流程基准测试台"
+abstract: >-
+  GeneBench 把量化研究拆成八个协议化阶段（S1 取数 … S8 状态执行），
+  为每个阶段定义可结算的产物契约与判据，并用「有效性闸门」而不是扣分来处理
+  前视、日历、复权、PIT 宇宙与欠定语义五族违例 ——
+  探针失败的那次运行效果分记 invalid，而不是记一个低分。
+  v1 出集 34 题，跑在私有与公开两条数据通道上；
+  τ / ε 由独立实现之间的自然离散度标定，不拍阈值。
+type: software
+version: "任务集 1.0.15 / 参考面 r1.0.22"
+date-released: "<待用户填：首次公开发布日>"
+
+authors:
+  - name: "<待用户填>"
+    # 每位作者用下面的字段填，family-names / given-names 缺一不可；
+    # 机构作者用 name:。**不要留占位符发布。**
+    # - family-names: "<姓>"
+    #   given-names: "<名>"
+    #   affiliation: "<机构>"
+    #   orcid: "https://orcid.org/<ORCID>"
+
+# license 已定（用户裁定 ⑳，2026-09-10）：代码按 Apache-2.0 授权，见 LICENSE 首行的 SPDX。
+# 这里填的是 SPDX 标识 —— CFF 1.2.0 的 license 字段收的就是 SPDX id，不是许可全文。
+license: Apache-2.0
+repository-code: "https://github.com/Decilix-Intelligence/GeneBench.git"
+# 协议工件（GeneQuant）单独发布，有自己的仓库地址（裁定 ㉑ / ⑩）。
+# CFF 1.2.0 里 `repository-code` 收的是**本作品自己的源码地址**，一个字段只放一个 URL；
+# 第二个地址因此放在 `repository` 里，并在这里写明它是什么 —— 不写明的话，
+# 引用工具会把它当成本体的另一个镜像。
+# 本体以 genequant/MANIFEST.json 的 sha256 **钉住**所用的协议版本
+#（见 RELEASE_MANIFEST.json 的 genequant 段：version + manifest sha256）。
+repository: "https://github.com/Decilix-Intelligence/GeneQuant.git"
+
+keywords:
+  - benchmark
+  - quantitative-finance
+  - llm-agent
+  - point-in-time
+  - lookahead-bias
+  - agent-evaluation
+
+references:
+  - type: data
+    title: "baostock 公开行情（GeneBench 公开数据通道的上游）"
+    notes: >-
+      再分发许可已取得（DATA_LICENSE 状态 granted：研究用途、允许再分发派生日线数据、
+      署名 baostock），**书面正文仍待替换**；措辞以 DATA_LICENSE 为准，
+      措辞按许可方要求写，不自行拟稿。公开包里 instruments/ 的再分发依据另行确认
+      （DATA_LICENSE §5）。

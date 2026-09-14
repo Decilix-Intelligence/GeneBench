@@ -1,0 +1,53 @@
+{
+ "filters": {
+  "batch": "m6_public",
+  "set_version": "p1.0.0",
+  "superseded": "None"
+ },
+ "n_records": 18,
+ "axis_values": {
+  "set_version": [
+   "p1.0.0"
+  ],
+  "reference_version": [
+   "r1.0.23"
+  ],
+  "protocol_version": [
+   "geneprotocol_v1@d6fbcaa08302",
+   "geneprotocol_v1@none"
+  ],
+  "channel": [
+   "public"
+  ]
+ },
+ "mixed_axes": {},
+ "allow_mixed_axes": false,
+ "version_combos": [
+  {
+   "set_version": "p1.0.0",
+   "reference_version": "r1.0.23",
+   "protocol_version": "geneprotocol_v1@d6fbcaa08302",
+   "channel": "public",
+   "n_runs": 9,
+   "batches": [
+    "m6_public"
+   ],
+   "tracks": [
+    "main"
+   ]
+  },
+  {
+   "set_version": "p1.0.0",
+   "reference_version": "r1.0.23",
+   "protocol_version": "geneprotocol_v1@none",
+   "channel": "public",
+   "n_runs": 9,
+   "batches": [
+    "m6_public"
+   ],
+   "tracks": [
+    "main"
+   ]
+  }
+ ]
+}

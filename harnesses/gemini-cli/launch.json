@@ -1,0 +1,15 @@
+{
+  "harness": "Gemini CLI",
+  "paradigm": "P1",
+  "image": "gb-gemini-cli-u:r1",
+  "command": [
+    "sh",
+    "-c",
+    "export HOME=/task/.gemini_home && GB_SETTINGS_DIR=\"$$HOME/.gemini\" && mkdir -p \"$$GB_SETTINGS_DIR\" && printf '%s' '{\"general\":{\"enableAutoUpdate\":false,\"enableAutoUpdateNotification\":false},\"privacy\":{\"usageStatisticsEnabled\":false},\"security\":{\"auth\":{\"selectedType\":\"gemini-api-key\"},\"folderTrust\":{\"enabled\":false}}}' > \"$$GB_SETTINGS_DIR/settings.json\" && export NO_COLOR=1 && export GEMINI_API_KEY=\"$$OPENAI_API_KEY\" && export GOOGLE_GEMINI_BASE_URL=\"$${OPENAI_BASE_URL%/v1}\" && cd /task && gemini -p \"$$(cat /task/INSTRUCTION.md)\" -m deepseek-chat --approval-mode yolo --skip-trust -o text"
+  ],
+  "env_required": [
+    "OPENAI_BASE_URL",
+    "OPENAI_API_KEY"
+  ],
+  "notes": "Gemini CLI 说的是 **Gemini API 协议**（POST /v1beta/models/<model>:streamGenerateContent），不是 OpenAI 兼容 —— 0.58.0 的包里 OPENAI_BASE_URL / OPENAI_API_KEY 各 0 处命中，没有任何 OpenAI 兼容 provider。它**有**一条正式的自定义 base URL：GOOGLE_GEMINI_BASE_URL（bundle/docs/reference/configuration.md 有条目，gemini-api-key 认证下生效），所以 base URL 仍然只从 env_required 列的变量取：$${OPENAI_BASE_URL%/v1}，把边车注入的 http://gateway:8081/v1 削掉尾巴变成 http://gateway:8081，主机名一个字都没写死。文档说该 URL「必须 https，除非指向 localhost」，**但 0.58.0 实测没有强制**：http://gateway:8081 直接走到了 fetch 层（f02 容器内实测，见 README §4），所以边车这条路是通的。鉴权头是 **x-goog-api-key**、不是 Authorization —— 边车的 _client_key() 只读 authorization，读不到就 key=None，于是 `if key and key != PLACEHOLDER_KEY` 不成立、**不会**判 foreign_credential，随后 _replace_auth() 因 seen_auth=False 而**插入** authorization: Bearer <真 key>。也就是说边车一行都不用改。GEMINI_API_KEY 仍指到占位 key：它会被原样放进 x-goog-api-key 转发给上游，占位 key 是公开的，不构成凭据泄露。settings.json 预写四件事：security.auth.selectedType=gemini-api-key（不写的话直接报 「Invalid auth method selected.」当场退出）、security.folderTrust.enabled=false 与 --skip-trust（否则 /task 不受信任，approval-mode 被强制降回 default、yolo 失效）、general.enableAutoUpdate=false（省掉起步时那次到 npm 的出网，运行期只有边车这一个出口）、privacy.usageStatisticsEnabled=false。HOME 指到 /task/.gemini_home 并 mkdir -p（容器以 uid 1000 跑、HOME 不可写）。compose 解析期会吃一层 $，命令里一律写 $$（N-101）。-m deepseek-chat 是为了让 config.yaml、launch.json 与请求 path 里的模型名三处一致；**模型待换**：DeepSeek 不服务 Gemini 协议，真跑到的是上游 404（见 README §4）。"
+}

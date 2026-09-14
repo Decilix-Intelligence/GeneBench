@@ -1,0 +1,16 @@
+# 卡 3.rt 票据收件箱（阶段三红队 findings 的登记项）
+
+红队 14 条 finding 里，9 条 major 已在本卡改进 `harnesses/README.md`（提交见 git log）；
+下面是**登记不修**的 5 条 minor，以及 2 条要别人改的代码/规格项。
+判据一律没有放宽，测试也没有绕过。
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | `harnesses/README.md` §1.1 铁律一末句与 §5 末行把「多条 FROM」说成被**注入器 P4c** 拦掉 | 登记不修（minor） | 真正拦它的是 `ops/test_harness_contract.py::test_dockerfile_from_unified_base` 与 `harnesses/build.sh` 第 3 步；注入器 P4c 读的是 bundle 里的 `image/Dockerfile`（`runner/inject.py:360-368`），不是 `harnesses/<id>/Dockerfile`。照文档去查 P4c 会找错地方，但**拦截本身是真的**、修法也对，所以不挡外部用户 |
+| N-? | §5 `403 foreign_credential` 一行没说明它是防御性说明 | 登记不修（minor） | f02 上 47 个既有 run dir 的 `log/llm_log.jsonl` 全文 0 命中；容器里只有占位 key，按文档做复现不出来。触发条件是 harness 自带 key（环境 / 配置文件 / 命令里写死）。机制为真（`egress_proxy.py:1106`） |
+| N-? | §5「`no_artifact` 且 run dir 里什么都没有」一行与相邻那行可信度不同，排版上看不出来 | 登记不修（minor） | 前者由 `runner/c42/harvest.py` 结构性保证（harvest 在 `down -v` 之前），f02 全部 run dir 里 0 例，只有自己写 up/down 才可能；后者（产物写到 `/task` 之外）真出现过（h_grok-cli 那次的 `run_status`） |
+| N-? | §4 与 §0 第 4 条写「四条命令」，实际列了五段（① 出集 ② 推送 ③ 真跑 ④ 结算 ⑤ 记账） | 登记不修（minor） | 数字不影响照抄；改它会动到 §0/§4 两处标题行，收益不抵共享文件的写冲突成本 |
+| N-? | §4 的 `STG=/data/shared/genebench/staging/<batch>` 与 §4① 的 `rm -rf "$STG"` 组合，同一批跑第二道题会删掉第一道的 bundle 与通行证 | 登记不修（minor，但**建议下张动 §4 的卡改成 `<batch>_<task>`**） | f01 上留痕的真跑用的都是 `<batch>_<task>`（`h_codex_s2-cor-01`、`m6_s7-rob-02`…），只有 `staging/w31` 是 batch-only 形态。文档与既有实践不一致 |
+| N-? | `ops/export_bundle.py` 命中 0 行时不列可选 `task_id` | 待办（代码，**不在 3.rt 的路径里**） | 现文案「参数表里 'xxx' 命中 0 行（要恰好 1 行）」，外部用户无从知道有哪些题号。本卡已在 §4 术语行写明出处（`grep task_id genetask/params/v1.0-smoke40.yaml`）作为替代；把候选打进报错更好，需要动 `ops/export_bundle.py::export_one` |
+| N-? | 施工契约要求「打包（出集）拿 `locks/heavy.lock`」，而 `harnesses/README.md` §4① 不提任何锁 | 待裁定（规格冲突） | 红队实测：出集本身 10 分钟内完成、并不重，等锁等了约 3.5 小时（阶段一的 gold 重算持锁）。外部用户照 README 不会拿锁，于是出集会和 gold 重算抢内存（f01 只有 30G）。要么 README 里写清「在 f01 上出集要拿 heavy.lock」，要么契约把「打包」从重活里拿掉 —— 两处只能留一个说法 |
+| N-? | 全量 pytest 里 `ops/test_sim_factory.py` 27 条红（`s8-*` 全族）+ `ops/test_lake_baseline.py` 1 条 | 登记（**不是本卡引入**，转给数据面/S8 的卡） | 报错是 `gateway/sim_factory.py:80`：`s8-cor-01 在多个出集里都有：[reference/tasks/v1.0-smoke/s8-cor-01, reference/tasks/v1.0-smoke-public/s8-cor-01] —— 不猜`。阶段一 1.1-b 的公开通道重建在答案面下多出了 `v1.0-smoke-public` 这一套，而 `sim_factory` 的定位是「按 task_id 全局唯一」。要么给它传 `set_id`，要么把公开那套挪出 `reference/tasks/`。本卡（3.rt）只改了 harnesses 文档与 ops/test_harness_contract.py，与之无关 |

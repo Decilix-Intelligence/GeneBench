@@ -1,0 +1,42 @@
+{
+  "year": 2026,
+  "public_rows": 466773,
+  "private_rows": 466773,
+  "rows_in_both": 466773,
+  "status_agree": 466773,
+  "status_agree_rate": 1.0,
+  "confusion": {
+    "limit_down": {
+      "limit_down": 3118,
+      "limit_up": 0,
+      "suspend": 0,
+      "trade": 0
+    },
+    "limit_up": {
+      "limit_down": 0,
+      "limit_up": 8374,
+      "suspend": 0,
+      "trade": 0
+    },
+    "suspend": {
+      "limit_down": 0,
+      "limit_up": 0,
+      "suspend": 853,
+      "trade": 0
+    },
+    "trade": {
+      "limit_down": 0,
+      "limit_up": 0,
+      "suspend": 0,
+      "trade": 454428
+    }
+  },
+  "only_public": {
+    "rows": 0,
+    "status": {}
+  },
+  "only_private": {
+    "rows": 0,
+    "status": {}
+  }
+}

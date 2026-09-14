@@ -1,0 +1,96 @@
+{
+ "kind": "artifact",
+ "artifact": {
+  "schema_version": "1.0",
+  "artifact_id": "S3-art-1",
+  "stage": "S3",
+  "task_id": "T-sample",
+  "config_id": "cfg-sample",
+  "arm": "strict",
+  "seed": 0,
+  "as_of": "2026-07-31",
+  "produced_at": "2026-09-01T12:00:00.000+00:00",
+  "provenance": [],
+  "declarations": {
+   "required_fields": [
+    "close"
+   ],
+   "lookback": 20,
+   "eval_frequency": "daily",
+   "operator_semantics": {
+    "ts_rank": "pct_0_1"
+   },
+   "param_order": [
+    "window"
+   ],
+   "nonfinite_policy": "propagate",
+   "warmup_policy": "null_until_full"
+  },
+  "payload": {
+   "factor_id": "gtja_191.001",
+   "expression": "ts_rank(close, 20)",
+   "values_ref": {
+    "rows": 6000,
+    "n_dates": 20,
+    "n_symbols": 300,
+    "coverage": 0.97,
+    "sha256": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+   },
+   "nonfinite": {
+    "inf": 0,
+    "nan": 12,
+    "replaced": 0
+   },
+   "warmup": {
+    "lookback": 20,
+    "first_valid_date": "2026-01-29",
+    "nonnull_before_warmup": 0
+   },
+   "approximated_operators": [],
+   "degeneracy": {
+    "is_constant": false,
+    "alert": false,
+    "coverage": 0.97
+   }
+  }
+ },
+ "task": {
+  "task_id": "T-sample",
+  "stage": "S3",
+  "declared": {
+   "required_fields": [
+    "close"
+   ],
+   "lookback": 20,
+   "eval_frequency": "daily",
+   "operator_semantics": {
+    "ts_rank": "pct_0_1"
+   },
+   "param_order": [
+    "window"
+   ],
+   "nonfinite_policy": "propagate",
+   "warmup_policy": "null_until_full"
+  },
+  "underdetermined": []
+ },
+ "gateway_log": [
+  {
+   "ts": "2026-09-01T12:00:00.000+00:00",
+   "task_id": "T-sample",
+   "config_id": "cfg-sample",
+   "method": "GET",
+   "path": "/bars",
+   "params": {
+    "code": "600519.SH",
+    "fields": "close"
+   },
+   "as_of": "2026-07-31",
+   "decision": "allow",
+   "reason": null,
+   "status": 200,
+   "rows": 8
+  }
+ ],
+ "tradability": null
+}

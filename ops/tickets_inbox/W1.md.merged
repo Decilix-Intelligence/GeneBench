@@ -1,0 +1,189 @@
+# W1 前置与裁定落地（2026-09-10）
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | **网关单元的 `StartLimitIntervalSec` / `StartLimitBurst` 写在 `[Service]` 里，systemd 静默丢掉** | **已修** | systemd v230 之后这两个键只在 `[Unit]` 生效。单元里写着 `StartLimitIntervalSec=120`，`systemctl --user show` 报的是 `StartLimitIntervalUSec=10s`（全局默认）——**写下的值不是生效的值，而且没有任何东西会报错**。讽刺的是它救了 08:48–08:55 那次：窗口只有 10 s、两次失败相隔 90 s，计数器永远清零，于是「掷硬币」掷了 5 次才起来，而不是 3 次之后彻底不起。已搬到 `[Unit]` 并放宽到 600 s / 5。断言：`ops/test_w1.py::test_start_limit_is_in_the_unit_section_where_it_actually_takes_effect`。 |
+| N-? | **网关 `ExecStartPre`（守门扫全树）69 s，撞默认 `TimeoutStartSec=90 s`** | **已修** | 2026-09-10 08:48–08:55 生产网关连挂 4 次（journal 逐条：`start-pre operation timed out. Terminating.`），NRestarts=4 才起来。实测：两个根 **5,486,074 条路径**（`$GB/runs_in` 一棵就 498 万）、`check()` **69 s 热 cache / 96 s 有争用**。`TimeoutStartSec=600`。**守门与判据一个字不改**。 |
+| N-? | **`ops/guard_modes.py` 每条路径做 4 次系统调用** | **已修（判据不变）** | `rglob` 内部 lstat + `is_symlink()` + `stat()` + `is_dir()`。新增 `_walk_stat()` 用 `os.scandir` 的 `DirEntry`，压成 1 次：真树上 **95.6 s → 43.9 s**，两版**逐条同结论**（同一路径集合、同一张违例表，`ops/test_w1.py` 拿夹具比对四种形态）。**没有缩小扫描范围** —— `runs_in` 占 498 万条且是答案面根，不能不扫。 |
+| N-? | **公开 provider 的 `files.sha256` 漏了它自己那两个元数据文件** | **待裁定（挡公开通道真跑）** | 见下 §3。`pin.verify_filelist` 对 `$SNAPSHOTS/public_v1/qlib_provider` 报 2 条「树里有而清单里没有」（`MANIFEST.sha256`、`build_info.json`），私有那份 0 条。后果：**即使 P2 的 expect 已经按通道给对了，公开通道仍然会在 P2 红**。 |
+| N-? | **`ops/run_f02_a1.py` 没有通道概念** | 登记不修 | 通道靠 `GENEBENCH_CHANNEL` 环境变量传给注入器（W1 第 3 项）。`run_joblist.py --channel public` 会设它；手工敲单题命令的人**必须自己 `export GENEBENCH_CHANNEL=public`**，否则 P2 用 private 的钉子。已写进 `runner/inject.py` 的 docstring。 |
+
+---
+
+## 1. 网关单元：改了什么、怎么验的
+
+`FragmentPath = /home/ljn/.config/systemd/user/genebench-gateway.service`（不在仓库里，
+备份 `…service.w1bak`）。**只动两处**，守门与它的判据一个字不改：
+
+```ini
+[Unit]
+StartLimitIntervalSec=600      # 从 [Service] 搬上来（写在那里被静默丢掉）
+StartLimitBurst=5
+
+[Service]
+TimeoutStartSec=600            # 新增；默认 90 s 兜不住 69 s 的 ExecStartPre
+```
+
+`ExecStartPre` 原样保留：没有 `-` 前缀（失败即拒起）、不加 `--harden`
+（那是把「拒绝启动」换成「悄悄改掉」）。
+
+**验：连起停三次**（`ops/gateway_lock.py` 内，日志 `$GB/scratch/W1/restart3.log`）：
+
+| # | rc | 耗时 | 状态 | NRestarts |
+|---|---|---|---|---|
+| 1 | 0 | 69 s | active/running | 0 |
+| 2 | 0 | 68 s | active/running | 0 |
+| 3 | 0 | 69 s | active/running | 0 |
+
+改之前同一条命令三次全是 `rc=1 / activating(auto-restart)`。
+
+**两条现场坑，抄命令的人先看**：
+
+* `systemctl --user restart` 返回时网关**还没在听**。`Type=simple`，systemd 在 `ExecStart`
+  一 fork 就报 `Started`，而网关要再花 **约 60 s** 才 bind（snapshot 后端 + 湖的 view）。
+  restart 之后立刻 `curl /healthz` 拿到 `000` 是**正常**的，别当成起失败 ——
+  轮询到 200 再下结论：`for i in $(seq 1 30); do curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://192.168.1.48:18080/healthz; sleep 10; done`
+* 第一次起停三次**全红**，红的原因是我自己 `scp` 上去的一个 0644 文件
+  （`$GB/scratch/W1/patch_guard.py`）—— N-289 的第 N 次。**`scp` 之后立刻
+  `chmod -R go-rwx`，不要等**：中间这几分钟里网关是起不来的，而对别人的表现是「网关连不上」。
+
+## 2. `guard_modes.py` 的耗时：量了什么
+
+```
+两个根：/data/shared/genebench/repo  +  /data/shared/genebench
+路径总数 5,486,074      （runs_in 4,982,652 / scratch 154,990 / snapshots 89,542 / env* 241,570 / repo 7,182）
+check() 老版 95.6 s（有争用）· 69 s（热 cache 独占）
+check() 新版 43.9 s（同一时刻、同一棵树、同一张违例表）
+harden() 峰值 RSS 17 MB —— 它不是内存重活，是 I/O 重活
+```
+
+**没有缩小扫描集**。任务书提的「敏感根 + 仓库两块」在这棵树上省不动：占 91% 的
+`runs_in` 本身就是 `ANSWER_PLANE_ROOTS` 之一，非扫不可。省下来的是**每条路径的系统调用次数**。
+`$GB` 只会长大 —— 这条随时可能再撞上限，`TimeoutStartSec=600` 是按数量级留的余量，
+下一次要再压就只能动扫描集，而那是**放宽判据**，要单独裁定。
+
+## 3. 公开 provider 上 f02：核对结果（**推成功，但公开通道仍被另一件事挡着**）
+
+推法：`rsync -a --delete --no-perms --chmod=D700,F600`，
+`$SNAPSHOTS/public_v1/qlib_provider/` → `f02:/data/genebench_runner/provider/qlib_provider_56134866/`。
+**只推 provider**。推之前先跑 `runner/f02/answer_plane_guard.scan`：**0 命中 / 28,610 个文件**。
+
+```
+rsync   28,610 个文件 / 3,579 个目录 / 369,118,133 字节 / 4 s / rc=0
+f02 现算根  561348660a3175b17b906e2b4413e956959d7df4362939b0a85c67cf816c3a92
+冻结值      561348660a3175b1…                                    ✅ 一致
+逐文件比对  pin.verify_filelist(f02 副本)  →  2 条
+              树里有而清单里没有：MANIFEST.sha256
+              树里有而清单里没有：build_info.json
+```
+
+**这 2 条不是传输问题**：对 **f01 的源树**跑同一个函数得到**同样的 2 条**
+（私有那份是 0 条）。也就是说传过去的副本与源**逐字节一致**，
+问题在公开 provider 自己：`ops/build_public_channel.py` 写了两个元数据文件，
+却没把它们放进 `files.sha256`，而 `pin.PROVIDER_META_FILES` 只豁免
+`files.sha256` 与 `manifest.json`。
+
+**后果必须写下来**：`check_provider_pin` 里根 hash 过了还要跑 `verify_filelist`，
+所以**即使 P2 的 expect 已经按通道给对（W1 第 3 项已做），公开通道的每一次注入仍然会在
+P2 红**，报错是「树里有而清单里没有」。这不是「provider 变了」那条了，但一样挡住整条公开链路。
+
+**两个方向（要用户裁定）**：
+
+* **① 把 `MANIFEST.sha256` / `build_info.json` 收进 `pin.PROVIDER_META_FILES`。**
+  一行改动，语义也对（这两个就是「清单不含自己」那一类元数据）。代价有两条：
+  `genetask/pin.py` **在冻结根里**（`ops/freeze_v10.py::CODE_FILES`）→ 要推任务集版本；
+  且**与用户 2026-09-10「`genetask/pin.py` 一个字不动」的裁定直接冲突**，必须先解。
+* **② 重出公开 provider 的 `files.sha256`，让它包含这两个文件。**
+  不动冻结根，但**根 sha 会从 `561348660a3175b1…` 变成一个新值** ——
+  `ops/HANDOFF.md:557`、`ops/reports/public/release_forms.md:118`、
+  `ops/reports/public/qlib_provider_public.md`、v1.0.13 签字包里那两处、
+  以及 W1 刚加的 `runner/inject.py::PUBLIC_PROVIDER_SHA256_ROOT` 全要跟着改，
+  已签字的那份就作废了。
+
+**倾向 ①**（判据本来就该豁免元数据，而②是为了绕开一行改动去改一个已签字的冻结值）。
+**没有采纳的第三条**：推的时候把这两个文件排除掉。那会让门变绿，但绿的原因是
+**把证据挪走了**，而不是判据被满足 —— 与「恒红的门会被绕过」同族，不做。
+
+## 4. N-388 / provider 前置 / N-130 的落点
+
+* **N-388**：`runner/registry.py::RUN_BUDGET["max_tokens"]` 600,000 → **6,000,000**。
+  `assert_registry_sane` 的「档位只能往上抬」仍然成立（S4 150/9M、S7 300/18M 都 ≥ 默认档）。
+  文档四处同步，并**删掉** `ops/joblists/{v1demo,m6_public}.yaml` 里那行 `max_tokens: 3000000`
+  —— 3M 现在比默认档低，写上去是把预算压下去。`integrations/P2_CONTRACT.md` 的
+  「调用预算」一行也跟着改（那是被测方照着做的硬约束）。
+* **provider 前置**：`runner/inject.py` 新增 `provider_pin_by_channel()` /
+  `provider_pin_expect()`，**P2 与 P7b 两个入口**都按 `GENEBENCH_CHANNEL` 给 expect。
+  P7b（`PA.materialize`）是同一个 bug 的第二个入口 —— 只修 P2 等于把它往后挪 40 行，
+  是 `ops/test_provider_pin_channel.py` 的 public 真注入把它抓出来的。
+  `genetask/pin.py` 一个字没动。
+* **N-130**：见 `ops/reports/n130/`。
+
+---
+
+## 5. N-130：复验结论与路上踩到的四条
+
+**结论：N-130 可关。**「S7 在 ≤300 次调用的预算里做不完」不成立了 ——
+两臂各自**自己停下来**（open 64 次 / 4.04 M，strict 87 次 / 5.66 M），
+`llm_log` 里 64 / 87 行**全是 `allow`**，一次 `budget_exceeded` 都没有。
+`strict` 臂 `sr_bucket = scorable`（`malformed=False`、`validator_rejections=0`），
+判 `invalid` 卡在 `gate_failed=['attribution_conservation']` —— **内容判据，不是预算**。
+2026-09-06 那次 `r03` 停在 90/90，而这次 87 次就收工：**上一次离终点只差几次调用**。
+全文与对照表见 `ops/reports/n130/README.md`。真 API 增量 **151 次 / 2 个 run**（2668 → 2819）。
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-130 | S7 在 300 次 / 18M 的档位里做得完 | **可关** | 见上。留两条给后续卡：`attribution_conservation` 为什么不过（第一次有真 agent 产物走到这条判据面前）、裸臂把 canary nonce 抄进了 `task_id`/`config_id`（协议臂没犯，值得看一眼题面身份字段那段话是不是有歧义）。 |
+| N-? | **`runner_core` 的 `docker compose run --rm task` 把父进程的 stdin 透传进容器 —— codex 卡死 32 分钟、零调用** | **建议根治**（本次用 `< /dev/null` 绕过） | 调用链 ssh → nohup → `gateway_lock` → ssh f02 → `run_f02_a1` → `compose run` 一路都是**开着的管道**，codex 打出 `Reading additional input from stdin...` 之后等一个永远不来的 EOF。**恶劣之处是它长得像正常**：容器一直 `Up`、`docker logs` 只有那一行、`llm_log.jsonl` 干脆不存在，而 `--timeout 7800` 会让它这么「思考」两个小时。根治：`runner/c41/runner_core.py:659` 的 `compose run` 加 `-T`，或 `subprocess.run(..., stdin=subprocess.DEVNULL)`。**那是 exec 树的文件，不在 W1 的路径里**，留给能改 `runner/c41/` 的卡。 |
+| N-? | **在 f01 杀跑批不会杀掉 f02 上的容器**，残留容器占着 `gb_task` 网络让下一次「边车起不来」 | 登记 | 现象：`compose down -v` 报 `Resource is still in use`，随后 `compose up gateway` 失败，跑批把这一 run 记成 `failed`。处置：`ssh f02 "docker rm -f <run>-task-run-* <run>-gateway-1"` 再 `docker network rm <run>_gb_task`。 |
+| N-? | **`--retry-failed` 补跑单臂会被出集步骤拒**（「arms ['strict'] 里没有参照臂 'open'」） | 登记，有绕法 | 清单被筛成只剩一行之后，出集看到的 `arms` 就只有那一个臂。bundle 早在 f02 上，**加 `--no-export` 即可**。要根治得让出集步骤按「清单里这道题的全部臂」判，而不是按「本轮要跑的臂」判。 |
+| N-? | **结果库里摘掉了一条幽灵行**（`n130/s7-cor-01.strict…r01` 的 `no_artifact`） | 已处置，记在此 | 那一行是上面第二条造成的：run 没跑起来（**零次调用**）却被记成「交白卷」。留着它，Table A 上就永远有一个「S7 strict 交白卷」的读数，而那件事没有发生过。处置口径是库自己那句报错给的（「先把这一批从 `results.jsonl` 里显式摘掉并记在票据里」）。备份 `$GB/results/v1/results.jsonl.w1bak-20260910T121025`（88 → 87 行，随后重收成 88）。 |
+
+### 预算档的 CONFLICT（按保守方向做了，并留下判据）
+
+裁定原文两处并列：「**S7 用 300 次 / 6M 跑一道验**」与「**走档位，不显式给**」，
+而 `BUDGET_TIERS["S7"]` 是 300 次 / 18M。**按「走档位」做**，理由：
+6M 会在约第 100 次调用上撞 token 闸，而撞闸的表现是「agent 做到一半自己放弃了」，
+**它长得像结论** —— 那正好会把 N-130 错误地关成「已知限制」。
+**事后两种读法都够**：strict 5.66 M（离 6M 差 5.6%）、open 4.04 M。
+下次要收紧 S7 的 token 档按这个数算，别按 18M 反推。
+
+---
+
+## 6. 收尾时发现的一条：一道 S7 就能把网关顶到 MemoryMax
+
+跑 N-130 期间（10:55、11:32、11:36、11:40）**生产网关被自己的 `MemoryMax=6G` 杀了四次**
+（`result 'oom-kill'`，不是系统 OOM —— N-125 那道自划的线按设计生效了）。
+每次重启 = 守门 ~70 s + 网关 bind ~60 s，**这两分钟里 agent 打过来的请求全是失败的**。
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | **单独一道 S7 的负载就能把网关顶过 `MemoryMax=6G`** | **建议尽快**（挡不住本轮，但会污染读数） | 证据：2026-09-10 10:55 / 11:32 / 11:36 / 11:40 四次 `oom-kill`，期间只有 n130 这一个 run 在打网关（网关锁串行，没有第二批）。open 臂一个 run 就发了 **4,318** 次请求。N-125 定 6G 时的依据是「实测常驻 2.3 G，留一倍余量」—— 那份实测里没有 S7。**后果不是网关挂了**（它自己起来了），是**这一次 S7 的读数里混进了两分钟一次的链路失败**：`overreach.malformed_requests=15`（`asof_missing` 7 / `param_malformed` 7 / 未分类 1）有多少是 agent 写错、多少是重启窗口里的半截请求，现在分不开。方向：① 抬 `MemoryMax`（要先量 S7 期间的真实峰值曲线，别拍脑袋）；② 查网关在 4k 请求下 RSS 为什么会涨到 6G（`as_of` 切片缓存？duckdb view 句柄？）——**② 更像根因，①只是把线往上挪**。 |
+| N-? | **`StartLimitBurst=5` 对「守门判红」是对的，对「连续 oom-kill」是紧的** | 如实记，**没有再放宽** | 算一遍：守门判红时一次尝试约 75 s（ExecStartPre 70 s + `RestartSec=5`），600 s 窗口里最多 8 次 → burst 5 会在约 6 分钟后停下，**正是单元作者要的**（「修不好就一直失败的原因早点停下来」）。但 11:32–11:40 那四次 oom-kill 只隔 8 分钟，计数器一路走到 5 —— **再多一次窗口内的 OOM，网关就彻底不起了**。把 burst 抬到 10 会让守门判红那条变成无限重启循环（10 × 75 s = 750 s > 600 s 窗口，永远不触限），把作者明确要避免的东西换回来。**所以这里按任务书给的 600 s / 5 落地，不自作主张再放宽**；真正该修的是上一行那条（别让它 OOM），不是把闸门开大。 |
+
+**给下一个人的一句话**：`systemctl --user show genebench-gateway.service -p NRestarts`
+不是 0 的时候，先 `journalctl --user -u genebench-gateway.service | grep oom-kill` ——
+2026-09-10 之后「起不来」和「被自己的内存线杀掉」是两件不同的事，症状都是「网关连不上」。
+
+---
+
+## 7. 顺手验掉的一条：f02 打得到 f01 的公开实例 18081
+
+编排方标着「18081 因公开实例当时没起所以是 000，**起了实例再验**」。验了：
+
+```
+ops/public_gateway.sh start          起来用了 46 秒，pid 44505
+  healthz  {"ok":true,"channel":"public","backend":"snapshot",
+            "bind":"192.168.1.48:18081","freeze_line":"2026-07-31",
+            "tables_dir":"…/snapshots/public_v1/tables"}
+f02 → f01:18081 = 200      ← 之前那个 000 是实例没起，**不是防火墙**
+f02 → f01:18080 = 200
+ops/public_gateway.sh stop           18081 已释放（探完就停，不占端口）
+```
+
+**于是公开通道的执行面两件前置都齐了**：`run_joblist.py --channel public --check-plane`
+在推 provider 之前报两条红（打不到 18081 / f02 上没有公开 provider），
+现在 provider 那条已消，18081 那条只在公开实例没起时出现。
+
+**但公开通道还不能真跑** —— 挡着的是 §3 那条：公开 provider 的 `files.sha256`
+少了 `MANIFEST.sha256` 与 `build_info.json` 两个文件，`pin.verify_filelist` 报 2 条，
+P2 照样红。**那是一次裁定，不是一条改动**（两个方向与倾向见 §3）。

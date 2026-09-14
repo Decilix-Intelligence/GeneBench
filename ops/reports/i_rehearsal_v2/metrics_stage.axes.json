@@ -1,0 +1,52 @@
+{
+ "filters": {
+  "batch": "i_rehearsal_v2",
+  "superseded": "None"
+ },
+ "n_records": 6,
+ "axis_values": {
+  "set_version": [
+   "1.0.15"
+  ],
+  "reference_version": [
+   "r1.0.22"
+  ],
+  "protocol_version": [
+   "geneprotocol_v1@d6fbcaa08302",
+   "geneprotocol_v1@none"
+  ],
+  "channel": [
+   "public"
+  ]
+ },
+ "mixed_axes": {},
+ "allow_mixed_axes": false,
+ "version_combos": [
+  {
+   "set_version": "1.0.15",
+   "reference_version": "r1.0.22",
+   "protocol_version": "geneprotocol_v1@d6fbcaa08302",
+   "channel": "public",
+   "n_runs": 3,
+   "batches": [
+    "i_rehearsal_v2"
+   ],
+   "tracks": [
+    "main"
+   ]
+  },
+  {
+   "set_version": "1.0.15",
+   "reference_version": "r1.0.22",
+   "protocol_version": "geneprotocol_v1@none",
+   "channel": "public",
+   "n_runs": 3,
+   "batches": [
+    "i_rehearsal_v2"
+   ],
+   "tracks": [
+    "main"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering
+\caption{Table Adaptation — GeneBench 适配赛道 v1.0-adapt（30 例 = L1 单位 / L2 词汇 / L3 缺协议字段 各 10；每级按阶段分层覆盖八个阶段；题源 = 出集规定题的 oracle 产物，种子固定；**不是主赛道实验数据**）。轴：set\_version=1.0.14、reference\_version=r1.0.21（声明值，来源 ops/freeze\_v10）；runner\_version / image\_digest适配记录里没有，表上写 ---　脚注（N-348，2026-09-10 用户裁定）：适配赛道 v1.0-adapt 的题源是**出集规定题的 oracle 产物**（探针题不入），这些产物随适配 bundle 进入执行面。**跑过适配赛道的被测方，主赛道这些题算「可能已见过答案」**；口径与逐题清单见 ops/specs/fairness\_protocol.md §7 与 ops/reports/known\_limits\_v1.md。}
+\label{tab:adaptation}
+\begin{tabular}{llrrrrrrrrrrr}
+\toprule
+config\_id & arm & level & n & first\_pass & repaired\_pass & correct\_flag & blocked & failed & resolved\_rate & as\_expected\_rate & set\_version & reference\_version \\
+\midrule
+cfg-codex-deepseek & adapt & L1 & 10 & 7 & 0 & 0 & 0 & 3 & 0.700 & 0.700 & 1.0.14 & r1.0.21 \\
+cfg-codex-deepseek & adapt & L2 & 10 & 7 & 0 & 0 & 0 & 3 & 0.700 & 0.700 & 1.0.14 & r1.0.21 \\
+cfg-codex-deepseek & adapt & L3 & 10 & 0 & 0 & 5 & 0 & 5 & 0.500 & 0.500 & 1.0.14 & r1.0.21 \\
+cfg-codex-deepseek & adapt & ALL & 30 & 14 & 0 & 5 & 0 & 11 & 0.633 & 0.633 & 1.0.14 & r1.0.21 \\
+\bottomrule
+\end{tabular}
+\end{table}

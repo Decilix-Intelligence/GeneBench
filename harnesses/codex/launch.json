@@ -1,0 +1,15 @@
+{
+  "harness": "Codex CLI",
+  "paradigm": "P1",
+  "image": "gb-cx-u:r1",
+  "command": [
+    "sh",
+    "-c",
+    "export CODEX_HOME=/task/.codex && mkdir -p \"$$CODEX_HOME\" && cd /task && codex exec -c model_provider=deepseek -c 'model_providers.deepseek={name=\"DeepSeek\",base_url=\"'\"$$OPENAI_BASE_URL\"'\",env_key=\"OPENAI_API_KEY\"}' -c model=deepseek-chat --skip-git-repo-check --ephemeral --dangerously-bypass-approvals-and-sandbox -C /task \"$$(cat /task/INSTRUCTION.md)\""
+  ],
+  "env_required": [
+    "OPENAI_BASE_URL",
+    "OPENAI_API_KEY"
+  ],
+  "notes": "compose 解析期会吃 $，命令里一律写 $$（N-101）。CODEX_HOME 指到 /task 下：任务容器以 uid 1000 跑、HOME 不可写。题面从 /task/INSTRUCTION.md 读；base_url 只从 env 取，不写死主机名（写死就绕过边车）。"
+}

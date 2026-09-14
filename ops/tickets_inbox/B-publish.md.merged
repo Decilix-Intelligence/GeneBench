@@ -1,0 +1,10 @@
+# 票据收件箱 —— 卡 B（冒烟集 S8 四题 gold 重出，裁定 ④）
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-? | S8 四题 gold 已按 F1 修后重出（两条通道各一次，8 次全部零 finding） | 已完成 | 新旧逐字节比对只差 `produced_at`；`gold/session.json` 逐字节相同。报告 `ops/reports/s8_gold_reissue.md` |
+| N-? | 常驻生产网关里的 `sim_factory` 会滞后于盘上代码 | 登记不修 | 本卡第一次私有跑批四题全红（`/sim/log` 500），是进程里那份还是 F1 修之前的。改了 `gateway/` 下的代码之后必须 `systemctl --user restart genebench-gateway.service` 并轮询 `/healthz`（实测 74s 才在听）。已写进报告 §2 |
+| N-? | `run_oracles.py` 的子集跑会连带重建题面，canary token 每次都换 | 登记不修 | `packager._token = secrets.token_hex(8)` → 两臂 INSTRUCTION 的 sha 变 → `task.yaml.task_sha256` 变。本卡用 `b_restore.sh` 逐件还原题面、只留新 gold。想只重出 gold 的后续卡照抄 `$GB/scratch/B/b_restore.sh` |
+| N-? | `reference/tasks/*/_ledger.jsonl` 末尾几行的 `judge_sha256` 与盘上判题件不对应 | 登记不修 | 台账只追加、全仓无人拿它校验盘上文件；题面还原后这几行记的是那份瞬时重建件。抹掉等于抹审计痕迹，保留 |
+| N-? | 公开集 `_ledger.jsonl` 里新追加行的 `set_id` 写成 `v1.0-smoke` 而非 `public/v1.0-smoke-public` | 登记不修 | 既有字段口径问题，不挡发布验收 |
+| N-? | 公开网关 `ExecStartPre` 的红线 5 守门会被**别的卡**在 `$GB/scratch/` 下留的 0644 文件拦停 | 登记不修 | 本卡第一次公开发起 `rc=143` 就是这个（撞的是 `$GB/scratch/A/a_patch_rebuild_notes.py`）。起公开实例前先 `python3 ops/guard_modes.py --harden` |

@@ -1,0 +1,53 @@
+# finance01 ufw 规则原文
+# 采集时间 : 2026-08-30 12:32 UTC（readiness 第二轮修订 R1，用户临场提供 sudo 后抄读）
+# 采集命令 : sudo ufw status numbered   /   cat /etc/default/ufw
+# 出处     : ops/recon/readiness_r1.md 小节 "A.2 ▶ R1：finance01 的 ufw 规则原文，以及两条绕过它的路径"
+# 用途     : 与 finance02 的同名文件（待 T-05 补齐 → ufw_finance02.txt）并排比对。
+# 注意     : 本文件是**抄录**，不是命令直出。原始终端输出未留存（当时为交互式 sudo）。
+#            若后续窗口能再跑一次，请以直出覆盖本文件并把本行删掉。
+
+$ sudo ufw status numbered
+Status: active
+     To                   Action      From
+[ 1] 22/tcp               ALLOW IN    192.168.1.0/24
+[ 2] 8472/udp             ALLOW IN    192.168.1.219      # k3s flannel vxlan
+[ 3] 10250/tcp            ALLOW IN    192.168.1.219      # k3s kubelet
+[ 4] Anywhere             ALLOW IN    10.42.0.0/16       # k3s pod cidr
+[ 5] Anywhere             ALLOW IN    10.43.0.0/16       # k3s service cidr
+
+$ cat /etc/default/ufw
+DEFAULT_INPUT_POLICY="DROP"
+DEFAULT_FORWARD_POLICY="ACCEPT"
+# 备份文件：/etc/default/ufw.bak-quantlab（当初为修 flannel VXLAN 丢包才把 FORWARD 改成 ACCEPT）
+
+# ---------------------------------------------------------------------------
+# 解读（这五条规则实际拦不住什么 —— 见 T-08）
+# ---------------------------------------------------------------------------
+# 规则里**没有任何一条**提到 tailscale（既无 100.64.0.0/10，也无 tailscale0 接口）。
+#
+# 绕过 ① tailscale 不经过 ufw：tailscale 把自己的 ACCEPT 规则插在 ufw 之前（ts-input 链），
+#   tailnet 流量根本到不了上面 5 条。实测从 tailnet 外部 Mac（100.95.238.12，不在
+#   192.168.1.0/24 内）直连 finance01 的 tailnet IP 100.79.40.76：
+#     22    OPEN   ← 规则[1]只允许 192.168.1.0/24
+#     111   OPEN   ← rpcbind，ufw 无对应规则
+#     2049  OPEN   ← nfsd，ufw 无对应规则
+#     10250 OPEN   ← 规则[3]只允许 192.168.1.219
+#     30810 OPEN   ← NodePort
+#     6443  closed ← 01 是 k3s agent，本就无 apiserver
+#     5000  closed ← MLflow 只绑 127.0.0.1
+#   => finance01 上一切监听 0.0.0.0 的服务对整个 tailnet 敞开。
+#   => 这就是红线 4 的由来：GeneBench 网关必须绑 192.168.1.48，禁止 0.0.0.0。
+#
+# 绕过 ② DEFAULT_FORWARD_POLICY=ACCEPT 放行所有 NodePort：NodePort 走 nat PREROUTING
+#   的 DNAT，之后落 FORWARD 链而不是 INPUT 链，ufw 的 INPUT 规则看不见它。
+#   实测 192.168.1.48:30810（quantlab）从 finance02 可达，而 ufw 里没有任何一条允许 30810。
+#   ⚠️ 未直接取证：没抓过 iptables 链（要 sudo iptables -t nat -L PREROUTING -n 才算实证），
+#      当前结论是"策略值 + 实测连通性"的推断。
+#
+# 缓解因素：NFS 的访问控制不只靠端口。finance01 的 /etc/exports 是
+#   /data 192.168.1.219(rw,sync,no_subtree_check,root_squash)  ← 按客户端 IP 限定，
+#   tailnet 上的 100.x 主机连得上 2049 但 mount 会被服务端拒。kubelet 10250 在 k3s 下
+#   默认关匿名访问、要客户端证书。所以"端口开着" != "数据能拿走"，
+#   但攻击面确实比这 5 条规则看起来的大得多。
+#
+# 相关工单：T-06（/etc/exports 把整块 /data 含 ChinaScope 以 rw 导给 02）、T-08（收紧 tailnet 面）。

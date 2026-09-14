@@ -1,0 +1,15 @@
+{
+  "harness": "OpenHands",
+  "paradigm": "P1",
+  "image": "gb-oh-u:r1",
+  "command": [
+    "sh",
+    "-c",
+    "cd /task && export HOME=/task/.oh_home && mkdir -p $$HOME && python - <<'GBOH'\nimport os, sys\nos.environ.setdefault(\"OPENHANDS_SUPPRESS_BANNER\", \"1\")\nfrom openhands.sdk import LLM, Agent, Conversation\nfrom openhands.tools import get_default_tools\nllm = LLM(model=\"openai/deepseek-chat\", api_key=os.environ[\"LLM_API_KEY\"],\n          base_url=os.environ[\"LLM_BASE_URL\"], temperature=0.0)\nagent = Agent(llm=llm, tools=get_default_tools(enable_browser=False))\nconv = Conversation(agent, workspace=\"/task\")\nconv.send_message(open(\"/task/INSTRUCTION.md\", encoding=\"utf-8\").read())\nconv.run()\nconv.close()\nGBOH"
+  ],
+  "env_required": [
+    "LLM_BASE_URL",
+    "LLM_API_KEY"
+  ],
+  "notes": "OpenHands 1.11.0 没有 CLI（openhands-ai 只装了 sdk 与 servers），所以用 SDK 写最小驱动并内联在命令里（heredoc），不往 work/ 放文件——work/ 是 P8 封闭的。HOME 指到 /task/.oh_home：LLMProfileStore 要写 ~/.openhands/profiles，而容器 HOME 不可写。"
+}

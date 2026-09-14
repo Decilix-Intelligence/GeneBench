@@ -1,0 +1,19 @@
+# 卡 C（裁定 ②：打包 release/public_v1/）的票
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `$GB/release/_staging_unpublished/public_v1/` 里还留着 **2026-09-06 那一版**包（782,040,927 B，换面**之前**的 provider） | 登记不修 | 许可翻成 `granted` 之后可发布路径是 `$GB/release/public_v1/`，staging 那一份既不会被发、也不再与任何在册的根对应（它的 `instruments/` 还是 tushare 派生的那版）。留着的唯一风险是**有人下错**。删是不可逆的动作，且不挡发布验收 —— 交给仓库所有者决定 |
+| N-? | `ops/reports/i_rehearsal_v2/package_inventory.json` 是 09-06 那次演练的数字，`RELEASE_MANIFEST.package.totals_bytes` / `parts` 照读 | 登记不修 | 换面之后 provider 少了 `csi1000` 的 `instruments`、多了 `universe/` 三件，逐项字节已变；`gold 因子面板 子集` 那一行记的 159,357,698 B 也是**旧 gold** 的（现值 159,359,214 B，见 `gold_factors_r2/gold_subset_public.json`）。本卡新增的 `release_attachments` 段记的是**现值**、逐件 sha256 可校，两段并存时**以 `release_attachments` 为准**。该文件不在本卡路径内 |
+| N-? | `ops/reports/i_rehearsal_v2/gold_subset.json` 里 `channels.public` 那 41 行的 `sha256` **41/41 已经不成立** | 登记不修（卡 A 已记一次） | `RELEASE_MANIFEST.package.gold.channels.public.list_sha256` 由它算出来，因此那个值指的是**旧** gold。打包脚本 `ops/release/pack_gold_subset.py` **不读它**，只读 `$SNAPSHOTS/public_v1/gold_factors_r2/gold_subset_public.json`，并逐件现算 sha256 与之比对，对不上当场抛 |
+| N-? | `ops/reports/release_scan_final.md:140` 写着「包内另有 universe/ 一层 = scratch/v1_union.txt（3,575 行）」 | 登记不修 | 换面之后 `universe/` 下有四件：取数名单 `v1_union.txt` **＋** 卡 A 反投影的 PIT 名单三件。那一行现在只说对了一半。不在本卡路径内 |
+| N-? | `ops/test_env.py::test_no_published_provider_package_while_license_text_is_pending` 仍只扫 `$GB/snapshots/public`，扫不到 `$GB/release/` | 登记不修（卡 1.4 已记一次） | 射程由 `pack_public_provider.assert_nothing_published_while_pending()` 补齐，`ops/test_release_forms.py` 盯着。现在许可是 `granted`，这条锁本来就不触发 |
+
+## 本卡动过的、严格说不属于自己的文件（说明）
+
+* `ops/test_release_forms.py` 的 `tree` 夹具：**纯追加三行**（`pub/universe/` 三件）。
+  裁定 ① 之后公开包的 `universe/` 多了一层**必需件**，夹具里没有它 `PP.collect()` 会当场抛 ——
+  不补的话那个文件 20 条测试全红。夹具原有的任何一行都没动，补丁幂等
+  （`$GB/scratch/C/patch_forms_fixture.py`）。
+* `ops/mk_release_manifest.py`：加了 `ATTACHMENTS` / `ATTACHMENT_FIELDS` /
+  `release_attachments_section()`，`build()` 里挂一行，`FATAL_KEYS` 追加一项。
+  **全是追加，没有重排、没有整文件重写**（该文件在本卡路径内）。

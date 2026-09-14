@@ -1,0 +1,21 @@
+{
+ "schema_version": "1.0",
+ "_what": "源侧单位 → 本协议单位。表里没有的单位 = 不可接纳，按 adaptation.md 规则 1 标记，不要自己想一个换算。",
+ "units": {
+  "percent": {"to": "ratio", "op": "divide", "by": 100,
+              "note": "比例类字段（coverage / positive_ratio / 权重 / 年化收益）在本协议一律是 [0,1] 或小数，不是百分数"},
+  "basis_point": {"to": "ratio", "op": "divide", "by": 10000,
+                  "note": "bps → 小数。注意 slippage_bps 这类**字段名自带单位**的不换算"},
+  "cents": {"to": "yuan", "op": "divide", "by": 100, "note": "分 → 元；价格类字段本协议一律是元"},
+  "lots": {"to": "shares", "op": "multiply", "by": 100,
+           "note": "A 股一手 = 100 股。tushare 的 vol 是手，撮合与台账要股"},
+  "hundreds": {"to": "count", "op": "multiply", "by": 100, "note": "以百计的计数 → 个数"},
+  "thousands": {"to": "count", "op": "multiply", "by": 1000, "note": "以千计的计数 → 个数"},
+  "date_compact": {"to": "iso_date", "op": "reformat", "from_pattern": "YYYYMMDD", "to_pattern": "YYYY-MM-DD",
+                   "note": "tushare 的 trade_date 就是紧凑串；本协议只收 ISO"},
+  "date_slash": {"to": "iso_date", "op": "reformat", "from_pattern": "YYYY/MM/DD", "to_pattern": "YYYY-MM-DD"},
+  "epoch_seconds": {"to": "iso_timestamp", "op": "reformat", "from_pattern": "unix_seconds",
+                    "to_pattern": "ISO-8601 带时区"}
+ },
+ "not_in_table": "标 unsupported，并停在该字段（不要产出依赖它的数）"
+}

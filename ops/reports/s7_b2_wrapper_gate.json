@@ -1,0 +1,92 @@
+{
+ "declared_sell_rule": "worst_n_drop",
+ "frozen_out": "/data/shared/genebench/snapshots/v1/epsilon/out_v2_b2_daily.json",
+ "config_contract": {
+  "adjust": "post",
+  "fill_price": "close",
+  "settlement": "t_plus_1",
+  "share_accounting": "adjusted_shares",
+  "delisting_policy": "force_liquidate_last_day",
+  "tradability_policy": "skip_untradable",
+  "risk_free_rate": 0,
+  "first_rebalance_day": "window_start",
+  "INIT_CASH": 100000000.0,
+  "LOT": 100,
+  "TOPK": 50,
+  "NDROP": 5,
+  "BUY_RATE": 0.0005,
+  "SELL_RATE": 0.0015,
+  "MIN_COST": 5.0,
+  "impact_cost": 0.0,
+  "rebalance_frequency": "daily",
+  "sell_rule": "dropped_from_target",
+  "calendar_id": "SSE",
+  "benchmark": "equal_weight_universe"
+ },
+ "G0a_wrapper_matches_todays_b2": {
+  "mismatched_keys": [],
+  "n_metrics": 11
+ },
+ "G0b_environment_drift": {
+  "two_reruns_today_agree": true,
+  "keys_drifted_vs_frozen": [
+   "ann_vol_net",
+   "max_drawdown_net",
+   "sharpe_net"
+  ],
+  "max_rel_drift_vs_frozen": 3.4821556607309196e-15,
+  "noise_floor": 1e-13
+ },
+ "G1_ledger_patch_is_neutral": {
+  "mismatched_keys": []
+ },
+ "G2_sell_rule_switch_bites": {
+  "changed_keys": [
+   "ann_return_gross",
+   "ann_return_net",
+   "ann_vol_net",
+   "max_drawdown_net",
+   "sharpe_net",
+   "total_cost",
+   "turnover_one_way_mean",
+   "turnover_two_way_mean"
+  ],
+  "dropped_from_target": {
+   "ann_return_gross": 0.05543641860012283,
+   "total_cost": 0.4553480048156921
+  },
+  "worst_n_drop": {
+   "ann_return_gross": 0.05564677668272355,
+   "total_cost": 0.45654983035402624
+  }
+ },
+ "G3_upper_layer_agrees": {
+  "compared": [
+   "ann_return_gross",
+   "ann_return_net",
+   "ann_vol_net",
+   "max_drawdown_net",
+   "sharpe_net",
+   "total_cost",
+   "turnover_one_way_mean",
+   "turnover_two_way_mean"
+  ],
+  "mismatched_keys": []
+ },
+ "ledger_max_abs_residual": 0.0,
+ "ledger_note": "B2 把 total_assets 直接算成 cash + mv，所以 gold 上这个残差**按构造恒为 0**。它不是空判据：探针核的是 agent 的 artifact。",
+ "daily_rows": 1818,
+ "daily_columns": [
+  "date",
+  "cash",
+  "mv",
+  "total_assets",
+  "r_gross",
+  "r_net",
+  "buy_val",
+  "sell_val",
+  "cost_abs",
+  "ta_pre_trade"
+ ],
+ "ok": true
+}

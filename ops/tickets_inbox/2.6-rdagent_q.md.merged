@@ -1,0 +1,33 @@
+# 卡 2.6（`integrations/rdagent_q`）票据
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `example_minimal/run.py::slot()` 在 **open 臂**题面上必然 `SystemExit` | 待裁定 | 它的正则要求键名后面跟 `:` / `：` / `=` / `\|`；open 臂写的是「本次任务的 as_of 是 2026-07-31」「标的范围（universe）是 csi300」。那个 30 行示例只在 **S1 strict** 走查里跑过，从没跑过 open 臂 —— 于是「照示例改」的接入者会在 open 臂拿到零产物。本卡第一次真跑就是这么丢掉一个臂的（`s3-cor-01.open.…r01`，exit 1、artifact 0 字节）。修法在 `integrations/rdagent_q/glue/instruction.py`：每条写成「锚点词 + 中间随便什么 + 值」。**不是我的路径，没动示例。** |
+| N-? | 题面锚点会被「可用端点」那一行偷走 | 已在本卡内绕开，建议广播 | 题面有一行 `可用端点：/bars /adj /calendar /limits /universe /tradability`。任何用「找 `universe` 后面那个词」思路的解析器都会把 universe 解析成 **`tradability`** —— 而这种错**没有症状**：网关照样返回成分表，因子照样算得出来，只是标的池整个换了。实测撞到过（本卡写解析器时）。建议在 `P2_CONTRACT.md` 或 `integrations/README.md` §1④ 单独点名。 |
+| N-? | 仓库文件是 0600，`COPY` 进镜像后**非 root 容器读不了入口** | 已在本卡 Dockerfile 内解决 | 红线 5 要求 `$GENEBENCH_ROOT` 全树 go-rwx，于是 `integrations/<id>/run.py` 是 0600；`COPY` 保模式；容器以 `--user $(id -u)` 跑时报 `python3: can't open file '/opt/<id>/run.py': Permission denied`。解法是 `RUN chmod -R a+rX /opt/<id>`。`example_minimal/Dockerfile` 没有这一行（它没被非 root 跑过），指南 §1② 的三行骨架也没提。 |
+| N-? | 重建镜像后 digest 变了，必须**重新 `export_bundle` + `push_bundle`** | 建议补进指南 | `integrations/README.md` §1⑥ 把「构建 → 出集 → 推送 → 真跑」写成一条直线，没说改了镜像要回到出集那一步。忘了的表现是通行证对不上（本卡在第二次真跑前照做了）。 |
+| N-? | 需要 **embedding** 的被测系统在本环境没有出路 | 待裁定 | RD-Agent 的知识库/RAG（`CoSTEERRAGStrategyV2.generate_knowledge` → `create_embedding`）默认打 `text-embedding-3-small`。本环境「一个模型 × 多种 harness」只发一个 chat 模型，边车后面没有 embedding。本卡用上游自己的构造参数 `knowledge_self_gen=False` 关掉了那条路，代价是 RD-Agent 的「跨任务经验累积」这一层能力**没有被测到**。两个方向：(a) 维持现状，在覆盖矩阵与发布材料里写明「本环境不测这一层」；(b) 边车放一个 embedding 上游。倾向 (a) —— (b) 会引入第二个模型，破掉主表的切片键。 |
+| N-105 | RD-Agent(Q) 真 LLM 驱动循环未实现 | **可关** | `s3-cor-01.strict.cfg-rdagent_q-deepseek.r02`：DeepSeek 写 `factor.py`、上游 `FactorFBWorkspace` 执行、上游评审器给 critic，产出覆盖率 0.989 的真值序列（18 次模型调用，全部 `decision=allow`）。判 `violation` 的是**模型自己**没守暖机口径（`warmup_boundary`），不是链路。降级路径现在只用于走查。 |
+
+## 指南 findings（我是 `integrations/README.md` 的第一个用户）
+
+按任务书要求记在这里，**没有自己改指南**。
+
+1. **§1④「题面只有一个入口」那张表把固定槽讲成了固定格式。** 表里说
+   「`as_of` / 窗口 / universe / 产出路径全在它的固定槽里」，读者（包括我）会以为
+   槽是 `key=value`。两臂的表达形式不同是**设计**（`fairness_protocol.md`），
+   指南应当在这里明说：**P2 系统的题面解析必须同时认键值与散文两种写法**，
+   并给一句「不许按 `GENEBENCH_ARM` 分支」的提醒（后半句 §0 有，但离得远）。
+2. **§1② 的 Dockerfile 三行骨架缺 `chmod`。** 见上表第三条。
+3. **§1⑥ 缺一条回路**：镜像重建 → 回到出集。见上表第四条。
+4. **§1⑥ 的 `docker build -t gb-<id>:r1` 与 `launch.json` 的 `image` 没有守门。**
+   `harnesses/build.sh` 特意从 `launch.json` 取 tag（理由写在脚本头部：拼名字会在
+   codex 那种历史短名上对不上，而对不上的表现是「构建成功了，跑的还是旧镜像」）。
+   `integrations/` 这条路是手敲 `docker build`，同一个坑原样留着。
+   建议：让 `harnesses/build.sh` 也认 `integrations/<id>/`，或复制一份守门。
+5. **§1⑤ 说「容器里只有占位 key」，但没说容器可能以非 root 运行。**
+   这一条会影响所有把可执行文件 `COPY` 进镜像的接入。
+6. **§1⑧ 的覆盖矩阵没有「一个阶段两臂结果不同」的写法。** 本卡就是：
+   strict 判 `invalid`（模型违了暖机口径），open 是结构合规但覆盖率 0。
+   我按「写最后一次、在备注里说清」处理，但那条规则原本是给「同一阶段跑过多次」的。
+   建议在表头补一句：**格值取该阶段最坏的那一臂，两臂差异写进备注**。

@@ -1,0 +1,6 @@
+slots:
+- visible_state_fields
+- permitted_operations
+- matching_frequency
+- calendar_id
+- slippage_reference_price

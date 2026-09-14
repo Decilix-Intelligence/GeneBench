@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s1-cor-01",
+  "probe": "source_status",
+  "name": "申报 status 与日志状态不符",
+  "why": "空结果 / 拒绝 / 限流必须可分辨，且以日志为准",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "source_status_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:source_status_mismatch [source_status] @$.payload.fetches[0].status — 日志说 ['ok']，artifact 说 'empty'"
+ ]
+}

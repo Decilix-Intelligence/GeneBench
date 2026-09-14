@@ -1,0 +1,8 @@
+{
+  "harness": "alphaagent",
+  "paradigm": "P2",
+  "image": "gb-alphaagent-u:r1",
+  "command": ["sh", "-c", "export HOME=/tmp/h; mkdir -p $$HOME && cd /task && python3 /opt/gb_alphaagent/run.py"],
+  "env_required": ["GENEBENCH_GATEWAY", "OPENAI_BASE_URL", "OPENAI_API_KEY"],
+  "notes": "AlphaAgent（RndmVariableQ/AlphaAgent @ b42cb397，论文 arXiv:2502.16789）作为 P2 被测方：网关取数落成它的 DSL 面板，模型经边车驱动它自己的 run_trajectory 工具调用循环写 DSL，用它自己的 DSL 解析器与算子库求值，产出 /task/values.parquet 与 /task/artifact.json。命令里的 $$ 是两个美元号（N-101）。"
+}

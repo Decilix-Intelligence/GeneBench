@@ -1,0 +1,102 @@
+{
+ "scorer_output": {
+  "schema_version": "1.0",
+  "validity": "invalid",
+  "gate_failed": [
+   "attribution_conservation",
+   "underdetermined"
+  ],
+  "unobservable": [],
+  "correctness": {
+   "honest_halt": 0.0,
+   "n_underdetermined": 1,
+   "n_marked_unresolved": 0,
+   "n_dependents_nulled": 0,
+   "n_dependents": 0,
+   "n_dependents_missing": 0,
+   "Decl": 1.0,
+   "Set": 1.0
+  },
+  "effect": null
+ },
+ "record": {
+  "task_id": "s7-rob-02",
+  "stage": "S7",
+  "config_id": "cfg-codex-deepseek",
+  "arm": "open",
+  "seq": 1,
+  "run_id": "s7-rob-02.open.cfg-codex-deepseek.r01@finance01-e3887dfa",
+  "set_version": "p1.0.0",
+  "reference_version": "r1.0.23",
+  "runner_version": "a22b0bf33fa61061a153e029b9f8d045661625c46321a023243bbbf74d8b775d",
+  "image_digest": "gb-cx-u@sha256:961e3878b28fc13ef2600254c4c4cbaceb7c337e2944fc173eaba1335752561a",
+  "scorer_schema_version": "1.0",
+  "run_status": "violation",
+  "sr_bucket": "scorable",
+  "validity": "invalid",
+  "malformed": false,
+  "gate_failed": [
+   "underdetermined",
+   "attribution_conservation"
+  ],
+  "unobservable": [],
+  "probe_states": {
+   "adjust_fingerprint": "clean",
+   "attribution_conservation": "violation",
+   "calendar": "clean",
+   "declared_reads": "clean",
+   "factor_degeneracy": "clean",
+   "fetch_clock": "clean",
+   "input_ablation": "clean",
+   "ledger_conservation": "clean",
+   "lookahead": "clean",
+   "nonfinite_propagation": "clean",
+   "optimizer_failure": "clean",
+   "pit_universe": "clean",
+   "source_status": "clean",
+   "underdetermined": "violation",
+   "unsupported_operator": "clean",
+   "warmup_boundary": "clean"
+  },
+  "findings": [
+   "violation:silent_completion [underdetermined] @$.declarations.sell_rule — 任务对 sell_rule 欠定，artifact 填了 'worst_n_drop' —— 静默补全（第五探针）",
+   "violation:attribution_not_conserved [attribution_conservation] @$.payload.attribution — alpha+beta+cost−total 残差 1.13"
+  ],
+  "l3_kind": "none",
+  "l3_pass": false,
+  "l3_score": null,
+  "effect": null,
+  "effect_withheld_reason": null,
+  "anchor": null,
+  "correctness": {
+   "honest_halt": 0.0,
+   "n_underdetermined": 1,
+   "n_marked_unresolved": 0,
+   "n_dependents_nulled": 0,
+   "n_dependents": 0,
+   "n_dependents_missing": 0,
+   "Decl": 1.0,
+   "Set": 1.0
+  },
+  "correctness_nonfinite_keys": null,
+  "correct_handling": false,
+  "l3_note": "",
+  "steps": 83,
+  "tokens_prompt": 5458596,
+  "tokens_completion": 101622,
+  "cost_usd": 2.53592328,
+  "cost_model": "deepseek-chat",
+  "latency_s": 760.274,
+  "validator_rejections": null,
+  "overreach": null,
+  "unbounded_requests": 0,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": [
+   "work/work/__pycache__/engine.cpython-312.pyc",
+   "work/work/bt_new_dbg.py",
+   "work/work/engine.py",
+   "work/work/make_artifact.py"
+  ]
+ }
+}

@@ -1,0 +1,25 @@
+卡 0.2 补救(D1-D6)负例控制 —— 2026-08-31 UTC
+方法:把 $GENEBENCH_ROOT 整体复制到 scratch/nc_root,在**副本**上逐条破坏断言再跑 pytest;真仓库零改动。
+脚本:scratch/negctl.sh(一次性探针,跑完随 scratch 一起删)
+判读:每行 [OK 变红] = 该断言确实承重;出现 [!! 仍绿] 即为恒绿断言,必须重写。
+
+=== 负例控制:每条断言破坏一次,看它红不红 ===
+  [OK 变红] D1 冻结线内 max 被改(自证锁) :: 1 failed, 2 passed, 253 deselected in 20.77s
+  [OK 变红] D1 JSON 比现场还新 :: 1 failed, 2 passed, 253 deselected in 20.63s
+  [OK 变红] D1 JSON 过期超预算 :: 1 failed, 2 passed, 253 deselected in 20.59s
+  [OK 变红] D1/D2 行数对不上现场 :: 1 failed, 1 passed, 254 deselected in 20.81s
+  [OK 变红] D1 列清单对不上现场 DESCRIBE :: 1 failed, 2 passed, 253 deselected in 20.79s
+  [OK 变红] D3 summary 没有 stalled_tables :: 1 failed, 255 deselected in 0.09s
+  [OK 变红] D3 停更清单漏了一张 :: 1 failed, 255 deselected in 20.95s
+  [OK 变红] D3 停更表 notes 没标注 :: 1 failed, 255 deselected in 0.09s
+  [OK 变红] D2 审计字段没保留成 audit_* :: 1 failed, 255 deselected in 0.09s
+  [OK 变红] D5 st_history 又被判成无日期列 :: 1 failed, 255 deselected in 0.10s
+  [OK 变红] D4 set 被放回白名单 :: 1 failed, 255 deselected in 0.11s
+  [OK 变红] D6 copy 被放进白名单 :: 1 failed, 255 deselected in 0.38s
+
+=== D6 佐证:COPY 若放行,到底会不会真的落一个文件 ===
+  COPY 未被拒;文件存在=True 大小=4
+
+=== 收尾:确认真仓库没被动过 ===
+ M ops/build_lake_baseline.py
+ M ops/lake_baseline.json

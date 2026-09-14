@@ -1,0 +1,34 @@
+# 卡 P1 收件箱（代码根因：把「默认值指着发布方那台机器」扫干净）
+
+编号从 **N-787** 起（取号前查过盘面：`ops/tickets.md` 与收件箱里已用到 **N-786**）。
+
+| 编号 | 事项 | 状态 | 说明 |
+|---|---|---|---|
+| N-770 | `ops/score_runs.py` 的 run 根写死发布方绝对路径 | **本卡已修** | `RUNS_IN` / `REF_TASKS` 改为从 `cfg.GENEBENCH_ROOT` 现算（与 `ops/run_joblist.py` 同源），并新增 `--runs-root` 显式入口；`--remote` 现在认 `[user@]host:/path`，另有 `--remote-host`（同机结算传 `local`，不走 ssh），每次拉取都把「从哪台机器拉」打印出来。run 根不存在时**当场 SystemExit 并说清三条出路**，不再是 `FileNotFoundError` 或「退 0 + runs: 0」。发布方那台的取值与 rsync 源逐字未变（`ops/test_P1.py::test_发布方那台的取值一字未动` / `::test_不带主机段时rsync的源与改动前逐字相同`）。卡 D2 那两条临时软链**不再需要**。 |
+| N-775 | `guard_modes --harden` 在外部机器上不收紧 `$GENEBENCH_ROOT` | **本卡已修** | `EXTERNAL_ROOTS` 与 `ANSWER_PLANE_ROOTS` 都改为从 `cfg.GENEBENCH_ROOT` 现算。顺带修掉的是同一条的更贵形态：`ANSWER_PLANE_ROOTS` 写死时，外部机器上三条路径都不存在 → **符号链接那道门一条都不触发，而守门照样返回 0**。 |
+| N-748 / 裁定 ② | `mk_release_manifest` 的 `has_remote` 机器依赖 | **本卡已修** | `no_clone_url` 的 `status_now` 不再看本树有没有 remote（回到 `declared_why`）。同一个病的**第二处**一并修了：`public_channel_zero_runs` 从前读 `$GB/runs_in/m6_public/jobs.jsonl`（那份清单不进仓库），改读仓库里的 `ops/reports/m6_public/records.json`。两格的文本在发布方机器上一字未变（18 / 18）。实测：clone + origin + 外部 `$GENEBENCH_ROOT` 下 `--check` **从退 1 变成退 0**，证据 `/data/shared/genebench/scratch/P1/clone_check.log`。 |
+| N-755 / N-778 | `RELEASE_ITEMS` 没有 `build/` 那五件 | **本卡已修** | 新增分组「统一基座构建上下文」收 `build/README.md` + `build/base/{Dockerfile,requirements.txt,constraints.txt,README.md}`。发布件 53 → **58 件，缺件 0**。只改生成器，`RELEASE_MANIFEST.json` 的重出留给卡 P3。 |
+| N-780 | `ops/test_pack_release.py:280` 写死 `ra["n"] == 2` | **本卡已修** | 改成「已发两件 ⊆ 清单」+「`n` 与表同源且名字不重复」+「逐件字段齐、四条轴与清单同源」+「`role` 在认得出的三个里」——**件数不写死**，多出来一件不认识的 role 仍然会红。 |
+| **N-787** | `ops/results_db.py` 没有 `--runs-in` / `--runs-root` 入口 | 待修（不在本卡可改路径） | 本卡给 `score_runs` 补了 `--runs-root`，但入库那一步（`results_db ingest` → `protocol_by_run()`）只认 `cfg.GENEBENCH_ROOT / "runs_in"`。两处现在**同源**，所以外部用户只要把 run 放在 `$GENEBENCH_ROOT/runs_in/<batch>/` 就一路通、**一条软链都不用**；但如果他用了 `--runs-root` 指到别处，结算出得了表、入库会报「协议轴反算不出」。`score_runs` 的 `--runs-root` help 里已经把这句写明。修法：`results_db` 的 `ingest` / `backfill` 补一个 `--runs-in`（函数签名里 `runs_in` 参数本来就有，只差 CLI 一行）。 |
+| **N-788** | `ops/run_probe_mutations.py` 的 `--help` 里那条公开题集路径**少一层 `public/`** | **本卡顺手修了**，登记备案 | 原文是 `/data/shared/genebench/reference/tasks/v1.0-smoke-public`，那个路径根本不存在（与红队 2026-09-07 的 N-304 逐字同形，只是没人再查第二处）。现在 help 从 `PUBLIC_ANSWER_ROOT` 常量渲染，三处（`run_controls` / `run_joblist` / `run_probe_mutations`）同值由 `ops/test_P1.py::test_公开题集根三处同值` 钉住。 |
+| **N-789** | 仓库根 `.gitignore` 的 `build/` 不锚定 | **本卡已修** | 补 `!/build/`（排在 `build/` 之后、锚定到仓库根）。代价此前是**在 `build/` 下新建文件 `git status` 不提醒**，漏 add 的表现正好是「我这台构得出来、别人 clone 下来构不出来」—— 卡 A2 当时只能 `git add -f`。实测：`touch build/<x>` → `git status` 看得见；`git check-ignore` 退 1。 |
+| **N-790** | 仍然写死 `/data/shared` 的 `ops/*.py`（**判成不修**） | 登记不修 | 逐条依据见下表。判据：只有进「结算 / 出集 / 外部自检」三条链路的才必须现算；纯发布方内部工具不在射程里，改它们等于把改动面摊大而不换来任何外部可用性。 |
+| **N-791** | `ops/test_env.py` 与 `ops/test_A2.py` 等测试里的 `/data/shared` 字面量 | 登记不修 | 那些字面量多数是**判据本身**（`ops/test_public_acceptance.py::BEFORE` 抄的就是「改动前的原文」，读出来的话那条测试永远绿；`ops/test_A2.py::_PUBLISHER_PATHS` 要的正是「发布方路径不许出现在 build/ 里」）。改它们会把判别力改没。外部机器上这些测试属于「内部自检」（卡 C2 已在 `ops/test_env.py` 文件头标注）。 |
+
+## N-790 逐条：哪些 `"/data/shared` 判成不修
+
+| 文件:行 | 是什么 | 为什么不修 |
+|---|---|---|
+| `ops/api_usage.py:52` | 用量统计的默认落点（scratch） | 发布方内部统计工具，不在三条链路上；外部用户不跑它。 |
+| `ops/gateway_lock.py:34` | 跑批串行锁 | 锁文件只在发布方这一台上有意义（红线 6 的「同一时刻只跑一个」是对这台机器说的）。外部单机用户自己一个人跑，不需要它。 |
+| `ops/mk_operator_conflicts.py:19/29` | 从 scratch 读两份中间件生成口径文档 | 一次性文档生成器，输入本来就只在发布方 scratch 里。 |
+| `ops/mutate.py:33` / `ops/screen_runner.py:21` | 写死发布方解释器路径 `env/bin/python` | 发布方内部批处理；外部用户走 README 的 `$PY`。**但这是下一类同形缺陷**（「默认值指着发布方那台机器」的解释器版本），要修的话与本卡同法（`cfg.PYTHON`）。 |
+| `ops/run_f02_a1.py:197` | 提示文案里的快照路径 | 已被 `ops/run_joblist.py` 取代的老跑批入口。 |
+| `ops/run_materiality_screen.py:312` / `ops/screen_band.py:15` | 重活的 scratch 落点 / epsilon 快照 | 发布方内部重算，外部用户不跑（口径结论以 `calibration.json` 交付）。 |
+
+## 本卡留下的一处**排好的红**
+
+`ops/test_release_manifest.py::test_the_judgement_sections_match_the_worktree` 一类**不红**（判据字段没变），
+但 `ops/mk_release_manifest.py --check` 会退 **3**（「内容已变、判据未变」）：
+`RELEASE_ITEMS` 多了 `build/` 五件，它们在落盘清单的 `files` 里还没有。
+**重出归卡 P3**，这是编排排好的，不是绕过恒红恒绿。P3 重出之后 `--check` 退 0（本卡在 clone 上已经预演过一遍：见 `clone_check.log` 的 ②③④）。

@@ -1,0 +1,46 @@
+[
+ {
+  "task_id": "s1-cor-01",
+  "stage": "S1",
+  "template_id": "cov_fields",
+  "ok": true,
+  "rc": 0,
+  "log_rows": 2249,
+  "note": "",
+  "stderr_tail": "",
+  "findings": []
+ },
+ {
+  "task_id": "s1-eco-01",
+  "stage": "S1",
+  "template_id": "lean_fetch",
+  "ok": true,
+  "rc": 0,
+  "log_rows": 1002,
+  "note": "",
+  "stderr_tail": "",
+  "findings": []
+ },
+ {
+  "task_id": "s1-ops-01",
+  "stage": "S1",
+  "template_id": "prov_ledger",
+  "ok": true,
+  "rc": 0,
+  "log_rows": 602,
+  "note": "",
+  "stderr_tail": "",
+  "findings": []
+ },
+ {
+  "task_id": "s1-rob-01",
+  "stage": "S1",
+  "template_id": "source_status",
+  "ok": true,
+  "rc": 0,
+  "log_rows": 789,
+  "note": "",
+  "stderr_tail": "",
+  "findings": []
+ }
+]

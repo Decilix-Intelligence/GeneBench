@@ -1,0 +1,14 @@
+# finance01 /etc/exports —— 改后（网关旁路已封堵）
+# 采集 2026-09-01T11:23:29+00:00  主机 finance01  LAN 192.168.1.48
+
+# /etc/exports: the access control list for filesystems which may be exported
+#		to NFS clients.  See exports(5).
+#
+# Example for NFSv2 and NFSv3:
+# /srv/homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)
+#
+# Example for NFSv4:
+# /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check)
+# /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)
+#
+#/data 192.168.1.219(rw,sync,no_subtree_check,root_squash)

@@ -1,0 +1,11 @@
+# 卡 1.5（价目表）登记事项 —— 待阶段收口代理统一编号并入 `ops/tickets.md`
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | **注册表写的 model id 与上游实际服务的对不上**：`runner/registry.py` 三条配置都写 `deepseek-chat`，而 M6/M6b 两批 1196 条响应体的 `model` 字段全是 `deepseek-v4-flash`，且上游 `/v1/models` 与官方定价页**都已不再列 `deepseek-chat`**（2026-09-06 复核）。证据 `ops/reports/m6_all/served_model_evidence.json` | 登记不修 | 本卡按 `alias_of` 把 `deepseek-chat` 指到 `deepseek-v4-flash`，价与出处因此没有第二份。**要不要把注册表改成实际 id 是另一件事**：`model` 进 M6 主表的口径说明，改它要过 registry 的 `assert_registry_sane`（三条必须同一模型）并复核 M6 报告里的措辞。不在本卡改（registry 是共享文件，且不是本卡的路径）|
+| N-? | **`$` 是成本上界，不是账单实数** | 已在代码与表下写明 | DeepSeek 2026-08-16 起分高峰 / 低谷两档（低谷是高峰的一半，高峰 = 周一至周五 01:00-04:00 与 06:00-10:00 UTC）。边车 `llm_log.jsonl` **不记这次调用落在哪一档**，价目表因此一律取高峰价。逐条按调用时刻判档 = v1.1（边车已记 `ts`，做得了，只是本卡时间盒外）|
+| N-? | **缓存命中价目前用不上**：`runner/pricing.cost_usd` 认 `prompt_cache_hit_tokens` / `cached_tokens` / `cache_read_input_tokens`，但 M6/M6b 的 usage 里**一个缓存键都没出现过**（只有 prompt/completion/total 三个）| 登记不修 | 两条可能：上游 Responses API 没返回缓存明细，或边车 `_norm_usage` 只搬平铺数值键、OpenAI 风格的嵌套 `prompt_tokens_details.cached_tokens` 到不了下游。前者无解、后者是 `runner/c41/egress_proxy.py` 的一行。**现状不会算错钱，只会高估**（按整价 = 上界）|
+| N-? | **`llm_trace.usage_totals` 只合计三个键** | 登记不修 | 它写死 `{prompt,completion,total}_tokens` 三个键累加，即使边车记下了缓存键也不会进 `usage_totals` → 到不了 `cost_usd`。与上一条同源，一起修才有意义 |
+| N-? | **`$` 的口径是「逐 run 均值」，规格 §3 写的是「$/task」** | 登记不修 | v1.0 冒烟集每题种子数不齐（m6_all 里 12 题 / 14–15 run），两者因此不等。本卡取逐 run 均值 —— 与同列的 Steps / Latency 一致，换口径要三列一起换。报告器 docstring 已写明 |
+| N-? | **未接模型的价是留位行**（claude / gemini / grok / gpt / opencode-default，价全 null）| 待 key | `price_of()` 对它们返回 `None` 而不是抛错，于是主表上「这家没接」与「这家不要钱」可分。接入时把 `model` 换成**实际调用的 id** 再填价；`opencode-default` 那一行要**拆成实际 provider 的几行**（opencode 自己不托管模型）|
+| N-? | **DeepSeek 官方价没有第三方复核** | 待用户核一次 | 价取自 https://api-docs.deepseek.com/quick_start/pricing （2026-09-06 抓取，`retrieved_at` 已记）。表格是从该页 HTML 里读出来的，建议用户对着页面核一次 flash 的 0.44 / 1.32 / 0.014（高峰）|

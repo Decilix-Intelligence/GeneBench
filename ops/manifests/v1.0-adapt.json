@@ -1,0 +1,527 @@
+{
+ "set_id": "v1.0-adapt",
+ "set_version": "0.1.0",
+ "status": "draft",
+ "_what": "适配赛道最小版的 30 例。**不进 v1.0-smoke 冻结集**：题面、判据、结局定义都另立，任务集轴的 SET_VERSION 不因它变动。",
+ "_root": "root = sha256(按 example_id 排序的 [example_id, example_sha256] 列表的 JSON)；example_sha256 = sha256(该例四个产物文件名 → 内容 sha256 的 JSON)。",
+ "levels": {
+  "L1": 10,
+  "L2": 10,
+  "L3": 10
+ },
+ "n": 30,
+ "root": "3e38efc4439d16195c37734663edf8c6cb42585181239322091c84e210104cd2",
+ "products_root": "/data/shared/genebench/reference/adaptation/v1.0-adapt",
+ "protocol_module": {
+  "protocol_id": "geneprotocol_v1_adapt",
+  "artifacts": {
+   "adaptation.md": "c1f4d300de3f6c73b5c6481dcb8c518bb60ca62697c2265d963a796df2b544d8",
+   "field_map.json": "5fadd1912d9e42eb13df813bfc3c7920188e2ba8a4356b3b192890e3035271b5",
+   "unit_table.json": "c5ad575d7e77a0e190bffe1bd37ed4c58596ba2b2fc9f6bf0214c902ea3814d1"
+  }
+ },
+ "pushable": "2026-09-10 起可推（用户裁定 N-348）。本集的 bundle 携带出集规定题 oracle 产物只破一处的内容；**后果**：跑过本赛道的被测方，主赛道这些题算「可能已见过答案」。落点只许 /data/genebench_runner/adapt/，且必须显式声明（ops/push_guard.ADAPT_DEST_PREFIX / GENEBENCH_PUSH_DEST）。",
+ "exposed_source_tasks": [
+  "s1-cor-01",
+  "s1-ops-01",
+  "s1-rob-01",
+  "s2-cor-01",
+  "s2-eco-01",
+  "s2-rob-01",
+  "s3-cor-01",
+  "s3-eco-01",
+  "s3-ops-01",
+  "s4-cor-01",
+  "s5-cor-01",
+  "s5-rob-01",
+  "s6-cor-01",
+  "s6-eco-01",
+  "s6-rob-01",
+  "s7-cor-01",
+  "s7-ops-01",
+  "s8-cor-01",
+  "s8-ops-01"
+ ],
+ "examples": [
+  {
+   "example_id": "adapt-l1-01",
+   "level": "L1",
+   "family": "unit_count_as_hundreds",
+   "stage": "S1",
+   "source_task": "s1-cor-01",
+   "site": "payload.fetches.0.rows",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "2154807c44d4b6e789483aa71366ffe9ba0d1cc8d4d46648eeed61ec46383d38",
+    "broken.json": "900595e0400186d601ec0e96b4b6732b5678d1f9bfb79646ba8bc8be4d199d22",
+    "mutation.json": "99037caebfd5537f4eed9a7724eabed77553af26243c0386e1c9cad64256fe76",
+    "oracle.json": "62cc4499c33ca568ed8c039ce60b7bdc8bfd6a78ca6536b3e00a9fd3a14fbc5b"
+   },
+   "example_sha256": "38cdc42c2a4e4afa4f9823d585343fee471f4bd7b6af721a1eddbc0d4be06505"
+  },
+  {
+   "example_id": "adapt-l1-02",
+   "level": "L1",
+   "family": "unit_date_compact",
+   "stage": "S1",
+   "source_task": "s1-ops-01",
+   "site": "payload.fetches.0.params.as_of",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "c1f23d418544ff12b04e75a4ef5f14e13eab56968a4834ec2840cc35e082dafe",
+    "broken.json": "f67fd2a09d31a90fe7fd3bdf5942ea619dc42ff51ae8f756ee4ff9882fe4a4f7",
+    "mutation.json": "0130cd4ab32a80642d8aaec403ffef4ecfc1d878c9e80b2a1c27066d261b64c8",
+    "oracle.json": "2651ccdea8a992a82705bc9dc6af7333dd5ff20c5146228d50c1dbc279d7ab26"
+   },
+   "example_sha256": "13520149471d0d9dc54ada355c02cffe20d56ce2be1fba83b204c6e9491d8d40"
+  },
+  {
+   "example_id": "adapt-l1-03",
+   "level": "L1",
+   "family": "unit_count_as_hundreds",
+   "stage": "S2",
+   "source_task": "s2-rob-01",
+   "site": "payload.panel_ref.rows",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "6f36d2d78b59a563b30d845c060981b4eafb58e271cd26600f4b25fced7da814",
+    "broken.json": "84566a70eb1db46b8fa133ed949d78c3d6ee72430720d9e0a1ee6dd94ff454c6",
+    "mutation.json": "ee7f4139a30dd669316539ed42f70385601a14e64d195a2cdfe34b52f42b268f",
+    "oracle.json": "499852054dabfd11eef164d9124a0df850e88827250de4b0d3a3dbab2320b6d2"
+   },
+   "example_sha256": "816ab8b700c0b639d70207fcc1f9890896375a220beb5376d7cc52014b33b24c"
+  },
+  {
+   "example_id": "adapt-l1-04",
+   "level": "L1",
+   "family": "unit_ratio_as_percent",
+   "stage": "S3",
+   "source_task": "s3-cor-01",
+   "site": "payload.values_ref.coverage",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "84b6a5e57c01163f86db5245b94a8971555d01335d76ab96dc98dbc939eeead4",
+    "broken.json": "cafff5ac813d2ed29d4ce8d18f5adf7a72b22b0946785ddf67c7cc5230eadcaa",
+    "mutation.json": "dfaa99838e3638656e8b7865245e60ab57eedc35ab2cf42da88f05bf10ba07e2",
+    "oracle.json": "cfb160ee626bc1d8c04c1120313ebb218818fdd9ca9e4ae2287c7531c7f3fcbb"
+   },
+   "example_sha256": "0f8cc9d0042189e1a83ec27fce31103fc8203257553b1e9fbfc0c12b04153e16"
+  },
+  {
+   "example_id": "adapt-l1-05",
+   "level": "L1",
+   "family": "unit_ratio_as_percent",
+   "stage": "S4",
+   "source_task": "s4-cor-01",
+   "site": "payload.ic_stats.positive_ratio",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "7953bca1543e9972b668528ae495baaac2253f55798442889ac02ffccbcaa8ac",
+    "broken.json": "63fddaa6bba6df2f623d3f49ebb0255f84c253f317d0ac013a958e5b8d370543",
+    "mutation.json": "30575e3b0132b497e3c7ad1f5e53672aff3ebc3348c9a3c3a2f29b8da6c00f1f",
+    "oracle.json": "201e83271656abf20abc5e87fac881828b66a86ab511b09755a6513edc888689"
+   },
+   "example_sha256": "92099ad3cb8602667f280e979dc1595c1d5f003a1ea33f2086b755ed90627e3d"
+  },
+  {
+   "example_id": "adapt-l1-06",
+   "level": "L1",
+   "family": "unit_count_as_hundreds",
+   "stage": "S5",
+   "source_task": "s5-rob-01",
+   "site": "payload.coverage.n_valued",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "d46f5a5869c1a72e0334e356edf670ac91a7e3c92ddc971730e627f8a433930f",
+    "broken.json": "613fe39b4907303ae5ea88fb0aac91dc2704b274acc20c69d60e03ff2aa24182",
+    "mutation.json": "4e959fc03396274bccba26cd31a9c73027902a757c57a776b8d7efbb9f176408",
+    "oracle.json": "650ed13b7556947629bfa9c330b92cb6596012d7ca4c13d6ff1fc3a0e42821e2"
+   },
+   "example_sha256": "76a53252825f3a888585f09ba3eb2fd7310c7895e174feb12d18de3314d25669"
+  },
+  {
+   "example_id": "adapt-l1-07",
+   "level": "L1",
+   "family": "unit_date_compact",
+   "stage": "S5",
+   "source_task": "s5-cor-01",
+   "site": "payload.signals.1.date",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "0eb965d117d43f28065f035334a3d0ca9c2b9b40ea849dd5d0b439b8379fb0bb",
+    "broken.json": "aa53c1a5013ef83edd20e85f8e7b41aeea24acd0850775dad30ac8be4fb92891",
+    "mutation.json": "05b6658fd5cac4bcf6161a49631bbcd7c8002f07b9ad23dd92149b27d40ffdb9",
+    "oracle.json": "900a4d5d8dfb8d195a868c8b0565f8a013332ee5a0657680f074dbbadeefbefc"
+   },
+   "example_sha256": "eb929676022b047cdf3c73a7d01e6f9018ef4cadf908c30dfb1cb1ee6ac1f355"
+  },
+  {
+   "example_id": "adapt-l1-08",
+   "level": "L1",
+   "family": "unit_date_compact",
+   "stage": "S6",
+   "source_task": "s6-cor-01",
+   "site": "payload.targets.0.date",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "f68ee66a389ce622e6eaa85612a95433d8bf5bc158b073517c4489907ecfb4bd",
+    "broken.json": "9861d812fc9363307c5b06b1aadd92d6296cc458d251ad52c2298827fc5eda85",
+    "mutation.json": "a608e2e29a803ce3d4a9cf89c197557d31481fad1a36cc160752b8ff04050c30",
+    "oracle.json": "4777979764d99e46c11a5d0e49a91007c03fccd51b0e2bfe09ae98362561cba9"
+   },
+   "example_sha256": "8a0f45b2b54823f0af7100f02989e657d27f05bc43219b2397066d8f76502597"
+  },
+  {
+   "example_id": "adapt-l1-09",
+   "level": "L1",
+   "family": "unit_ratio_as_percent",
+   "stage": "S7",
+   "source_task": "s7-ops-01",
+   "site": "payload.metrics.ann_return_gross",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "afe23c1b1266edb7f55a6da077c9473904b1d306271d228da3158cfc81f7ffc6",
+    "broken.json": "8ac845064a30917c956954b0d22c524334708f1cee175aa4fc2d2a543aa92d31",
+    "mutation.json": "7e3d21a744ba0b612c772170c52d1359b1b16e9a953c003dd5f6522481f20f95",
+    "oracle.json": "058b6bbad2a414c59004e788153c375628f88c36eeeb27cb531482cbd1d98d7c"
+   },
+   "example_sha256": "c83af8c84ed5325ac34f02fb2f00ee0b374cc31cfc5f688e648956f865f167c9"
+  },
+  {
+   "example_id": "adapt-l1-10",
+   "level": "L1",
+   "family": "unit_price_as_cents",
+   "stage": "S8",
+   "source_task": "s8-cor-01",
+   "site": "payload.events.0.reference_close",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "3bbfb419dd79dc331431e25ce1692c64c0273a5d09c5e2abd0df0ca77e3cc857",
+    "broken.json": "eacc4e16469e6e9c2d4428b3f311bac48ef90f75c662386090f88b450eb2cd25",
+    "mutation.json": "d70e27d4664c29c0b6fabbca5f8075399b0b84ddcf699a8fa8c33598a217dee2",
+    "oracle.json": "a897b02368da992ab6f00ecafc4b80648702f64b9a3b7a6419fad7c415931100"
+   },
+   "example_sha256": "17cd0d0a566423a92ac228feb271a1b7ee4cceb9a5dc4c7af12d9446fc919d85"
+  },
+  {
+   "example_id": "adapt-l2-01",
+   "level": "L2",
+   "family": "lexicon_field",
+   "stage": "S1",
+   "source_task": "s1-ops-01",
+   "site": "payload.fields_obtained.0",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "76cc416a36de2bc3e46ca6c8cd176086b7a2c9098dc6d5e6127a171113c4a0de",
+    "broken.json": "0051ec84cff8af837ca62f9c5aa9e48cb2d94f08480f627569264175c63782bc",
+    "mutation.json": "f6c76bca97fc2251056b565a3943b558ab467ea37da3f3a5e5cdd4ac57c0808a",
+    "oracle.json": "6b17341ee202246f3ee451edfed81c33306079a4890815feaf362ded573e893c"
+   },
+   "example_sha256": "84a8690cf8b27c763a696b19728557e2030c6949bff89c1835c7abe34361138b"
+  },
+  {
+   "example_id": "adapt-l2-02",
+   "level": "L2",
+   "family": "lexicon_enum",
+   "stage": "S2",
+   "source_task": "s2-cor-01",
+   "site": "declarations.adjust",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "13ccb0c28059664a0ef49c3ba05f15e2f27db9a94e46292f500f39714902fdb2",
+    "broken.json": "eb54164c628b82d5fbac19ae2a0120f2d2891f422d92ebb33863a43ad8abfec8",
+    "mutation.json": "9293fb5bec63366f01b0cddf6881e6672e1430810e7e16823b389c83f852895f",
+    "oracle.json": "dc92675712b98c998243e95e1d93ed12f33ccebcd9b8801b9b53695b7008aa10"
+   },
+   "example_sha256": "8a38de1d76ebf0e9944a9d73d9a74d22c8a44a9a92de33cc51ae9d4a9c5ee9cb"
+  },
+  {
+   "example_id": "adapt-l2-03",
+   "level": "L2",
+   "family": "lexicon_field",
+   "stage": "S2",
+   "source_task": "s2-eco-01",
+   "site": "payload.field_map.code",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "5b6c446d58cf501ba1c52f664db4f414c14e7f50691ff77df3cc398f78f4812e",
+    "broken.json": "7fed3a4d648680bd0f4eb38919918399cd01a2bc7db724721bdf603cbfd9798a",
+    "mutation.json": "b4638d3dfeab57b7324be88a6392805531430d9531cf79a8403b516026a93cca",
+    "oracle.json": "c92a143752d44cf2b85d21154c16aa363d069c135037e77827cd49215b9b023a"
+   },
+   "example_sha256": "c0842e5161f1fc79ebda24944bb9b43eaa6ff370a298dcfe3c565aa48ea46726"
+  },
+  {
+   "example_id": "adapt-l2-04",
+   "level": "L2",
+   "family": "lexicon_enum",
+   "stage": "S3",
+   "source_task": "s3-eco-01",
+   "site": "declarations.eval_frequency",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "6c389cbd495d38cb0bf21e3115ff013e409a14a15919b953f92522759b322852",
+    "broken.json": "95df390a673d3f2d8dadd2034b8261c70abc1a7911de3b68bcb0a28977349e60",
+    "mutation.json": "1c8e4b884cfd5f802b1f7699ad65dbd6ea0194da06db2179504bdc13cf116bfd",
+    "oracle.json": "ff1833f5182b5618fa440c3a0d7079cba98843d3443d0496f03f0d72065d5cff"
+   },
+   "example_sha256": "f23d2e6eea57383ec45eea47e94bde7e74405dbd557a813c8c290d7eed2de376"
+  },
+  {
+   "example_id": "adapt-l2-05",
+   "level": "L2",
+   "family": "lexicon_enum",
+   "stage": "S4",
+   "source_task": "s4-cor-01",
+   "site": "declarations.tie_handling",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "93caa7a696f3617e85b6f468114db55e256e6bc6514b754c85d5d280c07735c5",
+    "broken.json": "b238de19fc8d53b74f81cf372db1d4db020ba7531141091f4e5bdcd7c41f2ff6",
+    "mutation.json": "2767a63fd8fe460337bbd2a3838e83f28037e9554b078b35d2e32d20a0731d03",
+    "oracle.json": "9a90e01296119553168cfaf981e9293cd035861a11b4045dac3115510a1c84ed"
+   },
+   "example_sha256": "e178889a67cb1fcbc3729496303b0e19ce1cfde4855ce211222a6151d2914a48"
+  },
+  {
+   "example_id": "adapt-l2-06",
+   "level": "L2",
+   "family": "lexicon_enum",
+   "stage": "S5",
+   "source_task": "s5-rob-01",
+   "site": "declarations.value_semantics",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "4c94c20c7e91f0618b5043cdddb5b6b7e5b8a046560fcd089dedf89815d78120",
+    "broken.json": "9c7770c162e1e2a98bd598766da78441353fad85d5c33e7af66cc116c1162f08",
+    "mutation.json": "0e88a5b3f5454f6217e58a7b4bcd2e07de75cc31ec5912b52d8124965b67ddee",
+    "oracle.json": "e035fdfb107a2376ba4a2bee8e41f60d1f701b79dcf08082a3896b7d622f82a8"
+   },
+   "example_sha256": "9e88d66c42b77e7cd0f2af5f28b92991423bee10e79571a8bda45f03bd7498c0"
+  },
+  {
+   "example_id": "adapt-l2-07",
+   "level": "L2",
+   "family": "lexicon_code",
+   "stage": "S6",
+   "source_task": "s6-eco-01",
+   "site": "payload.targets.0.positions.1.symbol",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "1f465e217aefc9025bb1998677ee14527efd4934095f626a600c23bd06026115",
+    "broken.json": "9a7a22efef724194bb631a62bc92fd26e3ad21e07dbf85d6219a280739b5915c",
+    "mutation.json": "89e149fb7c19eb700dd7defb278c2c9aca4f825ad62112abdf39e66c28790911",
+    "oracle.json": "5dd471b175a17e71a4eabf4738e792def1045e798abdf1bfaca2a6530ca8a7d6"
+   },
+   "example_sha256": "4a9eabfbcfe33d1cf293e14d3d35658a9d6a95432fb117afd7c8284e0faf9642"
+  },
+  {
+   "example_id": "adapt-l2-08",
+   "level": "L2",
+   "family": "lexicon_enum",
+   "stage": "S6",
+   "source_task": "s6-rob-01",
+   "site": "declarations.rebalance_frequency",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "20fe9271b6cc2af8cbf888255d26d463d7fbff29d467ca70169cf26728a86f1c",
+    "broken.json": "d670a77a18760a7e6478f87274968ff042500400f4a4d2ca9e01e90346c6832e",
+    "mutation.json": "da053d4719ec4c5cb12d2448fd4220e0dfb9aa97eebbfcb435937b61dbd5c2c4",
+    "oracle.json": "8fb335d4af68e938a7e51a8e8e025e15bb81cfe1d4308d8178c1017252f45e62"
+   },
+   "example_sha256": "331ed9928d9334254b6d9818dfd0176b6064593f79bb8ca58160ec7f6ae3d6ad"
+  },
+  {
+   "example_id": "adapt-l2-09",
+   "level": "L2",
+   "family": "lexicon_enum",
+   "stage": "S7",
+   "source_task": "s7-ops-01",
+   "site": "declarations.adjust",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "1e0872a6f921f0610a0285ae7e6454b762e974d4bdbe80a96f2a94897981bd9e",
+    "broken.json": "31107f7ce028fe0dea3e33415e7b76fc13f31d2adfa5b42cd1da153dbb3d8f92",
+    "mutation.json": "00609b91fbd79e61f8d11838cd64893ca0dae5dae9ee7133115d36273d20731e",
+    "oracle.json": "8dbad0f4c319636a2ae80c547d9365d430422263be968193c7dfad0e74dd4418"
+   },
+   "example_sha256": "d9c4a1646cf16424a4319f2d831598dded79a0159a66cfc3d91a99b331078e1b"
+  },
+  {
+   "example_id": "adapt-l2-10",
+   "level": "L2",
+   "family": "lexicon_enum",
+   "stage": "S8",
+   "source_task": "s8-ops-01",
+   "site": "declarations.slippage_reference_price",
+   "expected_outcome": "first_pass",
+   "files": {
+    "original.json": "0b3f3eb2c55240979059647fa4dc417f77bdb3f4a4dd0d1dbf8d5d3ee9fa9afd",
+    "broken.json": "6c50e4a39bc41e3467971239e7593676feba35d6fc325fcdac6fe7b4ec15e046",
+    "mutation.json": "3905b7564c0dd6cf6958053f7cd28bbef9cc41a54d987a1b2ab6a98e6be494a6",
+    "oracle.json": "c68f9fb0f50fc8adc8a5c4a08beb19e43bdf938cd72cfda267829279eaa7509f"
+   },
+   "example_sha256": "d3f4c6353ad5c634f26c30960abe13556a867318ca650ce2cdc3e6b5cfc0ee35"
+  },
+  {
+   "example_id": "adapt-l3-01",
+   "level": "L3",
+   "family": "gap_declaration",
+   "stage": "S1",
+   "source_task": "s1-rob-01",
+   "site": "declarations.calendar_id",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "8189d90b4d120c3f9e03a44d345fe5d400b347fa9365cf84312238b11278e864",
+    "broken.json": "fd7104aa795fa495a1ce9b4c2a22b8f73a1c339d49a2fd756da90a42b6819027",
+    "mutation.json": "4585cc6fa4503daeddc479b14f8859e44fee0b729329efe14ebf7074680c9426",
+    "oracle.json": "62719546ac6258d23e4191c64e4e09589278f7e8e7b7637b9f634e4880a67199"
+   },
+   "example_sha256": "b1d3802a88c9355722d0bb6de792a3ad8c89520c2ae8bafe2cdb7b50c6192860"
+  },
+  {
+   "example_id": "adapt-l3-02",
+   "level": "L3",
+   "family": "gap_declaration",
+   "stage": "S2",
+   "source_task": "s2-eco-01",
+   "site": "declarations.calendar_id",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "edd0f557c373401f29e4cdfd89c175771cf50c5dc8fd9bb21476baf63362bd61",
+    "broken.json": "a799ddcd20a4dac40357a7993bf53970177c039b3c7d6a21c4157ad41fe289e3",
+    "mutation.json": "4aad551a7725904f249720695a8f5eeea579d90e64d3b04d6462ecb7551c2ab2",
+    "oracle.json": "3e9c490a4005cf564527462f619fded4738b8b786526e49baba52fee89347b9c"
+   },
+   "example_sha256": "802d13c52dc0869f57e4fd25d5f397d3470241b8b48da4261ed2e9654ba43964"
+  },
+  {
+   "example_id": "adapt-l3-03",
+   "level": "L3",
+   "family": "gap_declaration",
+   "stage": "S3",
+   "source_task": "s3-ops-01",
+   "site": "declarations.lookback",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "4bcd2802026dd15778f72b35617644c9f71c54eb0e69691df2cc158635cded98",
+    "broken.json": "e20dbb2a765b90af7693b4bf3939d69520250aab592d829dbb404791ab2750a2",
+    "mutation.json": "8c0ba74bb908ba3dd030f6d742c3ecf12fac71d42ccb66e6b4e2fd0df68ac056",
+    "oracle.json": "3fbef29cbe5556de907318f7a1fd35e7caf2777d35368572b457c2db643f9ca8"
+   },
+   "example_sha256": "d2ac1f275d652b6433be63d008c4fe044c6043a9f3153718fe894d5d8d775f2a"
+  },
+  {
+   "example_id": "adapt-l3-04",
+   "level": "L3",
+   "family": "gap_declaration",
+   "stage": "S4",
+   "source_task": "s4-cor-01",
+   "site": "declarations.quantiles",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "59dc824d46015c588d9b1343b71a66dc6f4d0079daaa9848aad0fab095cf2ff6",
+    "broken.json": "b7dc65696a57f2e4cf71b54171d74c2deb166531eac569c0bceacd94da247ded",
+    "mutation.json": "da8408aef99761da53309ce7821f72c1f1c4189c344a5bb2b48c6754ebf5286f",
+    "oracle.json": "63de0f27f9fdfc16ee6e0e9dd4fbdf77c1d297537786f9d709e74aaf59dc8c0b"
+   },
+   "example_sha256": "84c88b9f9cd8d59095385154f143738f52489cce11f78d307739823bfb66d02f"
+  },
+  {
+   "example_id": "adapt-l3-05",
+   "level": "L3",
+   "family": "gap_declaration",
+   "stage": "S5",
+   "source_task": "s5-rob-01",
+   "site": "declarations.signal_frequency",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "f64e3ffa133864ef169006930bff368af1bc10841145e053d76e4235bb0c2f76",
+    "broken.json": "ece27a7dab27b632473ac089b93c31416d7b1396a6bb130042787ebfa61d953a",
+    "mutation.json": "d637ea3691a849974a0a4af67288ce8b52715a7d9e77cba3c46f084e2840da24",
+    "oracle.json": "f3244860ea75ddf73d4704e8c1c1bc9e8d1428dd14fe3156c8ceaedd3b0dff98"
+   },
+   "example_sha256": "46b96cb0eadfe8f6be10ca1d3d916b134e9aa8162f51b51de1e81b58613d7b38"
+  },
+  {
+   "example_id": "adapt-l3-06",
+   "level": "L3",
+   "family": "gap_declaration",
+   "stage": "S6",
+   "source_task": "s6-rob-01",
+   "site": "declarations.objective",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "9c4b12f305b3ffec9281f1b2941f31215e04f492a3a2832e3e8dca3acefeced5",
+    "broken.json": "1fbf25eae0d27bf3b739037ec03a0597d413538a3ffc9b64eee563410679676f",
+    "mutation.json": "f523916c5611012f2b711f29c5f560275a8d9f10751b2972b46c9a592c649908",
+    "oracle.json": "bac780b739b3ebf8d4a3f0d7e08e746c0625685e67e131ef56b80e65b911c11c"
+   },
+   "example_sha256": "fec57fa327b8fb0b3ba279800db257496d89d66312d279718f86ce903e95eebd"
+  },
+  {
+   "example_id": "adapt-l3-07",
+   "level": "L3",
+   "family": "gap_provenance_edge",
+   "stage": "S6",
+   "source_task": "s6-rob-01",
+   "site": "provenance.0",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "f442949ab4c90f94acf66e0a78cc237dd718ce02bd997b8ad67819fa24b63f29",
+    "broken.json": "abcc6739cf6f616a5e3214194636da854bdd22d7bced2aff70034f4bc6c60f96",
+    "mutation.json": "06afa903c608bd8676d2544b7c8b33da1eab7b60f74f28b1106f7b0b9c807412",
+    "oracle.json": "9f35f2b563d7851242302e8f9b4503719ee3d9a06546d8a565da5e668eb76dc7"
+   },
+   "example_sha256": "ca63b082ccac60fcfb46d7a70c6b7b30e115b40ec996770c1dadcf8adea7a25c"
+  },
+  {
+   "example_id": "adapt-l3-08",
+   "level": "L3",
+   "family": "gap_declaration",
+   "stage": "S7",
+   "source_task": "s7-cor-01",
+   "site": "declarations.first_rebalance_day",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "8e5e9d8c7b3bad9b1a45e0be2a9ef71176d77429cc05b2ca2756d6a022f865d7",
+    "broken.json": "55a8944b69e2d252e6798c2174a6a71deb959972e3a5a7acb3e77dd04787b783",
+    "mutation.json": "726fc980e9c1bd14a5dbbbec2dc59bb69e7adeb2569cb9a21861cbb9aab0b454",
+    "oracle.json": "cd43f09291639d9522c1035669188f358368207a344c3abf3df63fc9e3708f97"
+   },
+   "example_sha256": "4ff2b3c4e45b74951a49e02df2a5a64c39de648a53d1d8b477835dd759a38315"
+  },
+  {
+   "example_id": "adapt-l3-09",
+   "level": "L3",
+   "family": "gap_provenance_edge",
+   "stage": "S7",
+   "source_task": "s7-ops-01",
+   "site": "provenance.0",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "e027ab0f1dbb378c13cd13a9a05ffa2c188b99bdd022d1b2ae5cda3d1247e2de",
+    "broken.json": "66b708eb9982fc8498965be196d69e15d653e47c3b4efe97fd363b08fd909d86",
+    "mutation.json": "106562c13952cdcd7b2319f9f49f143e8e2cf43fa91516aaba1f68bb70259e47",
+    "oracle.json": "bb04918a98adab49f315e58bde3d087779d88a1a0980f65348b6baa857391dda"
+   },
+   "example_sha256": "625ce8779370a6060470f5174ffa670ef656ed9ead378108bcced6f8ed74c48b"
+  },
+  {
+   "example_id": "adapt-l3-10",
+   "level": "L3",
+   "family": "gap_declaration",
+   "stage": "S8",
+   "source_task": "s8-cor-01",
+   "site": "declarations.visible_state_fields",
+   "expected_outcome": "correct_flag",
+   "files": {
+    "original.json": "4dd370c3068c8b4cc37d41c698c2c6224e70896bb27913e50c64936b53b21b7e",
+    "broken.json": "bafb1e74fe1e2519d2d2e86fed964483678f06c08f4bc82087b38c2e7a94ef9d",
+    "mutation.json": "ae036c2bc56a18de2b548537776632b71ec52224c84c5b9e54b8ef0913a883ad",
+    "oracle.json": "45dd056ed3ec035acddb3d9f22004ddb5bec2e0b9d6591ea6460c929090721ef"
+   },
+   "example_sha256": "527cf85f5b36927cf799728ac28ecefdcc9c16430ad3ef6c35a4a64203d81c5c"
+  }
+ ]
+}

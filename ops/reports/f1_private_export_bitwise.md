@@ -1,0 +1,16 @@
+# F1-① 通道分轴的两半证据（2026-09-11）
+
+私有通道逐字节不变（新旧 `packager.py` 各导一次，逐文件 sha256 比对）；公开通道 5 道带 `inputs` 的题出得了集，且 X `task.yaml` 里写的是盘上真值；防漏闸喂一件与私有声明相同的夹具当场红。
+
+- 私有 s4-cor-01: 逐字节相同（11 件）
+- 私有 s1-cor-01: 逐字节相同（10 件）
+- 私有 s7-rob-02: 逐字节相同（12 件）
+- 私有 s8-cor-01: 逐字节相同（10 件）
+- 公开 s4-cor-01: 出集 ok（11 件）；X task.yaml 的 inputs sha = 盘上真值：True；034c4526ad20…
+- 公开 s5-cor-01: 出集 ok（12 件）；X task.yaml 的 inputs sha = 盘上真值：True；ac18cf7ed262…
+- 公开 s6-cor-01: 出集 ok（11 件）；X task.yaml 的 inputs sha = 盘上真值：True；4bfb0ed5b3cd…
+- 公开 s7-cor-01: 出集 ok（12 件）；X task.yaml 的 inputs sha = 盘上真值：True；fccd344143ea…
+- 公开 s7-rob-02: 出集 ok（12 件）；X task.yaml 的 inputs sha = 盘上真值：True；fccd344143ea…
+- 防漏闸：当场红 ✓（公开通道的夹具 work/factor_panel.parquet 与**私有声明**逐字节相同（c8ed955efdfb…）—— 这意味着私有那一份漏进了公开…）
+
+结论：全绿

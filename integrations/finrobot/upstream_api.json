@@ -1,0 +1,20 @@
+{
+  "note": "FinRobot 0.1.5 的 data_source 层公开方法快照。**这不是文档，是判据的输入**：ops/test_integration_finrobot.py 拿它核对 glue 的替换点表 —— f01 上装不起 FinRobot（没有 autogen/chromadb 那一串），所以本地测试对着这份快照跑，而真正的活体检查（assert_no_native_datasource）在镜像里、每一次真跑开跑前都跑一遍。",
+  "produced_by": "docker run --rm gb-finrobot-u:r1 python3 -c \"import sys,types; sys.modules['yfinance']=types.ModuleType('yfinance'); import finrobot.data_source as DS; [print(c, sorted(m for m in dir(getattr(DS,c)) if not m.startswith('_') and callable(getattr(getattr(DS,c),m)))) for c in ('YFinanceUtils','FinnHubUtils','FMPUtils','SECUtils','RedditUtils')]\"",
+  "produced_at": "2026-09-07T11:36:00+00:00",
+  "source_sha256": "62ac363ed5e23dd5628797bb5e6c2b392012dde9401a1e6d4110f50f5afc8291",
+  "classes": {
+    "YFinanceUtils": ["get_analyst_recommendations", "get_balance_sheet", "get_cash_flow",
+                      "get_company_info", "get_income_stmt", "get_stock_data",
+                      "get_stock_dividends", "get_stock_info"],
+    "FinnHubUtils": ["get_basic_financials", "get_basic_financials_history",
+                     "get_company_news", "get_company_profile"],
+    "FMPUtils": ["get_financial_metrics", "get_historical_bvps",
+                 "get_historical_market_cap", "get_sec_report", "get_target_price"],
+    "SECUtils": ["download_10k_filing", "download_10k_pdf", "get_10k_metadata",
+                 "get_10k_section"],
+    "RedditUtils": ["get_reddit_posts"]
+  },
+  "market_analyst_toolkits": ["FinnHubUtils.get_company_profile", "FinnHubUtils.get_company_news",
+                              "FinnHubUtils.get_basic_financials", "YFinanceUtils.get_stock_data"]
+}

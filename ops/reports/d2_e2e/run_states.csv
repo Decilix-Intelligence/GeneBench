@@ -1,0 +1,7 @@
+run_id,run_status,wall_clock_s,llm_calls_allowed,artifact_bytes
+s1-cor-01.strict.cfg-codex-deepseek.r01,timeout,1548.1,89,1733
+s1-cor-01.open.cfg-codex-deepseek.r01,budget_exhausted,921.0,100,0
+s2-cor-01.strict.cfg-codex-deepseek.r01,budget_exhausted,1439.4,100,0
+s2-cor-01.open.cfg-codex-deepseek.r01,ok,1212.0,100,1469
+s3-cor-01.strict.cfg-codex-deepseek.r01,violation,1292.0,93,1105
+s3-cor-01.open.cfg-codex-deepseek.r01,budget_exhausted,874.4,100,0

@@ -1,0 +1,52 @@
+{
+ "artifact": "/data/shared/genebench/reference/tasks/public/v1.0-smoke-public/s1-cor-01/solution/artifact.json",
+ "artifact_mtime": 1788795853.99506,
+ "artifact_n_fetches": 601,
+ "artifact_fetched_at_range": [
+  "2026-09-07T15:41:43.048+00:00",
+  "2026-09-07T15:44:13.989+00:00"
+ ],
+ "log": "/data/shared/genebench/logs/gateway_access_public.jsonl",
+ "oracle_blocks_for_s1_cor_01": [
+  {
+   "hour": "2026-09-07T13",
+   "n": 601,
+   "first_ts": "2026-09-07T13:48:18.625+00:00",
+   "last_ts": "2026-09-07T13:51:09.553+00:00"
+  },
+  {
+   "hour": "2026-09-07T15",
+   "n": 601,
+   "first_ts": "2026-09-07T15:41:43.048+00:00",
+   "last_ts": "2026-09-07T15:44:13.989+00:00"
+  },
+  {
+   "hour": "2026-09-10T22",
+   "n": 601,
+   "first_ts": "2026-09-10T22:57:28.777+00:00",
+   "last_ts": "2026-09-10T22:59:54.979+00:00"
+  }
+ ],
+ "oracle_window_picks": "最近一次 = 2026-09-10T22",
+ "declared_vs_block": [
+  {
+   "block_hour": "2026-09-07T13",
+   "declared_hits_in_block": 0,
+   "declared_total": 601,
+   "verdict": "不命中"
+  },
+  {
+   "block_hour": "2026-09-07T15",
+   "declared_hits_in_block": 601,
+   "declared_total": 601,
+   "verdict": "逐条命中"
+  },
+  {
+   "block_hour": "2026-09-10T22",
+   "declared_hits_in_block": 0,
+   "declared_total": 601,
+   "verdict": "不命中"
+  }
+ ],
+ "conclusion": "产物的 601 个 fetched_at 与 **09-07T15** 那个块逐条相同；oracle_window() 现在选的是 **2026-09-10T22** 那个块（更晚的一次 oracle 跑），两者不是同一次跑 —— 601 条 fetch_clock_mismatch 由此而来。判据本身没变（另外 20 行与已签字的那份逐字节相同）。"
+}

@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s1-cor-01",
+  "probe": "lookahead",
+  "name": "日志里有一条被 as-of 边界拒掉的请求",
+  "why": "指标规格 §1：前视违例由网关日志直接结算，不依赖产物申报；**被拒 ≠ 没发生**",
+  "where": "log",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "lookahead_attempt"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:lookahead_attempt [lookahead] @$gateway_log — 1 次请求**显式**越过 as-of 边界被拒（{'range_end_after_asof': 1}）—— 例：GET /universe params={'as_of': '2026-07-31', 'date': '2026-07-31', 'end_date': '2026-08-31'} as_of=2026-07-31。被拒 ≠ 没发生：挡住它的是网关，不是被测方的克制"
+ ]
+}

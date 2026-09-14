@@ -1,0 +1,2672 @@
+{
+  "card": "1.1-sourceB",
+  "generated_by": "snapshots.universe_qlib",
+  "source": {
+    "qlib_release_dir_name": "2026-08-26",
+    "source_txt": {
+      "release": "2026-08-26",
+      "calendar_last": "2026-08-26",
+      "sha256": "06b945d78c4223e33f63425bc27d8ae956cb13ae4f9576af8fdeb95300f1beda",
+      "source": "https://github.com/chenditc/investment_data/releases/latest/download/qlib_bin.tar.gz"
+    },
+    "note": "上游是 chenditc/investment_data 的 qlib_bin 发布,其成分区间由 Tushare index_weight 快照生成 —— 与湖里的 index_weight 同宗,不是独立数据源。"
+  },
+  "output": {
+    "parquet_relative_to_snapshots": "v1/universe/qlib_instruments_intervals.parquet",
+    "schema": [
+      {
+        "name": "code",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "universe",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "in_date",
+        "type": "date32[day]",
+        "nullable": false
+      },
+      {
+        "name": "out_date",
+        "type": "date32[day]",
+        "nullable": false
+      },
+      {
+        "name": "raw_code",
+        "type": "string",
+        "nullable": false
+      },
+      {
+        "name": "source_file",
+        "type": "string",
+        "nullable": false
+      }
+    ],
+    "sort_order": "universe(按 UNIVERSE_ORDER) → code → in_date",
+    "date_dtype_note": "in_date/out_date 是 parquet date32,不是字符串。"
+  },
+  "interval_convention": {
+    "verdict": "闭日历区间 [in_date, out_date]",
+    "in_date": "生效日;当天该票已经在成分内;100% 落在交易日上",
+    "out_date": "最后一个仍在成分内的日历日(闭);不是退出日,退出生效日 = out_date + 1 天;不保证是交易日",
+    "equivalent_half_open_form": "[in_date, next_in_date) —— 按日历天,不是按 out_date",
+    "how_to_materialise_a_daily_universe": "in_date <= D <= out_date",
+    "endpoint_semantics_differ_by_file": {
+      "csi*": "两端都是**日历日**。in_date 是成分调整生效日(实测 100% 是交易日),out_date 由 `下一期 in_date - 1 日历天` 得到,只有 68.5%~91.8% 落在交易日上。要'最后一个成分内交易日'就取 <= out_date 的最后一个交易日。",
+      "all": "两端都是**交易日**(实测 100%)。in_date 是该票在本发布里第一个有数据的交易日、out_date 是最后一个 —— 不是上市日/退市日:6142 行里 925 行的 in_date 是日历起点 2000-01-04(左删失),右端 2026-08-26 是发布日(右删失)。"
+    },
+    "trap": "写成 in_date <= D < out_date 会在每个 epoch 边界日丢掉全部成分 —— 实测那天名单直接变成空集。",
+    "cross_source_warning": "源A(湖 index_weight)是月末时点快照,源B 是区间。两边约定不统一,对账结果就是垃圾:折算必须用闭区间。"
+  },
+  "code_normalization": {
+    "rule": "前 2 个字符 = 交易所前缀,其余 = 代码本体 → '<symbol>.<EX>'",
+    "examples": {
+      "SH600000": "600000.SH",
+      "SZ000001": "000001.SZ",
+      "BJ430017": "430017.BJ"
+    },
+    "prefixes_found_by_scanning": {
+      "BJ": 1541,
+      "SH": 121620,
+      "SZ": 133075
+    },
+    "prefixes_expected": [
+      "SH",
+      "SZ",
+      "BJ"
+    ],
+    "note": "前缀是**扫全量枚举出来的**,不是假设。实测只出现 SH/SZ/BJ 三种;任何新前缀都会进 unmapped 而不是被丢掉。",
+    "n_unmapped": 0,
+    "unmapped": [],
+    "n_symbol_anomalies": 7,
+    "symbol_anomalies": [
+      {
+        "universe": "csi300",
+        "line": 10299,
+        "raw_code": "SHT00018",
+        "code": "T00018.SH",
+        "anomaly": "代码本体 'T00018' 不是 6 位数字"
+      },
+      {
+        "universe": "csi300",
+        "line": 10300,
+        "raw_code": "SHT00018",
+        "code": "T00018.SH",
+        "anomaly": "代码本体 'T00018' 不是 6 位数字"
+      },
+      {
+        "universe": "csi300",
+        "line": 10301,
+        "raw_code": "SHT00018",
+        "code": "T00018.SH",
+        "anomaly": "代码本体 'T00018' 不是 6 位数字"
+      },
+      {
+        "universe": "csi300",
+        "line": 10302,
+        "raw_code": "SHT00018",
+        "code": "T00018.SH",
+        "anomaly": "代码本体 'T00018' 不是 6 位数字"
+      },
+      {
+        "universe": "csi300",
+        "line": 10303,
+        "raw_code": "SHT00018",
+        "code": "T00018.SH",
+        "anomaly": "代码本体 'T00018' 不是 6 位数字"
+      },
+      {
+        "universe": "csi300",
+        "line": 10304,
+        "raw_code": "SHT00018",
+        "code": "T00018.SH",
+        "anomaly": "代码本体 'T00018' 不是 6 位数字"
+      },
+      {
+        "universe": "csi300",
+        "line": 10305,
+        "raw_code": "SHT00018",
+        "code": "T00018.SH",
+        "anomaly": "代码本体 'T00018' 不是 6 位数字"
+      }
+    ]
+  },
+  "semantics_warning": {
+    "all_txt": "all.txt 是**每只票一段总的上市区间**(1 段/code),左端 2000-01-04 是日历起点(左删失)、右端是发布日(右删失),都不是真实上市/退市日;且里面**混着指数代码**。",
+    "csi_txt": "csi*.txt 是**成分区间多段**,语义与 all.txt 不同,禁止混用。",
+    "non_stock_entries": {
+      "all": [
+        {
+          "code": "000300.SH",
+          "raw_code": "SH000300",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        },
+        {
+          "code": "000852.SH",
+          "raw_code": "SH000852",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        },
+        {
+          "code": "000905.SH",
+          "raw_code": "SH000905",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        },
+        {
+          "code": "000906.SH",
+          "raw_code": "SH000906",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        },
+        {
+          "code": "000985.SH",
+          "raw_code": "SH000985",
+          "in_date": "2005-01-04",
+          "out_date": "2026-07-06"
+        },
+        {
+          "code": "399300.SZ",
+          "raw_code": "SZ399300",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        }
+      ]
+    }
+  },
+  "freeze": {
+    "freeze_date": "2026-07-31",
+    "policy": "in_date > FREEZE 的行整条丢弃;out_date > FREEZE 截到 FREEZE。截断后 out_date == FREEZE 即右删失。",
+    "n_dropped_in_after_freeze": {
+      "all": 16
+    },
+    "n_clipped_out_after_freeze": {
+      "all": 5539,
+      "csi1000": 1000,
+      "csi300": 300,
+      "csi500": 500,
+      "csi800": 800,
+      "csiall": 5061
+    },
+    "n_natural_out_eq_freeze_before_clip": {},
+    "censoring_sentinel_is_unambiguous": true,
+    "dropped_rows_sample": [
+      {
+        "universe": "all",
+        "code": "920038.BJ",
+        "in_date": "2026-08-05",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "920059.BJ",
+        "in_date": "2026-08-19",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "920093.BJ",
+        "in_date": "2026-08-21",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "920107.BJ",
+        "in_date": "2026-08-17",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "920138.BJ",
+        "in_date": "2026-08-12",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "920165.BJ",
+        "in_date": "2026-08-11",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "920258.BJ",
+        "in_date": "2026-08-03",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "603468.SH",
+        "in_date": "2026-08-06",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "688826.SH",
+        "in_date": "2026-08-18",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "688828.SH",
+        "in_date": "2026-08-11",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "688835.SH",
+        "in_date": "2026-08-25",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "688836.SH",
+        "in_date": "2026-08-19",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "001232.SZ",
+        "in_date": "2026-08-04",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "301655.SZ",
+        "in_date": "2026-08-20",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "301707.SZ",
+        "in_date": "2026-08-07",
+        "out_date": "2026-08-26"
+      },
+      {
+        "universe": "all",
+        "code": "301717.SZ",
+        "in_date": "2026-08-11",
+        "out_date": "2026-08-26"
+      }
+    ]
+  },
+  "parse_diagnostics": {
+    "all": {
+      "source_file": "all.txt",
+      "n_lines_parsed": 6142,
+      "prefix_enumeration": {
+        "BJ": 588,
+        "SH": 2467,
+        "SZ": 3087
+      },
+      "n_unmapped": 0,
+      "unmapped": [],
+      "n_symbol_anomalies": 0,
+      "symbol_anomalies": [],
+      "n_bad_lines": 0,
+      "bad_lines": [],
+      "n_reversed_intervals": 0,
+      "reversed_intervals": []
+    },
+    "csi300": {
+      "source_file": "csi300.txt",
+      "n_lines_parsed": 16198,
+      "prefix_enumeration": {
+        "SH": 10305,
+        "SZ": 5893
+      },
+      "n_unmapped": 0,
+      "unmapped": [],
+      "n_symbol_anomalies": 7,
+      "symbol_anomalies": [
+        {
+          "line": 10299,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "line": 10300,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "line": 10301,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "line": 10302,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "line": 10303,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "line": 10304,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "line": 10305,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        }
+      ],
+      "n_bad_lines": 0,
+      "bad_lines": [],
+      "n_reversed_intervals": 0,
+      "reversed_intervals": []
+    },
+    "csi500": {
+      "source_file": "csi500.txt",
+      "n_lines_parsed": 22503,
+      "prefix_enumeration": {
+        "SH": 11971,
+        "SZ": 10532
+      },
+      "n_unmapped": 0,
+      "unmapped": [],
+      "n_symbol_anomalies": 0,
+      "symbol_anomalies": [],
+      "n_bad_lines": 0,
+      "bad_lines": [],
+      "n_reversed_intervals": 0,
+      "reversed_intervals": []
+    },
+    "csi800": {
+      "source_file": "csi800.txt",
+      "n_lines_parsed": 59207,
+      "prefix_enumeration": {
+        "SH": 34987,
+        "SZ": 24220
+      },
+      "n_unmapped": 0,
+      "unmapped": [],
+      "n_symbol_anomalies": 0,
+      "symbol_anomalies": [],
+      "n_bad_lines": 0,
+      "bad_lines": [],
+      "n_reversed_intervals": 0,
+      "reversed_intervals": []
+    },
+    "csi1000": {
+      "source_file": "csi1000.txt",
+      "n_lines_parsed": 33008,
+      "prefix_enumeration": {
+        "SH": 13136,
+        "SZ": 19872
+      },
+      "n_unmapped": 0,
+      "unmapped": [],
+      "n_symbol_anomalies": 0,
+      "symbol_anomalies": [],
+      "n_bad_lines": 0,
+      "bad_lines": [],
+      "n_reversed_intervals": 0,
+      "reversed_intervals": []
+    },
+    "csiall": {
+      "source_file": "csiall.txt",
+      "n_lines_parsed": 119178,
+      "prefix_enumeration": {
+        "BJ": 953,
+        "SH": 48754,
+        "SZ": 69471
+      },
+      "n_unmapped": 0,
+      "unmapped": [],
+      "n_symbol_anomalies": 0,
+      "symbol_anomalies": [],
+      "n_bad_lines": 0,
+      "bad_lines": [],
+      "n_reversed_intervals": 0,
+      "reversed_intervals": []
+    }
+  },
+  "per_universe": {
+    "all": {
+      "source_file": "all.txt",
+      "n_intervals": 6126,
+      "n_distinct_codes": 6126,
+      "in_date_min": "2000-01-04",
+      "in_date_max": "2026-07-30",
+      "out_date_min": "2001-04-13",
+      "out_date_max": "2026-07-31",
+      "n_codes_with_multiple_segments": 0,
+      "max_segments_per_code": 1,
+      "segments_per_code_hist": {
+        "1": 6126
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "430017.BJ",
+          "n_segments": 1
+        },
+        {
+          "code": "430047.BJ",
+          "n_segments": 1
+        },
+        {
+          "code": "430090.BJ",
+          "n_segments": 1
+        },
+        {
+          "code": "430139.BJ",
+          "n_segments": 1
+        },
+        {
+          "code": "430198.BJ",
+          "n_segments": 1
+        }
+      ],
+      "n_right_censored_at_freeze": 5539,
+      "exchange_hist": {
+        "BJ": 581,
+        "SH": 2462,
+        "SZ": 3083
+      }
+    },
+    "csi300": {
+      "source_file": "csi300.txt",
+      "n_intervals": 16198,
+      "n_distinct_codes": 949,
+      "in_date_min": "2005-04-08",
+      "in_date_max": "2026-06-30",
+      "out_date_min": "2005-06-30",
+      "out_date_max": "2026-07-31",
+      "n_codes_with_multiple_segments": 925,
+      "max_segments_per_code": 54,
+      "segments_per_code_hist": {
+        "1": 24,
+        "2": 50,
+        "3": 40,
+        "4": 69,
+        "5": 38,
+        "6": 36,
+        "7": 49,
+        "8": 26,
+        "9": 45,
+        "10": 32,
+        "11": 30,
+        "12": 20,
+        "13": 33,
+        "14": 35,
+        "15": 23,
+        "16": 21,
+        "17": 23,
+        "18": 17,
+        "19": 25,
+        "20": 20,
+        "21": 14,
+        "22": 17,
+        "23": 14,
+        "24": 12,
+        "25": 14,
+        "26": 15,
+        "27": 14,
+        "28": 5,
+        "29": 6,
+        "30": 7,
+        "31": 10,
+        "32": 14,
+        "33": 6,
+        "34": 12,
+        "35": 13,
+        "36": 6,
+        "37": 6,
+        "38": 6,
+        "39": 4,
+        "40": 5,
+        "41": 9,
+        "42": 5,
+        "43": 8,
+        "44": 6,
+        "45": 6,
+        "46": 6,
+        "47": 7,
+        "48": 2,
+        "49": 5,
+        "50": 2,
+        "51": 1,
+        "52": 2,
+        "53": 1,
+        "54": 33
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600000.SH",
+          "n_segments": 54
+        },
+        {
+          "code": "600009.SH",
+          "n_segments": 54
+        },
+        {
+          "code": "600010.SH",
+          "n_segments": 54
+        },
+        {
+          "code": "600015.SH",
+          "n_segments": 54
+        },
+        {
+          "code": "600016.SH",
+          "n_segments": 54
+        }
+      ],
+      "n_right_censored_at_freeze": 300,
+      "exchange_hist": {
+        "SH": 10305,
+        "SZ": 5893
+      }
+    },
+    "csi500": {
+      "source_file": "csi500.txt",
+      "n_intervals": 22503,
+      "n_distinct_codes": 1802,
+      "in_date_min": "2007-01-31",
+      "in_date_max": "2026-06-30",
+      "out_date_min": "2007-07-30",
+      "out_date_max": "2026-07-31",
+      "n_codes_with_multiple_segments": 1733,
+      "max_segments_per_code": 45,
+      "segments_per_code_hist": {
+        "1": 69,
+        "2": 97,
+        "3": 109,
+        "4": 113,
+        "5": 72,
+        "6": 88,
+        "7": 97,
+        "8": 87,
+        "9": 94,
+        "10": 88,
+        "11": 78,
+        "12": 46,
+        "13": 82,
+        "14": 71,
+        "15": 43,
+        "16": 61,
+        "17": 50,
+        "18": 47,
+        "19": 49,
+        "20": 35,
+        "21": 42,
+        "22": 33,
+        "23": 24,
+        "24": 16,
+        "25": 25,
+        "26": 27,
+        "27": 25,
+        "28": 15,
+        "29": 18,
+        "30": 10,
+        "31": 15,
+        "32": 11,
+        "33": 8,
+        "34": 9,
+        "35": 5,
+        "36": 5,
+        "37": 10,
+        "38": 6,
+        "39": 2,
+        "40": 2,
+        "41": 6,
+        "42": 2,
+        "43": 4,
+        "44": 4,
+        "45": 2
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600563.SH",
+          "n_segments": 45
+        },
+        {
+          "code": "000830.SZ",
+          "n_segments": 45
+        },
+        {
+          "code": "600580.SH",
+          "n_segments": 44
+        },
+        {
+          "code": "000513.SZ",
+          "n_segments": 44
+        },
+        {
+          "code": "000563.SZ",
+          "n_segments": 44
+        }
+      ],
+      "n_right_censored_at_freeze": 500,
+      "exchange_hist": {
+        "SH": 11971,
+        "SZ": 10532
+      }
+    },
+    "csi800": {
+      "source_file": "csi800.txt",
+      "n_intervals": 59207,
+      "n_distinct_codes": 2016,
+      "in_date_min": "2007-01-22",
+      "in_date_max": "2026-06-30",
+      "out_date_min": "2007-01-22",
+      "out_date_max": "2026-07-31",
+      "n_codes_with_multiple_segments": 1990,
+      "max_segments_per_code": 86,
+      "segments_per_code_hist": {
+        "1": 26,
+        "2": 52,
+        "3": 58,
+        "4": 57,
+        "5": 57,
+        "6": 52,
+        "7": 52,
+        "8": 65,
+        "9": 48,
+        "10": 57,
+        "11": 53,
+        "12": 32,
+        "13": 52,
+        "14": 37,
+        "15": 40,
+        "16": 43,
+        "17": 35,
+        "18": 38,
+        "19": 30,
+        "20": 56,
+        "21": 24,
+        "22": 27,
+        "23": 35,
+        "24": 28,
+        "25": 24,
+        "26": 27,
+        "27": 30,
+        "28": 20,
+        "29": 14,
+        "30": 17,
+        "31": 20,
+        "32": 26,
+        "33": 20,
+        "34": 31,
+        "35": 19,
+        "36": 21,
+        "37": 18,
+        "38": 20,
+        "39": 17,
+        "40": 21,
+        "41": 11,
+        "42": 13,
+        "43": 14,
+        "44": 24,
+        "45": 17,
+        "46": 28,
+        "47": 25,
+        "48": 12,
+        "49": 22,
+        "50": 16,
+        "51": 15,
+        "52": 17,
+        "53": 20,
+        "54": 16,
+        "55": 18,
+        "56": 14,
+        "57": 20,
+        "58": 18,
+        "59": 22,
+        "60": 19,
+        "61": 12,
+        "62": 9,
+        "63": 17,
+        "64": 18,
+        "65": 14,
+        "66": 17,
+        "67": 20,
+        "68": 16,
+        "69": 11,
+        "70": 15,
+        "71": 14,
+        "72": 17,
+        "73": 13,
+        "74": 13,
+        "75": 10,
+        "76": 12,
+        "77": 8,
+        "78": 3,
+        "79": 7,
+        "80": 4,
+        "81": 4,
+        "83": 1,
+        "86": 1
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600875.SH",
+          "n_segments": 86
+        },
+        {
+          "code": "000858.SZ",
+          "n_segments": 83
+        },
+        {
+          "code": "600029.SH",
+          "n_segments": 81
+        },
+        {
+          "code": "600795.SH",
+          "n_segments": 81
+        },
+        {
+          "code": "000063.SZ",
+          "n_segments": 81
+        }
+      ],
+      "n_right_censored_at_freeze": 800,
+      "exchange_hist": {
+        "SH": 34987,
+        "SZ": 24220
+      }
+    },
+    "csi1000": {
+      "source_file": "csi1000.txt",
+      "n_intervals": 33008,
+      "n_distinct_codes": 2803,
+      "in_date_min": "2014-10-31",
+      "in_date_max": "2026-06-30",
+      "out_date_min": "2015-05-28",
+      "out_date_max": "2026-07-31",
+      "n_codes_with_multiple_segments": 2668,
+      "max_segments_per_code": 33,
+      "segments_per_code_hist": {
+        "1": 135,
+        "2": 120,
+        "3": 180,
+        "4": 194,
+        "5": 115,
+        "6": 157,
+        "7": 187,
+        "8": 142,
+        "9": 146,
+        "10": 122,
+        "11": 113,
+        "12": 79,
+        "13": 103,
+        "14": 124,
+        "15": 107,
+        "16": 59,
+        "17": 73,
+        "18": 74,
+        "19": 70,
+        "20": 41,
+        "21": 48,
+        "22": 37,
+        "23": 47,
+        "24": 44,
+        "25": 36,
+        "26": 44,
+        "27": 30,
+        "28": 21,
+        "29": 25,
+        "30": 26,
+        "31": 18,
+        "32": 19,
+        "33": 67
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600057.SH",
+          "n_segments": 33
+        },
+        {
+          "code": "600063.SH",
+          "n_segments": 33
+        },
+        {
+          "code": "600116.SH",
+          "n_segments": 33
+        },
+        {
+          "code": "600185.SH",
+          "n_segments": 33
+        },
+        {
+          "code": "600206.SH",
+          "n_segments": 33
+        }
+      ],
+      "n_right_censored_at_freeze": 1000,
+      "exchange_hist": {
+        "SH": 13136,
+        "SZ": 19872
+      }
+    },
+    "csiall": {
+      "source_file": "csiall.txt",
+      "n_intervals": 119178,
+      "n_distinct_codes": 5718,
+      "in_date_min": "2011-08-31",
+      "in_date_max": "2026-05-29",
+      "out_date_min": "2012-01-30",
+      "out_date_max": "2026-07-31",
+      "n_codes_with_multiple_segments": 5716,
+      "max_segments_per_code": 35,
+      "segments_per_code_hist": {
+        "1": 2,
+        "2": 309,
+        "3": 44,
+        "4": 34,
+        "5": 133,
+        "6": 114,
+        "7": 173,
+        "8": 185,
+        "9": 181,
+        "10": 235,
+        "11": 265,
+        "12": 251,
+        "13": 132,
+        "14": 75,
+        "15": 79,
+        "16": 69,
+        "17": 88,
+        "18": 186,
+        "19": 246,
+        "20": 218,
+        "21": 98,
+        "22": 49,
+        "23": 169,
+        "24": 103,
+        "25": 30,
+        "26": 46,
+        "27": 81,
+        "28": 50,
+        "29": 80,
+        "30": 77,
+        "31": 68,
+        "32": 213,
+        "33": 110,
+        "34": 176,
+        "35": 1349
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600000.SH",
+          "n_segments": 35
+        },
+        {
+          "code": "600004.SH",
+          "n_segments": 35
+        },
+        {
+          "code": "600006.SH",
+          "n_segments": 35
+        },
+        {
+          "code": "600007.SH",
+          "n_segments": 35
+        },
+        {
+          "code": "600008.SH",
+          "n_segments": 35
+        }
+      ],
+      "n_right_censored_at_freeze": 5061,
+      "exchange_hist": {
+        "BJ": 953,
+        "SH": 48754,
+        "SZ": 69471
+      }
+    }
+  },
+  "per_universe_raw_before_freeze": {
+    "all": {
+      "source_file": "all.txt",
+      "n_intervals": 6142,
+      "n_distinct_codes": 6142,
+      "in_date_min": "2000-01-04",
+      "in_date_max": "2026-08-25",
+      "out_date_min": "2001-04-13",
+      "out_date_max": "2026-08-26",
+      "n_codes_with_multiple_segments": 0,
+      "max_segments_per_code": 1,
+      "segments_per_code_hist": {
+        "1": 6142
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "430017.BJ",
+          "n_segments": 1
+        },
+        {
+          "code": "430047.BJ",
+          "n_segments": 1
+        },
+        {
+          "code": "430090.BJ",
+          "n_segments": 1
+        },
+        {
+          "code": "430139.BJ",
+          "n_segments": 1
+        },
+        {
+          "code": "430198.BJ",
+          "n_segments": 1
+        }
+      ],
+      "n_right_censored_at_freeze": 0,
+      "exchange_hist": {
+        "BJ": 588,
+        "SH": 2467,
+        "SZ": 3087
+      }
+    },
+    "csi300": {
+      "source_file": "csi300.txt",
+      "n_intervals": 16198,
+      "n_distinct_codes": 949,
+      "in_date_min": "2005-04-08",
+      "in_date_max": "2026-06-30",
+      "out_date_min": "2005-06-30",
+      "out_date_max": "2026-08-26",
+      "n_codes_with_multiple_segments": 925,
+      "max_segments_per_code": 54,
+      "segments_per_code_hist": {
+        "1": 24,
+        "2": 50,
+        "3": 40,
+        "4": 69,
+        "5": 38,
+        "6": 36,
+        "7": 49,
+        "8": 26,
+        "9": 45,
+        "10": 32,
+        "11": 30,
+        "12": 20,
+        "13": 33,
+        "14": 35,
+        "15": 23,
+        "16": 21,
+        "17": 23,
+        "18": 17,
+        "19": 25,
+        "20": 20,
+        "21": 14,
+        "22": 17,
+        "23": 14,
+        "24": 12,
+        "25": 14,
+        "26": 15,
+        "27": 14,
+        "28": 5,
+        "29": 6,
+        "30": 7,
+        "31": 10,
+        "32": 14,
+        "33": 6,
+        "34": 12,
+        "35": 13,
+        "36": 6,
+        "37": 6,
+        "38": 6,
+        "39": 4,
+        "40": 5,
+        "41": 9,
+        "42": 5,
+        "43": 8,
+        "44": 6,
+        "45": 6,
+        "46": 6,
+        "47": 7,
+        "48": 2,
+        "49": 5,
+        "50": 2,
+        "51": 1,
+        "52": 2,
+        "53": 1,
+        "54": 33
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600000.SH",
+          "n_segments": 54
+        },
+        {
+          "code": "600009.SH",
+          "n_segments": 54
+        },
+        {
+          "code": "600010.SH",
+          "n_segments": 54
+        },
+        {
+          "code": "600015.SH",
+          "n_segments": 54
+        },
+        {
+          "code": "600016.SH",
+          "n_segments": 54
+        }
+      ],
+      "n_right_censored_at_freeze": 0,
+      "exchange_hist": {
+        "SH": 10305,
+        "SZ": 5893
+      }
+    },
+    "csi500": {
+      "source_file": "csi500.txt",
+      "n_intervals": 22503,
+      "n_distinct_codes": 1802,
+      "in_date_min": "2007-01-31",
+      "in_date_max": "2026-06-30",
+      "out_date_min": "2007-07-30",
+      "out_date_max": "2026-08-26",
+      "n_codes_with_multiple_segments": 1733,
+      "max_segments_per_code": 45,
+      "segments_per_code_hist": {
+        "1": 69,
+        "2": 97,
+        "3": 109,
+        "4": 113,
+        "5": 72,
+        "6": 88,
+        "7": 97,
+        "8": 87,
+        "9": 94,
+        "10": 88,
+        "11": 78,
+        "12": 46,
+        "13": 82,
+        "14": 71,
+        "15": 43,
+        "16": 61,
+        "17": 50,
+        "18": 47,
+        "19": 49,
+        "20": 35,
+        "21": 42,
+        "22": 33,
+        "23": 24,
+        "24": 16,
+        "25": 25,
+        "26": 27,
+        "27": 25,
+        "28": 15,
+        "29": 18,
+        "30": 10,
+        "31": 15,
+        "32": 11,
+        "33": 8,
+        "34": 9,
+        "35": 5,
+        "36": 5,
+        "37": 10,
+        "38": 6,
+        "39": 2,
+        "40": 2,
+        "41": 6,
+        "42": 2,
+        "43": 4,
+        "44": 4,
+        "45": 2
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600563.SH",
+          "n_segments": 45
+        },
+        {
+          "code": "000830.SZ",
+          "n_segments": 45
+        },
+        {
+          "code": "600580.SH",
+          "n_segments": 44
+        },
+        {
+          "code": "000513.SZ",
+          "n_segments": 44
+        },
+        {
+          "code": "000563.SZ",
+          "n_segments": 44
+        }
+      ],
+      "n_right_censored_at_freeze": 0,
+      "exchange_hist": {
+        "SH": 11971,
+        "SZ": 10532
+      }
+    },
+    "csi800": {
+      "source_file": "csi800.txt",
+      "n_intervals": 59207,
+      "n_distinct_codes": 2016,
+      "in_date_min": "2007-01-22",
+      "in_date_max": "2026-06-30",
+      "out_date_min": "2007-01-22",
+      "out_date_max": "2026-08-26",
+      "n_codes_with_multiple_segments": 1990,
+      "max_segments_per_code": 86,
+      "segments_per_code_hist": {
+        "1": 26,
+        "2": 52,
+        "3": 58,
+        "4": 57,
+        "5": 57,
+        "6": 52,
+        "7": 52,
+        "8": 65,
+        "9": 48,
+        "10": 57,
+        "11": 53,
+        "12": 32,
+        "13": 52,
+        "14": 37,
+        "15": 40,
+        "16": 43,
+        "17": 35,
+        "18": 38,
+        "19": 30,
+        "20": 56,
+        "21": 24,
+        "22": 27,
+        "23": 35,
+        "24": 28,
+        "25": 24,
+        "26": 27,
+        "27": 30,
+        "28": 20,
+        "29": 14,
+        "30": 17,
+        "31": 20,
+        "32": 26,
+        "33": 20,
+        "34": 31,
+        "35": 19,
+        "36": 21,
+        "37": 18,
+        "38": 20,
+        "39": 17,
+        "40": 21,
+        "41": 11,
+        "42": 13,
+        "43": 14,
+        "44": 24,
+        "45": 17,
+        "46": 28,
+        "47": 25,
+        "48": 12,
+        "49": 22,
+        "50": 16,
+        "51": 15,
+        "52": 17,
+        "53": 20,
+        "54": 16,
+        "55": 18,
+        "56": 14,
+        "57": 20,
+        "58": 18,
+        "59": 22,
+        "60": 19,
+        "61": 12,
+        "62": 9,
+        "63": 17,
+        "64": 18,
+        "65": 14,
+        "66": 17,
+        "67": 20,
+        "68": 16,
+        "69": 11,
+        "70": 15,
+        "71": 14,
+        "72": 17,
+        "73": 13,
+        "74": 13,
+        "75": 10,
+        "76": 12,
+        "77": 8,
+        "78": 3,
+        "79": 7,
+        "80": 4,
+        "81": 4,
+        "83": 1,
+        "86": 1
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600875.SH",
+          "n_segments": 86
+        },
+        {
+          "code": "000858.SZ",
+          "n_segments": 83
+        },
+        {
+          "code": "600029.SH",
+          "n_segments": 81
+        },
+        {
+          "code": "600795.SH",
+          "n_segments": 81
+        },
+        {
+          "code": "000063.SZ",
+          "n_segments": 81
+        }
+      ],
+      "n_right_censored_at_freeze": 0,
+      "exchange_hist": {
+        "SH": 34987,
+        "SZ": 24220
+      }
+    },
+    "csi1000": {
+      "source_file": "csi1000.txt",
+      "n_intervals": 33008,
+      "n_distinct_codes": 2803,
+      "in_date_min": "2014-10-31",
+      "in_date_max": "2026-06-30",
+      "out_date_min": "2015-05-28",
+      "out_date_max": "2026-08-26",
+      "n_codes_with_multiple_segments": 2668,
+      "max_segments_per_code": 33,
+      "segments_per_code_hist": {
+        "1": 135,
+        "2": 120,
+        "3": 180,
+        "4": 194,
+        "5": 115,
+        "6": 157,
+        "7": 187,
+        "8": 142,
+        "9": 146,
+        "10": 122,
+        "11": 113,
+        "12": 79,
+        "13": 103,
+        "14": 124,
+        "15": 107,
+        "16": 59,
+        "17": 73,
+        "18": 74,
+        "19": 70,
+        "20": 41,
+        "21": 48,
+        "22": 37,
+        "23": 47,
+        "24": 44,
+        "25": 36,
+        "26": 44,
+        "27": 30,
+        "28": 21,
+        "29": 25,
+        "30": 26,
+        "31": 18,
+        "32": 19,
+        "33": 67
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600057.SH",
+          "n_segments": 33
+        },
+        {
+          "code": "600063.SH",
+          "n_segments": 33
+        },
+        {
+          "code": "600116.SH",
+          "n_segments": 33
+        },
+        {
+          "code": "600185.SH",
+          "n_segments": 33
+        },
+        {
+          "code": "600206.SH",
+          "n_segments": 33
+        }
+      ],
+      "n_right_censored_at_freeze": 0,
+      "exchange_hist": {
+        "SH": 13136,
+        "SZ": 19872
+      }
+    },
+    "csiall": {
+      "source_file": "csiall.txt",
+      "n_intervals": 119178,
+      "n_distinct_codes": 5718,
+      "in_date_min": "2011-08-31",
+      "in_date_max": "2026-05-29",
+      "out_date_min": "2012-01-30",
+      "out_date_max": "2026-08-26",
+      "n_codes_with_multiple_segments": 5716,
+      "max_segments_per_code": 35,
+      "segments_per_code_hist": {
+        "1": 2,
+        "2": 309,
+        "3": 44,
+        "4": 34,
+        "5": 133,
+        "6": 114,
+        "7": 173,
+        "8": 185,
+        "9": 181,
+        "10": 235,
+        "11": 265,
+        "12": 251,
+        "13": 132,
+        "14": 75,
+        "15": 79,
+        "16": 69,
+        "17": 88,
+        "18": 186,
+        "19": 246,
+        "20": 218,
+        "21": 98,
+        "22": 49,
+        "23": 169,
+        "24": 103,
+        "25": 30,
+        "26": 46,
+        "27": 81,
+        "28": 50,
+        "29": 80,
+        "30": 77,
+        "31": 68,
+        "32": 213,
+        "33": 110,
+        "34": 176,
+        "35": 1349
+      },
+      "top_codes_by_segments": [
+        {
+          "code": "600000.SH",
+          "n_segments": 35
+        },
+        {
+          "code": "600004.SH",
+          "n_segments": 35
+        },
+        {
+          "code": "600006.SH",
+          "n_segments": 35
+        },
+        {
+          "code": "600007.SH",
+          "n_segments": 35
+        },
+        {
+          "code": "600008.SH",
+          "n_segments": 35
+        }
+      ],
+      "n_right_censored_at_freeze": 0,
+      "exchange_hist": {
+        "BJ": 953,
+        "SH": 48754,
+        "SZ": 69471
+      }
+    }
+  },
+  "epoch_structure": {
+    "_note": "只统计 csi*;all.txt 是每票一段上市区间,不存在 epoch 结构,对它做 (in,out) 分组没有含义。",
+    "csi300": {
+      "n_epochs": 54,
+      "modal_member_count": 300,
+      "member_count_hist": {
+        "298": 1,
+        "300": 53
+      },
+      "n_off_modal_epochs": 1,
+      "off_modal_epochs": [
+        {
+          "in": "2009-12-29",
+          "out": "2010-01-03",
+          "n_members": 298
+        }
+      ]
+    },
+    "csi500": {
+      "n_epochs": 45,
+      "modal_member_count": 500,
+      "member_count_hist": {
+        "500": 42,
+        "501": 3
+      },
+      "n_off_modal_epochs": 3,
+      "off_modal_epochs": [
+        {
+          "in": "2023-12-29",
+          "out": "2024-06-27",
+          "n_members": 501
+        },
+        {
+          "in": "2024-06-28",
+          "out": "2024-12-30",
+          "n_members": 501
+        },
+        {
+          "in": "2024-12-31",
+          "out": "2025-06-29",
+          "n_members": 501
+        }
+      ]
+    },
+    "csi800": {
+      "n_epochs": 152,
+      "modal_member_count": 200,
+      "member_count_hist": {
+        "200": 103,
+        "204": 1,
+        "800": 45,
+        "801": 3
+      },
+      "n_off_modal_epochs": 49,
+      "off_modal_epochs": [
+        {
+          "in": "2007-01-23",
+          "out": "2007-02-05",
+          "n_members": 800
+        },
+        {
+          "in": "2007-07-06",
+          "out": "2007-07-18",
+          "n_members": 800
+        },
+        {
+          "in": "2008-01-03",
+          "out": "2008-01-16",
+          "n_members": 800
+        },
+        {
+          "in": "2008-03-18",
+          "out": "2008-03-30",
+          "n_members": 800
+        },
+        {
+          "in": "2008-07-01",
+          "out": "2008-07-14",
+          "n_members": 800
+        },
+        {
+          "in": "2009-01-12",
+          "out": "2009-02-09",
+          "n_members": 800
+        },
+        {
+          "in": "2009-05-12",
+          "out": "2009-05-21",
+          "n_members": 800
+        },
+        {
+          "in": "2009-07-01",
+          "out": "2009-07-08",
+          "n_members": 800
+        },
+        {
+          "in": "2009-12-22",
+          "out": "2010-01-05",
+          "n_members": 204
+        },
+        {
+          "in": "2010-01-07",
+          "out": "2010-01-20",
+          "n_members": 800
+        },
+        {
+          "in": "2010-07-06",
+          "out": "2010-07-19",
+          "n_members": 800
+        },
+        {
+          "in": "2011-01-04",
+          "out": "2011-01-13",
+          "n_members": 800
+        },
+        {
+          "in": "2011-07-01",
+          "out": "2011-07-13",
+          "n_members": 800
+        },
+        {
+          "in": "2012-01-31",
+          "out": "2012-03-29",
+          "n_members": 800
+        },
+        {
+          "in": "2012-03-30",
+          "out": "2012-07-30",
+          "n_members": 800
+        },
+        {
+          "in": "2012-07-31",
+          "out": "2013-01-30",
+          "n_members": 800
+        },
+        {
+          "in": "2013-01-31",
+          "out": "2013-04-25",
+          "n_members": 800
+        },
+        {
+          "in": "2013-04-26",
+          "out": "2013-07-30",
+          "n_members": 800
+        },
+        {
+          "in": "2013-07-31",
+          "out": "2013-09-29",
+          "n_members": 800
+        },
+        {
+          "in": "2013-09-30",
+          "out": "2013-12-30",
+          "n_members": 800
+        },
+        {
+          "in": "2013-12-31",
+          "out": "2014-06-29",
+          "n_members": 800
+        },
+        {
+          "in": "2014-06-30",
+          "out": "2014-12-30",
+          "n_members": 800
+        },
+        {
+          "in": "2014-12-31",
+          "out": "2015-01-29",
+          "n_members": 800
+        },
+        {
+          "in": "2015-01-30",
+          "out": "2015-06-29",
+          "n_members": 800
+        },
+        {
+          "in": "2015-06-30",
+          "out": "2015-12-30",
+          "n_members": 800
+        },
+        {
+          "in": "2015-12-31",
+          "out": "2016-06-29",
+          "n_members": 800
+        },
+        {
+          "in": "2016-06-30",
+          "out": "2016-12-29",
+          "n_members": 800
+        },
+        {
+          "in": "2016-12-30",
+          "out": "2017-01-25",
+          "n_members": 800
+        },
+        {
+          "in": "2017-01-26",
+          "out": "2017-06-29",
+          "n_members": 800
+        },
+        {
+          "in": "2017-06-30",
+          "out": "2017-12-28",
+          "n_members": 800
+        },
+        {
+          "in": "2017-12-29",
+          "out": "2018-06-28",
+          "n_members": 800
+        },
+        {
+          "in": "2018-06-29",
+          "out": "2018-12-27",
+          "n_members": 800
+        },
+        {
+          "in": "2018-12-28",
+          "out": "2019-06-27",
+          "n_members": 800
+        },
+        {
+          "in": "2019-06-28",
+          "out": "2019-12-30",
+          "n_members": 800
+        },
+        {
+          "in": "2019-12-31",
+          "out": "2020-06-29",
+          "n_members": 800
+        },
+        {
+          "in": "2020-06-30",
+          "out": "2020-12-30",
+          "n_members": 800
+        },
+        {
+          "in": "2020-12-31",
+          "out": "2021-03-30",
+          "n_members": 800
+        },
+        {
+          "in": "2021-03-31",
+          "out": "2021-06-29",
+          "n_members": 800
+        },
+        {
+          "in": "2021-06-30",
+          "out": "2021-12-30",
+          "n_members": 800
+        },
+        {
+          "in": "2021-12-31",
+          "out": "2022-06-29",
+          "n_members": 800
+        }
+      ]
+    },
+    "csi1000": {
+      "n_epochs": 34,
+      "modal_member_count": 1000,
+      "member_count_hist": {
+        "3": 1,
+        "1000": 29,
+        "1001": 3,
+        "1002": 1
+      },
+      "n_off_modal_epochs": 5,
+      "off_modal_epochs": [
+        {
+          "in": "2014-10-31",
+          "out": "2015-05-28",
+          "n_members": 3
+        },
+        {
+          "in": "2015-05-29",
+          "out": "2015-06-29",
+          "n_members": 1002
+        },
+        {
+          "in": "2022-12-30",
+          "out": "2023-06-29",
+          "n_members": 1001
+        },
+        {
+          "in": "2023-06-30",
+          "out": "2023-07-30",
+          "n_members": 1001
+        },
+        {
+          "in": "2023-07-31",
+          "out": "2023-12-28",
+          "n_members": 1001
+        }
+      ]
+    },
+    "csiall": {
+      "n_epochs": 35,
+      "modal_member_count": 2479,
+      "member_count_hist": {
+        "1881": 1,
+        "2057": 1,
+        "2151": 1,
+        "2289": 1,
+        "2290": 1,
+        "2342": 1,
+        "2343": 1,
+        "2405": 1,
+        "2421": 1,
+        "2479": 2,
+        "2526": 1,
+        "2701": 1,
+        "2724": 1,
+        "2807": 1,
+        "2965": 1,
+        "3228": 1,
+        "3352": 1,
+        "3402": 1,
+        "3415": 1,
+        "3435": 1,
+        "3471": 1,
+        "3586": 1,
+        "3765": 1,
+        "4098": 1,
+        "4281": 1,
+        "4500": 1,
+        "4631": 1,
+        "4895": 1,
+        "4946": 1,
+        "4961": 1,
+        "5058": 1,
+        "5061": 1,
+        "5062": 1,
+        "5171": 1
+      },
+      "n_off_modal_epochs": 33,
+      "off_modal_epochs": [
+        {
+          "in": "2011-08-31",
+          "out": "2012-01-30",
+          "n_members": 1881
+        },
+        {
+          "in": "2012-01-31",
+          "out": "2012-07-30",
+          "n_members": 2057
+        },
+        {
+          "in": "2012-07-31",
+          "out": "2013-01-30",
+          "n_members": 2151
+        },
+        {
+          "in": "2013-01-31",
+          "out": "2013-04-25",
+          "n_members": 2290
+        },
+        {
+          "in": "2013-04-26",
+          "out": "2013-07-30",
+          "n_members": 2289
+        },
+        {
+          "in": "2013-07-31",
+          "out": "2013-09-29",
+          "n_members": 2343
+        },
+        {
+          "in": "2013-09-30",
+          "out": "2013-12-30",
+          "n_members": 2342
+        },
+        {
+          "in": "2013-12-31",
+          "out": "2014-06-29",
+          "n_members": 2405
+        },
+        {
+          "in": "2014-06-30",
+          "out": "2014-12-30",
+          "n_members": 2421
+        },
+        {
+          "in": "2015-06-30",
+          "out": "2015-12-30",
+          "n_members": 2526
+        },
+        {
+          "in": "2015-12-31",
+          "out": "2016-06-29",
+          "n_members": 2724
+        },
+        {
+          "in": "2016-06-30",
+          "out": "2016-12-29",
+          "n_members": 2701
+        },
+        {
+          "in": "2016-12-30",
+          "out": "2017-06-29",
+          "n_members": 2807
+        },
+        {
+          "in": "2017-06-30",
+          "out": "2017-12-28",
+          "n_members": 2965
+        },
+        {
+          "in": "2017-12-29",
+          "out": "2018-06-28",
+          "n_members": 3228
+        },
+        {
+          "in": "2018-06-29",
+          "out": "2018-12-27",
+          "n_members": 3352
+        },
+        {
+          "in": "2018-12-28",
+          "out": "2019-07-30",
+          "n_members": 3435
+        },
+        {
+          "in": "2019-07-31",
+          "out": "2019-12-30",
+          "n_members": 3402
+        },
+        {
+          "in": "2019-12-31",
+          "out": "2020-07-30",
+          "n_members": 3471
+        },
+        {
+          "in": "2020-07-31",
+          "out": "2020-12-30",
+          "n_members": 3415
+        },
+        {
+          "in": "2020-12-31",
+          "out": "2021-06-29",
+          "n_members": 3586
+        },
+        {
+          "in": "2021-06-30",
+          "out": "2021-12-30",
+          "n_members": 3765
+        },
+        {
+          "in": "2021-12-31",
+          "out": "2022-06-29",
+          "n_members": 4098
+        },
+        {
+          "in": "2022-06-30",
+          "out": "2022-12-29",
+          "n_members": 4281
+        },
+        {
+          "in": "2022-12-30",
+          "out": "2023-06-29",
+          "n_members": 4500
+        },
+        {
+          "in": "2023-06-30",
+          "out": "2023-12-28",
+          "n_members": 4631
+        },
+        {
+          "in": "2023-12-29",
+          "out": "2024-06-27",
+          "n_members": 4895
+        },
+        {
+          "in": "2024-06-28",
+          "out": "2024-12-30",
+          "n_members": 4946
+        },
+        {
+          "in": "2024-12-31",
+          "out": "2025-03-30",
+          "n_members": 5062
+        },
+        {
+          "in": "2025-03-31",
+          "out": "2025-05-29",
+          "n_members": 5058
+        },
+        {
+          "in": "2025-05-30",
+          "out": "2025-12-30",
+          "n_members": 4961
+        },
+        {
+          "in": "2025-12-31",
+          "out": "2026-05-28",
+          "n_members": 5171
+        },
+        {
+          "in": "2026-05-29",
+          "out": "2026-08-26",
+          "n_members": 5061
+        }
+      ]
+    }
+  },
+  "evidence_structural": {
+    "qlib_calendar": {
+      "path_relative_to_release": "calendars/day.txt",
+      "n_trading_days": 6458
+    },
+    "weekday_legend": "0=周一 … 4=周五 5=周六 6=周日",
+    "reading": "in_date 100% 是交易日且从不落在周末;out_date 大量落在周日(6)与节假日 —— 说明 out_date 是 `下一段 in_date - 1 日历天` 的纯日历减法结果,区间右端是**闭**的日历日,不是交易日。",
+    "per_universe": {
+      "all": {
+        "n_rows": 6142,
+        "in_date_is_trading_day": 6142,
+        "in_date_trading_day_ratio": 1.0,
+        "out_date_is_trading_day": 6142,
+        "out_date_trading_day_ratio": 1.0,
+        "in_weekday_hist": {
+          "0": 786,
+          "1": 1953,
+          "2": 1012,
+          "3": 1241,
+          "4": 1150
+        },
+        "out_weekday_hist": {
+          "0": 62,
+          "1": 294,
+          "2": 5631,
+          "3": 74,
+          "4": 81
+        },
+        "consecutive_segment_pairs": 0,
+        "pairs_with_gap_eq_1_calendar_day": 0,
+        "of_which_out_date_is_a_trading_day": 0,
+        "n_overlapping_pairs": 0,
+        "overlap_examples": []
+      },
+      "csi300": {
+        "n_rows": 16198,
+        "in_date_is_trading_day": 16198,
+        "in_date_trading_day_ratio": 1.0,
+        "out_date_is_trading_day": 11100,
+        "out_date_trading_day_ratio": 0.68527,
+        "in_weekday_hist": {
+          "0": 3300,
+          "1": 3298,
+          "2": 2400,
+          "3": 1800,
+          "4": 5400
+        },
+        "out_weekday_hist": {
+          "0": 3300,
+          "1": 2400,
+          "2": 2100,
+          "3": 5100,
+          "6": 3298
+        },
+        "consecutive_segment_pairs": 15249,
+        "pairs_with_gap_eq_1_calendar_day": 14973,
+        "of_which_out_date_is_a_trading_day": 10189,
+        "n_overlapping_pairs": 0,
+        "overlap_examples": []
+      },
+      "csi500": {
+        "n_rows": 22503,
+        "in_date_is_trading_day": 22503,
+        "in_date_trading_day_ratio": 1.0,
+        "out_date_is_trading_day": 20502,
+        "out_date_trading_day_ratio": 0.911079,
+        "in_weekday_hist": {
+          "0": 1500,
+          "1": 5001,
+          "2": 4000,
+          "3": 4500,
+          "4": 7502
+        },
+        "out_weekday_hist": {
+          "0": 5001,
+          "1": 3500,
+          "2": 5000,
+          "3": 7501,
+          "6": 1501
+        },
+        "consecutive_segment_pairs": 20701,
+        "pairs_with_gap_eq_1_calendar_day": 20037,
+        "of_which_out_date_is_a_trading_day": 18238,
+        "n_overlapping_pairs": 0,
+        "overlap_examples": []
+      },
+      "csi800": {
+        "n_rows": 59207,
+        "in_date_is_trading_day": 59207,
+        "in_date_trading_day_ratio": 1.0,
+        "out_date_is_trading_day": 52206,
+        "out_date_trading_day_ratio": 0.881754,
+        "in_weekday_hist": {
+          "0": 6600,
+          "1": 14605,
+          "2": 8200,
+          "3": 14400,
+          "4": 15402
+        },
+        "out_weekday_hist": {
+          "0": 12801,
+          "1": 7604,
+          "2": 17000,
+          "3": 15401,
+          "6": 6401
+        },
+        "consecutive_segment_pairs": 57191,
+        "pairs_with_gap_eq_1_calendar_day": 35912,
+        "of_which_out_date_is_a_trading_day": 32199,
+        "n_overlapping_pairs": 0,
+        "overlap_examples": []
+      },
+      "csi1000": {
+        "n_rows": 33008,
+        "in_date_is_trading_day": 33008,
+        "in_date_trading_day_ratio": 1.0,
+        "out_date_is_trading_day": 28007,
+        "out_date_trading_day_ratio": 0.848491,
+        "in_weekday_hist": {
+          "0": 5001,
+          "1": 5000,
+          "2": 2000,
+          "3": 4000,
+          "4": 17007
+        },
+        "out_weekday_hist": {
+          "0": 5002,
+          "1": 2000,
+          "2": 5000,
+          "3": 16005,
+          "6": 5001
+        },
+        "consecutive_segment_pairs": 30205,
+        "pairs_with_gap_eq_1_calendar_day": 29659,
+        "of_which_out_date_is_a_trading_day": 24767,
+        "n_overlapping_pairs": 0,
+        "overlap_examples": []
+      },
+      "csiall": {
+        "n_rows": 119178,
+        "in_date_is_trading_day": 119178,
+        "in_date_trading_day_ratio": 1.0,
+        "out_date_is_trading_day": 109368,
+        "out_date_trading_day_ratio": 0.917686,
+        "in_weekday_hist": {
+          "0": 9821,
+          "1": 17672,
+          "2": 19041,
+          "3": 15582,
+          "4": 57062
+        },
+        "out_weekday_hist": {
+          "0": 17107,
+          "1": 16692,
+          "2": 19975,
+          "3": 55594,
+          "6": 9810
+        },
+        "consecutive_segment_pairs": 113460,
+        "pairs_with_gap_eq_1_calendar_day": 112906,
+        "of_which_out_date_is_a_trading_day": 103138,
+        "n_overlapping_pairs": 0,
+        "overlap_examples": []
+      }
+    }
+  },
+  "lake_resolution": {
+    "lake_stock_basic_n_codes": 5890,
+    "per_universe": {
+      "all": {
+        "n_codes": 6142,
+        "n_unresolved_in_lake": 258,
+        "by_class": {
+          "a_share_absent_from_lake_stock_basic": 4,
+          "bj_pre2025_migration_code": 248,
+          "index_instrument_not_a_stock": 6
+        },
+        "unresolved_excluding_bj_migration": [
+          "000022.SZ",
+          "000043.SZ",
+          "000300.SH",
+          "000852.SH",
+          "000905.SH",
+          "000906.SH",
+          "000985.SH",
+          "300114.SZ",
+          "399300.SZ",
+          "601313.SH"
+        ],
+        "bj_pre2025_migration_sample": [
+          "430017.BJ",
+          "430047.BJ",
+          "430090.BJ",
+          "430139.BJ",
+          "430198.BJ",
+          "430300.BJ",
+          "430418.BJ",
+          "430425.BJ",
+          "430476.BJ",
+          "430478.BJ"
+        ]
+      },
+      "csi300": {
+        "n_codes": 949,
+        "n_unresolved_in_lake": 2,
+        "by_class": {
+          "a_share_absent_from_lake_stock_basic": 1,
+          "nonstandard_symbol": 1
+        },
+        "unresolved_excluding_bj_migration": [
+          "000022.SZ",
+          "T00018.SH"
+        ],
+        "bj_pre2025_migration_sample": []
+      },
+      "csi500": {
+        "n_codes": 1802,
+        "n_unresolved_in_lake": 3,
+        "by_class": {
+          "a_share_absent_from_lake_stock_basic": 3
+        },
+        "unresolved_excluding_bj_migration": [
+          "000022.SZ",
+          "000043.SZ",
+          "300114.SZ"
+        ],
+        "bj_pre2025_migration_sample": []
+      },
+      "csi800": {
+        "n_codes": 2016,
+        "n_unresolved_in_lake": 3,
+        "by_class": {
+          "a_share_absent_from_lake_stock_basic": 3
+        },
+        "unresolved_excluding_bj_migration": [
+          "000022.SZ",
+          "000043.SZ",
+          "300114.SZ"
+        ],
+        "bj_pre2025_migration_sample": []
+      },
+      "csi1000": {
+        "n_codes": 2803,
+        "n_unresolved_in_lake": 4,
+        "by_class": {
+          "a_share_absent_from_lake_stock_basic": 4
+        },
+        "unresolved_excluding_bj_migration": [
+          "000022.SZ",
+          "000043.SZ",
+          "300114.SZ",
+          "601313.SH"
+        ],
+        "bj_pre2025_migration_sample": []
+      },
+      "csiall": {
+        "n_codes": 5718,
+        "n_unresolved_in_lake": 125,
+        "by_class": {
+          "a_share_absent_from_lake_stock_basic": 4,
+          "bj_pre2025_migration_code": 121
+        },
+        "unresolved_excluding_bj_migration": [
+          "000022.SZ",
+          "000043.SZ",
+          "300114.SZ",
+          "601313.SH"
+        ],
+        "bj_pre2025_migration_sample": [
+          "430047.BJ",
+          "430090.BJ",
+          "430139.BJ",
+          "430198.BJ",
+          "430418.BJ",
+          "430476.BJ",
+          "430489.BJ",
+          "430510.BJ",
+          "430564.BJ",
+          "430685.BJ"
+        ]
+      }
+    }
+  },
+  "totals": {
+    "n_intervals": 256220,
+    "n_intervals_before_freeze": 256236,
+    "n_distinct_codes_union": 6127
+  },
+  "evidence_lake_crosscheck": {
+    "caveat": "湖 index_weight 与 qlib 发布同宗(上游都是 Tushare,见 SOURCE.txt),本项验的是区间开闭约定,不构成对数据本身的独立验证。",
+    "per_universe": {
+      "csi300": {
+        "lake_index_code": "000300.SH",
+        "n_snapshot_dates": 211,
+        "snapshot_date_range": [
+          "20090123",
+          "20260731"
+        ],
+        "closed_total_symmetric_diff": 42,
+        "halfopen_total_symmetric_diff": 942,
+        "n_snapshots_exactly_matched_by_closed": 190,
+        "n_discriminating_dates": 3,
+        "discriminating_dates": [
+          {
+            "snapshot_date": "2009-06-30",
+            "lake_members": 300,
+            "closed_members": 300,
+            "closed_symmetric_diff": 0,
+            "halfopen_members": 0,
+            "halfopen_symmetric_diff": 300
+          },
+          {
+            "snapshot_date": "2010-06-30",
+            "lake_members": 300,
+            "closed_members": 300,
+            "closed_symmetric_diff": 0,
+            "halfopen_members": 0,
+            "halfopen_symmetric_diff": 300
+          },
+          {
+            "snapshot_date": "2011-06-30",
+            "lake_members": 300,
+            "closed_members": 300,
+            "closed_symmetric_diff": 0,
+            "halfopen_members": 0,
+            "halfopen_symmetric_diff": 300
+          }
+        ],
+        "discriminating_note": "快照日恰好落在某条 out_date 上时,闭区间给出完整名单、半开区间给出空集 —— 这是开闭之争的判决性证据。"
+      },
+      "csi500": {
+        "lake_index_code": "000905.SH",
+        "n_snapshot_dates": 211,
+        "snapshot_date_range": [
+          "20090123",
+          "20260731"
+        ],
+        "closed_total_symmetric_diff": 144,
+        "halfopen_total_symmetric_diff": 1636,
+        "n_snapshots_exactly_matched_by_closed": 143,
+        "n_discriminating_dates": 3,
+        "discriminating_dates": [
+          {
+            "snapshot_date": "2009-06-30",
+            "lake_members": 500,
+            "closed_members": 500,
+            "closed_symmetric_diff": 2,
+            "halfopen_members": 0,
+            "halfopen_symmetric_diff": 500
+          },
+          {
+            "snapshot_date": "2010-06-30",
+            "lake_members": 500,
+            "closed_members": 500,
+            "closed_symmetric_diff": 4,
+            "halfopen_members": 0,
+            "halfopen_symmetric_diff": 500
+          },
+          {
+            "snapshot_date": "2011-06-30",
+            "lake_members": 500,
+            "closed_members": 500,
+            "closed_symmetric_diff": 2,
+            "halfopen_members": 0,
+            "halfopen_symmetric_diff": 500
+          }
+        ],
+        "discriminating_note": "快照日恰好落在某条 out_date 上时,闭区间给出完整名单、半开区间给出空集 —— 这是开闭之争的判决性证据。"
+      },
+      "csi1000": {
+        "lake_index_code": "000852.SH",
+        "n_snapshot_dates": 142,
+        "snapshot_date_range": [
+          "20141031",
+          "20260731"
+        ],
+        "closed_total_symmetric_diff": 7513,
+        "halfopen_total_symmetric_diff": 7513,
+        "n_snapshots_exactly_matched_by_closed": 20,
+        "n_discriminating_dates": 0,
+        "discriminating_dates": [],
+        "discriminating_note": "快照日恰好落在某条 out_date 上时,闭区间给出完整名单、半开区间给出空集 —— 这是开闭之争的判决性证据。"
+      }
+    }
+  },
+  "evidence_named_case": {
+    "index": "000300.SH (csi300)",
+    "effective_date_of_change": "2026-06-30",
+    "qlib_out_date_of_leavers": "2026-06-29",
+    "lake_snapshot_before": "20260529",
+    "lake_snapshot_after": "20260630",
+    "n_leavers": 19,
+    "n_joiners": 19,
+    "leavers": [
+      "000661.SZ",
+      "000786.SZ",
+      "000876.SZ",
+      "000983.SZ",
+      "002252.SZ",
+      "002459.SZ",
+      "002601.SZ",
+      "300347.SZ",
+      "300759.SZ",
+      "300782.SZ",
+      "300979.SZ",
+      "600161.SH",
+      "600377.SH",
+      "601236.SH",
+      "601298.SH",
+      "601808.SH",
+      "603195.SH",
+      "688169.SH",
+      "688187.SH"
+    ],
+    "joiners": [
+      "000657.SZ",
+      "000988.SZ",
+      "001280.SZ",
+      "002202.SZ",
+      "002353.SZ",
+      "002532.SZ",
+      "002558.SZ",
+      "002602.SZ",
+      "002837.SZ",
+      "300450.SZ",
+      "301165.SZ",
+      "301308.SZ",
+      "600118.SH",
+      "600221.SH",
+      "600549.SH",
+      "601727.SH",
+      "688072.SH",
+      "688183.SH",
+      "688521.SH"
+    ],
+    "leavers_present_in_snapshot_before": [
+      "000661.SZ",
+      "000786.SZ",
+      "000876.SZ",
+      "000983.SZ",
+      "002252.SZ",
+      "002459.SZ",
+      "002601.SZ",
+      "300347.SZ",
+      "300759.SZ",
+      "300782.SZ",
+      "300979.SZ",
+      "600161.SH",
+      "600377.SH",
+      "601236.SH",
+      "601298.SH",
+      "601808.SH",
+      "603195.SH",
+      "688169.SH",
+      "688187.SH"
+    ],
+    "leavers_present_in_snapshot_after": [],
+    "joiners_present_in_snapshot_before": [],
+    "joiners_present_in_snapshot_after": [
+      "000657.SZ",
+      "000988.SZ",
+      "001280.SZ",
+      "002202.SZ",
+      "002353.SZ",
+      "002532.SZ",
+      "002558.SZ",
+      "002602.SZ",
+      "002837.SZ",
+      "300450.SZ",
+      "301165.SZ",
+      "301308.SZ",
+      "600118.SH",
+      "600221.SH",
+      "600549.SH",
+      "601727.SH",
+      "688072.SH",
+      "688183.SH",
+      "688521.SH"
+    ],
+    "names": {
+      "000661.SZ": "长春高新",
+      "000786.SZ": "北新建材",
+      "000876.SZ": "新希望",
+      "000983.SZ": "山西焦煤",
+      "002252.SZ": "上海莱士",
+      "002459.SZ": "晶澳科技",
+      "002601.SZ": "龙佰集团",
+      "300347.SZ": "泰格医药",
+      "300759.SZ": "康龙化成",
+      "300782.SZ": "卓胜微",
+      "300979.SZ": "华利集团",
+      "600161.SH": "天坛生物",
+      "600377.SH": "宁沪高速",
+      "601236.SH": "红塔证券",
+      "601298.SH": "青岛港",
+      "601808.SH": "中海油服",
+      "603195.SH": "公牛集团",
+      "688169.SH": "石头科技",
+      "688187.SH": "时代电气",
+      "000657.SZ": "中钨高新",
+      "000988.SZ": "华工科技",
+      "001280.SZ": "中国铀业",
+      "002202.SZ": "金风科技",
+      "002353.SZ": "杰瑞股份",
+      "002532.SZ": "天山铝业",
+      "002558.SZ": "巨人网络",
+      "002602.SZ": "世纪华通",
+      "002837.SZ": "英维克",
+      "300450.SZ": "先导智能",
+      "301165.SZ": "锐捷网络",
+      "301308.SZ": "江波龙",
+      "600118.SH": "中国卫星",
+      "600221.SH": "海航控股",
+      "600549.SH": "厦门钨业",
+      "601727.SH": "上海电气",
+      "688072.SH": "拓荆科技",
+      "688183.SH": "生益电子",
+      "688521.SH": "芯原股份"
+    },
+    "verdict": "调出者在 out_date 之前的快照里全部在册、在 in_date 当天的快照里全部不在;调入者恰好相反。=> in_date 是生效日(当天已在成分内),out_date 是最后一个仍在成分内的日历日(闭区间),退出生效日 = out_date + 1 天。"
+  },
+  "known_data_hazards": [
+    {
+      "id": "B-01",
+      "severity": "high",
+      "what": "csi1000 在 2015-05-29 之前只有 3 个成分",
+      "detail": "首个 epoch [2014-10-31, 2015-05-28] 只有 3 个成员(应为 1000),上游快照残缺。该区间的 csi1000 宇宙不可用。",
+      "evidence": [
+        {
+          "in": "2014-10-31",
+          "out": "2015-05-28",
+          "n_members": 3
+        }
+      ]
+    },
+    {
+      "id": "B-02",
+      "severity": "high",
+      "what": "csi800 在 2012-01-31 之前每期只有 200 个成分",
+      "detail": "2007-01-22 ~ 2012-01-30 之间 104 个 epoch 的成员数是 200/204(应为 800),只有零星几期是完整 800。csi800 早期宇宙不可用。",
+      "evidence": {
+        "200": 103,
+        "204": 1,
+        "800": 45,
+        "801": 3
+      }
+    },
+    {
+      "id": "B-03",
+      "severity": "medium",
+      "what": "北交所 2025 年代码迁移会把同一家公司在区间表里拆成两个 code",
+      "detail": "241 个 43xxxx/83xxxx/87xxxx 老码在 all.txt 里于 2025-09-30 结束,241 个 920xxx 新码于 2025-10-09 开始。跨 2025-10 的连续性需要额外映射,老码在湖 stock_basic 里查不到。",
+      "evidence": {
+        "n_old": 241,
+        "n_new": 241,
+        "boundary": [
+          "2025-09-30",
+          "2025-10-09"
+        ]
+      }
+    },
+    {
+      "id": "B-04",
+      "severity": "medium",
+      "what": "all.txt 里混着 6 个指数代码,不是股票",
+      "detail": "000300.SH / 000852.SH / 000905.SH / 000906.SH / 000985.SH / 399300.SZ。当股票宇宙用之前必须过滤,否则凭空多出 6 只'票'。",
+      "evidence": [
+        {
+          "code": "000300.SH",
+          "raw_code": "SH000300",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        },
+        {
+          "code": "000852.SH",
+          "raw_code": "SH000852",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        },
+        {
+          "code": "000905.SH",
+          "raw_code": "SH000905",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        },
+        {
+          "code": "000906.SH",
+          "raw_code": "SH000906",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        },
+        {
+          "code": "000985.SH",
+          "raw_code": "SH000985",
+          "in_date": "2005-01-04",
+          "out_date": "2026-07-06"
+        },
+        {
+          "code": "399300.SZ",
+          "raw_code": "SZ399300",
+          "in_date": "2005-01-04",
+          "out_date": "2026-08-26"
+        }
+      ]
+    },
+    {
+      "id": "B-05",
+      "severity": "medium",
+      "what": "T00018.SH 是悬空成分",
+      "detail": "csi300 里 7 段(2005-04-08 ~ 2007-01-03),代码本体不是 6 位数字;既不在 all.txt、也不在 qlib 发布的 features/、也不在湖 stock_basic。有成分记录但没有任何价格数据。",
+      "evidence": [
+        {
+          "universe": "csi300",
+          "line": 10299,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "universe": "csi300",
+          "line": 10300,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "universe": "csi300",
+          "line": 10301,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "universe": "csi300",
+          "line": 10302,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "universe": "csi300",
+          "line": 10303,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "universe": "csi300",
+          "line": 10304,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        },
+        {
+          "universe": "csi300",
+          "line": 10305,
+          "raw_code": "SHT00018",
+          "code": "T00018.SH",
+          "anomaly": "代码本体 'T00018' 不是 6 位数字"
+        }
+      ]
+    },
+    {
+      "id": "B-06",
+      "severity": "medium",
+      "what": "指数基数偶发多 1(501/801/1001/1002)与少数(298)",
+      "detail": "上游快照在个别期出现成分数偏离基数,直接按 epoch 取名单会拿到 501 只票。对账时要按期核基数,不要默认 300/500/800/1000。",
+      "evidence": {
+        "csi300": {
+          "298": 1,
+          "300": 53
+        },
+        "csi500": {
+          "500": 42,
+          "501": 3
+        },
+        "csi800": {
+          "200": 103,
+          "204": 1,
+          "800": 45,
+          "801": 3
+        },
+        "csi1000": {
+          "3": 1,
+          "1000": 29,
+          "1001": 3,
+          "1002": 1
+        },
+        "csiall": {
+          "1881": 1,
+          "2057": 1,
+          "2151": 1,
+          "2289": 1,
+          "2290": 1,
+          "2342": 1,
+          "2343": 1,
+          "2405": 1,
+          "2421": 1,
+          "2479": 2,
+          "2526": 1,
+          "2701": 1,
+          "2724": 1,
+          "2807": 1,
+          "2965": 1,
+          "3228": 1,
+          "3352": 1,
+          "3402": 1,
+          "3415": 1,
+          "3435": 1,
+          "3471": 1,
+          "3586": 1,
+          "3765": 1,
+          "4098": 1,
+          "4281": 1,
+          "4500": 1,
+          "4631": 1,
+          "4895": 1,
+          "4946": 1,
+          "4961": 1,
+          "5058": 1,
+          "5061": 1,
+          "5062": 1,
+          "5171": 1
+        }
+      }
+    },
+    {
+      "id": "B-07",
+      "severity": "high",
+      "what": "源A/源B 同宗,交叉验证不是独立验证",
+      "detail": "qlib 发布来自 chenditc/investment_data,其成分数据同样来自 Tushare;与湖 index_weight 是同一上游。对上不代表数据对,只代表口径一致。",
+      "evidence": {
+        "release": "2026-08-26",
+        "calendar_last": "2026-08-26",
+        "sha256": "06b945d78c4223e33f63425bc27d8ae956cb13ae4f9576af8fdeb95300f1beda",
+        "source": "https://github.com/chenditc/investment_data/releases/latest/download/qlib_bin.tar.gz"
+      }
+    }
+  ]
+}

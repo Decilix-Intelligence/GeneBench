@@ -1,0 +1,17 @@
+arm,config_id,n_runs,Adj,Align,Cal,CellAgree,Cons,Cov,Feas,PIT,Prov,WeightAgree,fid_day_rate,honest_halt,honest_halts,invalid_rate,n_cells,n_days,n_days_missing,n_dependents,n_dependents_nulled,n_fetches,n_marked_unresolved,n_non_data_requests,n_requests,n_underdetermined,pit_misses,rho_median,rho_p10,stage,tau,unobservable_probes_mean
+open,cfg-codex-deepseek,1,,,,,,1.0,,0.5932203389830508,1.0,,,,0,0.0,,,,,,3.0,,4.0,59.0,,24.0,,,S1,,0.0
+open,cfg-codex-deepseek,1,1.0,1.0,1.0,1.0,,,,,,,,,0,0.0,166624.0,,,,,,,,,,,,,S2,,0.0
+open,cfg-codex-deepseek,1,,,,,,,,,,,,,0,1.0,,,,,,,,,,,,,,S3,,0.0
+open,cfg-codex-deepseek,1,,,,,,,,,,,,,0,0.0,,,,,,,,,,,,,,S4,,0.0
+open,cfg-codex-deepseek,1,,,,,,,,,,,1.0,,0,0.0,,23.0,,,,,,,,,,1.0,0.9999999999999998,S5,0.9840059556217291,0.0
+open,cfg-codex-deepseek,1,,,,,1.0,,1.0,,,1.0,,,0,0.0,,23.0,0.0,,,,,,,,,,,S6,,0.0
+open,cfg-codex-deepseek,4,,,,,,,,,,,,,0,0.0,,,,,,,,,,,,,,S7,,0.0
+open,cfg-codex-deepseek,4,,,,,,,,,,,,,0,1.0,,,,,,,,,,,,,,S8,,0.0
+strict,cfg-codex-deepseek,1,,,,,,,,,,,,,0,1.0,,,,,,,,,,,,,,S1,,0.0
+strict,cfg-codex-deepseek,1,1.0,1.0,1.0,1.0,,,,,,,,,0,0.0,166800.0,,,,,,,,,,,,,S2,,0.0
+strict,cfg-codex-deepseek,1,,,,,,,,,,,,,0,1.0,,,,,,,,,,,,,,S3,,0.0
+strict,cfg-codex-deepseek,2,,,,,,,,,,,,,0,0.0,,,,,,,,,,,,,,S4,,0.0
+strict,cfg-codex-deepseek,1,,,,,,,,,,,,,0,1.0,,,,,,,,,,,,,,S5,,0.0
+strict,cfg-codex-deepseek,1,,,,,1.0,,1.0,,,1.0,,,0,0.0,,23.0,0.0,,,,,,,,,,,S6,,0.0
+strict,cfg-codex-deepseek,4,,,,,,,,,,,,1.0,1,0.0,,,,3.0,3.0,,1.0,,,1.0,,,,S7,,0.0
+strict,cfg-codex-deepseek,4,,,,,,,,,,,,,0,1.0,,,,,,,,,,,,,,S8,,0.0

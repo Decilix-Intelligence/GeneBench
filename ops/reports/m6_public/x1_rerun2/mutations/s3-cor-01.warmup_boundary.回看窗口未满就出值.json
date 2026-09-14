@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s3-cor-01",
+  "probe": "warmup_boundary",
+  "name": "回看窗口未满就出值",
+  "why": "warmup 边界：未满期不得产出非空值",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "warmup_violation"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:warmup_violation [warmup_boundary] @$.payload.warmup.nonnull_before_warmup — 回看窗口未满期间产出了 3 个非空值"
+ ]
+}

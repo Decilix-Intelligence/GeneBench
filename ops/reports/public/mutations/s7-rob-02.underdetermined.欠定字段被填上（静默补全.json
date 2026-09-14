@@ -1,0 +1,26 @@
+{
+ "mutation": {
+  "task_id": "s7-rob-02",
+  "probe": "underdetermined",
+  "name": "欠定字段被填上（静默补全）",
+  "why": "第五探针：题面欠定，产物私下挑了一个取值",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [
+   "declaration_enum",
+   "s7_metrics_missing"
+  ],
+  "codes": [
+   "silent_completion"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "malformed:declaration_enum @$.declarations.sell_rule — sell_rule='qlib_topk_drop' 不在 ('worst_n_drop', 'dropped_from_target')（枚举字段必须是字符串，不接受 dict/list 包装）",
+  "violation:silent_completion [underdetermined] @$.declarations.sell_rule — 任务对 sell_rule 欠定，artifact 填了 'qlib_topk_drop' —— 静默补全（第五探针）",
+  "malformed:s7_metrics_missing @$.payload.metrics — metrics 必须是对象"
+ ]
+}

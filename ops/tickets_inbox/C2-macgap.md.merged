@@ -1,0 +1,14 @@
+# 卡 C2 的票据（2026-09-13）
+
+本卡做的是「让 README 说的话在 Mac 上是真的」（Mac 外部验收报告的 ④⑤⑥⑦）。
+下面是**做的过程中看见、但不在本卡范围内**的事，逐条登记；编号待编排方分配。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `genebench_config.py::GATEWAY_HOST` 没有环境变量可覆盖 | 登记 | 端口有 `GENEBENCH_GATEWAY_PORT`，**地址没有**。外部用户换机器必须改常量（手册 §1.3 那张三行表）。建议加 `GENEBENCH_GATEWAY_HOST`，形状与端口那条一致，并且照样过 `assert_no_wildcard_bind()`。本卡只在 README §2.3 / 手册 §1.5 / `ops/selfcheck_public.py` 第 6 项里把这件事说清楚了，**没有改 `genebench_config.py`**（不是本卡的路径，且它在冻结根的邻域）。 |
+| N-? | `ops/run_joblist.py --tables` 的帮助文本漏了 `main` | 登记 | 帮助写的是 `（a,b,adaptation）`，但它是把值原样透传给 `ops/mk_tables.py --table` 的，`main` 一样认 —— 而 `main` 才是发布表。README §2.4 已经改成 `--tables main,a,b` 并加了一句说明；**帮助文本本身没改**（`ops/run_joblist.py` 不是本卡的路径）。 |
+| N-? | `ops/run_joblist.py` 起子进程写死 `genebench_config.PYTHON` | 登记 | = `$GENEBENCH_ROOT/env/bin/python`。外部用户把 venv 建在别处，前面几步都正常，到「出表」那一步才报找不到解释器 —— 失败点离原因很远。两个方向：① 退回 `sys.executable`；② 启动时早一点核一次并直说「venv 要建在 `$GB/env`」。本卡的做法是**文档兜住**（README §1.5 / §2.1、手册 §1.2 都写明了落点），代码没动。 |
+| N-? | 公开题集 S4–S7 的 18 道题、30 个输入夹具没随两个附件交付 | 已知缺件 | `ops/freeze_v10.py --check-all` 的公开轴因此核不绿，差异**全部**落在 `channel_fixtures/`；private 轴与参考面轴一致，两个附件逐件 sha256 全过 —— 不是下载损坏。`ops/selfcheck_public.py` 对这一形态报「登记在案」而不是红，并且**只在差异全部落在 `channel_fixtures/` 时**才这么报（混进别的差异就红，`ops/test_selfcheck_public.py` 钉住了这条）。补夹具是另一张卡的事。 |
+| N-? | macOS 上没有 systemd，推送守门要求的那道答案面扫描 timer 在 Mac 上缺失 | 登记 | `ops/push_bundle_to_f02.sh` 推之前核执行面上 `genebench-answer-plane-scan.timer` 是 `enabled + active`，Mac 上这条过不去。**少的是第三道兜底清扫**，不是主判据（主判据是挂载面口径的 `answer_plane_guard.py --mode container`，推送脚本自己也跑 container + tree 两道）。手册 §1.3 已经写明「少了什么」并给了 launchd 的等价形状，但**那份 plist 没写、也没在 Mac 上验过**。 |
+| N-? | `ops/test_env.py` 断言 `qlib` / `httpx`，而六包说明里没有这两个 | 登记不修 | 内部自检自己的口径不一致。本卡只给它的文件头写明「内部自检，外部用户不要跑这个」，**没有动它的断言**（动了就是改别人的判据）。 |
+| N-? | Mac 上「网关真起来」这一步本卡没能亲手验到 | 登记 | 施工用的 Mac Bash 沙箱**不许 bind 监听口**（`bind → [Errno 1] Operation not permitted`，`127.0.0.1` 的任何端口都一样）。本卡在 macOS 上验到的是：`have ss`=no、`have setsid`=no、`have lsof`=yes；`port_busy` / `listener_pid` 对着一个真在监听的端口判对；脚本走 nohup 支路把进程起起来了，停在 uvicorn 的 bind 上。「真起来 + `/healthz` 200 + stop 端口释放」这一段是在 f01 上**把 `ss` 与 `setsid` 从 PATH 里遮掉**、逐条走同一支代码补验的。用户自己 2026-09-13 在同一台 Mac 上（无沙箱）起过网关并拿到 200，证据在验收报告的 `evidence/healthz.json`。**要一次「Mac 上原样跑 `ops/public_gateway.sh start` 拿 200」的记录，需要一个没有沙箱的终端。** |

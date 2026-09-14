@@ -1,0 +1,1854 @@
+{
+ "channel": "public",
+ "epsilon_dir": "/data/shared/genebench/snapshots/public_v1/epsilon",
+ "sandbox": "/data/shared/genebench/scratch/1.1c/screen/public",
+ "gates": {
+  "baseline_reproduces": true,
+  "baseline_detail": [],
+  "patch_neutral:P-SELL": true,
+  "patch_neutral_detail:P-SELL": []
+ },
+ "entrypoint_forensics": {
+  "resolved": [
+   "A"
+  ],
+  "missing": [
+   "B1",
+   "B2",
+   "B3"
+  ],
+  "note": "IMPL_CANDIDATES 找的是 reference.backtest_b* 这样的**模块**；B 侧三份独立实现是**脚本**（snapshots/<通道>/epsilon/impl_v2_b*.py），由 ops/screen_runner.py 驱动。本轮走的是后者。"
+ },
+ "tasks": {
+  "s3-rob-02": {
+   "stage": "S3",
+   "probe_field": "eval_frequency",
+   "evidence_condition": [
+    [
+     "lookback",
+     "24"
+    ]
+   ],
+   "verdict": "inconclusive",
+   "reason": "这套 harness 结构上量不到这个字段：S3 是因子求值，三份实现是 S7 的回测引擎 —— 它们不求值因子，只吃现成的信号面板。",
+   "by_impl": {},
+   "diffs": [],
+   "cross_impl_divergence": [],
+   "n_diffs": 0,
+   "n_cross": 0,
+   "diff_summary": null,
+   "metrics_by_value": null,
+   "values": [],
+   "harness": {
+    "module": null,
+    "out_of_reach": true
+   }
+  },
+  "s4-rob-02": {
+   "stage": "S4",
+   "probe_field": "holding_periods",
+   "evidence_condition": [
+    [
+     "ic_method",
+     "spearman"
+    ]
+   ],
+   "verdict": "inconclusive",
+   "reason": "这套 harness 结构上量不到这个字段：S4 是 IC 分布，三份实现不出 IC；S4 的判据是 IC 族 ε（N-117），不是回测指标 ε。",
+   "by_impl": {},
+   "diffs": [],
+   "cross_impl_divergence": [],
+   "n_diffs": 0,
+   "n_cross": 0,
+   "diff_summary": null,
+   "metrics_by_value": null,
+   "values": [],
+   "harness": {
+    "module": null,
+    "out_of_reach": true
+   }
+  },
+  "s5-rob-02": {
+   "stage": "S5",
+   "probe_field": "signal_frequency",
+   "evidence_condition": [
+    [
+     "value_semantics",
+     "score"
+    ]
+   ],
+   "verdict": "inconclusive",
+   "reason": "这套 harness 结构上量不到这个字段：S5 是信号面，三份实现吃的是已经算好的信号，不重采样它。",
+   "by_impl": {},
+   "diffs": [],
+   "cross_impl_divergence": [],
+   "n_diffs": 0,
+   "n_cross": 0,
+   "diff_summary": null,
+   "metrics_by_value": null,
+   "values": [],
+   "harness": {
+    "module": null,
+    "out_of_reach": true
+   }
+  },
+  "s6-rob-02": {
+   "stage": "S6",
+   "probe_field": "rebalance_frequency",
+   "evidence_condition": [
+    [
+     "weighting_scheme",
+     "equal"
+    ]
+   ],
+   "verdict": "material",
+   "reason": "实现 ['B1', 'B2', 'B3'] 上，不同取值之间有 81 处指标超出 ε 带",
+   "by_impl": {
+    "B1": "material",
+    "B2": "material",
+    "B3": "material"
+   },
+   "diffs": [
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.05631767901596407,
+      0.09087568393112644
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "ann_return_net",
+     "values": [
+      0.0025484023382065235,
+      0.07823014235685144
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.2320789933790066,
+      0.23821116100682166
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.5314863801446847,
+      -0.3507784347764411
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "sharpe_net",
+     "values": [
+      0.12714595467090414,
+      0.434893160302293
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.45866387691026034,
+      0.12907615857392515
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.10356199133680538,
+      0.02300616153481571
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.2074663147962438,
+      0.046515685836471234
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "win_rate_net",
+     "values": [
+      0.49944994499449946,
+      0.4977997799779978
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.05631767901596407,
+      0.057105900148595845
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "ann_return_net",
+     "values": [
+      0.0025484023382065235,
+      0.05395728685700307
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.2320789933790066,
+      0.23198689122173208
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.5314863801446847,
+      -0.4653540178303043
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "sharpe_net",
+     "values": [
+      0.12714595467090414,
+      0.34191363795521845
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.45866387691026034,
+      0.030928252107274793
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.10356199133680538,
+      0.005783327533594374
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.2074663147962438,
+      0.012104784660645263
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "win_rate_net",
+     "values": [
+      0.49944994499449946,
+      0.49394939493949397
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "weekly",
+      "monthly"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.09087568393112644,
+      0.057105900148595845
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "weekly",
+      "monthly"
+     ],
+     "metric": "ann_return_net",
+     "values": [
+      0.07823014235685144,
+      0.05395728685700307
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "weekly",
+      "monthly"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23821116100682166,
+      0.23198689122173208
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "weekly",
+      "monthly"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.3507784347764411,
+      -0.4653540178303043
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "weekly",
+      "monthly"
+     ],
+     "metric": "sharpe_net",
+     "values": [
+      0.434893160302293,
+      0.34191363795521845
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "weekly",
+      "monthly"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.12907615857392515,
+      0.030928252107274793
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "weekly",
+      "monthly"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.02300616153481571,
+      0.005783327533594374
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "weekly",
+      "monthly"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.046515685836471234,
+      0.012104784660645263
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "weekly",
+      "monthly"
+     ],
+     "metric": "win_rate_net",
+     "values": [
+      0.4977997799779978,
+      0.49394939493949397
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.05651073904579196,
+      0.09216476072301583
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "ann_return_net",
+     "values": [
+      0.0027322141253758314,
+      0.07950674029172089
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23209395135154787,
+      0.23821677896875462
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.5314731085890664,
+      -0.3507475218813467
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "sharpe_net",
+     "values": [
+      0.12794266208414642,
+      0.4398568509433898
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.458664748558013,
+      0.12977314475067186
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.10356085214581455,
+      0.023001623657362778
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.2074640113820878,
+      0.04650664722756375
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "weekly"
+     ],
+     "metric": "win_rate_net",
+     "values": [
+      0.4988998899889989,
+      0.49724972497249725
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.05651073904579196,
+      0.05723696901186348
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "ann_return_net",
+     "values": [
+      0.0027322141253758314,
+      0.05408689127757338
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23209395135154787,
+      0.23218750295811624
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "daily",
+      "monthly"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.5314731085890664,
+      -0.4657661483886867
+     ]
+    }
+   ],
+   "cross_impl_divergence": [
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.09087568393112644,
+      0.09216476072301583
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "ann_return_net",
+     "values": [
+      0.07823014235685144,
+      0.07950674029172089
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.3507784347764411,
+      -0.3507475218813467
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "sharpe_net",
+     "values": [
+      0.434893160302293,
+      0.4398568509433898
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.12907615857392515,
+      0.12977314475067186
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.02300616153481571,
+      0.023001623657362778
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.046515685836471234,
+      0.04650664722756375
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.09087568393112644,
+      0.08745073489607602
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "ann_return_net",
+     "values": [
+      0.07823014235685144,
+      0.07485564081367446
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23821116100682166,
+      0.23759918642412634
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.3507784347764411,
+      -0.3506686408823836
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "sharpe_net",
+     "values": [
+      0.434893160302293,
+      0.4222124340970553
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.12907615857392515,
+      0.12563721489692892
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.02300616153481571,
+      0.022986147552357304
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.046515685836471234,
+      0.04647637415725815
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "win_rate_net",
+     "values": [
+      0.4977997799779978,
+      0.4961453744493392
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.09216476072301583,
+      0.08745073489607602
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "ann_return_net",
+     "values": [
+      0.07950674029172089,
+      0.07485564081367446
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23821677896875462,
+      0.23759918642412634
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.3507475218813467,
+      -0.3506686408823836
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "sharpe_net",
+     "values": [
+      0.4398568509433898,
+      0.4222124340970553
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.12977314475067186,
+      0.12563721489692892
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.023001623657362778,
+      0.022986147552357304
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.04650664722756375,
+      0.04647637415725815
+     ]
+    },
+    {
+     "value": "weekly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "win_rate_net",
+     "values": [
+      0.49724972497249725,
+      0.4961453744493392
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23198689122173208,
+      0.23218750295811624
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.4653540178303043,
+      -0.4657661483886867
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.030928252107274793,
+      0.031048042883771585
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.005783327533594374,
+      0.005785346955711859
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.012104784660645263,
+      0.012108835075970693
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.057105900148595845,
+      0.04626039377890989
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "ann_return_net",
+     "values": [
+      0.05395728685700307,
+      0.043106035885154936
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23198689122173208,
+      0.2278931290066501
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.4653540178303043,
+      -0.4571275173518472
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "sharpe_net",
+     "values": [
+      0.34191363795521845,
+      0.2985702506441809
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.030928252107274793,
+      0.02823016469449088
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.005783327533594374,
+      0.005854131542556832
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.012104784660645263,
+      0.012252625214977313
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "win_rate_net",
+     "values": [
+      0.49394939493949397,
+      0.4980523094045632
+     ]
+    },
+    {
+     "value": "monthly",
+     "impls": [
+      "B2",
+      "B3"
+     ],
+     "metric": "ann_return_gross",
+     "values": [
+      0.05723696901186348,
+      0.04626039377890989
+     ]
+    }
+   ],
+   "n_diffs": 81,
+   "n_cross": 48,
+   "diff_summary": {
+    "n_diffs_total": 81,
+    "by_impl": {
+     "B1": 27,
+     "B2": 27,
+     "B3": 27
+    },
+    "by_metric": {
+     "ann_return_gross": {
+      "n": 9,
+      "kind": "relative",
+      "epsilon": 0.00512451349304595,
+      "observed_max": 0.47101194936915697,
+      "observed_min": 0.012688127596711103,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "ann_return_net": {
+      "n": 9,
+      "kind": "absolute",
+      "epsilon": 0.00027571768075396186,
+      "observed_max": 0.07677452616634506,
+      "observed_min": 0.024272855499848367,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "ann_vol_net": {
+      "n": 9,
+      "kind": "relative",
+      "epsilon": 9.667188085405075e-05,
+      "observed_max": 0.040850549884251054,
+      "observed_min": 0.0003968569319158419,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "max_drawdown_net": {
+      "n": 9,
+      "kind": "relative",
+      "epsilon": 3.745596156599482e-05,
+      "observed_max": 0.34019495019545976,
+      "observed_min": 0.1236317682654084,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "sharpe_net": {
+      "n": 9,
+      "kind": "relative",
+      "epsilon": 0.009340599143368175,
+      "observed_max": 0.7091265901400889,
+      "observed_min": 0.21379853912267732,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "total_cost": {
+      "n": 9,
+      "kind": "relative",
+      "epsilon": 2.850604135317977e-06,
+      "observed_max": 0.9384514184200048,
+      "observed_min": 0.7170631814224593,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "turnover_one_way_mean": {
+      "n": 9,
+      "kind": "relative",
+      "epsilon": 1.6500131604170237e-05,
+      "observed_max": 0.9441558871267184,
+      "observed_min": 0.7453191523624205,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "turnover_two_way_mean": {
+      "n": 9,
+      "kind": "relative",
+      "epsilon": 1.665389023460425e-05,
+      "observed_max": 0.9416542166253178,
+      "observed_min": 0.7363687370809273,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "win_rate_net": {
+      "n": 9,
+      "kind": "relative",
+      "epsilon": 0.0016519823788545898,
+      "observed_max": 0.011013215859030822,
+      "observed_min": 0.00169889912073227,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     }
+    },
+    "cross_by_metric": {
+     "ann_return_gross": 5,
+     "ann_return_net": 5,
+     "max_drawdown_net": 6,
+     "sharpe_net": 5,
+     "total_cost": 6,
+     "turnover_one_way_mean": 6,
+     "turnover_two_way_mean": 6,
+     "ann_vol_net": 5,
+     "win_rate_net": 4
+    },
+    "n_cross_total": 48
+   },
+   "metrics_by_value": {
+    "B1|daily": {
+     "ann_return_gross": 0.05631767901596407,
+     "ann_return_net": 0.0025484023382065235,
+     "ann_vol_net": 0.2320789933790066,
+     "sharpe_net": 0.12714595467090414,
+     "max_drawdown_net": -0.5314863801446847,
+     "turnover_one_way_mean": 0.10356199133680538,
+     "turnover_two_way_mean": 0.2074663147962438,
+     "win_rate_net": 0.49944994499449946,
+     "total_cost": 0.45866387691026034
+    },
+    "B1|weekly": {
+     "ann_return_gross": 0.09087568393112644,
+     "ann_return_net": 0.07823014235685144,
+     "ann_vol_net": 0.23821116100682166,
+     "sharpe_net": 0.434893160302293,
+     "max_drawdown_net": -0.3507784347764411,
+     "turnover_one_way_mean": 0.02300616153481571,
+     "turnover_two_way_mean": 0.046515685836471234,
+     "win_rate_net": 0.4977997799779978,
+     "total_cost": 0.12907615857392515
+    },
+    "B1|monthly": {
+     "ann_return_gross": 0.057105900148595845,
+     "ann_return_net": 0.05395728685700307,
+     "ann_vol_net": 0.23198689122173208,
+     "sharpe_net": 0.34191363795521845,
+     "max_drawdown_net": -0.4653540178303043,
+     "turnover_one_way_mean": 0.005783327533594374,
+     "turnover_two_way_mean": 0.012104784660645263,
+     "win_rate_net": 0.49394939493949397,
+     "total_cost": 0.030928252107274793
+    },
+    "B2|daily": {
+     "ann_return_gross": 0.05651073904579196,
+     "ann_return_net": 0.0027322141253758314,
+     "ann_vol_net": 0.23209395135154787,
+     "sharpe_net": 0.12794266208414642,
+     "max_drawdown_net": -0.5314731085890664,
+     "turnover_one_way_mean": 0.10356085214581455,
+     "turnover_two_way_mean": 0.2074640113820878,
+     "win_rate_net": 0.4988998899889989,
+     "total_cost": 0.458664748558013
+    },
+    "B2|weekly": {
+     "ann_return_gross": 0.09216476072301583,
+     "ann_return_net": 0.07950674029172089,
+     "ann_vol_net": 0.23821677896875462,
+     "sharpe_net": 0.4398568509433898,
+     "max_drawdown_net": -0.3507475218813467,
+     "turnover_one_way_mean": 0.023001623657362778,
+     "turnover_two_way_mean": 0.04650664722756375,
+     "win_rate_net": 0.49724972497249725,
+     "total_cost": 0.12977314475067186
+    },
+    "B2|monthly": {
+     "ann_return_gross": 0.05723696901186348,
+     "ann_return_net": 0.05408689127757338,
+     "ann_vol_net": 0.23218750295811624,
+     "sharpe_net": 0.342340480706211,
+     "max_drawdown_net": -0.4657661483886867,
+     "turnover_one_way_mean": 0.005785346955711859,
+     "turnover_two_way_mean": 0.012108835075970693,
+     "win_rate_net": 0.4944994499449945,
+     "total_cost": 0.031048042883771585
+    },
+    "B3|daily": {
+     "ann_return_gross": 0.05651073904579218,
+     "ann_return_net": 0.0027322141253749432,
+     "ann_vol_net": 0.23209395135154792,
+     "sharpe_net": 0.12794266208414445,
+     "max_drawdown_net": -0.5314731085890676,
+     "turnover_one_way_mean": 0.10356085214581455,
+     "turnover_two_way_mean": 0.2074640113820878,
+     "win_rate_net": 0.4988998899889989,
+     "total_cost": 0.458664748558013
+    },
+    "B3|weekly": {
+     "ann_return_gross": 0.08745073489607602,
+     "ann_return_net": 0.07485564081367446,
+     "ann_vol_net": 0.23759918642412634,
+     "sharpe_net": 0.4222124340970553,
+     "max_drawdown_net": -0.3506686408823836,
+     "turnover_one_way_mean": 0.022986147552357304,
+     "turnover_two_way_mean": 0.04647637415725815,
+     "win_rate_net": 0.4961453744493392,
+     "total_cost": 0.12563721489692892
+    },
+    "B3|monthly": {
+     "ann_return_gross": 0.04626039377890989,
+     "ann_return_net": 0.043106035885154936,
+     "ann_vol_net": 0.2278931290066501,
+     "sharpe_net": 0.2985702506441809,
+     "max_drawdown_net": -0.4571275173518472,
+     "turnover_one_way_mean": 0.005854131542556832,
+     "turnover_two_way_mean": 0.012252625214977313,
+     "win_rate_net": 0.4980523094045632,
+     "total_cost": 0.02823016469449088
+    }
+   },
+   "values": [
+    "daily",
+    "weekly",
+    "monthly"
+   ],
+   "harness": {
+    "module": "ops/screen_runner.py",
+    "patch": null,
+    "implementations": [
+     "B1",
+     "B2",
+     "B3"
+    ],
+    "band_tier": "daily",
+    "note": "频率就是三份实现的 argv —— **不打任何补丁**，因此没有「补丁改了算法」这种可能，Gate 1（补丁中性）在这个字段上不适用，只跑 Gate 0（沙箱副本复现快照产物）。",
+    "sandbox": "/data/shared/genebench/scratch/1.1c/screen/public/s6-rob-02",
+    "impls": {
+     "B1": {
+      "src": "/data/shared/genebench/snapshots/public_v1/epsilon/impl_v2_b1.py",
+      "src_sha256": "01dd4ed17db5708cf3a60e32b85b960e4ca22a6e3e7d6270f3559347bf260c54"
+     },
+     "B2": {
+      "src": "/data/shared/genebench/snapshots/public_v1/epsilon/impl_v2_b2.py",
+      "src_sha256": "83a8134750746b2f64ce180eb21b1b8f57aeaefa8e590aaddb65d417bb0f982a"
+     },
+     "B3": {
+      "src": "/data/shared/genebench/snapshots/public_v1/epsilon/impl_v2_b3.py",
+      "src_sha256": "c97dfe5b113e592488d5d8e6f0a5a901d39a48734fc7041562ac98ed04ce55dd"
+     }
+    },
+    "n_runs": 9,
+    "skipped_metrics": {}
+   }
+  },
+  "s1-rob-02": {
+   "stage": "S1",
+   "probe_field": "data_version",
+   "evidence_condition": [],
+   "verdict": "inconclusive",
+   "reason": "这套 harness 结构上量不到这个字段：三份冻结实现读的是一张定死的 csi300 面板（bt_input_csi300_v2.parquet），没有「数据版本」这个入口；换版本等于换输入面板，那是另一份标定不是一个开关。",
+   "by_impl": {},
+   "diffs": [],
+   "cross_impl_divergence": [],
+   "n_diffs": 0,
+   "n_cross": 0,
+   "diff_summary": null,
+   "metrics_by_value": null,
+   "values": [],
+   "harness": {
+    "module": null,
+    "out_of_reach": true
+   }
+  },
+  "s2-rob-02": {
+   "stage": "S2",
+   "probe_field": "adjust",
+   "evidence_condition": [
+    [
+     "missing_row_policy",
+     "keep_missing"
+    ]
+   ],
+   "verdict": "inconclusive",
+   "reason": "这套 harness 结构上量不到这个字段：复权口径在面板生成时就已经定死（post），三份实现拿到的是复权后的价；它们没有「换一种复权」的入口。",
+   "by_impl": {},
+   "diffs": [],
+   "cross_impl_divergence": [],
+   "n_diffs": 0,
+   "n_cross": 0,
+   "diff_summary": null,
+   "metrics_by_value": null,
+   "values": [],
+   "harness": {
+    "module": null,
+    "out_of_reach": true
+   }
+  },
+  "s7-rob-02": {
+   "stage": "S7",
+   "probe_field": "sell_rule",
+   "evidence_condition": [
+    [
+     "rebalance_frequency",
+     "daily"
+    ]
+   ],
+   "verdict": "material",
+   "reason": "实现 ['B1', 'B2', 'B3'] 上，不同取值之间有 15 处指标超出 ε 带",
+   "by_impl": {
+    "B1": "material",
+    "B2": "material",
+    "B3": "material"
+   },
+   "diffs": [
+    {
+     "impl": "B1",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23204501304215444,
+      0.2320789933790066
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.5314623564360343,
+      -0.5314863801446847
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.45997240986452087,
+      0.45866387691026034
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.10392312583813536,
+      0.10356199133680538
+     ]
+    },
+    {
+     "impl": "B1",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.2081878671684246,
+      0.2074663147962438
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23206638651744577,
+      0.23209395135154787
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.5315556394116122,
+      -0.5314731085890664
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.45989638429439456,
+      0.458664748558013
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.10392302916313163,
+      0.10356085214581455
+     ]
+    },
+    {
+     "impl": "B2",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.2081876665832124,
+      0.2074640113820878
+     ]
+    },
+    {
+     "impl": "B3",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "ann_vol_net",
+     "values": [
+      0.23206638651744585,
+      0.23209395135154792
+     ]
+    },
+    {
+     "impl": "B3",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.5315556394116108,
+      -0.5314731085890676
+     ]
+    },
+    {
+     "impl": "B3",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.45989638429439456,
+      0.458664748558013
+     ]
+    },
+    {
+     "impl": "B3",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "turnover_one_way_mean",
+     "values": [
+      0.10392302916313163,
+      0.10356085214581455
+     ]
+    },
+    {
+     "impl": "B3",
+     "pair": [
+      "worst_n_drop",
+      "dropped_from_target"
+     ],
+     "metric": "turnover_two_way_mean",
+     "values": [
+      0.20818766658321242,
+      0.2074640113820878
+     ]
+    }
+   ],
+   "cross_impl_divergence": [
+    {
+     "value": "worst_n_drop",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.5314623564360343,
+      -0.5315556394116122
+     ]
+    },
+    {
+     "value": "worst_n_drop",
+     "impls": [
+      "B1",
+      "B2"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.45997240986452087,
+      0.45989638429439456
+     ]
+    },
+    {
+     "value": "worst_n_drop",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "max_drawdown_net",
+     "values": [
+      -0.5314623564360343,
+      -0.5315556394116108
+     ]
+    },
+    {
+     "value": "worst_n_drop",
+     "impls": [
+      "B1",
+      "B3"
+     ],
+     "metric": "total_cost",
+     "values": [
+      0.45997240986452087,
+      0.45989638429439456
+     ]
+    }
+   ],
+   "n_diffs": 15,
+   "n_cross": 4,
+   "diff_summary": {
+    "n_diffs_total": 15,
+    "by_impl": {
+     "B1": 5,
+     "B2": 5,
+     "B3": 5
+    },
+    "by_metric": {
+     "ann_vol_net": {
+      "n": 3,
+      "kind": "relative",
+      "epsilon": 9.667188085405075e-05,
+      "observed_max": 0.00014641711581648084,
+      "observed_min": 0.00011876584435550844,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "max_drawdown_net": {
+      "n": 3,
+      "kind": "relative",
+      "epsilon": 3.745596156599482e-05,
+      "observed_max": 0.00015526281056332892,
+      "observed_min": 4.5200986418241564e-05,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "total_cost": {
+      "n": 3,
+      "kind": "relative",
+      "epsilon": 2.850604135317977e-06,
+      "observed_max": 0.002844807484531398,
+      "observed_min": 0.0026780722320120824,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "turnover_one_way_mean": {
+      "n": 3,
+      "kind": "relative",
+      "epsilon": 1.6500131604170237e-05,
+      "observed_max": 0.0034850506209606487,
+      "observed_min": 0.0034750157716816445,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     },
+     "turnover_two_way_mean": {
+      "n": 3,
+      "kind": "relative",
+      "epsilon": 1.665389023460425e-05,
+      "observed_max": 0.0034759753687683627,
+      "observed_min": 0.0034658713881585727,
+      "impls": [
+       "B1",
+       "B2",
+       "B3"
+      ]
+     }
+    },
+    "cross_by_metric": {
+     "max_drawdown_net": 2,
+     "total_cost": 2
+    },
+    "n_cross_total": 4
+   },
+   "metrics_by_value": {
+    "B1|worst_n_drop": {
+     "ann_return_gross": 0.05658313754398292,
+     "ann_return_net": 0.002617900571175502,
+     "ann_vol_net": 0.23204501304215444,
+     "sharpe_net": 0.12743009440498917,
+     "max_drawdown_net": -0.5314623564360343,
+     "turnover_one_way_mean": 0.10392312583813536,
+     "turnover_two_way_mean": 0.2081878671684246,
+     "win_rate_net": 0.4988998899889989,
+     "total_cost": 0.45997240986452087
+    },
+    "B1|dropped_from_target": {
+     "ann_return_gross": 0.05631767901596407,
+     "ann_return_net": 0.0025484023382065235,
+     "ann_vol_net": 0.2320789933790066,
+     "sharpe_net": 0.12714595467090414,
+     "max_drawdown_net": -0.5314863801446847,
+     "turnover_one_way_mean": 0.10356199133680538,
+     "turnover_two_way_mean": 0.2074663147962438,
+     "win_rate_net": 0.49944994499449946,
+     "total_cost": 0.45866387691026034
+    },
+    "B2|worst_n_drop": {
+     "ann_return_gross": 0.056763131541209155,
+     "ann_return_net": 0.0027887511025932454,
+     "ann_vol_net": 0.23206638651744577,
+     "sharpe_net": 0.12817395508437754,
+     "max_drawdown_net": -0.5315556394116122,
+     "turnover_one_way_mean": 0.10392302916313163,
+     "turnover_two_way_mean": 0.2081876665832124,
+     "win_rate_net": 0.4988998899889989,
+     "total_cost": 0.45989638429439456
+    },
+    "B2|dropped_from_target": {
+     "ann_return_gross": 0.05651073904579196,
+     "ann_return_net": 0.0027322141253758314,
+     "ann_vol_net": 0.23209395135154787,
+     "sharpe_net": 0.12794266208414642,
+     "max_drawdown_net": -0.5314731085890664,
+     "turnover_one_way_mean": 0.10356085214581455,
+     "turnover_two_way_mean": 0.2074640113820878,
+     "win_rate_net": 0.4988998899889989,
+     "total_cost": 0.458664748558013
+    },
+    "B3|worst_n_drop": {
+     "ann_return_gross": 0.05676313154120938,
+     "ann_return_net": 0.0027887511025936895,
+     "ann_vol_net": 0.23206638651744585,
+     "sharpe_net": 0.1281739550843792,
+     "max_drawdown_net": -0.5315556394116108,
+     "turnover_one_way_mean": 0.10392302916313163,
+     "turnover_two_way_mean": 0.20818766658321242,
+     "win_rate_net": 0.4988998899889989,
+     "total_cost": 0.45989638429439456
+    },
+    "B3|dropped_from_target": {
+     "ann_return_gross": 0.05651073904579218,
+     "ann_return_net": 0.0027322141253749432,
+     "ann_vol_net": 0.23209395135154792,
+     "sharpe_net": 0.12794266208414445,
+     "max_drawdown_net": -0.5314731085890676,
+     "turnover_one_way_mean": 0.10356085214581455,
+     "turnover_two_way_mean": 0.2074640113820878,
+     "win_rate_net": 0.4988998899889989,
+     "total_cost": 0.458664748558013
+    }
+   },
+   "values": [
+    "worst_n_drop",
+    "dropped_from_target"
+   ],
+   "harness": {
+    "module": "ops/screen_runner.py",
+    "patch": "P-SELL",
+    "implementations": [
+     "B1",
+     "B2",
+     "B3"
+    ],
+    "band_tier": "daily",
+    "note": "两种读法由 P-SELL 开关切换（只加开关不改算法，Gate 1 逐指标验中性）；频率取本题声明的 rebalance_frequency。",
+    "sandbox": "/data/shared/genebench/scratch/1.1c/screen/public/s7-rob-02",
+    "impls": {
+     "B1": {
+      "src": "/data/shared/genebench/snapshots/public_v1/epsilon/impl_v2_b1.py",
+      "src_sha256": "01dd4ed17db5708cf3a60e32b85b960e4ca22a6e3e7d6270f3559347bf260c54",
+      "patch": "P-SELL",
+      "patched_sha256": "1a2bdce32e47e672e250c3d8e34e1eb10d37b5c763f593a11d139cd963efad4e",
+      "anchors": [
+       "INPUT = HERE / \"bt_input_csi300_v2.parquet\"",
+       "            (hold > 0) & (~is_target[t]) & sella"
+      ]
+     },
+     "B2": {
+      "src": "/data/shared/genebench/snapshots/public_v1/epsilon/impl_v2_b2.py",
+      "src_sha256": "83a8134750746b2f64ce180eb21b1b8f57aeaefa8e590aaddb65d417bb0f982a",
+      "patch": "P-SELL",
+      "patched_sha256": "0dd4a45a976eda240691eceaca66bd3863e55793bc18dc6cf92bda993061d76f",
+      "anchors": [
+       "INPUT = os.path.join(BASE, \"bt_input_csi300_v2.p",
+       "                cand = held[~np.isin(held, tgt)]"
+      ]
+     },
+     "B3": {
+      "src": "/data/shared/genebench/snapshots/public_v1/epsilon/impl_v2_b3.py",
+      "src_sha256": "c97dfe5b113e592488d5d8e6f0a5a901d39a48734fc7041562ac98ed04ce55dd",
+      "patch": "P-SELL",
+      "patched_sha256": "48431ac7b920098cbb383e49d630e37b972f33b74e229d29641a3010cd8c454a",
+      "anchors": [
+       "INPUT = os.path.join(HERE, \"bt_input_csi300_v2.p",
+       "            cand = held & ~target_mask[t] & can_"
+      ]
+     }
+    },
+    "n_runs": 6,
+    "skipped_metrics": {}
+   }
+  },
+  "s8-rob-02": {
+   "stage": "S8",
+   "probe_field": "slippage_reference_price",
+   "evidence_condition": [
+    [
+     "matching_frequency",
+     "daily"
+    ]
+   ],
+   "verdict": "inconclusive",
+   "reason": "这套 harness 结构上量不到这个字段：S8 是撮合模拟，三份实现按 close 成交、没有滑点参考价这个入口；它换入之后要重做一次面板与标定（题面自己也标着「等 slippage_reference_price 换入后一并跑」）。",
+   "by_impl": {},
+   "diffs": [],
+   "cross_impl_divergence": [],
+   "n_diffs": 0,
+   "n_cross": 0,
+   "diff_summary": null,
+   "metrics_by_value": null,
+   "values": [],
+   "harness": {
+    "module": null,
+    "out_of_reach": true
+   }
+  }
+ }
+}

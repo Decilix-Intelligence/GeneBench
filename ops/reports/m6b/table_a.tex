@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\caption{Table A — m6b（接入/harness 验证，不是实验数据）　脚注（N-348，2026-09-10 用户裁定）：适配赛道 v1.0-adapt 的题源是**出集规定题的 oracle 产物**（探针题不入），这些产物随适配 bundle 进入执行面。**跑过适配赛道的被测方，主赛道这些题算「可能已见过答案」**；口径与逐题清单见 ops/specs/fairness\_protocol.md §7 与 ops/reports/known\_limits\_v1.md。}
+\label{tab:a-m6b}
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+config\_id & arm & SR & pass@1 & pass\^{}3 & ProgressRate & Steps & \$ & Latency & Recov & 越权率 \\
+\midrule
+\multicolumn{11}{l}{\textit{参照臂（baseline）}} \\
+cfg-codex-deepseek & open & 0.250 & 0.000 & --- & 0.250 & 36.750 & 0.825 & 535.498 & --- & 0.055 \\
+\midrule
+\multicolumn{11}{l}{\textit{协议臂（protocol）—— 与参照臂的差异是投放的工件}} \\
+cfg-codex-deepseek & strict & 0.750 & 0.000 & --- & 0.750 & 36.500 & 0.825 & 493.644 & --- & 0.104 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% set_version = 1.0.9
+% reference_version = r1.0.14
+% protocol_version = geneprotocol_v1@7e8ad97d1f7a（裸臂在协议轴上记 `geneprotocol_v1@none` —— 它们不投放协议工件，与协议臂并排不算混轴）
+% channel = private
+% 记录数 8；筛选 batch=m6b

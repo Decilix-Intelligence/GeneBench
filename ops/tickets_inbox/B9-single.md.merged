@@ -1,0 +1,73 @@
+# 卡 B9（用户裁定 ③）：`/data` 不可及条件下的单机形态门 —— 2026-09-14
+
+> 编号先写 N-?，合并时由收尾卡定号。本卡取的是盘上实际最大号 **N-854** 之后的
+> **N-855 … N-860**（取号前已 grep 复核过全树，这六个号当时无人占用）。
+> 本卡**没有**把内容追加进 `ops/tickets.md`（按并发施工规则 C，收件箱是唯一入口）。
+
+## 这道门跑到哪儿了（一句话）
+
+七步里**前五步全绿**（clone → 三件附件逐件核 sha256 → 起网关 `/healthz` 200 →
+现构基座与 harness 镜像 → 出集 + **单机本地落位**，全程 **0 次 ssh、0 次 `/data` open**）；
+**第六步（一个 job）没跑成**，被下面四条挡住 —— 其中**三条是本卡新量到的**、
+一条是 README 自己写着要机器主人做的那一步。因此**第七步（出表）没有真实读数可出**。
+
+## 票据
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-855 | `ops/run_f02_a1.py:51` `RUNNER_PROVIDER_ROOT` 写死 `/data/genebench_runner/provider` | 新发现·**挡单机真跑** | 单机路径上 `ops/run_joblist.py` **不传** `--provider-root`，于是 `provider_default(channel)` 现算出来的仍是 `/data/...`；同一条路径上 `run_joblist.probe_f02_provider` 查的却是 `runner_root()/provider` —— **两处不同源**。实测（f02，`GENEBENCH_ROOT=/home/ljn/gb_single`）：探针要求把 provider 放到 `$GB/genebench_runner/provider/qlib_provider_f7dda289`，照做之后 inner 打出来的记录里是 `"provider_root": "/data/genebench_runner/provider/qlib_provider_f7dda289"`。f02 上 `/data` 那一份**存在**（双机遗留），所以这条在 Linux 上表现为「跑起来 ok，只是读了另一棵树」；在造不出 `/data` 的机器上是硬停。同源的还有 `:69 RUN_ROOT` / `:70 RESULTS`（被显式 `--run-root`/`--results-dir` 盖掉，latent）。**修法**：这三个从 `GENEBENCH_RUNNER_ROOT` 现算（与 `runner/c41/runner_core.ROOT` 同一套）。回归锁在 `ops/test_single_machine.py::test_exec_face_provider_root_comes_from_runner_root`（现为 `xfail(strict=True)`，修好即 XPASS，把标记删掉）。 |
+| N-856 | 执行面解释器默认 `python3`，而 `runner/c41/egress_proxy.py` 模块级 `import h11` | 新发现·**挡任何新铺的执行面** | 全新单机部署上系统 `python3` 没有 `h11`，真跑第一步 `ModuleNotFoundError: No module named 'h11'`。`exec/vendor/h11` **不在仓库里**（`ops/push_exec_to_f02.sh:60` 自己写着「h11 是在 f02 上就地铺的」），**没有任何文档化步骤会铺它**；f02 上 `/data/genebench_runner/exec/vendor/h11` 是遗留物。卡 A9 加的 `GENEBENCH_RUNNER_PY` 能绕过（venv 里有 h11，uvicorn 带的），但**README / 手册 / HANDOFF 里 grep 命中 0 次**。**修法二选一**：① 单机形态下执行面解释器默认取 `cfg.PYTHON`；② 把 `vendor/h11` 随树发，并在 §2.4 ③ 之后加一句。 |
+| N-857 | `ops/guard_modes.py:32` 模块级 `import genebench_config`，而 exec 树白名单不含 `genebench_config.py` | 新发现·**挡任何新铺的执行面（单机与双机都挡）** | `runner/inject.py:294-300` 的 P0 `check_modes`（默认 `True`）用 `spec_from_file_location` 动态加载 exec 树上的 `ops/guard_modes.py` → `ModuleNotFoundError: No module named 'genebench_config'`。f02 上双机能跑，**只因为那棵 exec 树是 2026-09-10 的旧版**（那时 `guard_modes` 还不 import cfg，md5 与仓库当前版不同）—— 也就是说**下一次 `ops/push_exec_to_f02.sh` 会把双机生产也打断**。**修法三选一**：① `guard_modes` 把 `import genebench_config` 降成函数内 import 并在缺它时降级；② 把 `genebench_config.py` 加进 exec 树白名单（两处都要加：`runner/placement.OPS_FILES` 与 `ops/push_exec_to_f02.sh` 的 shell 数组）；③ `preflight` 在加载失败时降级并记一条。回归锁在 `ops/test_single_machine.py::test_guard_modes_is_importable_on_an_exec_tree`（`xfail(strict=True)`）。 |
+| N-858 | 单机形态的真跑前置「容器打得到宿主网关」在 §2.4 里一个字都没有 | 新发现·文档 | §2.3 ① 写了那条 `sudo ufw allow …`，但 §2.4「最短路径」那五条命令里没有任何地方提醒「跑 ④ 之前这条必须先做，否则容器起得来、模型调得动、**只有数据网关打不通**」。实测（f02，无 sudo）：从运行时真用的 `172.31.241.0/24` 出发，`192.168.1.219:18081`、`:22`、`172.31.241.1`、`172.17.0.1`、tailscale 地址**全部超时**，而同一个容器打**另一台机器**的 22 端口是通的（FORWARD 链 docker 开了，INPUT 链没有）；`api.deepseek.com:443` 也是通的 —— **所以失败形态是「模型照调、数据取不到」，很难认**。已把这条量进 `ops/test_single_machine.py::_container_to_host_check`。 |
+| N-859 | `ops/joblists/v1demo.yaml` 的 `digest:` 钉死发布方那台的镜像 id | 新发现·minor | `digest: sha256:961e3878…` 是 f02 上 `gb-cx-u:r1` 的 image id。外部用户按 §2.3 `sh harnesses/build.sh codex` 自己构出来的镜像 id 必然不同，照抄这份矩阵会在 `pin_image_digest` 那一步停。README §2.4 说「现成的验收矩阵」，但没说「digest 要换成你自己那台上的」。本卡是自己另写了一份 `ops/joblists/b9one.yaml`（只在 f02 的那棵**测试克隆**里，没有进仓库）。 |
+| N-860 | 单机形态下「把 provider 放到执行面」这一步没有任何文档 | 新发现·minor | §2.1a ③ 落位那一节把 provider 放到 `$GB/snapshots/public_v1/qlib_provider` 就结束了；**执行面还要一份**（`<runner_root>/provider/qlib_provider_<钉子前 8 位>/`）。这一步只在真跑被拒时的报错里出现（那条报错写得很好，单机形态的话也说了「就在本机 cp」）。建议在 §2.4 ③ 与 ④ 之间补一行。 |
+| N-836 更新 | 卡 A9 的静态门闭包**够不到执行面入口** | 更新 | `ops/test_A9.py::single_path_closure()` 的入口集合是六个 `ops/*.py`，走的是 **AST import 闭包**；而 `ops/run_joblist.py` 调 `ops/run_f02_a1.py` 用的是**子进程字符串**（`python3 exec/ops/run_f02_a1.py …`），闭包永远走不过去。N-855 那三行就住在那里。本卡的 `ops/test_single_machine.py::ENTRIES` 是**超集**（16 个入口，含 `gateway/app.py`、`ops/guard_modes.py`、`ops/selfcheck_public.py`、`ops/run_f02_a1.py`、`runner/inject.py`），闭包 50+ 个文件。**给后续加入口的人**：凡是被**子进程**调起来的文件，都要手工加进 `ENTRIES` —— 静态闭包这条路天生够不到它们。 |
+
+## 第 ③层（把 `/data` 真遮掉）：**做不到，如实写**
+
+* `unshare -r -m sh -c 'mount -t tmpfs none /data; …'` → `unshare: write failed /proc/self/uid_map: Operation not permitted`
+* `bwrap --dev-bind / / --tmpfs /data …` → `bwrap: setting up uid map: Permission denied`
+* 成因：f02 是 Ubuntu 24.04，`kernel.apparmor_restrict_unprivileged_userns = 1`（`/proc/sys/kernel/unprivileged_userns_clone` 是 1，但 apparmor 那条把它按死了）。翻它要 root；docker.io 被墙，也装不了别的东西。
+
+所以本门的「`/data` 不可及」是**断言**出来的，不是**遮蔽**出来的：
+
+| 层 | 射程 | 本卡做到了吗 |
+| --- | --- | --- |
+| ① 静态 | 单机路径闭包里 `/data` 的**取值位** | **做到**（独立重算，超集闭包；量到 3 行未登记的 → N-855） |
+| ② 运行时断言 | **我们自己的 Python 进程树**（靠 `PYTHONPATH` 里的 `sitecustomize` 进每个子解释器）的 `open`/`exec`/子进程参数 | **做到**（exec 树落位实测 0 命中；钩子自检会炸，证明门不是假的） |
+| ②' `strace -f` | 上一层**覆盖不到的非 Python 子进程**（`docker` / `rsync` / `git`） | **做到**（f02 上量过，exec 树落位 `openat`/`execve` 里 `/data` 0 命中）；但 `strace` 不是每台机器都有，所以它在测试文件里是可选的 |
+| ③ 遮蔽 | 「就算去开也开不到」 | **做不到**（上面那三行） |
+
+**别把这道门读成比它实际更强**：第 ②层能证明「我们的 Python 没去开 `/data`」，
+**不能**证明「这台机器上 `/data` 不可及」。真正的反面判据仍然只有一个 —— 在一台
+**造不出 `/data`** 的机器上（macOS 根卷只读）从头走一遍。
+
+## 补证（2026-09-14 晚些时候）：把上面三条各打一个**最小本地补丁**之后，剩下的路是通的
+
+补丁只落在 f02 那棵**测试克隆**里（`/home/ljn/gb_single/repo`），**一个字节都没进仓库**：
+① N-855 → `run_f02_a1` 的三个根改成从 `GENEBENCH_RUNNER_ROOT` 现算；
+② N-857 → 把 `genebench_config.py` 复制进 exec 树根（= 白名单加一项）；
+③ N-856 → `export GENEBENCH_RUNNER_PY=$GB/env/bin/python`（只是环境变量，没改代码）。
+
+**结果**：`clone → 三件附件 → 起网关 → 出集 → 单机落位 → 一个 job（真跑）→ 出表` 全程跑通。
+
+* run：`s1-cor-01.strict.cfg-codex-deepseek.r01@finance02-9a64489e`，646.5 s，`exit=124`
+  （撞 600 s 墙钟闸；成因是 N-858 那条防火墙 —— agent 取不到数据），
+  `calls=2`，`log/llm_log.jsonl` 里 **`decision=="allow"` 1 条**（真打了一次 DeepSeek）。
+  记录里 `provider_root` 已经是 `/home/ljn/gb_single/genebench_runner/provider/qlib_provider_f7dda289`
+  —— **不再是 `/data`**。
+* 表：`ops/reports/b9one/table_main.csv`，**列数 24**，表头逐字：
+  `config_id,arm,arm_kind,n_tasks,n_runs,SR,P@1,$,Cov,Prov,Cell%,Adj,Fid,Decl,IC-agr,Set,Sig,ρ̄,W-agr,Cons,ε-agr,Ledger,Audit,Ovr`
+  （5 身份列 + 19 指标列，与 README §2.4 那张表逐字相同）。
+* 这一整段里 **审计钩子 `/data` 命中 0、ssh 垫片 0**。
+
+**这一段本身又量出两条**：
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-861 | `--harden` 之后任何 git 操作都会把 `.git/index` 造回 0644，注入器 P0 当场拒 | 新发现·**挡外部用户** | 实测报错：`P0 红线 5 文件对组/其它开放 0o644 /home/ljn/gb_single/repo/.git/index`。README §2.1 把 `--harden` 写成「开跑之前跑一次」，但**它不是一次性的**：`git status` / `git pull` / 任何写 index 的操作之后都要再跑一次，否则 §2.4 ④ 真跑一条都起不来。建议在 §2.4 ④ 之前补一行 `$PY ops/guard_modes.py --harden`。 |
+| N-862 | **单机形态下每个 run 自己的产物会让下一个 run 起不来** | 新发现·**挡单机连跑** | 单机执行面根 = `$GENEBENCH_ROOT/genebench_runner`，**落在 `$GENEBENCH_ROOT` 里面**；而注入器 P0 的 `check_modes` 审计的正是 `$GENEBENCH_ROOT` 全树。实测：strict 臂跑完，open 臂立刻 `P0 红线 5 文件对组/其它开放 0o644 …/runs/…/log/llm_log.jsonl`（5 条）。双机形态下 run 目录在 `/data/genebench_runner`（**在 `$GENEBENCH_ROOT` 之外**），P0 看不见它们 —— 又一条只在单机形态下显形的。**修法二选一**：① 注入器写 run 目录时按 0600/0700 落；② P0 的审计根排除执行面 run 根。回归锁在 `ops/test_single_machine.py::test_single_runner_root_is_not_inside_the_audited_tree`（`xfail(strict=True)`）。 |
+
+**所以「单机形态能不能交付」的完整答案是**：代码侧还差 N-855 / N-856 / N-857 / N-862 四条
+（都不大，合起来大概十几行），文档侧还差 N-858 / N-860 / N-861 三句话；
+**这七条都补上之后，这条路是通的 —— 本卡已经用本地补丁把它走到了表**。

@@ -1,0 +1,20 @@
+........
+① factor 逐值：84568 个点（= 样本全量），最大相对偏差 5.331e-08
+..
+② 反算原始价：75409 行（= 样本全量），最大相对偏差 {'open': 1.0884189313437697e-07, 'high': 1.1027448414376285e-07, 'low': 1.0544306750028943e-07, 'close': 1.0613305057128739e-07}
+.
+②补 网关端点：688062.SH adj 44 点 / bars 44 点
+.
+恒等式 vwap×volume==amount：75409 行，最大相对偏差 1.562e-07
+.
+vwap 落带率 99.944304%（75367/75409，相对容差 1e-06）
+....
+qlib 读回：{'rows': 44, 'cols': ['$close', '$factor', '$vwap', '$volume', '$amount'], 'last': 8.279999732971191, 'last_factor': 1.0, 'csi300_n': 300, 'cal_max': '2026-07-31', 'cal_n': 139}
+...
+=============================== warnings summary ===============================
+ops/test_qlib_provider.py::test_02b_gateway_bars_and_adj_agree_with_provider
+  /data/shared/genebench/env/lib/python3.10/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+20 passed, 1 warning in 6.11s

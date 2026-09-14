@@ -1,0 +1,46 @@
+# 卡 2.6（integrations/tradingagents）票据
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `integrations/README.md` §1② 的 Dockerfile 三行骨架装不上垫片 | 待裁定 | 骨架里那句 `pip install --no-cache-dir --no-index --no-build-isolation /opt/genebench_client` 在 `gb-base:bookworm-r1` 上**当场失败**：`BackendUnavailable: Cannot import 'setuptools.build_meta'` —— 基座是 `python:3.12-slim`，没有 setuptools，而 `--no-build-isolation` 又不许 pip 去装构建后端。本卡的修法是在它前面加一行 `RUN pip install --no-cache-dir "setuptools>=61" wheel`（走 index，构建期出网是允许的；垫片本身仍然 `--no-index`）。**建议把这一行补进手册的骨架与 `example_minimal/Dockerfile`** —— 现在照手册走的第一步就是红的。（`example_minimal` 的镜像看起来没有真构建过，否则会撞到同一条。）|
+| N-? | `integrations/README.md` 没说 `COPY` 会把 `$GB` 的 0600 权限带进镜像 | 待裁定 | 红线 5 要求 `$GENEBENCH_ROOT` 全树 `go-rwx`，于是接入目录里的文件都是 0600；`docker build` 的 `COPY` **原样保留文件权限**，而任务容器以 `user: "1000:1000"` 跑 —— 结果是 `python3: can't open file '/opt/<id>/run.py': [Errno 13] Permission denied`，两臂 13 秒退出、`no_artifact`。症状与手册 §3.7 那四条（`$$`、HOME 不可写、路径写错、运行期装包）**长得一模一样但都不是**，排查的人会先去查那四条。修法一行：`RUN chmod -R a+rX /opt/<id>`。建议在 §3.7 加第 5 条，并在 §1② 的骨架里带上这一行。本卡第一次真跑就是这么挂的（run_id `s5-eco-01.{strict,open}.cfg-tradingagents-deepseek.r01`，0 次模型调用）。|
+| N-? | 手册没说 run dir 已存在时怎么重跑 | 待裁定 | 第一次真跑失败后照原样再跑一次，得到 `RunError: 注入失败：run dir 已存在 …… 不覆盖（F9）`。正解是把 `--seq` 加一（`--seq 2` → `r02`），旧的 `r01` 作为证据留着。手册 §1⑥ 的示例命令写死了 `--seq 1`，§3 也没有这条症状。建议在 §3 补一条「症状 → 原因 → 看哪里」。|
+| N-? | `scratch/<卡号>` 会撞车：两个不同的卡都叫 2.6 | 待裁定 | 本卡（tradingagents 接入）与另一个正在做 `integrations/rdagent_q` 的代理**同时**在用 `/data/shared/genebench/scratch/2.6/`。后果不是小事：双方互相覆盖了 `realrun.sh` 与 `README.md`，本卡因此**按对方的 `--config-id` 起了一次 run**（发现后立刻 kill，当时还阻塞在网关锁上、远端命令没开始；对方的脚本已还原成 `--seq 1`）。本卡已改用 `/data/shared/genebench/scratch/2.6-tradingagents/`。建议施工契约把 scratch 落点从「卡号」改成「卡号-系统名」，或由编排方保证卡号全局唯一。**这条值得广播** —— 撞车的两方都不会主动发现（文件被覆盖时没有任何提示）。|
+| N-? | `S5.json` 里没有「一格 vs 一张面板」的粒度说明 | 登记不修 | TradingAgents 的产出粒度是 `(标的, 交易日) → 一条五档评级`，而 S5 题面要的是窗口 × universe 的一张面板。这不是 schema 的缺陷（`signals` 本来就是数组），但它意味着**「产出粒度与阶段不匹配」这一族失败在结算侧只会表现为 coverage 太小**，与「跑挂了只交出几格」不可区分。卡 5.x 若要在主表上区分这两件事，需要一个「声明的目标格数」之类的东西 —— 属出题面/结算口径，本卡不动。|
+| N-? | `runner/c42/adapters/tradingagents/` 与 `integrations/tradingagents/` 并存 | 已处理 | 前者是上一代实现（自己拼 URL、自己做 PIT 判断），**v1.0 起以后者为准**，已在 `integrations/tradingagents/README.md` 开头标注。本卡不删前者（不是本卡路径，且它是 `runner/c42` 的一部分）。建议 v1.0 收口时由 `runner/**` 的负责代理决定是删还是留一句指针。|
+| N-? | `get_indicators` 的指标在接入层现算，口径没有第三方背书 | 登记不修 | 上游 yfinance 路径用 `stockstats` 从 OHLCV 算指标；本接入保留 `stockstats`、只把 OHLCV 换成网关 `/bars`。所以指标口径与上游一致，但**这个环境里没有第二份指标可以对账**。算不出来时返回 `[NO_INDICATOR]` 并明说「没有回退到别的行情源」，不静默给一个数。|
+
+| N-? | TradingAgents 还有**第三条**未替换的原生取数路径 | 待修（v1.1） | `dataflows/stocktwits.py` 与 `dataflows/reddit.py` 直接用 `urllib.request.urlopen` 抓 StockTwits API 与 Reddit RSS（社交/情绪分析师用），**既不在 `VENDOR_METHODS` 里，也不经 `yfinance`** —— 本接入的两处替换都覆盖不到。真跑 `r03` 的 stderr 里逐条可见 `StockTwits fetch failed …: 403 Forbidden` / `Reddit RSS fetch failed for r/wallstreetbets …: 403 Forbidden` —— **挡住它的是容器的出向白名单（CONNECT 允许集是空集），不是接入层**。修法与第二条缝同形：把那两个模块的取数函数换成返回 `[NO_DATA]` 并留痕。**本卡没有改**：改了就与 `sha256:d875d084…` 那次真跑的证据对不上，而真跑预算（同一目标 1 次 + 1 次重试）已经用完。v1.1 修并重跑。|
+| N-? | 「vendor 表之外还有路」这件事不该由每个接入者各自去发现 | 待裁定 | 本次三条缝里，接入者自己找到的是第 1 条；第 2、3 条是**真跑 + 容器隔离**告诉我们的（一条报 `NoMarketDataError`、一条报 403）。这说明「被测系统的取数是否全部经过数据面」**不能靠接入者穷举替换点来保证**。两个方向：(a) 在 `integrations/README.md` 加一条自检步骤 —— 真跑后必须读一遍容器 stderr 与 `log/egress.jsonl`，把每一条被出向白名单挡下的请求都当成一条未替换的路径登记；(b) 更强的做法是让 runner 把 `egress.jsonl` 里的 CONNECT 拒绝数直接进结算表（现在越权率只数网关 403，**看不见「它试图直连第三方」这件事**）。倾向 (a) + (b) 都做：(a) 是纪律、(b) 是判据。|
+| N-? | 垫片的 `NO_DATA` 留痕在结算里被算成 `malformed_requests` | 待裁定 | `r03` 的 `overreach.malformed_requests` 是 strict 60 / open 45，`malformed_reasons` 全是 `unclassified` —— 那些全是垫片打的 `GET /nodata/<kind>`（故意打在白名单之外，让网关中间件记 404）。于是「参数拼错」与「本环境没有这类数据源」在结算口径上分不开，而两者含义相反。卡 2.2 的 notes 已经建议把 `/nodata/{kind}` 做成正式端点（404 + `reason="no_such_data_source"`）；这次的数字说明**不做的话，任何大量使用 NO_DATA 的接入都会在表上显得「参数写得很烂」**。|
+
+## 指南 findings（我是 `integrations/README.md` 的第一个外部用户）
+
+按手册八步实走了一遍，**卡住的地方**与**手册说得对但容易读错的地方**分开记：
+
+### 做不下去的（三处，已在上表登记）
+
+1. **§1② 的 Dockerfile 骨架直接失败**（setuptools）。这是手册里唯一一段可以整段复制的
+   Dockerfile，而它在统一基座上跑不通 —— 第一步就断了。
+2. **权限那条根本没写**（`COPY` 带 0600 → 容器非 root 读不到）。它与 §3.7 的四条症状完全同形，
+   而 §3.7 的四条都不适用，于是排查会从「$$ 写对了吗」开始绕一圈。
+3. **重跑要改 `--seq`** 没写。§1⑥ 的命令写死 `--seq 1`，第一次失败后照抄第二遍必然撞 F9。
+
+### 说得对、但我读错过一次的
+
+4. §1⑥ 的 `scp -r integrations/<id> integrations/genebench_client ljn@…:/data/genebench_runner/build/<id>/`
+   会在 `build/<id>/` 下建出 `<id>/` 与 `genebench_client/` 两个子目录，
+   所以 `docker build` 的**上下文是 `build/<id>`、Dockerfile 是 `-f <id>/Dockerfile`**。
+   手册的命令是对的，但 `-f` 那一段藏在 `example_minimal/Dockerfile` 的注释里而不在 §1⑥ 的正文里；
+   只看 §1⑥ 会以为上下文就是接入目录本身。建议把 `-f` 那一句抬到 §1⑥。
+
+### 手册里最有用的三条（写下来是为了不被后来的整理删掉）
+
+5. **「`fields` 显式传」**与「compat 层的 `fields` 只裁剪返回值、不改变网关上的读取集」——
+   本接入的 `get_stock_data` 因此**直接用 `Client.bars(fields=[...])` 而不是 compat.yfinance**。
+   如果照 §1③ 的 (a) 走 compat 层，access_log 上的读取集永远是六列，S3 类任务就没法接。
+6. **「不要指到 `/task` 下」**（P2 与 P1 的 CONFLICT 那一段）。TradingAgents 默认往
+   `~/.tradingagents/{logs,cache,memory}` 写几十个文件，指到 `/task` 会当场破 P8 文件集封闭。
+   手册把两处原文都摆出来、并说明为什么 P2 不同 —— 这一段省了我一次返工。
+7. **「预算耗尽不是故障，是这次运行结束了」**。TradingAgents 一格要走四个分析师 + 辩论 + 风控，
+   实测每格数十次调用；没有这句话，我会把「只跑出 3 格」当成 bug 去查。

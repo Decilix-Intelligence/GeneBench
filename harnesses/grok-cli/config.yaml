@@ -1,0 +1,28 @@
+# 被测配置（数据驱动，W-0）。
+#
+# **和 Gemini CLI 正相反的一条**：Grok CLI 说的是 xAI 的 **OpenAI 兼容**协议
+# （dist/grok/client.js 用 @ai-sdk/xai 的 createXai，请求落在
+#  $GROK_BASE_URL/chat/completions），而 api.deepseek.com 恰好就服务这套协议 ——
+# 所以它不需要任何协议翻译层就能经边车跑到 DeepSeek，链路与产出都是真的。
+#
+# base_url 写 https://api.deepseek.com：这里登记的是**边车实际转发到的上游**
+# （collect_egress_hosts() 拿它去和 MODEL_API_ALLOW 对键集），不是 harness 原产地的
+# api.x.ai。写 api.x.ai 会要求把一个没有 key、也没有任何配置真在用的主机加进出向白名单。
+#
+# **模型待换**：注册表里的模型仍是 deepseek-chat，不是 grok-*。要换回真 Grok 需要三件：
+# ① XAI_API_KEY 落到 f02 ~/.config/genebench/secrets.env（0600）；
+# ② api.x.ai 进 runner/c41/egress_proxy.py::MODEL_API_ALLOW，并与本文件的 base_url 同源；
+# ③ assert_registry_sane 要求**所有已启用配置同一模型** —— 换成 grok-* 会当场红，
+#    那是 v1.0「一个模型 × 多种 harness」的实验设计，要先过 M7 的实验设计审定。
+# 详见 harnesses/grok-cli/README.md §6。
+# **enabled: false 是结论，不是没做完**（与 gemini-cli 同理）：
+# 真跑两臂都跑完了、100 次调用全部 allow/200，但工具调用的参数在客户端被丢成 {}，
+# agent 因此一步也走不动 —— 这样的配置进主表只会得到一个会被误读成「Grok CLI 能力差」的 0。
+# 要重跑：把这里临时翻成 true → ops/push_exec_to_f02.sh --with-launch-data → 跑完翻回来。
+config_id: cfg-grok-cli-deepseek
+harness: Grok CLI
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: CLI harness（xAI OpenAI 兼容协议，@ai-sdk/xai），经 DeepSeek 的 /v1/chat/completions 接入；链路已真跑验证（100 次 allow/200），但**在 DeepSeek 上拿不到可评分产物** —— @ai-sdk/xai 的流式 chunk schema 只认 xAI「一片 = 一次完整工具调用」的形状，DeepSeek 的标准分片续片被整片丢弃，工具参数恒为 {}（README §5 有假上游对照实验）；模型待换（换回真 Grok 需要 XAI key + api.x.ai 进白名单 + 过 M7）
+enabled: false

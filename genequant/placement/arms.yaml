@@ -1,0 +1,85 @@
+# GeneTask 臂注册表（卡 4.1）。**臂 = 投放的工件集合 + 指令变体**，由本文件定义，不写死在代码里。
+#
+# 为什么是数据而不是常量（N-?，2026-09-07）：`schema.py::ARMS` 原本是 `("strict","open")`
+# 写死的元组，`render.check_arms` 的每一条硬规则也按「两臂成对」写死，`inject.P7` 里
+# 「协议工件」与「strict」这个名字绑死。于是「加一个臂」= 改五个文件的代码 = 推任务集版本 =
+# 重新签字。本文件把「臂是什么」变成配置：**加臂只改本文件与它引用的清单/文本**。
+#
+# 字段：
+#   id                 臂名。进 run_id（`<task>.<arm>.<cfg>.rNN`）与 `arms/INSTRUCTION.<id>.md`。
+#   kind               baseline    = 裸臂（无工件，等价规则的**参照**）；恰好一个。
+#                      protocol    = 投放工件的臂（E1–E14 全查，两两 vs baseline）。
+#                      instruction_variant = 只改指令措辞的臂（E 规则按 §6.6 开例外）。
+#   default            true = 出集时默认渲染并写进 task.yaml 的 instruction 段。
+#                      **改动 default 集合就是改题面内容** —— 要推任务集版本。
+#                      false = 只登记；`build_task(..., arms=[...])` 显式点名才渲染。
+#   phrasebook_column  在 `genetask/phrasebook.yaml` / `render.FIXED_PHRASES` 里取哪一列措辞。
+#                      措辞表只有 strict / open 两列（`render.PHRASEBOOK_COLUMNS`）。
+#   fallback_column    列不存在时回退到哪一列。**只有 instruction_variant 臂可以有**：
+#                      baseline / protocol 臂回退 = 悄悄换了题面，不许。
+#   variant_text_file  instruction_variant 臂渲染后要追加的固定文本（相对本目录）。
+#   equivalence        e_rules = E1–E14 全查；instruction_variant_exception = 只查 E1/E2 欠定/C1，
+#                      其余记进 arms/equivalence.md 的「例外」段（公平性协议 §6.6）。
+#   artifacts          该臂**独有**投放的工件集合，逐条 {manifest, mount, per_task_rules}：
+#                        manifest       相对仓库根的 MANIFEST.json（封闭集合，每条带 sha256）
+#                        mount          落在 bundle/run dir 的 `work/<mount>/`，容器里是 `/task/<mount>/`
+#                        per_task_rules 是否再叠 bundle 里逐题生成的规则 JSON（`genetask/protocol_rules.py`）
+#                      baseline 臂必须为空 —— 「裸臂独有文件集为空」是 §6.2 等号判据的另一半。
+schema_version: "1.0"
+arms:
+  - id: strict
+    kind: protocol
+    default: true
+    phrasebook_column: strict
+    equivalence: e_rules
+    description: GQ 协议臂。题面用 strict 列措辞（键值记法），并被动投放 geneprotocol_v1 的执行机制（三态强制、validator 的结构化反馈、修复回路）。
+    artifacts:
+      - manifest: ops/protocol/geneprotocol_v1/MANIFEST.json
+        mount: protocol
+        per_task_rules: true
+
+  - id: open
+    kind: baseline
+    default: true
+    phrasebook_column: open
+    equivalence: e_rules
+    description: 裸臂（基线）。题面用 open 列措辞（自然语言），不投放任何工件 —— 等价规则以它为参照。
+    artifacts: []
+
+  # ---- 以下是**非默认臂**（default: false）。它们只登记，不进任何既有出集：
+  # `build_task()` 不点名就不渲染，task.yaml 的 instruction 段一个字都不变。
+  # **加这两条没有改动任何 .py** —— 这就是「臂机制数据驱动」这句话的验收判据。
+  - id: doc
+    kind: protocol
+    default: false
+    phrasebook_column: strict
+    equivalence: e_rules
+    description: 文档臂。题面与 strict 臂逐字相同，但只投放协议的**只读文档**（README + contract），不投放 validator。它回答的是「把规则写给 agent 看够不够」——strict 臂多出来的那部分才是执行机制。
+    artifacts:
+      - manifest: ops/protocol/geneprotocol_v1_doc/MANIFEST.json
+        mount: protocol
+        per_task_rules: false
+
+  - id: hint
+    kind: instruction_variant
+    default: false
+    phrasebook_column: hint
+    fallback_column: open
+    variant_text_file: arms/hint.md
+    equivalence: instruction_variant_exception
+    description: 提示臂。措辞用 open 列（措辞表没有 hint 列，按 fallback_column 回退），题面末尾追加一段固定提示。它**不是**协议臂：差异全在那段文字里，因此 E 规则按公平性协议 §6.6 开例外，主表上单列。
+    artifacts: []
+
+  - id: adapt
+    kind: protocol
+    default: false
+    # strict 列（不是 open）：E10 对位置 A 的臂要求「声明项带 `f=` 头部」，而 open 列是自然语言
+    # 括注 —— protocol 臂用 open 列在**任何**题上都建不出来（实测见 ops/tickets_inbox/4.2b.md）。
+    # 与 doc 臂同形：题面与 strict 臂逐字相同，臂间差异全在投放的工件上。
+    phrasebook_column: strict
+    equivalence: e_rules
+    description: 适配臂（赛道 v1.0-adapt）。被动投放适配模块 geneprotocol_v1_adapt（单位表 / 字段映射 / 可接纳性条文）到 /task/adaptation/；题面只说「若存在」，不说里面有什么。它回答的是「上游按自己的口径交来的产物，agent 能不能在不替源补值的前提下接进协议」。
+    artifacts:
+      - manifest: ops/protocol/geneprotocol_v1_adapt/MANIFEST.json
+        mount: adaptation
+        per_task_rules: false

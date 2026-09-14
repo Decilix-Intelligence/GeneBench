@@ -1,0 +1,44 @@
+# 卡 Y2 收件箱（适配赛道 30 例真跑 + 适配赛道表）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `ops/push_bundle_to_f02.sh` 应当自己把落点传给守门 | 待办（**不在本卡路径**） | N-348 之后适配 bundle 的判据是**落点**（`push_guard.ADAPT_DEST_PREFIX`），而推送脚本只给守门传 `<bundle> <manifest>` 两个参数。现在靠调用方显式 `GENEBENCH_PUSH_DEST=<DST> ops/push_bundle_to_f02.sh …`（守门**没拿到落点就拒**，所以漏给不会变成静默放行，只会推不动）。**一行改动**：在 `push_guard.py` 那一行前加 `GENEBENCH_PUSH_DEST="$DST"`，或把 `"$DST"` 作为第三个参数传进去（CLI 已经收）。改了之后 `ops/test_y2.py::test_the_narrower_gate_is_the_destination` 仍然成立。 |
+| N-? | 裁定原文写「33 道出集规定题」，清单现值是 **32 道** | 已如实记 | 出集 34 = 规定题 32（regulated 29 + free 3）+ 已放出的欠定探针题 2；挂起 6 道全是探针题。八个阶段各 4 道规定题。差写在 `ops/adaptation_track.py::source_counts()`（进 `_index.json`）、`ops/specs/adaptation_track.md` §2、`ops/test_y2.py::test_the_ruling_says_33_the_manifest_says_32`。**没有把清单改成 33，也没有假装 33 就是 32。** |
+| N-? | 题源体量帽 `MAX_SOURCE_BYTES = 700 KB` 排掉了两道规定题 | 已记因 | `s5-eco-01` 的 oracle 产物 **4.0 MB**（41,700 条 signals）、`s4-ops-01` **878 KB**。做成适配题量到的是「agent 会不会用脚本改文件而不是把整份文件读进上下文」，不是适配能力，而且 bundle 跟着胖 4 MB。帽下每阶段仍剩 ≥3 道题，分层不受影响。**这是本卡自己加的判据，不是裁定里的** —— 若编排方认为应当保留大产物题，改一行常量即可，但要一并想清楚预算。 |
+| N-? | 适配模块 `MANIFEST.json` 的 `status` 从 `draft` 改成 `released` | 已改 | 三件工件（`adaptation.md` / `field_map.json` / `unit_table.json`）**内容一字未改**，sha 与 2026-09-07 相同；改的只有 status。理由：draft 下 `runner/inject.py` 的 P7 拒绝投放，adapt 臂就是个裸臂（卡 4.2-b 实测：22.7 s 中止、零次模型调用），而 N-348 放行的是**真跑**。该文件不在本卡的路径清单里，但它是 `ops/adaptation_track.py::write_module_manifest()` 的产物，且不改就跑不成 —— 记在这里请编排方过目。 |
+| N-? | `ops/test_4rt.py` 的两条断言按新判据改写 | 已改 | `test_push_guard_refuses_the_adaptation_set` → `test_push_guard_gates_the_adaptation_set_by_destination`；`test_pack_adaptation_bundle_is_still_not_pushable` → `…_needs_an_explicit_destination`。**判据变了不是判据消失了**：两条现在钉的是「没声明落点 = 拒」与「主赛道 batch 目录 = 拒」。`test_push_guard_refuses_a_gold_derived_passport` 一字未动（一般规则没放宽，适配集是唯一例外）。 |
+| N-? | `ops/test_adaptation_track.py` 的三处夹具改成**按性质挑**，不写死 example_id | 已改 | 换题源之后 `adapt-l1-01` 不再是「结构合法的破坏」那一类，写死 id 的夹具会假红。`test_structurally_legal_breaks_are_recorded` 的数从 **13** 改成 **9**（实测值，不是设计目标）。 |
+| N-? | 适配赛道只跑了 `adapt` 干预臂，**没有跑 `open` 参照臂** | 已知限制 | 本卡的完成定义是「30 例各有 oracle 与**一次**真运行」，30 个 adapt run 已用掉约 700 次真 API。要读「适配模块到底带来了多少」还需要同样的 30 个 `open` run（再约 700 次）—— bundle 里的 `INSTRUCTION.open.md` 已经就位，补跑只要把 `--arms adapt` 换成 `--arms open`。 |
+| N-? | S1 / S5 的题源产物有 87 KB–669 KB，适配题的难度里混进了「文件有多大」 | 已知限制 | 帽已经把 4 MB 那道排掉了，但 S5 三道题仍在 650 KB 量级。逐例对照表里这几例的 calls 与结局要单独看。彻底的解法是给 S1/S5 造小一号的规定题产物，那是 v1.1。 |
+
+## 真跑结果（2026-09-10，30 例各一次 adapt 臂真运行）
+
+**完成定义达成**：例 30 / 有 oracle 30 / **有真运行 30** / 结算到的 run 30 / 问题 0。
+真 API **749 次**（`llm_log` 里 `decision == allow` 的条数，30 个 run 合计；单 run 16–59 次，
+中位数约 21）。**不是「都要通过」** —— 结局分布如实报：
+
+| level | n | first_pass | correct_flag | failed | resolved_rate | as_expected_rate |
+| --- | --- | --- | --- | --- | --- | --- |
+| L1 单位错配 | 10 | 7 | — | 3 | 0.70 | 0.70 |
+| L2 词汇翻译 | 10 | 7 | — | 3 | 0.70 | 0.70 |
+| L3 缺协议字段 | 10 | — | 5 | 5 | 0.50 | 0.50 |
+| **ALL** | **30** | **14** | **5** | **11** | **0.633** | **0.633** |
+
+`blocked` 与 `repaired_pass` 各 **0**：adapt 臂投放的是适配模块（单位表 / 字段映射 /
+可接纳性条文），**不投 `validate_artifact.py`**，所以这一批根本没有修复回路 ——
+`validator_rejections` 全是 `None`（不可得），不是 0。要量「修了几轮」得同时投协议臂的工件。
+
+失败的 11 例（逐例见 `ops/reports/adapt/oracle_matrix.md`，`note` 列写着差在哪个字段）：
+`adapt-l1-03`（S2 rows）、`adapt-l1-04`（S3 coverage）、`adapt-l1-08`（S6 date）、
+`adapt-l2-03`（S2 symbol→ts_code）、`adapt-l2-07`（S6 akshare 代码）、`adapt-l2-08`（S6 1d→daily）、
+`adapt-l3-04`（S4 quantiles）、`adapt-l3-06`（S6 objective）、`adapt-l3-07`（S6 依赖图边）、
+`adapt-l3-09`（S7 依赖图边）、`adapt-l3-10`（S8 visible_state_fields）。
+**两条读得出来的规律，登记不解读过头**：① 两例 `gap_provenance_edge`（删掉整条上游引用）
+**全败** —— 删一个标量和删一条依赖图的边，对 agent 不是同一件事；② S6 六例中败了四例 ——
+S6 的产物是 5 个调仓日 × 20 个持仓的嵌套表，改一处要重写一大块。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `ops/mk_tables.py` 末尾那条已知限制过期了 | 待改（**不在本卡路径**） | 原文：「适配赛道还没有记录……`ops/reports/adapt/records.json` 现在是空的（真跑被红线 B2 闸住）」。现在 `records.json` 有 30 条，`ops/results_db.py` 里 `batch=adapt` 有 30 行，`ops/mk_tables.py --table adaptation --filter batch=adapt` 出 4 行真表。补轴的做法在 `ops/reports/adapt/adapt_report.py::axes_for`：`set_version` / `reference_version` 取 `freeze_v10` 的当前值并在 `axes_source` 里标 `declared:`，`protocol_version` 由 `results_db.protocol_by_run` 逐 run 反算（adapt 臂投的是 `geneprotocol_v1_adapt`，不是 `geneprotocol_v1` 的三件，所以反算出来是显式的 `…@none`）。建议把这段折进 `ops/score_runs.py`（4.2-b 当时就提过）。 |
+| N-? | 施工中途收过一次库，收完发现要能删 | 已处理 | 27 个 run 跑到第 10 个时收过一次库用来验通路。`results_db.ingest` 按 `(batch, run_id)` 幂等，同主键内容不一致会抛且**不覆盖**（这是对的）。跑完之后用 `$GB/scratch/Y2/db_drop_adapt.py` 显式删掉自己那 10 行再重收 30 行 —— **没有去放宽 `ingest` 的幂等判据**。库里现在 `batch=adapt` 恰好 30 行。 |
+| N-? | `$GB/runs_in/adapt/` 占了 **18 GB** | 登记不修 | 每个 run 目录带一份 602 MB 的 `work/provider/`（qlib provider 的臂内独占副本，PA-2/PA-3），30 个 run 就是 18 GB。`adapt_report.pull()` 与 `ops/score_runs.py` 的排除项同源，都没排 provider。结算只用到 `inject.json` / `run.json` / `artifact.json` / `work/protocol/validator.log` / `log/llm_log.jsonl`。/data 还有 2.4 T 空闲，所以本卡没删；要省盘就在两处 `pull` 里加 `--exclude=work/provider/`（那是共享文件 `ops/score_runs.py`，不在本卡路径）。 |

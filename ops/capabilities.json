@@ -1,0 +1,11 @@
+{
+ "n33_bars_open_amount_vwap": true,
+ "s8_state_endpoint": true,
+ "anchor_ladder_54": false,
+ "_note": "五把状态锁的输入。n33 由 test_gateway_fields 与网关实际对齐；s8 等状态端点契约与实现；anchor_ladder_54 等卡 5.4 落地；probe_materiality_verified 等 f01 上 oracle 逐值实测（materiality.py）；n23_index_instrument 等 provider v1.1 加指数标的。provider_sha256_pinned 等卡 4.2 适配层核对冻结 provider 的 sha256 根（54fdda39…）。改任一位必须先让对应测试翻转。",
+ "_updated": "2026-09-05",
+ "n23_index_instrument": false,
+ "provider_sha256_pinned": false,
+ "_probe_materiality": "已从全局 bool 改为**逐 (字段, 条件)** 判据（2026-09-03 裁定）：见 genetask/schema.py 的 DIVERGENCE_EVIDENCE（实测记录，键带条件）与 FIELD_MATERIAL_WHEN（静态规则）。E9c/E9d2 判一道题时取该题探针字段与其声明参数去匹配；匹配不上就只许 draft。全局开关会把一个条件下的结论搬到另一个条件上用，因此退役。",
+ "_s8_state_endpoint": "2026-09-05 翻绿（N-96 第 4 步）：五端点 + 会话工厂 + 会话键、SIM-A..N 全绿（SIM-N 从 f02 任务容器真打）、越界/越权用例齐。第 5 步 draft→packed 待签字。"
+}

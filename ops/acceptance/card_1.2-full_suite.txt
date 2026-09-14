@@ -1,0 +1,44 @@
+    [env] duckdb     1.4.3                <- /data/shared/genebench/env/lib/python3.10/site-packages/duckdb/__init__.py
+.    [env] pandas     2.2.3                <- /data/shared/genebench/env/lib/python3.10/site-packages/pandas/__init__.py
+.    [env] pyarrow    20.0.0               <- /data/shared/genebench/env/lib/python3.10/site-packages/pyarrow/__init__.py
+.    [env] qlib       0.9.8.dev32          <- /data/shared/genebench/env/lib/python3.10/site-packages/qlib/__init__.py
+.    [env] fastapi    0.141.1              <- /data/shared/genebench/env/lib/python3.10/site-packages/fastapi/__init__.py
+.    [env] uvicorn    0.52.1               <- /data/shared/genebench/env/lib/python3.10/site-packages/uvicorn/__init__.py
+.    [env] pydantic   2.13.4               <- /data/shared/genebench/env/lib/python3.10/site-packages/pydantic/__init__.py
+.    [env] httpx      0.28.1               <- /data/shared/genebench/env/lib/python3.10/site-packages/httpx/__init__.py
+.    [env] pytest     9.1.1                <- /data/shared/genebench/env/lib/python3.10/site-packages/pytest/__init__.py
+.    [env] python     = /data/shared/genebench/env/bin/python3.10
+    [env] cfg.PYTHON = /data/shared/genebench/env/bin/python  (exists=True)
+.    [env] /data: total=2750G used=75G free=2535G
+.    [env] st_dev: root=2049 /data=2049 home=64512
+.    [env] bind ok  192.168.1.48:18080 (已释放)
+.    [env] GENEBENCH_ROOT = /data/shared/genebench
+.    [env] mode = 0o700 (要求 0o700)
+.    [env] 目录权限审计:56 个目录 <- /data/shared/genebench (不下钻:/data/shared/genebench/env, /data/shared/genebench/repo/.git)
+.    [env] reference  /data/shared/genebench/repo/reference  mode=0o700
+.    [env] scorer     /data/shared/genebench/repo/scorer  mode=0o700
+.    [env] reference  文件权限审计:1 个文件
+.    [env] scorer     文件权限审计:1 个文件
+.    [env] write probe ok -> .gb_write_probe_hn2c9k9k.tmp
+.    [env] REPO       /data/shared/genebench/repo  exists=True
+.    [env] ENV        /data/shared/genebench/env  exists=True
+.    [env] LOGS       /data/shared/genebench/logs  exists=True
+.    [env] SNAPSHOTS  /data/shared/genebench/snapshots  exists=True
+.    [env] RESULTS    /data/shared/genebench/results  exists=True
+.    [env] WHEELS     /data/shared/genebench/wheels  exists=True
+.    [env] OPS        /data/shared/genebench/repo/ops  exists=True
+.    [env] genebench_config <- /data/shared/genebench/repo/genebench_config.py
+..    [env] create_dir 三级全 0700(umask=002 下)-> /data/shared/genebench/.gb_mkdir_probe_7ttkgyiy/a/b/c
+...............    [env] catalog  /home/ljn/projects/data/market_lake/catalog/market.duckdb  access_mode=read_only  views=150
+    [env] catalog  size=536576 mtime_moved_during_test=False  (外部 ETL 在写,非本测试所为)
+.    [env] 扫了 51 个 .py,可写 duckdb 连接 0 处
+.    [env] gold datasets = 147  <- /home/ljn/projects/data/market_lake/gold
+    [env] qlib release  <- /home/ljn/projects/data/qlib/releases/2026-08-26
+........................................................................ [ 23%]
+........................................................................ [ 38%]
+........................................................................ [ 52%]
+........................................................................ [ 67%]
+........................................................................ [ 81%]
+........................................................................ [ 95%]
+....................                                                     [100%]
+499 passed in 132.73s (0:02:12)

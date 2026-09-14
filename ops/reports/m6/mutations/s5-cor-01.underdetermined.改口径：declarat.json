@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s5-cor-01",
+  "probe": "underdetermined",
+  "name": "改口径：declarations 与任务声明不符",
+  "why": "S5 上同族的可造条目（`missing_masquerading_as_signal` 见脚注）",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "declaration_mismatch"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:declaration_mismatch [underdetermined] @$.declarations.value_semantics — 任务声明 value_semantics='rank'，artifact 写 'score' —— 自行改口径"
+ ]
+}

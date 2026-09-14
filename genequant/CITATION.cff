@@ -1,0 +1,46 @@
+# 引用信息（Citation File Format 1.2.0）
+# https://citation-file-format.github.io/
+#
+# ⚠ authors 仍是 "<待用户填>"：**没有编造任何作者名、机构或地址**。
+#    填之前不要把这份文件当成一条可照抄的引用。
+#    license 与 repository-code 两处已定（2026-09-10 / 2026-09-11 用户裁定）。
+
+cff-version: 1.2.0
+message: "如果你用到了 GeneQuant 协议，请按下面的信息引用。"
+title: "GeneQuant: 量化研究产物的三态声明协议与自检验证器"
+abstract: >-
+  GeneQuant 为量化研究的产物定义可结算的结构契约：契约必填的每个口径字段只有
+  有值 / 显式 unresolved / 缺失三种状态，依赖图规定「口径未定则依赖它的数不得算出」，
+  随附一个零依赖、不联网的自检验证器与一条修复回路。
+  协议另含一个适配模块，处理「上游产物不按本协议口径书写」时的接入：
+  源中缺失的信息保持缺失，翻译由使用方提出、由协议裁决可接纳性。
+type: software
+version: "v1"
+date-released: "<待用户填：首次公开发布日>"
+
+authors:
+  - name: "<待用户填>"
+    # 每位作者用下面的字段填，family-names / given-names 缺一不可；
+    # 机构作者用 name:。**不要留占位符发布。**
+    # - family-names: "<姓>"
+    #   given-names: "<名>"
+    #   affiliation: "<机构>"
+    #   orcid: "https://orcid.org/<ORCID>"
+
+license: Apache-2.0
+repository-code: "https://github.com/Decilix-Intelligence/GeneQuant.git"
+
+keywords:
+  - protocol
+  - quantitative-finance
+  - llm-agent
+  - artifact-validation
+  - underdetermination
+
+references:
+  - type: software
+    title: "GeneBench：用这套协议评测量化研究 agent 的基准"
+    repository-code: "https://github.com/Decilix-Intelligence/GeneBench.git"
+    notes: >-
+      GeneBench 以本树 MANIFEST.json 的 sha256 钉住它所用的协议版本
+      （RELEASE_MANIFEST.json 的 genequant 段）。

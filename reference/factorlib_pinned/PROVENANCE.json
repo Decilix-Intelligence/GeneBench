@@ -1,0 +1,22 @@
+{
+  "vendored_at": "2026-09-01",
+  "source_dir": "/home/ljn/projects/quant/platform/src/quant_platform/factorlib",
+  "platform_git_rev": "97d153249719059ae8a686082fda949dc169b87f",
+  "platform_worktree_dirty": false,
+  "why": "平台是既有服务且会变；gold 因子值是 τ 的输入、τ 要签字。provider 已经冻了，参考实现不冻等于只冻了一半。",
+  "rerun_consequence": "重新钉版本 = 必须重算 gold、重标 τ、重新签字。",
+  "files": {
+    "formula.py": {
+      "sha256": "3eaf99b7dc829e824cc37cea4a414858ffc34dec9b317ab807df960bf9cb17a4",
+      "bytes": 11431
+    },
+    "qlib_loader.py": {
+      "sha256": "bbad13f3b7152df1566b5719290baa6426f717e79227c7009a51c9208224cf96",
+      "bytes": 19019
+    },
+    "qlib_ops.py": {
+      "sha256": "f3d16a7925c5778cf3760516ac62671958fdef675e26fb90983077aca8c7ced2",
+      "bytes": 4897
+    }
+  }
+}

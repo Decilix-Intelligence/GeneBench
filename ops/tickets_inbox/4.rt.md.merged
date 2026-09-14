@@ -1,0 +1,31 @@
+# 卡 4.rt（阶段四红队修复）票据
+
+红队 2026-09-07 的十二条 findings：**block 与 major 已修**（见下「已修」段），
+**minor 登记不修**（纪律：只修 block 与 major）。编号先写 N-?，并表时编排方给号。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | 两本接入手册通篇写死「两臂」（红队 finding 10，minor） | 待办 | `harnesses/README.md:395/:416` 与 `integrations/README.md:41-49/:297` 都只说两臂，不提臂注册表、不提公平性协议 §6.6。跟着手册做的人不会知道臂是数据驱动的。修法：两本各加一行「臂集合定义在 `genetask/arms.yaml`（§6.6）；默认出集两臂，出非默认臂见 `ops/export_bundle.py --arms`（§6.6.5）」。**本卡不改**：手册归接入卡，且本卡不碰 `harnesses/**`、`integrations/**` |
+| N-? | 重出一道题会**静默覆写**别人正在用的答案面（finding 11，minor） | 待办 | `genetask/packager.write_task` 对已存在的 `task_dir` 直接覆写：`task.yaml` / `canary.json` / `gold_token` / `judge_sha` 全换一套，`_ledger.jsonl` 再追一行 —— 别人手上已导出的 bundle 与通行证就对不上了。只有 `ops/HANDOFF.md:566` 提了一句。修法：`export_one` 发现 `reference/tasks/<set>/<task_id>` 已存在时默认拒绝，要覆盖给 `--force`（打印上一次的 `judge_sha256` 与 `packed_at`），手册那条命令下面加同样的警告。**注意**：`write_task` 在冻结根内（`genetask/packager.py`），闸放在 `export_one` 这一侧就不必推版本 |
+| N-? | `ops/test_env.py` 的 key 形态扫描会命中**被拷贝的判据文件自身**（finding 12，minor） | 待办 | 把仓库整棵拷进 `$GB/scratch` 试改（外部用户最自然的做法）会让红线 3 那条测试当场红，命中的是副本里的 `ops/test_env.py` 自己。修法二选一：扫描器按**文件名**白名单排除 `ops/test_env*.py` 这类判据文件（不是按内容），或在 `ops/HANDOFF.md` 的 scratch 纪律里写明「不要把仓库整棵拷进 `$GB/scratch`」 |
+| N-? | `build_task` 的**臂顺序语义**还没有在冻结根内落闸（finding 5 的另一半） | 待办（要推任务集版本） | `genetask/packager.py:247` 的 `strict, open_ = rendered[arm_ids[0]], rendered[S.BASELINE_ARM]` 把 arms 列表的第一个元素当干预臂；`arms=('open','hint')` 得到 ok=True、无 problems、两侧**逐字节相同**的等价表。本卡在 `ops/export_bundle.check_arms` 上加了闸（文档化入口那一侧全覆盖），但直接调 `build_task` 的人仍能踩。修法：`build_task` 里显式挑「第一个非 baseline 的臂」，一个都没有就 `PackError`。**`genetask/packager.py` 在冻结根内 → 要推任务集版本**，本卡不动（见 `pending_freeze_bumps`） |
+| N-? | 加臂之后的**同版本重冻**（finding 3 的另一半） | 待办（收口时做） | `genetask/arms.yaml` 在 `ops/freeze_v10.CODE_FILES` 里。现在工作树是漂的：清单记 `e727dfd2083e…`、盘上 `b873299c0df8…`（卡 4.2-b 加 adapt 臂那次留下的）。本卡把这件事变成**可查**（通行证记 `arm_registry.in_sync`，出集时 stderr 打 `[黄]`），但**没有重冻**：`code` 在 `ROOT_FIELDS` 里，重冻会让**所有已发通行证作废**（root 变 → 注入器 P3 对所有旧 bundle 当场拒），而此刻阶段一/二/三都有在途 bundle。修法：收口时挑一个没有在途 bundle 的时刻跑 `flock $GB/locks/heavy.lock $PY ops/freeze_v10.py --write`（同版本重冻，题面未变不推版本），并把已导出的 bundle 重新导出 |
+| N-? | 适配模块还是草稿，`adapt` 臂注入不了（finding 9） | 待办 | `ops/protocol/geneprotocol_v1_adapt/MANIFEST.json` 的 `status` 是 `draft`，注入器 P7 明文拒：「协议工件是干预本身，缺了它 adapt 臂就是个裸臂」。要在清单里落定三件工件的内容（`adaptation.md` / `field_map.json` / `unit_table.json`）并改成 `released`。已写进 `ops/specs/adaptation_track.md` §0 的现状表 |
+| N-? | 适配赛道的**题源裁定**（finding 8 的正解，红线 B2） | 待办（需要裁定） | 本卡先把守门补上：`ops/push_guard.check_pushable_set` 按集拒 `set_id=v1.0-adapt` 与通行证 `origin: gold_derived`。但这只是**挡住**，不是解决 —— 赛道要能真跑得走 `ops/specs/adaptation_track.md` §7 方向 1（换合成题源）。方向 2（烧掉被引用的那十几道主赛道题）不划算 |
+| N-? | 红队留下的两处目录与一处权限 | 待办（顺手） | ① `rm -rf /data/shared/genebench/staging/rt_phase4_adapt`（gold 派生内容，**任何情况下不推 f02**）；② `rm -rf /data/shared/genebench/scratch/rt_phase4`（证据，归档后再删）；③ `/data/shared/genebench/repo/.git/index` 曾是 0o664，`ops/test_env_guard.py::test_guard_covers_the_git_object_store` 会红 —— 下一个拿 `git.lock` 的人顺手跑 `$PY -c "from ops import report_io as R; R.secure_tree('/data/shared/genebench/repo')"` |
+
+## 已修（卡 4.rt，2026-09-07）
+
+| finding | 严重度 | 修在哪 |
+| --- | --- | --- |
+| 1 只凭文档加不出臂的集 | block | `ops/export_bundle.py`：`export_one(arms=…)` + CLI `--arms`（默认行为逐字节不变）；公平性协议 §6.6.5 写明这条命令 |
+| 2 没有文档化的「本地核一遍新臂」路径 | block | `ops/run_f02_a1.py --dry`（P0–P9 + `work/` 装配，不起容器/不调模型/不读凭据，跑完按 §6.2/§6.6.4 比臂）；`--provider-root`；run 根落在数据根内时先说人话；L-5a 的报错补了一句本地自查怎么放 run 根 |
+| 6 pack→pin 顺序把通行证打废 | block | `ops/pack_adaptation.py --digest`：钉 digest 挪到出通行证**之前**；`ops/reports/adapt/README.md` 的步骤①②并成一步 |
+| 7 适配 bundle 里没有 adapt 臂的题面 | block | `ops/pack_adaptation.py --arms`（每个点名的臂各写一份题面）+ 注入器 **P6b**（缺臂时报「这个 bundle 有哪几个臂」，且红在建 run dir 之前） |
+| 8 适配 bundle 能过守门 | block | `ops/push_guard.check_pushable_set`（按集 / 按通行证 origin 拒）；`assert_pushable` 收编第三道；`pack_adaptation` 改调前两道（打得出来 ≠ 推得上去） |
+| 9 适配赛道现状没写在规格正文 | block | `ops/specs/adaptation_track.md` §0 现状表（三条各带落点与票据） |
+| 3 冻结输入漂移无人报 | major | 通行证记 `arm_registry.{sha256, frozen_sha256, in_sync}`，出集时 stderr 打 `[黄]`；§6.6.5 写明重冻命令**与它的代价**。重冻本身留给收口（见上表） |
+| 4 §6.6.3 没实现 | major | `scorer/report.py`：`table_a` / `table_b` 每行带 `arm_kind`，`to_latex` 按 kind 分块，`instruction_variant` 块首逐条写出免掉的等价规则（与 `genetask.render.WAIVED_FOR_VARIANT` 同源）；§6.6.3 的「落点」改成实指 |
+| 5 臂顺序静默决定等价表比什么 | major | `ops/export_bundle.check_arms` 拒「第一个是参照臂」；`build_task` 那一层要推版本，登记在上表 |
+
+判据：`ops/test_4rt.py`（本卡新增）。

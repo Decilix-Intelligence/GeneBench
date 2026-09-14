@@ -1,0 +1,3 @@
+config_id,arm,arm_kind,stage,n_runs,n_runs_denom,invalid_rate,honest_halt_rate,unsettled_rate,Decl,Set,Ovr,Align,Adj,Cal,CellAgree
+cfg-quantagent-deepseek,open,baseline,S2,3,3,0.0,0.0,0.3333333333333333,—,—,0.0,1.0,1.0,1.0,—
+cfg-quantagent-deepseek,strict,protocol,S2,3,3,0.0,0.0,0.3333333333333333,—,—,0.0,1.0,1.0,1.0,—

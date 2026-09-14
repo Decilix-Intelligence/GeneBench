@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s7-cor-01",
+  "probe": "ledger_conservation",
+  "name": "复式记账残差超容差",
+  "why": "资金 + 持仓市值 = 净值，逐日守恒",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "ledger_not_conserved"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:ledger_not_conserved [ledger_conservation] @$.payload.ledger_check.max_abs_residual — 残差 0.001 超容差 1e-06"
+ ]
+}

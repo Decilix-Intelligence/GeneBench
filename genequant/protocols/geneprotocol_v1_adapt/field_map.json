@@ -1,0 +1,47 @@
+{
+ "schema_version": "1.0",
+ "_what": "三家常见数据源与本协议 schema 的对照。**查得到且唯一**才算翻译成立；查不到 = 不可接纳，按 adaptation.md 规则 1 标记。",
+ "vendors": ["tushare", "yfinance", "akshare", "internal_legacy"],
+ "field_names": {
+  "date": {"tushare": "trade_date", "yfinance": "Date", "akshare": "日期", "internal_legacy": "dt"},
+  "symbol": {"tushare": "ts_code", "yfinance": "Ticker", "akshare": "代码", "internal_legacy": "instrument"},
+  "open": {"tushare": "open", "yfinance": "Open", "akshare": "开盘", "internal_legacy": "OPEN"},
+  "high": {"tushare": "high", "yfinance": "High", "akshare": "最高", "internal_legacy": "HIGH"},
+  "low": {"tushare": "low", "yfinance": "Low", "akshare": "最低", "internal_legacy": "LOW"},
+  "close": {"tushare": "close", "yfinance": "Close", "akshare": "收盘", "internal_legacy": "CLOSE"},
+  "volume": {"tushare": "vol", "yfinance": "Volume", "akshare": "成交量", "internal_legacy": "VOL"},
+  "amount": {"tushare": "amount", "yfinance": "Turnover", "akshare": "成交额", "internal_legacy": "AMT"},
+  "vwap": {"tushare": "avg_price", "yfinance": "VWAP", "akshare": "均价", "internal_legacy": "AVGPX"},
+  "adj_factor": {"tushare": "adj_factor", "yfinance": "Adj Close", "akshare": "复权因子", "internal_legacy": "ADJF"}
+ },
+ "enum_values": {
+  "adjust": {"post": ["hfq", "后复权"], "pre": ["qfq", "前复权"], "none": ["bfq", "不复权"]},
+  "ic_method": {"spearman": ["rank_ic", "rankic", "rank"], "pearson": ["normal_ic", "pearson_ic"]},
+  "eval_frequency": {"daily": ["1d", "D", "day"], "weekly": ["1wk", "W", "week"], "monthly": ["1mo", "M", "month"]},
+  "signal_frequency": {"daily": ["1d", "D", "day"], "weekly": ["1wk", "W", "week"], "monthly": ["1mo", "M", "month"]},
+  "rebalance_frequency": {"daily": ["1d", "D", "day"], "weekly": ["1wk", "W", "week"], "monthly": ["1mo", "M", "month"]},
+  "fill_price": {"close": ["Close", "收盘价"], "open": ["Open", "开盘价"], "vwap": ["VWAP", "均价"]},
+  "slippage_reference_price": {"close": ["Close"], "open": ["Open"], "reference_close": ["ref_close", "prev_close_ref"]},
+  "direction": {"higher_is_long": ["long_top", "asc_long"], "lower_is_long": ["short_top", "desc_long"]},
+  "value_semantics": {"rank": ["percentile", "pct_rank"], "score": ["raw", "zscore"]},
+  "missing_row_policy": {"keep_missing": ["keep_na", "keep_nan"], "forward_fill": ["ffill"], "drop": ["dropna"]},
+  "missing_policy": {"keep_null": ["keep_na", "keep_nan"], "forward_fill": ["ffill"], "fill_zero": ["zerofill"]},
+  "side": {"buy": ["B", "bid", "买入"], "sell": ["S", "ask", "卖出"]},
+  "tie_handling": {"average": ["avg", "mean"], "min": ["minimum"], "max": ["maximum"], "first": ["ordinal"], "dense": ["dense_rank"]}
+ },
+ "code_notation": {
+  "schema": "<6 位数字>.<SH|SZ>，例 600000.SH / 000001.SZ",
+  "patterns": {
+   "tushare": "600000.SH（与 schema 同形）",
+   "yfinance": "600000.SS（上交所后缀 .SS）/ 000001.SZ",
+   "akshare": "sh600000 / sz000001（小写前缀在前，无点号）",
+   "internal_legacy": "SH600000 / SZ000001（大写前缀在前，无点号）"
+  },
+  "rules": [
+   "前缀式（sh/sz/SH/SZ 打头）→ 取后 6 位数字 + '.' + 前缀大写",
+   "yfinance 的 .SS 后缀 → .SH；.SZ 保持",
+   "只有 6 位数字、没有市场标识 → **不可判**（600xxx 与 000xxx 的市场可推，其余不可）：按规则 1 标记"
+  ]
+ },
+ "unresolvable": "表里查不到、或查到两个以上候选而源里无从分辨 → 标 unsupported / unresolved，停在该字段"
+}

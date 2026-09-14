@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s4-cor-01",
+  "probe": "underdetermined",
+  "name": "ci_method 不是块自举",
+  "why": "冻结口径冲突：换了不确定性方法却照常出数",
+  "where": "artifact",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "ci_method_not_block_bootstrap"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:ci_method_not_block_bootstrap [underdetermined] @$.payload.ic_stats.ci_method — 不确定性一律 block-bootstrap，HAC/NW 可并列但不能替代"
+ ]
+}

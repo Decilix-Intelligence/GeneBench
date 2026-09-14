@@ -1,0 +1,21 @@
+{
+ "mutation": {
+  "task_id": "s6-cor-01",
+  "probe": "optimizer_failure",
+  "name": "求解失败却沿用上期持仓",
+  "why": "solver_status=not_converged 时静默沿用上期",
+  "where": "artifact(day)",
+  "base_clean": true,
+  "hit": true,
+  "other_families": [],
+  "side_effects": [],
+  "codes": [
+   "optimizer_failure_silently_carried"
+  ],
+  "ok": true,
+  "verdict": "✅ 该族响、其余不响"
+ },
+ "findings": [
+  "violation:optimizer_failure_silently_carried [optimizer_failure] @$.payload.targets[22] — solver_status=not_converged，持仓却与上期完全相同 —— 静默沿用上期持仓"
+ ]
+}

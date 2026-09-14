@@ -1,0 +1,22 @@
+{
+  "paper_url": "https://arxiv.org/abs/2502.16789",
+  "paper_title": "AlphaAgent: LLM-Driven Alpha Mining with Regularized Exploration to Counteract Alpha Decay",
+  "paper_authors_first": "Ziyi Tang",
+  "paper_version_seen": "2502.16789v2",
+  "paper_published": "2025-02-24",
+  "repo_url": "https://github.com/RndmVariableQ/AlphaAgent",
+  "commit": "b42cb397025510da44355db9dcf278304321f589",
+  "commit_ref": "main HEAD at retrieved_at (committed 2026-07-03T11:54:54Z, message \"Rename packages\")",
+  "commit_date": "2026-07-03T11:54:54Z",
+  "dist": "alphaagent==0.1.0 (source tarball, not on PyPI)",
+  "dist_repo_url": "https://codeload.github.com/RndmVariableQ/AlphaAgent/tar.gz/b42cb397025510da44355db9dcf278304321f589",
+  "dist_sha256": "cddabb7ea2c3df31bf3cfb5f8c8be95427f2913b80965b3d180164a14e274581",
+  "dist_filename": "alphaagent-b42cb397.tar.gz",
+  "license": "none_declared",
+  "version_declared": "0.1.0",
+  "runnable_check": "python3 -c \"import genebench_client.compat as c; c.install('tushare'); import importlib.metadata as m; from alphaagent.dsl.eval import eval_factor; from alphaagent.dsl.catalog import list_operator_names; from alphaagent.factor.mining.loop import run_trajectory; print(m.version('alphaagent'), len(list_operator_names()), eval_factor.__name__, run_trajectory.__name__)\"",
+  "runnable_check_result": "0.1.0 118 eval_factor run_trajectory",
+  "retrieved_at": "2026-09-07T12:35:00+00:00",
+  "note": "【为什么不是 PyPI】PyPI 上没有名为 alphaagent 的这一个包（本仓库的 pyproject 也没有发布配置，index-url 指向清华镜像只是它自己 uv sync 用的）。所以走「本地 Mac 下载 codeload tarball → 记 commit 与 sha256 → scp 到 f01 → scp 到 f02 → Dockerfile COPY」这条路（integrations/README.md §1② 的正路）。dist_sha256 是本地 shasum -a 256 那一份 tarball 的摘要，f02 上构建前会再核一次。【跨字段判据】不从 PyPI 装，所以「PyPI 声明的仓库必须就是 repo」那一条不适用；改用两条可核的：① 仓库名 RndmVariableQ/AlphaAgent 是 GitHub 上以 AlphaAgent 命名、描述为 alpha mining 框架的唯一主仓（407 星，其余同名仓分别是 Godot 插件、越南股市的 Microsoft 分支、PPO 交易 agent 等，见 README §1）；② 论文摘要里 AlphaAgent 的三个机制（AST 相似度做原创性约束、假设-因子语义一致性、AST 结构复杂度控制）在本 commit 的代码里都能找到落点（alphaagent/factor/zoo/similarity.py、alphaagent/factor/mining/prompts.py、alphaagent/dsl/core/parser.py）。【必须连着读的一句】本 commit **不是论文那一版代码**：仓库的整个 git 历史只有 8 个提交、最早一个是 2026-07-01 的「初始化项目：初始提交」，而论文是 2025-02 —— 历史被重置过，当前 HEAD 是一次重写（提交信息 \"Release new AlphaAgent factor research framework\"）。README 里也不再提论文。所以本接入钉的是「AlphaAgent 这个仓库的当前发布版」，不是「论文实验用的那一版」；论文里的数字不能拿来解释本接入的结果。【license】仓库里没有 LICENSE 文件，GitHub API 的 license 字段是 null；README 末尾只有一句「Code in this repository is open source ... Research use only」。所以写 none_declared 而不是猜一个 MIT —— 猜出来的许可证比空着更坏。本接入只在内网做研究性评测，不再分发镜像。【runnable_check】在镜像里跑，回答的是「这个镜像里到底装没装上、DSL 与 agent 循环两条路都 import 得到吗」，实测输出见 runnable_check_result，为什么开头要 compat.install 见 runnable_check_note。",
+  "runnable_check_note": "开头那句 compat.install('tushare') 不是装饰：镜像里**没装** tushare（红线 5），而上游 alphaagent/data/__init__.py 顶层就 import 它，agent 循环那条 import 链一定会经过 —— 不顶替就 ModuleNotFoundError（实测过一次）。所以这条命令核的正是「按本接入的用法，这个镜像里装没装上」。118 是本镜像里 alphaagent.dsl.catalog.list_operator_names() 数出来的算子个数（未装可选的 C++/numba 后端，算子集不受影响）。"
+}

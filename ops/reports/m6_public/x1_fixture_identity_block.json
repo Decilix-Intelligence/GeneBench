@@ -1,0 +1,108 @@
+{
+ "what": "X1：公开通道 m6_public 的 18 个 run 里，哪些题出不了集，为什么",
+ "gate": "genetask/packager.py::export_task —— 夹具 sha256 != 题面 inputs[].sha256 即 PackError",
+ "counter_gate": "ops/tickets.md N-277：公开链要求任何一件夹具的 sha 与声明**相同**就停（相同=私有源漏入）",
+ "consequence": "两条在公开通道同时成立 → 声明了 inputs 的题一件都出不了集",
+ "freeze": "genetask/packager.py 与 genetask/params/v1.0-smoke40.yaml 都在 ops/freeze_v10.CODE_FILES 里（冻结根）",
+ "n_tasks_in_joblist": 9,
+ "n_tasks_with_declared_inputs": 5,
+ "n_fixture_rows": 8,
+ "n_public_matches_declared": 0,
+ "n_private_matches_declared": 8,
+ "tasks_exportable": [
+  "s1-cor-01",
+  "s2-cor-01",
+  "s3-cor-01",
+  "s8-cor-01"
+ ],
+ "tasks_blocked": [
+  "s4-cor-01",
+  "s5-cor-01",
+  "s6-cor-01",
+  "s7-cor-01",
+  "s7-rob-02"
+ ],
+ "runs_blocked": 10,
+ "rows": [
+  {
+   "task": "s4-cor-01",
+   "path": "work/factor_panel.parquet",
+   "declared_sha256": "c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6",
+   "public_actual_sha256": "034c4526ad20d25675dee361869a60cd3d8c6a427a008e1f9051dfaa9ccf4e92",
+   "private_actual_sha256": "c8ed955efdfbbaa79231c8c1888055e5386049e96b358536971aa072933860e6",
+   "public_matches_declared": false,
+   "private_matches_declared": true,
+   "origin": "reference/gold_factors/csi300/gtja_191.001"
+  },
+  {
+   "task": "s5-cor-01",
+   "path": "work/inputs/manifest.json",
+   "declared_sha256": "5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a",
+   "public_actual_sha256": "ac18cf7ed2626ce777e874eba9b8e6a249ec637787f85646b378f695ccafe537",
+   "private_actual_sha256": "5ac21b05efa5887dcd4ddecde6f2884603389e67500439ad2b06c4fff2b1915a",
+   "public_matches_declared": false,
+   "private_matches_declared": true,
+   "origin": "f01 物化：输入因子清单（factor_id/path/stage=S3/artifact_id/sha256/max_date）"
+  },
+  {
+   "task": "s5-cor-01",
+   "path": "work/inputs/gtja_191.001.parquet",
+   "declared_sha256": "6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847",
+   "public_actual_sha256": "1cc3497b2baf5ac01bb8f4dd99fb235778f5eb9090b28f8b5cfe3db86a488271",
+   "private_actual_sha256": "6b9c2b2b5b352568e416cf3ea92a556d395b5b787a9158bbc17f9bbb1b542847",
+   "public_matches_declared": false,
+   "private_matches_declared": true,
+   "origin": "2.1b gold 因子面板 gtja_191.001 @csi300 切到 window（列 date/code/value）"
+  },
+  {
+   "task": "s6-cor-01",
+   "path": "work/signal_s5_gtja001_csi300_v1.parquet",
+   "declared_sha256": "5f91bee97dd580ffe00bd126348437538168a6ef920d480755ae61051ae986cb",
+   "public_actual_sha256": "4bfb0ed5b3cd79c7feb816f815d9b4556ed8d3e40e2fe943fa7b281e51fbbfed",
+   "private_actual_sha256": "5f91bee97dd580ffe00bd126348437538168a6ef920d480755ae61051ae986cb",
+   "public_matches_declared": false,
+   "private_matches_declared": true,
+   "origin": "reference/signals/s5_gtja001_csi300_v1/slice.parquet"
+  },
+  {
+   "task": "s7-cor-01",
+   "path": "work/signal.parquet",
+   "declared_sha256": "4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e",
+   "public_actual_sha256": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325",
+   "private_actual_sha256": "4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e",
+   "public_matches_declared": false,
+   "private_matches_declared": true,
+   "origin": "signal:s7_dedicated_signal_v1"
+  },
+  {
+   "task": "s7-cor-01",
+   "path": "work/signal.meta.json",
+   "declared_sha256": "10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc",
+   "public_actual_sha256": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "private_actual_sha256": "10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc",
+   "public_matches_declared": false,
+   "private_matches_declared": true,
+   "origin": "signal:s7_dedicated_signal_v1#meta"
+  },
+  {
+   "task": "s7-rob-02",
+   "path": "work/signal.parquet",
+   "declared_sha256": "4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e",
+   "public_actual_sha256": "fccd344143eaa4b7e200f1fb40e7e0765481aaf227be89a3c2f96837a916d325",
+   "private_actual_sha256": "4597e07783b9e442982c81fe61d1c76d1b1b25040aa1937b9aa2620e7088b78e",
+   "public_matches_declared": false,
+   "private_matches_declared": true,
+   "origin": "signal:s7_dedicated_signal_v1"
+  },
+  {
+   "task": "s7-rob-02",
+   "path": "work/signal.meta.json",
+   "declared_sha256": "10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc",
+   "public_actual_sha256": "8d74169c382fb2bd1f918517753a710463a723f214fcefaac1e4977f8f431f8c",
+   "private_actual_sha256": "10b1d61ad5bac01771e3e250efa47995b84e73c25b0f0476301cb42f4d7392dc",
+   "public_matches_declared": false,
+   "private_matches_declared": true,
+   "origin": "signal:s7_dedicated_signal_v1#meta"
+  }
+ ]
+}

@@ -1,0 +1,102 @@
+
+======== B1a index_weight / index_member_all / dc_index_member / ths_index_member
+ -- index_weight: ['index_code', 'con_code', 'trade_date', 'weight', 'source', 'first_seen_at']
+ -- index_member_all: ['l1_code', 'l1_name', 'l2_code', 'l2_name', 'l3_code', 'l3_name', 'ts_code', 'name', 'in_date', 'out_date', 'is_new', 'source', 'first_seen_at']
+ -- index_classify: ['index_code', 'industry_name', 'level', 'industry_code', 'is_pub', 'parent_code', 'src', 'source', 'first_seen_at']
+ -- dc_index_member: ['trade_date', 'ts_code', 'con_code', 'name', 'source', 'first_seen_at', 'last_seen_at']
+ -- ths_index_basic: ['ts_code', 'name', 'count', 'exchange', 'list_date', 'type', 'snapshot_date', 'source', 'first_seen_at', 'last_seen_at']
+    ('000300.SH', 63298, '20090123', '20260731', 211)
+    ('000852.SH', 142000, '20141031', '20260731', 142)
+    ('000905.SH', 105500, '20090123', '20260731', 211)
+  index_weight all indices covered:
+    (3,)
+  sample index_weight rows:
+    ('000300.SH', '300750.SZ', '20260731', 4.012, 'tushare', '2026-08-05T05:40:43.713893+00:00')
+    ('000300.SH', '300308.SZ', '20260731', 3.86, 'tushare', '2026-08-05T05:40:43.713893+00:00')
+    ('000300.SH', '600519.SH', '20260731', 3.239, 'tushare', '2026-08-05T05:40:43.713893+00:00')
+  index_member_all sample (in/out dates?):
+    ('801010.SI', '农林牧渔', '801016.SI', '种植业', '850111.SI', '种子', '000998.SZ', '隆平高科', '20000629', None, 'Y', 'tushare_aux', '2026-08-05T09:08:54.091431+00:00')
+    ('801010.SI', '农林牧渔', '801016.SI', '种植业', '850111.SI', '种子', '000713.SZ', '国投丰乐', '19970422', None, 'Y', 'tushare_aux', '2026-08-05T09:08:54.091431+00:00')
+
+======== B1b delist / list_date  (stock_basic)
+ -- stock_basic: ['ts_code', 'symbol', 'name', 'area', 'industry', 'market', 'exchange', 'list_status', 'list_date', 'delist_date', 'is_hs', 'source', 'first_seen_at', 'last_seen_at']
+    ('L', 99807, 5551)
+    ('D', 6102, 339)
+    (339,)
+    ('920305.BJ', '云创退', '20210826', '20260730', 'D', '2026-08-14T01:32:16.412408+00:00')
+    ('920305.BJ', '云创退', '20210826', '20260730', 'D', '2026-08-12T01:32:46.891298+00:00')
+    ('920305.BJ', '云创退', '20210826', '20260730', 'D', '2026-08-27T01:31:42.406040+00:00')
+    ('19901201', '20260828')
+
+======== B1c ST marks + history
+ -- stock_st: ['ts_code', 'name', 'trade_date', 'type', 'type_name', 'trade_month', 'source', 'first_seen_at', 'last_seen_at']
+ -- st_history: ['ts_code', 'name', 'pub_date', 'imp_date', 'st_tpye', 'st_reason', 'st_explain', 'event_id', 'published_month', 'source', 'first_seen_at', 'last_seen_at']
+ -- namechange: ['ts_code', 'name', 'start_date', 'end_date', 'ann_date', 'change_reason', 'source', 'first_seen_at', 'last_seen_at']
+ -- stk_alert: ['ts_code', 'name', 'start_date', 'end_date', 'type', 'source', 'first_seen_at', 'last_seen_at']
+    ('002650.SZ', 'ST加加', '20260828', 'ST', '风险警示板', '202608', 'tushare_premium', '2026-08-30T05:34:58.682569+00:00', '2026-08-30T05:34:58.682569+00:00')
+    ('000010.SZ', '*ST美丽', '20260828', 'ST', '风险警示板', '202608', 'tushare_premium', '2026-08-30T05:34:58.682569+00:00', '2026-08-30T05:34:58.682569+00:00')
+    ('000016.SZ', '*ST康佳A', '20260828', 'ST', '风险警示板', '202608', 'tushare_premium', '2026-08-30T05:34:58.682569+00:00', '2026-08-30T05:34:58.682569+00:00')
+    ('002485.SZ', '*ST雪发', '20220430', '20220506', '*ST', '最近一个会计年度经审计的净利润为负值且营业收入低于一亿元(含被追溯重述)', '公司2021年度经审计的净利润为负值且营业收入低于1亿元', '24614223e71ebbf18cc84421cce6baf37505dbc88bc034dffd2809a5191e1750', '202204', 'tushare_premium', '2026-08-05T18:13:22.802419+00:00', '2026-08-30T05:57:47.979568+00:00')
+    ('688086.SH', '*ST紫晶', '20220430', '20220506', '*ST', '最近一个年度被注册会计师出具无法表示意见或否定意见的审计报告', '中喜会计师事务所(特殊普通合伙)作为公司2021年度财务报告审计机构,对公司2021年度出具了无法表示意见的财务报表审计报告', '06f4bc44753c6b858e14092e37c0806d5aaa73635b035146ae43cc9c0dfa8f67', '202204', 'tushare_premium', '2026-08-05T18:13:22.802419+00:00', '2026-08-30T05:57:47.979568+00:00')
+
+======== B1d suspension
+ -- suspend_d: ['ts_code', 'trade_date', 'suspend_timing', 'suspend_type', 'source', 'first_seen_at', 'last_seen_at']
+    ERR IO Error: Cannot open file "/home/ljn/projects/data/market_lake/gold/suspend_d/trade_date=2013-03-20/data.parquet": Too many open files
+    ('S', 457224)
+    ('R', 25066)
+
+======== B2 limit price / tradability
+ -- stk_limit: ['trade_date', 'ts_code', 'pre_close', 'up_limit', 'down_limit', 'source', 'first_seen_at', 'last_seen_at']
+    ERR IO Error: Cannot open file "/home/ljn/projects/data/market_lake/gold/stk_limit/trade_date=2013-03-18/data.parquet": Too many open files
+ -- daily cols: ['ts_code', 'trade_date', 'open', 'high', 'low', 'close', 'pre_close', 'change', 'pct_chg', 'amount', 'volume', 'source', 'first_seen_at', 'last_seen_at']
+ -- limit_list_d: ['trade_date', 'ts_code', 'industry', 'name', 'close', 'pct_chg', 'amount', 'limit_amount', 'float_mv', 'total_mv', 'turnover_ratio', 'fd_amount', 'first_time', 'last_time', 'open_times', 'up_stat', 'limit_times', 'limit', 'source', 'first_seen_at', 'last_seen_at']
+    ERR IO Error: Cannot open file "/home/ljn/projects/data/market_lake/gold/limit_list_d/trade_date=2024-03-20/data.parquet": Too many open files
+  suspended-day presence in daily (20260828):
+    (5, 5547, 5551)
+    ('600491.SH', 'R', 1)
+    ('000711.SZ', 'S', 0)
+    ('002586.SZ', 'S', 0)
+
+======== B3 adjustment chain
+ -- adj_factor: ['ts_code', 'trade_date', 'adj_factor', 'source', 'first_seen_at', 'last_seen_at']
+    ('20090105', '20260828', 15369639, 5834)
+    ERR IO Error: Cannot open file "/home/ljn/projects/data/market_lake/gold/adj_factor/trade_date=2013-03-20/data.parquet": Too many open files
+ -- stk_factor_pro price cols: ['open', 'open_hfq', 'open_qfq', 'high', 'high_hfq', 'high_qfq', 'low', 'low_hfq', 'low_qfq', 'close', 'close_hfq', 'close_qfq', 'pre_close', 'adj_factor']
+ -- fund_adj: ['ts_code', 'trade_date', 'adj_factor', 'source', 'first_seen_at', 'last_seen_at']
+    ('20260105', '20260514')
+
+======== B4 trade calendars
+ -- trade_cal: ['exchange', 'cal_date', 'is_open', 'pretrade_date', 'source', 'first_seen_at']
+    ('SSE', 6574, '20090101', '20261231')
+ -- hk_trade_calendar: ['cal_date', 'is_open', 'pretrade_date', 'source', 'first_seen_at', 'last_seen_at']
+    ERR Binder Error: Referenced column "exchange" not found in FROM clause!
+Candidate bindings: "cal_date", "pretrade_date", "source"
+
+LINE 1: select exchange, count(*
+ -- fut_trade_calendar: ['exchange', 'cal_date', 'is_open', 'pretrade_date', 'source', 'first_seen_at', 'last_seen_at']
+    ('CFFEX', 4236, '20150101', '20260806')
+    ('CZCE', 6426, '20090101', '20260806')
+    ('DCE', 6426, '20090101', '20260806')
+    ('GFEX', 1324, '20221222', '20260806')
+    ('INE', 3363, '20170523', '20260806')
+    ('SHFE', 6426, '20090101', '20260806')
+    ('SSE', '20261231', 1, '20261230', 'tushare', '2026-08-05T05:38:41.701682+00:00')
+    ('SSE', '20261230', 1, '20261229', 'tushare', '2026-08-05T05:38:41.701682+00:00')
+
+======== B5 financial dual timestamps
+ -- income: ['ann_date', 'f_ann_date', 'end_date', 'end_type', 'update_flag']
+ -- income_vip: ['ann_date', 'f_ann_date', 'end_date', 'end_type', 'update_flag', 'request_period']
+ -- balancesheet: ['ann_date', 'f_ann_date', 'end_date', 'end_type', 'lending_funds', 'update_flag']
+ -- balancesheet_vip: ['ann_date', 'f_ann_date', 'end_date', 'end_type', 'lending_funds', 'update_flag', 'request_period']
+ -- cashflow: ['ann_date', 'f_ann_date', 'end_date', 'end_type', 'recp_tax_rends', 'c_cash_equ_beg_period', 'c_cash_equ_end_period', 'end_bal_cash', 'end_bal_cash_equ', 'update_flag']
+ -- cashflow_vip: ['ann_date', 'f_ann_date', 'end_date', 'end_type', 'recp_tax_rends', 'c_cash_equ_beg_period', 'c_cash_equ_end_period', 'end_bal_cash', 'end_bal_cash_equ', 'update_flag', 'request_period']
+ -- fina_indicator: ['ann_date', 'end_date']
+ -- fina_indicator_vip: ['ann_date', 'end_date', 'update_flag', 'request_period']
+ -- forecast: ['ann_date', 'end_date', 'first_ann_date', 'update_flag']
+ -- express: ['ann_date', 'end_date', 'update_flag']
+ -- fina_mainbz_vip: ['end_date', 'request_period']
+ -- disclosure_date: ['ann_date', 'end_date', 'pre_date', 'actual_date', 'modify_date']
+    ERR IO Error: Cannot open file "/home/ljn/projects/data/market_lake/gold/income/ts_code=002407.SZ/data.parquet": Too many open files
+    ERR IO Error: Cannot open file "/home/ljn/projects/data/market_lake/gold/fina_indicator/ts_code=002407.SZ/data.parquet": Too many open files
+    ('920125.BJ', '20260805', '20260630', '20260807', None, None, 'tushare', '2026-08-05T05:41:25.365510+00:00')
+    ('920116.BJ', '20260805', '20260630', '20260825', None, None, 'tushare', '2026-08-05T05:41:25.365510+00:00')

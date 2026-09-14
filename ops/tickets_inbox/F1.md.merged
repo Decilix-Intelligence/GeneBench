@@ -1,0 +1,9 @@
+# 卡 F1 的票据（写入 ops/tickets.md 时请合并）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | CHANGELOG.md 要在本次提交后重出 | 待办 | `REVISIONS` / `REFERENCE_REVISIONS` 重排并补录了 11 条，`ops/test_release_manifest.py::test_changelog_is_generated_not_hand_written` 在重出之前是红的。命令：`$PY ops/mk_release_manifest.py --write-changelog`。**本卡没跑**：`ops/mk_release_manifest.py` 当时有别的代理未提交的改动，跑它等于把别人的半成品渲进 CHANGELOG。 |
+| N-? | `ops/mk_release_manifest.py::split_revisions` 的「历史遗留」注与渲染出来的那段话已经不成立 | 待办 | 那两处逐字写着「拆轴之后新增的任务集记录写进了 `REFERENCE_REVISIONS` 元组里（`1.0.7` … `1.0.13`）」—— N-573 收口后**已经不是事实**。按前缀分轴的代码本身仍然正确（分完两边各自干净），只是那段说明要改。该文件本卡无路径授权且当时有别人在改。 |
+| N-? | `adapt_report.axes_for` 取的是 `freeze_v10` 的**当前**版本号，不是这批数**重算时**那一版 | 待办 | 本卡先推号（1.0.16 / r1.0.23）再收库，于是 30 行适配记录被标成了「在 1.0.16 / r1.0.23 下算的」，而那一版根本没重算过适配切片。已就地钉回 1.0.15 / r1.0.22（`axes_source` 写成 `pinned:…`）。根治：轴应由 run 自己的通行证反算（`results_db.protocol_by_run` 已经是这个形态），不该取当前值。 |
+| N-? | 冒烟集 S8 四题的 gold **尚未重出** | 待办 | 本卡把「算不出来」的根因修掉了（`task_dir` 的 `set_id` 必填 + 基点实例不再同号），但 gold 重出要经网关真跑（`ops/public_gateway.sh run --` / `run_oracles`，两条通道各一次），时间盒内没做。盘上现存的 S8 gold 是 v1.0.14 时期产物，**没有被本卡改动影响**（会话构造参数一个都没改）。 |
+| N-? | `gateway/sim_factory.py` 决定 S8 gold 的运行环境，却不在 `REFERENCE_MODULE_FILES` 里 | 登记不修 | 它住在网关侧、不在 `reference/` 下，收进参考清单会撞上 `test_env_guard::test_reference_files_cover_the_whole_reference_plane` 的口径。本次改动靠 r1.0.23 的记因钉住。已进已知限制表。 |

@@ -1,0 +1,7 @@
+arm,arm_kind,config_id,image_digest,n_runs,reference_version,runner_version,set_version,Adj,Align,Cal,CellAgree,Decl,Set,honest_halts,invalid_rate,n_cells,n_gold_rows,n_rows_missing,n_runs_denom,stage,unobservable_probes_mean
+open,baseline,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.22,66f921b78275…,1.0.15,,,,,,,0,0.0,,,,1,S1,0.0
+open,baseline,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.22,66f921b78275…,1.0.15,1.0,0.6666666666666666,0.9772727272727273,0.03449640287769784,1.0,1.0,0,0.0,166800.0,41700.0,2185.0,1,S2,0.0
+open,baseline,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.22,66f921b78275…,1.0.15,,,,,,,0,1.0,,,,1,S3,0.0
+strict,protocol,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.22,66f921b78275…,1.0.15,,,,,,,0,0.0,,,,1,S1,0.0
+strict,protocol,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.22,66f921b78275…,1.0.15,1.0,1.0,1.0,0.0,1.0,1.0,0,0.0,166800.0,41700.0,41700.0,1,S2,0.0
+strict,protocol,cfg-codex-deepseek,gb-cx-u@sha256:961e3878b28f…,1,r1.0.22,66f921b78275…,1.0.15,,,,,,,0,0.0,,,,1,S3,0.0

@@ -1,0 +1,9 @@
+基线（应全绿）：problems=[]  connect 调用数=3
+红 ✅  注入真连接 duckdb.connect(cfg.CATALOG)  -> ["L193 connect 参数不是 ':memory:'", 'L193 引用了 cfg.CATALOG']
+红 ✅  只引用 cfg.GOLD 不开连接  -> ['L109 引用了 cfg.GOLD']
+红 ✅  connect 参数换成变量  -> ["L194 connect 参数不是 ':memory:'"]
+绿 ✅  反向对照：只改注释 -> []
+主仓 sha256 前 007867531d0ac817 后 007867531d0ac817 —— 未改动 ✅
+三例全红
+   pct_ours_amount_over_volume  pct_tushare_doc_formula  pct_div10  pct_x1000
+0                    99.984303                 0.000137    0.00011        0.0

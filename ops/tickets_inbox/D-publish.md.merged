@@ -1,0 +1,9 @@
+# 卡 D 的票据收件箱（裁定 ③⑤）
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | GitHub token 缺 `Contents: Read and write`，Release v1.0.16 建不了、两个附件传不上 | **待用户** | 实测 `POST /repos/Decilix-Intelligence/GeneBench/releases` 回 `403 Resource not accessible by personal access token`，`x-accepted-github-permissions: contents=write`。同一把 token 的读全通、账号本身是 repo admin（`permissions.admin=true`），响应头无 `x-oauth-scopes` → fine-grained PAT，仓库权限只给了读。机器上没有第二把凭据（无 `gh`、无 `~/.git-credentials`、无 credential.helper）。补法与补完照抄的一条命令在 `ops/reports/push_result.md` §2.2–§2.3 |
+| N-? | `RELEASE_MANIFEST.release_attachments` 的 `download_url` 仍是空串 | **待上一条** | 空串的既定语义就是「还没上传」（`attachments.json` 的 `note` 与 `mk_release_manifest.release_attachments_section` 的 `uploaded` 计数同源）。上传之后回填两条，再跑 `$PY ops/mk_release_manifest.py`（`release_attachments` 在 `FATAL_KEYS` 里，不重出会让 `test_release_manifest` 红） |
+| N-? | Release 的 tag 该指向哪个提交 | **待上一条** | 本卡准备的 `target_commitish` 是 force-push **之前**的远端 HEAD `45e33deb…`；树已经推新，补做时应换成推后的 HEAD（`push_result.md` §6 记着值）。附件的 `browser_download_url` 只由 tag 名决定，不随 tag 指向哪个提交而变 |
+| N-? | 公开树里的 `ops/reports/push_result.md` 比内网仓库的少一节（§6 推后补记） | **设计性** | 树的内容里含本文件，而树的提交 sha 是对内容算的 —— 把 sha 写进去 sha 就变，递归绕不过去。口径写在该文件 §5 |
+| N-? | `ops/test_p.py::test_树里没有配远端` 两条恒红 | **登记不修** | `$GB/release/trees/*` 配了 origin（推送需要），而那条测试钉「树里没有配远端」。卡 A 已点过一次名；本卡重打树之后又加回了 origin，这条仍红。要么改断言、要么推完就 `git remote remove origin` —— 都不挡发布，按裁定 ⑥ 登记不修 |

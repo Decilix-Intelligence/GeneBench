@@ -1,0 +1,16 @@
+{
+  "paper_url": "https://arxiv.org/abs/2505.15155",
+  "paper_title": "R&D-Agent-Quant: A Multi-Agent Framework for Data-Centric Factors and Model Joint Optimization",
+  "repo_url": "https://github.com/microsoft/RD-Agent",
+  "commit": "274e274d5dbb72cc2ea139d1a7c93d73ce9b1198",
+  "commit_ref": "tag v0.8.0",
+  "dist": "rdagent==0.8.0",
+  "dist_repo_url": "https://github.com/microsoft/RD-Agent/",
+  "dist_sha256": "5914499f7e896d5547d414a51db12332c78b2e4862595a98e895608450e65123",
+  "license": "MIT",
+  "version_declared": "0.8.0",
+  "runnable_check": "python3 -c \"import importlib.metadata as m; from rdagent.components.coder.factor_coder import FactorCoSTEER; from rdagent.components.coder.factor_coder.factor import FactorTask, FactorFBWorkspace; print(m.version('rdagent'), FactorCoSTEER.__name__, FactorFBWorkspace.__name__)\"",
+  "runnable_check_result": "0.8.0 FactorCoSTEER FactorFBWorkspace",
+  "retrieved_at": "2026-09-07T08:50:00+00:00",
+  "note": "从 PyPI 装（构建期 PyPI 实测 200；docker.io 被墙，GitHub codeload 在 f02 构建网里也不可达 —— 但本条不需要它，wheel 就够）。跨字段判据：PyPI 自己声明的 Project-URL homepage 是 https://github.com/microsoft/RD-Agent/，与 repo_url 归一后相同（实测读的是镜像里 rdagent-0.8.0.dist-info/METADATA）。license 取自同一份 METADATA 的 `Classifier: License :: OSI Approved :: MIT License` 与 dist-info/licenses/LICENSE 的抬头，不是凭记忆。commit 与 dist_sha256 与 runner/c42/upstream_pins.py::PINS['rdagent_q'] 逐字相同。"
+}

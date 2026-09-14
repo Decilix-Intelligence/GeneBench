@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{Table A — rehearsal\_echo（接入/harness 验证，不是实验数据）}
+\label{tab:a-rehearsal_echo}
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+config\_id & arm & SR & pass@1 & pass\^{}3 & ProgressRate & Steps & \$ & Latency & Recov & 越权率 \\
+\midrule
+\multicolumn{11}{l}{\textit{参照臂（baseline）}} \\
+cfg-echo-min-deepseek & open & 0.000 & 0.000 & --- & 0.000 & --- & --- & 13.397 & --- & --- \\
+\midrule
+\multicolumn{11}{l}{\textit{协议臂（protocol）—— 与参照臂的差异是投放的工件}} \\
+cfg-echo-min-deepseek & strict & 0.000 & 0.000 & --- & 0.000 & --- & --- & 13.464 & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}

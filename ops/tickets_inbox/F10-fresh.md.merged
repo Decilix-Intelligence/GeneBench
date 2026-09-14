@@ -1,0 +1,38 @@
+# 卡 F10（用户裁定 ①）：五条代码缺陷一次修完 —— 其中一条正在等着打断双机生产
+
+日期 2026-09-14。**不 push、不碰 Release、不重打树。**
+自验落点：`$GB/scratch/F10/`（`push_fresh2.log` = 一棵全新执行面目录的推送；
+`smoke_f02.sh` = 在那棵树上的注入冒烟脚本，f02 上同一份在 `/data/genebench_runner/f10_smoke.sh`）。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-857 | `ops/guard_modes.py:32` **模块级** `import genebench_config`，而 exec 白名单不含它 → 任何新铺的执行面第一次真跑就炸在 P0 | **已修** | 改成**可选 import**（`try/except ModuleNotFoundError` + `CONFIG_AVAILABLE`）。**取舍**：另一条路是把 `genebench_config.py` 收进两处白名单 —— 代价是把 807 行发布方数据面地图（湖 / gold / reference / runs_in 的绝对路径、网关绑定地址与端口）送上跑 agent 的那台机器，还要为「仓库根下的文件」新造一套同步机制（两处白名单现在都只认 `ops/` 下的文件）。选可选 import 的**判据**：`EXTERNAL_ROOTS` / `ANSWER_PLANE_ROOTS` 在执行面上**本来就全是不存在的路径**（`roots()` 按 `exists()` 过滤），落空**不改变任何一条真实判据**；主判据（仓库根 = 这棵树自己）照旧全量跑。**不是静默跳过**：① `runner/inject.preflight` 新增一条断言 —— 守门必须把注入器自己这棵树列进 `roots()`，否则 P0 当场红；② `main()` 把审计根与降级说明打出来；③ `ops/test_F10.py` 拿一棵没有 `genebench_config.py` 的树证明 0644 文件 / 0775 目录 / 0775 `__pycache__` 照样全抓到。**两处白名单本次无需改动**（没加新文件）。f02 实测：全新树上 `check_modes=True` → `CONFIG_AVAILABLE=False`、审计根 `['/data/genebench_runner/exec_f10']`、`P0 = []`。 |
+| N-855 | `ops/run_f02_a1.py:51` `RUNNER_PROVIDER_ROOT` 写死 `/data/genebench_runner/provider`，与 `ops/run_joblist.probe_f02_provider` 查的 `runner_root()/provider` **不同源**；危险在于**它不报错** | **已修** | 两处现在都从执行面根现算：`run_f02_a1.runner_root()` = `runner.c41.runner_core.ROOT`，与 `runner/placement.runner_root()` 认**同一个** `GENEBENCH_RUNNER_ROOT`、回落到**同一个** `placement_dual.RUNNER_ROOT_DEFAULT`。另加一条**当场拒**：`assert_provider_same_source()` —— 真跑时 provider 根的父目录不是 `<执行面根>/provider` 就 `SystemExit`，**两个值都打出来**（`--dry` 豁免，本模块 docstring 明确要求它指到数据面那一份）。还补了传播那一半：`ops/run_joblist.f02_run_cmd` 在**双机**形态下，只要 `GENEBENCH_RUNNER_ROOT` 被显式设了就一并 `export` 过去（不设 → inner **逐字节不变**，有断言钉住）。发布方取值 `/data/genebench_runner/provider` **一字未变**。 |
+| N-856 | `runner/c41/egress_proxy.py` 模块级 `import h11`，而 `exec/vendor/h11` **不在仓库里、也没有任何文档化步骤会铺它**（f02 上那份是 2026-09-05 手工遗留物） | **已修** | 选的是**随 exec 树船运发布方网关环境自己那份 h11**，不是 vendor 进仓库。理由：裁定 2026-09-05 要的不是「版本号相同」是**同一份字节**（P7d 再把它复制进 run dir）——把一份副本放进仓库等于造第二个真相，会与 `egress_proxy.H11_VERSION` 漂；而且不动公开树的发布件清单。实现**只有一处**：`runner/placement.stage_vendor()`（`VENDOR_PKGS=("h11",)`），`ops/push_exec_to_f02.sh` 第 1 步用 `"$PY" -m runner.placement --stage-vendor "$STAGE"` 调它，单机落位 `place_exec_tree()` 直接调 —— **不造第二张 shell 清单**。三条当场拒：环境里没有它 / 版本与代码里钉的不一致 / 带了编译产物（挂进 musl 容器会炸）。h11 缺失时的报错也改成说人话（说清该跑哪条命令重铺）。**对卡 I 的影响**：仓库里**没有**新增文件，`RELEASE_MANIFEST.json` 的发布件清单不受影响；`vendor/` 仍然只存在于执行面那棵树上。 |
+| N-862 | 单机形态下执行面根落在 `$GENEBENCH_ROOT` **里面**，P0 审计的正是那棵树 → 上一个 run 自己的 0644 产物让下一个 run 起不来 | **已修** | `ops/guard_modes.RUN_PRODUCT_ROOTS`：把**执行面 run 产物根**从模式审计里剪掉，取值与 `runner/placement.runner_root()` 同源（`GENEBENCH_RUNNER_ROOT` > `$GENEBENCH_ROOT/genebench_runner`）。**判别力不许降低**，所以只剪这一棵、而且 `<run 产物根>/exec`（代码树）作为独立的根**加回来**；答案面字节落进 run 根归 `runner/f02/answer_plane_guard.py` 的树口径扫描管（每次落位/推送后都跑，命中即删），本来就不是模式位这道门的活。**反面测试**（`test_run产物剪枝不许伤到判别力`）：答案面根下的 0644 → 必红；`<run 产物根>/exec` 里 0775 的 `__pycache__` → 必红；run 自己的 `work/artifact.json` 0644 → 必绿；再把剪枝关掉 → 那条 0644 立刻变红（证明「必绿」不是夹具没造对）。**发布方那台上这个路径不存在**（双机执行面根在 `$GENEBENCH_ROOT` 之外），剪一棵不存在的树 = 行为逐字节不变。 |
+| N-861 | `--harden` 不是一次性的：git 一动 `.git/index` 回 0644，P0 / 网关启动守门当场拒 | **已修** | `guard_modes.harden_git_repos()`：`--harden` 时给审计根里的每个 git 工作树设 `core.sharedRepository = 0600`（只写**仓库自己的** `.git/config`，不碰 `--global`、不碰系统配置），让 git **自己**按 0600 造 index / refs / objects。**实测**（2026-09-14，f01，`umask 022`）：只 `chmod -R go-rwx` 再提交一次 → `.git/` 下回来 **8** 条组/其它可读的条目；设了 `core.sharedRepository` 再提交一次 → **0** 条。测试里带**对照组**（不设它必须复现那 8 条），否则这条测试是空的。判别力没降：`.git` 仍在审计范围内（D-23 那条理由没动）。 |
+| N-851（= N-840） | `ops/push_exec_to_f02.sh:29/:32` `GENEBENCH_PY` / `GENEBENCH_EXEC_STAGE` 默认发布方绝对路径 + **静默使用** → 外部双机用户 rc=127 | **已修** | 默认改成从 `GENEBENCH_ROOT` 现算（`$GENEBENCH_ROOT/env/bin/python`、`$GENEBENCH_ROOT/scratch/exec_push`）；`GB_ROOT` 自己的兜底值与 `genebench_config._DEFAULT_ROOT` **钉在一起**（测试比对两个字面量，漂了就红）。解释器不在 → **第 0 步当场停 rc=2**，并把 `GENEBENCH_ROOT` / `GENEBENCH_PY` / `GENEBENCH_EXEC_STAGE` / `GENEBENCH_F02` / `GENEBENCH_EXEC_DEST` 五个变量与 `--print-paths` 一起打出来（此前是走到第 133 行才 `No such file or directory`，rc=127，而报错里没有一句话告诉他该设什么）。新增 `--print-paths`：只打印解析出来的五个落点然后退出。**双机语义一条没动**：六步与顺序、落地即扫、逐字节复核、没有任何 `--force`/`--skip` 绕过开关 —— 都有断言钉住；**不设任何变量时四个取值与改动前逐字节相同**。`GENEBENCH_APG_LOG` 在 `ops/push_bundle_to_f02.sh:61`，**不在本卡可改路径内**，留给编排方派卡。 |
+| N-?（建议 **N-881**；盘上最大 N-880，2026-09-14 查） | **一棵全新的执行面目录，根自己是 0775** —— `mkdir -m 700 -p "$DEST/$d"` 的 `-m` 只作用在最后一段，中间的 `$DEST` 吃 f02 的 umask（022） | **已修（本卡实测发现）** | 这是用户裁定 ④ 那道新门**当场量出来的第一条**：第一次推到 `/data/genebench_runner/exec_f10` 之后，P0 = `红线 5 目录对组/其它开放 0o775 /data/genebench_runner/exec_f10` —— **新铺的执行面第一次真跑就红在自己的根上**。既有那棵 `exec/` 是 2026-09 手工 `mkdir` 出来的 0700，所以这条**在既有树上永远不显形**。两处都修：`push_exec_to_f02.sh` 第 4 步前 `mkdir -m 700 -p "$DEST" && chmod go-rwx "$DEST"`；`runner/placement.place_exec_tree` 落位前把 `runner_root()` 与 `exec_dest()` 两级都收紧（`Path.mkdir(parents=True, mode=…)` 对中间段同样不给 mode）。**这正是「f02 上能跑靠的是历次手工遗留物；从零铺一遍才知道什么从没被交付过」的第一个实例，已按要求写进 design_notes 的候选文本（见下）。** |
+
+## 给 design_notes 的一段（卡 H 取用）
+
+> **单机的门替双机挖出故障，从零铺一遍的门替「历次手工遗留物」挖出故障 —— 是同一条。**
+> 双机能跑，靠的往往不是交付链路，而是某次手工操作留下的东西：f02 上的 `exec/vendor/h11`
+> 是 2026-09-05 跑容器测试时手工复制的，`exec/` 根的 0700 是 2026-09 手工 `mkdir` 的，
+> `/data/genebench_runner/provider` 恰好存在使得写死的 provider 父目录「看起来对」。
+> 这三件事都没有任何一条文档化步骤会产生它们，而**只要既有那棵树还在，它们就永远不显形**。
+> 所以判据不能是「在现有环境上跑通」，必须是**在一棵全新的目录上从零铺一遍**：
+> 2026-09-14 第一次这么做，当场掉出三条（N-856 / N-857 的真实爆点、以及 $DEST 根 0775）。
+
+## 给后续卡的话
+
+* **卡 G（把门固化）**：冒烟脚本在 `$GB/scratch/F10/smoke_f02.sh`（f02 上 `/data/genebench_runner/f10_smoke.sh`），
+  四段 A/B/C/D 各自独立退码：A = 整棵 runner import（N-856）、B = `preflight(check_modes=True)`（N-857）、
+  C = provider 父目录同源（N-855）、D = `--dry` 全量注入（P0–P9 + 公平性比臂）。
+  证据树留在 f02 `/data/genebench_runner/exec_f10`（**与既有 `exec/` 并存，既有那棵一个字节没动**）。
+* **卡 H（文档）**：`GENEBENCH_PY` / `GENEBENCH_EXEC_STAGE` / `GENEBENCH_EXEC_DEST` / `GENEBENCH_F02` /
+  `GENEBENCH_ROOT` 五个变量要进 README §2.3 与手册 §1.3 那张表；照抄一句
+  「不确定这次会解析成什么就跑 `ops/push_exec_to_f02.sh --print-paths`」。
+  另：`GENEBENCH_APG_LOG` 在 `ops/push_bundle_to_f02.sh`，本卡没动它。
+* **卡 I（重出发布清单）**：本卡**没有往仓库里新增任何文件**（h11 不进仓库，只随 exec 树船运），
+  发布件清单不受影响；新增的只有 `ops/test_F10.py` 一个测试文件。

@@ -1,0 +1,26 @@
+# 被测配置（数据驱动，W-0）。**enabled: false —— 模型待换，这条不进主表。**
+#
+# 为什么是 false：Gemini CLI 说的是 Gemini API 协议
+# （POST /v1beta/models/<model>:streamGenerateContent），**不是 OpenAI 兼容**
+# （0.58.0 的包里 OPENAI_BASE_URL / OPENAI_API_KEY 各 0 处命中）。
+# 它有一条正式的自定义 base URL（GOOGLE_GEMINI_BASE_URL），所以链路能指到边车、
+# 请求能落 llm_log —— 这条已经在 f02 真跑证明了（见 README §4）。
+# 但**没有一个够得着的上游会说这个协议**：
+#   * generativelanguage.googleapis.com 从 f02 实测不可达（curl 退 000），
+#     而且它不在 MODEL_API_ALLOW 里；
+#   * api.deepseek.com 可达，但只服务 OpenAI 兼容与 Anthropic 兼容两套协议，
+#     对 Gemini 的 /v1beta/models/...:streamGenerateContent 回 404。
+# 于是它现在**跑得起来但拿不到模型输出**，把它放进主表等于放一条注定
+# no_artifact 的配置进实验表。要翻开这个开关，见 README §6「模型待换」的三件前置。
+#
+# base_url 写 https://api.deepseek.com 而不是 Google 的域名：这里登记的是
+# **边车实际转发到的上游**（collect_egress_hosts() 拿它去和 MODEL_API_ALLOW 对键集），
+# 真跑时请求确实被转发到了 api.deepseek.com。写 Google 的域名会要求把一个
+# 不可达、也没有任何配置真在用的主机加进出向白名单 —— 那正是白名单膨胀的来源。
+config_id: cfg-gemini-cli-deepseek
+harness: Gemini CLI
+model: deepseek-chat
+base_url: https://api.deepseek.com
+api_key_env: DEEPSEEK_API_KEY
+note: CLI harness（Gemini API 协议，非 OpenAI 兼容）；链路经 GOOGLE_GEMINI_BASE_URL 指到边车已真跑验证，模型待换 —— DeepSeek 不服务 Gemini 协议（上游 404），需要 GEMINI key + 一条能到 generativelanguage.googleapis.com 的出口
+enabled: false

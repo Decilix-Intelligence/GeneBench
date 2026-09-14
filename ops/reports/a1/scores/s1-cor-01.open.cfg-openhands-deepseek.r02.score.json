@@ -1,0 +1,83 @@
+{
+ "scorer_output": null,
+ "record": {
+  "task_id": "s1-cor-01",
+  "stage": "S1",
+  "config_id": "cfg-openhands-deepseek",
+  "arm": "open",
+  "seq": 2,
+  "run_id": "s1-cor-01.open.cfg-openhands-deepseek.r02",
+  "set_version": "1.0.7",
+  "reference_version": "r1.0.7",
+  "runner_version": "df2067cc41d87b0783da1b7a929693e6b53276e3d171be43b08fe81a313b9ad9",
+  "image_digest": "gb-oh-u@sha256:ccfae0c3fd9164fbd460396f99e8d1dc935eea79d00779755124d3884abf6f18",
+  "scorer_schema_version": "1.0",
+  "run_status": "malformed",
+  "sr_bucket": "malformed",
+  "validity": "invalid",
+  "malformed": true,
+  "gate_failed": [],
+  "unobservable": [],
+  "probe_states": {
+   "adjust_fingerprint": "clean",
+   "attribution_conservation": "clean",
+   "calendar": "clean",
+   "declared_reads": "clean",
+   "factor_degeneracy": "clean",
+   "fetch_clock": "clean",
+   "input_ablation": "clean",
+   "ledger_conservation": "clean",
+   "lookahead": "clean",
+   "nonfinite_propagation": "clean",
+   "optimizer_failure": "clean",
+   "pit_universe": "clean",
+   "source_status": "clean",
+   "underdetermined": "clean",
+   "unsupported_operator": "clean",
+   "warmup_boundary": "clean"
+  },
+  "findings": [
+   "malformed:s1_status_enum @$.payload.fetches[0].status — status ∈ {ok, empty, denied, rate_limited} —— 空结果/拒绝/限流必须可分辨",
+   "malformed:s1_status_enum @$.payload.fetches[1].status — status ∈ {ok, empty, denied, rate_limited} —— 空结果/拒绝/限流必须可分辨",
+   "malformed:s1_status_enum @$.payload.fetches[2].status — status ∈ {ok, empty, denied, rate_limited} —— 空结果/拒绝/限流必须可分辨"
+  ],
+  "l3_kind": null,
+  "l3_pass": null,
+  "l3_score": null,
+  "effect": null,
+  "effect_withheld_reason": null,
+  "anchor": null,
+  "correctness": {},
+  "correctness_nonfinite_keys": null,
+  "correct_handling": null,
+  "l3_note": "",
+  "steps": 34,
+  "tokens_prompt": 1027018,
+  "tokens_completion": 33793,
+  "cost_usd": 0.49649468,
+  "cost_model": "deepseek-chat",
+  "latency_s": 252.371,
+  "validator_rejections": null,
+  "overreach": {
+   "denied": 5,
+   "total": 47,
+   "source": "gateway_access_log(403)",
+   "reasons": {
+    "open_range_would_cross_asof": 5
+   },
+   "malformed_requests": 12,
+   "malformed_reasons": {
+    "asof_missing": 6,
+    "unclassified": 3,
+    "param_malformed": 3
+   }
+  },
+  "unbounded_requests": 5,
+  "budget": null,
+  "anchor_status": "fixed",
+  "unexpected_files": [
+   "work/.oh_home/.bash_history",
+   "work/.oh_home/.openhands/profiles/.profiles.lock"
+  ]
+ }
+}

@@ -1,0 +1,45 @@
+# 卡 1.1-sourceB 负例对照(在 $GENEBENCH_ROOT/scratch_c11b/negctl 的仓库副本上做,真仓库零改动)
+# 脚本:scratch_c11b/negctl.sh   版本:1.1-sourceB-fix(对齐 cfg.UNIVERSE_DIR 之后)
+
+=== 0. 基线(未注入,必须全绿)===
+  ✅ baseline -> GREEN (期望 GREEN)
+       .....................                                                    [100%]
+       21 passed in 1.41s
+=== 1. 把 BJ 从已知前缀里拿掉 → 应出现 unmapped,前缀枚举断言变红 ===
+  ✅ 去掉 BJ 前缀 -> RED (期望 RED)
+       =========================== short test summary info ============================
+       FAILED ops/test_universe_source_b.py::test_prefix_enumeration_is_complete - a...
+       1 failed, 1 passed, 19 deselected in 0.52s
+=== 2. 静默丢弃形态异常码 → 异常上报断言变红 ===
+  ✅ 静默丢弃 T00018 -> RED (期望 RED)
+       =========================== short test summary info ============================
+       FAILED ops/test_universe_source_b.py::test_symbol_anomaly_is_reported_not_dropped
+       1 failed, 20 deselected in 0.38s
+=== 3. 不做冻结截断 → 红线 7 断言变红 ===
+  ✅ 不截冻结线 -> RED (期望 RED)
+       =========================== short test summary info ============================
+       FAILED ops/test_universe_source_b.py::test_freeze_line_respected - assert dat...
+       1 failed, 1 passed, 19 deselected in 0.57s
+=== 4. 把区间当半开用(折算写成 in<=D<out)→ 湖交叉验证断言变红 ===
+  ✅ 闭区间改成半开 -> RED (期望 RED)
+       =========================== short test summary info ============================
+       FAILED ops/test_universe_source_b.py::test_closed_interval_beats_half_open_on_lake
+       1 failed, 20 deselected in 0.17s
+=== 5. 产物文件放宽成 0644 → 权限断言变红 ===
+  ✅ 文件 0644 -> RED (期望 RED)
+       =========================== short test summary info ============================
+       FAILED ops/test_universe_source_b.py::test_output_permissions - AssertionErro...
+       1 failed, 20 deselected in 0.17s
+=== 6. 改字段名 out_date → end_date → schema 断言变红 ===
+  ✅ 字段改名 -> RED (期望 RED)
+       =========================== short test summary info ============================
+       FAILED ops/test_universe_source_b.py::test_parquet_schema_exact - AssertionEr...
+       1 failed, 20 deselected in 0.37s
+=== 7. 反向对照:只改注释,不改行为 → 必须仍全绿 ===
+  ✅ 只改注释 -> GREEN (期望 GREEN)
+       .....................                                                    [100%]
+       21 passed in 1.41s
+=== 收尾:恢复副本并确认真仓库未被动过 ===
+  真仓库 universe_qlib.py 与副本原件一致 ✅
+.....................                                                    [100%]
+21 passed in 1.40s

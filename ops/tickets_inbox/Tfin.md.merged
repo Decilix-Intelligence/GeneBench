@@ -1,0 +1,33 @@
+# 卡 Tfin（终核卡，站在外部用户那一侧，只读）收件箱
+
+**跑法**：GitHub 上 `git clone --depth 1`（SSH）到一棵全新空目录 → 按 `docs/OPERATOR_MANUAL.md` §1.2
+的无 root 办法装出一个**真 3.12** 外部解释器 → 照 `README.md` §2.1 / §2.1a **逐字**搭根、落位三件附件
+→ 两次 `ops/selfcheck_public.py`（落位前 / 落位后）→ 定向测试 10 个文件 → 三类扫描 + `.py` 文案扫描。
+逐条实测输出在 `$GB/scratch/Tfin/`（`selfcheck_before.txt` / `selfcheck_after.txt` /
+`selfcheck_after2.txt` / `gateway_check.txt` / `tests.log` / `scan_stale.txt` / `pyscan.txt` /
+`venv_trap.txt` / `assets_anon.txt` / `release_anon.txt` / `three_way.txt` / `place.log`）。
+
+**复核通过、没有发现问题的**：三件附件匿名 206 + 总长 + digest 与 `attachments.json` /
+`RELEASE_MANIFEST.json` 三处逐字同源；Release `id=387775425`、`target_commitish` 仍是字符串 `"main"`
+（经过一次 force-push 之后依然成立）、`draft/prerelease=False`、三件 `state=uploaded`；
+`ops/mk_release_manifest.py --check` 在全新外部 clone 上**退 0**（`releasable=True` / 58 件）；
+三条冻结根落位后全绿，public 根 `3e5ab441…`（没用 `--write*`）；N-808 终验通过 ——
+落位前后两次自检**没有任何一句**说第三件「还没上传」；`build/` 五件在树里；
+预算档两处同源且与 `runner/registry.py` 逐值相符；D-06 第五例在表里、措辞与前四例同形。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| **N-818** | **照 README 把 venv 建在 `$GB/env`，网关就永远起不来，而文档给的修法是空转** | **待修 · block（外部路径）** | `python3.12 -m venv $GB/env` 在 POSIX 上默认把 `bin/python` `bin/python3` `bin/python3.12` 建成**符号链接**，最终指向系统解释器（`/usr/bin/python3.12`、Mac 上 `/opt/homebrew/…`，`0755` 且 root 所有）。`ops/guard_modes.py` 的 `_walk_stat` 第 162 行用 `e.stat()`（**跟随链接**）取 mode，于是读到的是**目标**的 `0755` → `check()` 判红线 5 违例 → `assert_modes()` 让网关**拒绝启动**，并提示「修：`python3 ops/guard_modes.py --harden`」；而 `harden()` 第 264–265 行 `if islink: continue` —— 它**结构上不可能**修好这一条。实测（`$GB/scratch/Tfin/venv_trap.txt`）：干净 venv → check 3 条红 → `--harden` 打印「收紧 0 个条目」退 1 → 再 check 仍 3 条红，**死循环**。发布方机器上 `$GB/env` 是 conda 环境，`python → python3.10` 指向**同一棵树里**一个已经 `0700` 的实体文件，链条在根内终止 —— **这一条在内部永远不显形**，是 D-06 家族的**第六例**（成因与第五例 N-770 同型）。绕法实测有效：`python3.12 -m venv --copies $GB/env` → `--harden` 收紧 3 个条目、check 退 0。**改法（任选其一，建议都做）**：① README §2.1 与手册 §1.2 的建 venv 那行加 `--copies`；② `_walk_stat`/`check()` 对「符号链接且不在答案面根下」改用 `lstat` 或直接跳过（判据不变：答案面根下的软链仍一律违例）；③ `assert_modes()` 的提示语对软链这一类换成可执行的话。 |
+| **N-819** | `ops/test_pack_release.py` 三条在「**照文档做对了**的外部 clone」上恒红 | **待修 · major** | 实测 3 failed：`test_包里的宇宙定义面是baostock重建的_没有csi1000` / `test_包里的universe带上了卡A反投影的PIT名单` / `test_manifest的宇宙说明不再说它是tushare派生的`，都停在 `PackageError: 缺必需文件 $GENEBENCH_ROOT/scratch/v1_union.txt（组件 universe/v1_union.txt）`。这三条的 `_need()` 守卫只看**落位产物**（`snapshots/public_v1/qlib_provider`、`universe/universe_pit.parquet`），落位之后守卫全部放行，接着去调 `PP.collect()` —— 而打包器第 239 行要的是**打包前的发布方中间件** `$GB/scratch/v1_union.txt`，它既不在仓库里也不在三件附件里（附件里那份在 `snapshots/public_v1/universe/v1_union.txt`，路径不同）。所以**落位前这三条 skip、落位后反而红**：越照文档做对越会看到红。发布方机器上 `$GB/scratch/v1_union.txt` 在（32,175 B，2026-09-05），故内部 251 passed。**改法**：`_need()` 再加一条打包器输入的守卫（`_need(cfg.GENEBENCH_ROOT / "scratch" / "v1_union.txt")`），或让这三条整体 `skipif` 掉「非发布方机器」。**不要**放宽断言。 |
+| **N-820** | `DATA_LICENSE` §3 现在时说「地址已定不等于已推送」「`_staging_unpublished/` 里那份旧包…推完要重打一次公开包」 | **待修 · minor（措辞）** | `DATA_LICENSE:154`。标题链是「数据许可与来源声明 › ## 3. 发布形态（两条都走通）」，**整条链上没有任何时点**，所以按「值被小节标题整节地标了时点」的口径它没被标住。三处都已经不是现状：树 2026-09-13 已推（读者正是 clone 它拿到这份文件的）、`_staging_unpublished/` 卡 R2 按 N-714 已整棵删除、公开包已重打并挂上 Release。**改法**：句首加「2026-09-11 那一轮：」，或整句改成「两个仓库地址已写进 `RELEASE_MANIFEST.json`，2026-09-13 均已推送；`release/public_v1/` 下的包是重打之后的那一份」。（同源的一句还在 `ops/mk_release_manifest.py:390` 的 `closes_when` 里、并随之进了 `RELEASE_MANIFEST.json` —— 那一条**已由卡 V 登记为 N-793**，本卡不另开号。） |
+| **N-821** | `ops/selfcheck_public.py` 第 4 项找附件的目录，**README 与手册里一次都没写过** | **待修 · minor** | 自检找三处：`cwd/downloads`、`$GENEBENCH_ROOT/downloads`、`<仓库父目录>/downloads`（第 199–210 行）。而 README §2.1a 的 `curl -L -O` 紧接在 §2.1 的 `cd $REPO` 之后，包会落在 `$REPO/` —— **那三处都不是它**。全树 `grep downloads README.md docs/OPERATOR_MANUAL.md` = **0 命中**。后果不重（自检自己会提示「下完把它们放在 ./downloads/ 下」），但外部用户照文档做完第一次自检必然看到「还没找到附件」。**改法**：§2.1a 的 curl 块前加一行 `mkdir -p $GB/downloads && cd $GB/downloads`，或在自检的候选目录里加上仓库根与 `$GENEBENCH_ROOT`。**附带**：`$GENEBENCH_ROOT` 与 `cwd` 的父目录重合时，那句「找过：…」会把**同一个路径打印两遍**（本卡实测两遍 `…/gb/downloads`）——去重一行即可。 |
+| **N-822** | 六个包缺一个时，自检第 5 项给出的**诊断是错的** | **待修 · minor** | 实测：只缺 `pyyaml` 时第 2 项红（对），第 5 项也红，理由写「`--check-all` 没有报出三条轴…它说：Traceback」，建议是「**说明这棵树不完整，或者你不是在仓库根下跑的**」。真因是 `genetask/packager.py:29 import yaml` 抛 `ModuleNotFoundError` —— 树是完整的，目录也是对的。外部用户会被支去查一件没坏的事。**改法**：第 5 项在第 2 项红时直接报「跳过（先装齐六个包）」，或把子进程 stderr 的**最后一行**（真正的异常）打出来而不是第一行 `Traceback (most recent call last):`。 |
+| **N-823** | `ops/test_env.py` 文件头仍写「两个附件落位与 sha256」 | **登记不修** | N-810 修了四处（README ×2、手册、`--downloads` 的 help），`ops/test_env.py:16` 这第五处没在射程里。它是内部自检的 docstring、且该文件明写「不是给外部用户跑的」，不挡任何事；顺手改的话与前四处同口径改成「发布附件落位与 sha256」。 |
+
+## 给下一张卡的两句话
+
+1. **N-818 是本轮唯一一条「外部用户照做就走不下去、而且文档给的修法不管用」的**。它和 N-770（D-06 第五例）
+   是同一个成因：**判据的取值在发布方那台机器上恰好落在合规的一侧**，所以内部怎么跑都不会现形。
+   `ops/reports/known_limits_v1.md` 的「D-06 家族」那一节可以按同一措辞收第六例
+   —— 但那张表被清单的 sha256 钉着，**要跟重出清单的卡一起做**。
+2. 本卡**没有往 `known_limits_v1.md` 写一个字节**（按任务书），也没有推树、没有碰 Release。

@@ -1,0 +1,99 @@
+
+===== sam_pit / fin_secu_sam_period_pit  (期间级 PIT 财务)
+  encoding=utf-8  ncols=1
+  HEADER: operation;id;report_id;secu;publish_date;report_date;p;q;y;fy;currency;valid;company_id;market;create_time;update_time
+  ROW: A;201059;S0000622014-06-302014Q212-3162014-08-27;002054_SZ_EQ;2014-08-27;2014-06-30;6;Q2;2014;12-31;CNY;1;CSF0000000712;1002;2016-08-27 12:24:19;2016-08-27 12:24:19
+  ROW: A;201060;S0000622014-06-302014Q212-3162015-08-29;002054_SZ_EQ;2015-08-29;2014-06-30;6;Q2;2014;12-31;CNY;1;CSF0000000712;1002;2016-08-27 12:24:19;2016-08-27 12:24:19
+
+===== sam_pit / fin_secu_sam_product_pit (产品级 PIT)
+  encoding=utf-8  ncols=1
+  HEADER: operation;id;report_id;secu;report_date;publish_date;product_code;product_cost;product_income;product_profit;company_id;partial_cost;market;create_time;update_time
+  ROW: A;789200;S0000622014-06-302014Q212-3162014-08-27;002054_SZ_EQ;2014-06-30;2014-08-27;CC0010060404;76085519.86;95902542.77;19817022.91;CSF0000000712;0;1002;2016-08-27 12:24:19;2016-08-27 12:24:19
+  ROW: A;789201;S0000622014-06-302014Q212-3162014-08-27;002054_SZ_EQ;2014-06-30;2014-08-27;CC0050010503;254631654.05;448094190.57;193462536.52;CSF0000000712;0;1002;2016-08-27 12:24:19;2016-08-27 12:24:19
+
+===== sam_pit / fin_secu_sam_product_calc_pit (产品级测算 PIT)
+  encoding=utf-8  ncols=1
+  HEADER: operation;id;report_id;secu;report_date;publish_date;income;profit;product_code;product_path;product_level;product_income;product_income_ratio;product_profit;product_profit_ratio;product_b_income;product_b_income_ratio;product_b_profit;product_b_profit_ratio;company_id;market;partial_calc;product_partial_calc;create_time;update_time
+  ROW: A;631762;S100093532014-06-302014Q212-3162015-08-26;300433_SZ_EQ;2014-06-30;2015-08-26;5436436613.7;1324678502.6;EC00102003;EC004>EC001>EC00102001>EC001020>EC00102003;5;5436436613.7;1;1324678502.6;1;5436436613.7;1;1324678502.6;1;CSF0000000625;1012;0;0;2023-04-23 19:46:02;2023-04-23 19:46:02
+  ROW: A;631763;S0008212014-06-302014Q212-3162015-07-28;002503_SZ_EQ;2014-06-30;2015-07-28;564670493.75;217198754.24;CG001001;CG006>CG001>CG001001;3;564670493.75;1;217198754.24;1;;;;;CSF0000194595;1002;0;0;2023-04-23 19:46:02;2023-04-23 19:46:02
+
+===== sam_pit / supply_chain_relation (供应链关系)
+  encoding=utf-8  ncols=1
+  HEADER: operation;id;primary_code;primary_en;primary;primary_type;related_code;related_product_en;related_product;related_type;relationship;importance;create_time;update_time
+  ROW: A;569378df11c0d21d7cd5edae;AC001;Auto Parts and Equipment;机动车零配件与设备;M;AC005;Automobiles;汽车;P;1;4;2018-12-11 02:38:47;2018-12-11 02:38:47
+  ROW: A;5693786c11c0d21d7cd5eda1;AC001;Auto Parts and Equipment;机动车零配件与设备;P;CC001;Commodity Chemicals;商品化工;M;-1;2;2018-12-11 02:38:47;2018-12-11 02:38:47
+
+===== sam_pit / base_stock
+  encoding=utf-8  ncols=1
+  HEADER: operation;id;code;ticker;orgid;org_en;org;abbr;abbr_en;abbr_py;mkt_code;mkt_en;mkt;list_status;list_dt;list_edt;csfid;create_time;update_time
+  ROW: A;S10063260;001339_SZ_EQ;001339;10135220;JWIPC Technology Co., Ltd.;深圳市智微智能科技股份有限公司;智微智能;Jwipc;zwzn;1002;SZSE Main Board A Share;深圳证券交易所主板A股;LT;2022-08-15;;ICN5113342004;2021-07-05 10:02:39;2023-10-12 13:53:22
+  ROW: A;S000063;002055_SZ_EQ;002055;10005218;Shenzhen Deren Electronic Co., Ltd.;深圳市得润电子股份有限公司;得润电子;Deren;drdz;1002;SZSE Main Board A Share;深圳证券交易所主板A股;LT;2006-07-25;;CSF0000001437;2012-09-05 08:00:00;2023-10-12 17:16:38
+
+===== sam_pit / base_company
+  encoding=utf-8  ncols=1
+  HEADER: operation;company_id;credit_code;company;company_en;is_bond_issuer;is_listing;ref_company_id;create_time;update_time
+  ROW: A;CSF0000000001;911101081020066652;北京欧泰克能源环保工程技术股份有限公司;Beijing Otc Energy & Environment Engineering Co.,Ltd.;0;1;CSF0000000001;2019-03-16 03:06:01;2023-08-02 15:57:52
+  ROW: A;CSF0000000002;;Xinchen China Power Holdings Limited;Xinchen China Power Holdings Limited;0;1;CSF0000000002;2019-03-16 03:05:41;2024-04-03 13:31:40
+
+===== sam_pit / dict_industry
+  encoding=utf-8  ncols=1
+  HEADER: operation;id;code;name;name_en;parent;ancestors;publisher;industry_level;create_time;update_time
+  ROW: A;5141beb016f2555859123048;CSF_10;能源;Energy;;;CSF;1;2013-03-14 08:00:00;2013-03-14 08:00:00
+  ROW: A;5141beb016f2555859123049;CSF_1010;能源;Energy;CSF_10;CSF_10;CSF;2;2013-03-14 08:00:00;2013-03-14 08:00:00
+
+===== sam_pit / dict_product_rs
+  encoding=utf-8/replace  ncols=1
+  HEADER: operation;id;code;name;name_en;parent;ancestors;valid;industry_code;rem_szh;rem_en;product_level;create_time;update_time
+  ROW: A;1838;PP001;个人用品;Personal Products;;;1;CSF_30302010;包括个人护理用品以及美容护理用品。;It includes personal care products and beauty products.;1;2013-07-09 08:00:00;2023-11-02 18:00:15
+  ROW: A;2232;FN002;互助储蓄银行与抵押信贷;Mutual Saving Banks and Mortgage Loans;;;1;CSF_40102010;提供抵押贷款以及抵押贷款相关服务的金融机构； 不直接包括商业银行业务中的个人住房抵押贷款业务。;It refers to financial institutions which provide mortgage loans and related services, not directly including personal housing mortgage loan services in commercial banking.;1;2013-07-09 08:00:00;2020-02-05 16:25:55
+
+===== sam_pit / sam_release_notes_tree
+  encoding=utf-8/replace  ncols=1
+  HEADER: operation;id;tree_id;tree_version;tree_name;node_code;node_operation_type;node_name;node_change_note;rel_operation_type;from_parent_code;from_parent_name;to_parent_code;to_parent_name;display_order;rel_change_note;create_time;update_time
+  ROW: A;1;2;v1.11;数库SAM树正式版;P0000001;2;角膜塑形镜;;3;;;HC00200903;隐形眼镜;0;;2022-08-12 11:11:12;2022-08-12 11:11:12
+  ROW: A;2;2;v1.11;数库SAM树正式版;P0000002;2;铁皮石斛;;3;;;PH002006;中药材;0;;2022-08-12 11:11:12;2022-08-12 11:11:12
+
+===== Smartag / news_company_label 2008-2009
+  encoding=utf-8  ncols=10
+  HEADER: stockCode,companyId,chineseName,englishName,newsId,newsTs,relevance,emotionIndicator,emotionWeight,emotionDetail
+  ROW: 02318_HK_EQ,CSF0000001741,中国平安,PINGAN-H,779762,2008-02-26T07:39:08+0800,0.275,0,0.64,"{0=0.6362, 1=0.128, 2=0.2357}"
+  ROW: 600050_SH_EQ,CSF0000002615,中国联通,China Unicom (Hong Kong) ADR,779762,2008-02-26T07:39:08+0800,0.325,2,0.99,"{0=0.0054, 1=0.0024, 2=0.9922}"
+  ROW: 02318_HK_EQ,CSF0000001741,中国平安,PINGAN-H,779763,2008-02-26T07:12:24+0800,0.27,2,0.86,"{0=0.1269, 1=0.0178, 2=0.8553}"
+
+===== Smartag / news_company_label 2024 (末段)
+  ERR [Errno 2] No such file or directory: '/data/financial_data/ripple_alpha/extracted/ripple alpha/chinascope/Smartag_v4.2_20080101-20240901/news_company_label_20240601-20240901.zip'
+
+===== Smartag dict / concept_dictionary
+  encoding=utf-8  ncols=1
+  HEADER: operation;code;name;name_en;concept_id;inclusion_date;def;create_time;update_time
+  ROW: A;CP0001;水利工程;Water Conservancy Project Concept;1;2019-01-17;水利工程是用于控制和调配自然界的地表水和地下水，达到除害兴利目的而修建的工程。也称为水工程。水是人类生产和生活必不可少的宝贵资源，但其自然存在的状态并不完全符合人类的需要。;2019-01-17 15:20:28;2019-05-20 10:12:03
+  ROW: A;CP0002;材料;Material Concept;2;2019-01-17;新材料按组分为金属材料、无机非金属材料（如陶瓷、砷化镓半导体等）、有机高分子材料、先进复合材料四大类。;2019-01-17 15:20:28;2020-05-20 01:07:16
+
+===== Smartag dict / concept_stock
+  encoding=utf-8  ncols=1
+  HEADER: operation;code;name;name_en;concept_code;inclusion_date;delete_date;create_time;update_time
+  ROW: A;000001_SZ_EQ;平安银行;PING AN BANK;CP0233;2019-01-17;;2019-01-17 15:23:48;2019-04-02 15:36:04
+  ROW: A;000001_SZ_EQ;平安银行;PING AN BANK;CP0106;2019-01-17;;2019-01-17 15:23:48;2019-04-02 15:36:25
+
+===== Smartag dict / event_dictionary
+  encoding=utf-8  ncols=1
+  HEADER: operation;code;name;name_en;parent_code;level;pos;importance;inclusion_date;delete_date;create_time;update_time
+  ROW: A;A;经营事件;Operations;;1;;;2019-04-04;;2019-04-04 14:08:25;2019-04-18 10:44:18
+  ROW: A;AA;利润表;Income Statement;A;2;;;2019-04-04;;2019-04-04 14:08:25;2019-11-14 09:11:46
+
+===== Smartag dict / region_dictionary
+  encoding=utf-8  ncols=1
+  HEADER: operation;code;name;name_en;level;parent_code;ancestors;external_code;create_time;update_time
+  ROW: A;CSF_003002;南非;South Africa;7;CSF_003000;CSF_000000,CSF_003000;;2019-01-29 04:41:18;2022-07-15 15:39:07
+  ROW: A;CSF_003005;中非;Central Africa;7;CSF_003000;CSF_000000,CSF_003000;;2019-01-29 04:41:18;2022-07-15 15:39:07
+
+===== Smartag dict / base_stock
+  encoding=utf-8  ncols=1
+  HEADER: operation;id;code;ticker;orgid;org_en;org;abbr;abbr_en;abbr_py;mkt_code;mkt_en;mkt;list_status;list_dt;list_edt;csfid;create_time;update_time
+  ROW: A;S10063260;001339_SZ_EQ;001339;10135220;JWIPC Technology Co., Ltd.;深圳市智微智能科技股份有限公司;智微智能;Jwipc;zwzn;1002;SZSE Main Board A Share;深圳证券交易所主板A股;LT;2022-08-15;;ICN5113342004;2021-07-05 10:02:39;2023-10-12 13:53:22
+  ROW: A;S000063;002055_SZ_EQ;002055;10005218;Shenzhen Deren Electronic Co., Ltd.;深圳市得润电子股份有限公司;得润电子;Deren;drdz;1002;SZSE Main Board A Share;深圳证券交易所主板A股;LT;2006-07-25;;CSF0000001437;2012-09-05 08:00:00;2023-10-12 17:16:38
+
+===== extracted to ~/genebench_inventory/tmp (3 files, authorized)
+  dict_industry.csv  34,795 B
+  concept_dictionary.csv  189,803 B
+  event_dictionary.csv  298,505 B

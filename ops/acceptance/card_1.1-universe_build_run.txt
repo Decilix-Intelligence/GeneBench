@@ -1,0 +1,8 @@
+csi300   行   1690 | 进出   1024 | 去重 code   825 | both   1023 | 一致   1384 不一致   306 不适用     0
+csi500   行   3281 | 进出   2316 | 去重 code  1738 | both   2265 | 一致   2766 不一致   515 不适用     0
+csi1000  行   4475 | 进出   3437 | 去重 code  2839 | both   3345 | 一致   3354 不一致  1121 不适用     0
+all      行   5813 | 进出   5813 | 去重 code  5813 | both      0 | 一致      0 不一致     0 不适用  5813
+完整性自查非零项:无(全部为 0)
+parquet      -> /data/shared/genebench/snapshots/v1/universe/universe_pit.parquet (286420 B, mode 0o600)
+data_card    -> /data/shared/genebench/repo/ops/data_cards/universe_pit.md (25652 B, mode 0o600)
+summary_json -> /data/shared/genebench/repo/ops/universe_pit.json (52656 B, mode 0o600)

@@ -1,0 +1,22 @@
+# 2.rt 阶段二红队修复 —— 登记不修的 minor
+
+红队 14 条 finding：6 条 major 已在本卡修完（见提交说明），下面 8 条按纪律
+「minor 登记不修」留在这里。编号先写 `N-?`，等编排方分配。
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | 垫片 §3 的接口清单缺 `members(universe, as_of) -> list[str]` | 待办 | `integrations/README.md:459` 的旗舰 30 行示例用了 `cli.members()`，但 `genebench_client/README.md` §3 只列了六个数据端点方法与五个 sim 方法。实测 `gateway.Client.members()` 在 `gateway.py:331`，是 `/universe` 的便利包装，返回排序后的 `list[str]`。改法：§3 接口清单补一行，或把示例改用已文档化的方法。 |
+| N-? | `ts index_weight` 那一行没给 `index_code` 词汇表 | 待办 | `genebench_client/README.md:194`。按题面的 universe 名直接传（`index_code="csi300"`）是 422。可用值只能从报错里拿：`INDEX_TO_UNIVERSE` = `000300.SH`/`399300.SZ`→csi300、`000905.SH`/`399905.SZ`→csi500、`000852.SH`/`399852.SZ`→csi1000；`trade_date` 收 `YYYYMMDD` 与 `YYYY-MM-DD` 两种写法。报错信息本身写得很好（当场给全集），所以只算 minor。 |
+| N-? | 外部作者给**自己的**系统做本地自检的路径不在正文里 | 待办 | 协议 validator 缺四份逐题规则 JSON 就不跑（「validator 不猜规则」）。生成它们的 `genetask.protocol_rules.write_rules(...)` 与手工验时要加的 `--rules-dir` 只出现在 `integrations/example_minimal/smoke.sh` 的脚本正文与 `example_minimal/README.md:36–45`，主手册（`integrations/README.md` §2）与 `P2_CONTRACT.md` §3.5 都没提。改法：§2 末尾加四行 —— 造 `/task/protocol/` 的命令（`write_rules` + `task_json` 的三个键 `task_id`/`stage`/`declared`）、跑 validator 要带 `--rules-dir`、以及「容器里不用带 `--rules-dir`」这条差别。 |
+| N-? | `integrations/README.md:334` 的 `docker images --digests` 少了 ssh 前缀 | 待办 | 上一行是 `ssh ljn@192.168.1.219 "…docker build…"`，说明当前 shell 在 f01；而本节开头刚写过「构建在 f02（f01 没有容器运行时）」。f01 上 `command -v docker` 为空，照抄即 command not found。改成 `ssh ljn@192.168.1.219 "docker images --digests gb-<id>:r1"`。 |
+| N-? | 「漏了 `begin` 后面补不回来」与 §5.2① 的补救路径自相矛盾 | 待办 | `integrations/README.md:77` 说补不回来，`:736`（§5.2①）给了 `--at` / `loc --base <sha>` 的完整补救。第一次读到 §1① 的人会以为只能作废重来。改法：§1① 改成「漏了这一步要用 §5.2① 的 `--at` / `--base` 补记，别凭回忆重填」。 |
+| N-? | `integrations.cost` 的全局 `--repo` 一次都没在正文里出现 | 待办 | `integrations/README.md:708–721` 给的每条命令都会往共享的 `integrations/COST.jsonl` 追加事件，而 §5.2③ 又强调它是共享文件、坏一行下游每个数都偏小。想空跑一遍或在自己的 fork 里记账，只能用 `--help` 里那句「仓库根（默认：本文件所在的仓库）」。改法：§5 命令块加一行注释给出 `--repo <你的 fork 或 scratch 仓库>`。 |
+| N-? | `integrations/COVERAGE.md` 表头之后一行数据都没有 | 待办 | 导航表把它标成「谁接了什么、跑到哪个阶段」，实际是空的：① 「已有哪些接入、跑到哪」得不到回答；② §1⑧ 要求「手写一行」却没有样例可抄（范式列写 `P2` 还是 `P2/P3`、备注列写什么、多次运行怎么标只有散文描述）。改法：补一行 `example_minimal` 的实测行（未过评分器就按定义写 `—` 并在备注注明「只过 smoke + validator」）。注意 `ops/test_integrations_readme.py::test_coverage_rows_only_use_defined_values` 盯着格值。 |
+| N-? | 「怎么看自己的切片」在契约 §2.1⑤ 只说了一半 | 待办 | 契约给了路径与字段清单，却把身份四字段写成「身份四字段」而不点名（实测键是 `run_id` / `task_id` / `config_id` / `arm`），也没给可抄的切片命令；同时 §1.2 的环境变量全集里没有 `GENEBENCH_ROOT`，容器里那个路径根本不存在，而没有一句话说明「这是网关侧运行者看的，被测方看不见也不该拿它自查」。改法：§2.1⑤ 补两句 —— 切片键是行里的 `run_id`，网关侧运行者用 `grep -F "<run_id>" $GENEBENCH_ROOT/logs/gateway_access.jsonl`；这份日志在**宿主**上，被测方自查请用 `cli.ledger`（§4.4 验行为不验申报）。**本卡已在同一段落改了 `params` 的措辞（finding 2），这一条落在同一处，改的时候一起做。** |
+
+## 顺带核到的、不在红队清单里的两条
+
+| 编号 | 事项 | 状态 | 说明 |
+| --- | --- | --- | --- |
+| N-? | `/healthz` 现在是七个字段，契约 §5.3/§7 写的是五个 | 待办 | `gateway/app.py` 的探活返回里已加上 `channel` 与 `tables_dir`（卡 1.1-a，提交 `b073ba2`）。红队 2026-09-06 实测**运行中**的生产网关仍是五个字段 —— 也就是说代码已走在部署前面，契约暂时还对得上。等新网关起来之后 §5.3/§7 的自查记录会变错。`gateway/**` 是阶段一的路径，本卡没碰。 |
+| N-? | 红队对 finding 6 的建议改法本身是错的 | 已修正 | 红队建议写「面板文件应写在 /tmp 且不进 /task」。实际相反：S2/S3/S7 的题面固定槽「产出文件」点名 `/task/panel.csv` / `/task/values.parquet` / `/task/ledger.parquet`，容器退出后那次 P8 复核的允许集（`runner/c42/harvest.py::PRODUCED_BY_STAGE`）里有它们 —— 写 `/tmp` 反而交不出 `panel_ref.sha256` 指的那个文件。本卡按 `genetask/file_contract.py::FILE_SPECS` 的事实写。 |

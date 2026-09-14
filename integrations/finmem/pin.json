@@ -1,0 +1,27 @@
+{
+  "paper_url": "https://arxiv.org/abs/2311.13743",
+  "paper_title": "FinMem: A Performance-Enhanced LLM Trading Agent with Layered Memory and Character Design",
+  "repo_url": "https://github.com/pipiku915/FinMem-LLM-StockTrading",
+  "commit": "be814aa47970de9bf2fdd6a1d5a60ae5cf361b46",
+  "commit_ref": "branch main HEAD（2024-08-18 之后未再更新；仓库没有打过 tag）",
+  "commit_committed_at": "2024-08-18T01:58:13Z",
+  "dist": null,
+  "dist_repo_url": null,
+  "source_tarball": "https://codeload.github.com/pipiku915/FinMem-LLM-StockTrading/tar.gz/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46",
+  "source_tarball_sha256": "f0ee88b737b3f4523d4ff7f57d670bbe910f3980136061b44f7c8334bc2d5c36",
+  "license": "MIT",
+  "license_source": "仓库根 LICENSE 抬头 `MIT License / Copyright (c) 2023 Yangyang Yu, Haohang Li, Zhi Chen, Yuechen Jiang, Yang Li`，与 GitHub API 的 `license.spdx_id = MIT` 一致（两处都实测读过，不是凭记忆）",
+  "runnable_check": "/opt/finmem/venv/bin/python -c \"import sys; sys.path[:0]=['/opt/finmem/src','/opt/finmem']; import puppy, puppy.memorydb as M, puppy.chat as C, genebench_client, genebench_client.emit; print(sys.version_info[:2], puppy.LLMAgent.__name__, puppy.MarketEnvironment.__name__, M.OpenAILongerThanContextEmb.__name__, C.ChatOpenAICompatible.__name__)\"",
+  "runnable_check_result": "(3, 10) LLMAgent MarketEnvironment OpenAILongerThanContextEmb ChatOpenAICompatible",
+  "retrieved_at": "2026-09-07T10:20:00+00:00",
+  "cross_field_note": "本条**不是从 PyPI 装的**（FinMem 没有发布到任何 index：仓库根的 pyproject.toml 里 `name = \"finmem\" / version = \"0.0.0\"`，只是 poetry 的本地工程壳）。所以 `dist` / `dist_repo_url` 为 null，跨字段判据落在源码上：tarball 从 `repo_url` 对应的 codeload 路径按 `commit` 取，sha256 已钉；`paper_url` 的 arXiv 号 2311.13743 取自仓库 README 里的徽章与正文链接（同一项目，不是同名的另一篇）。",
+  "deviations": [
+    "不装 torch：上游冻结清单里的 `torch==2.2.0+cpu`（与它带的 `--extra-index-url https://download.pytorch.org/whl/cpu`）没装。理由与实测见 requirements.gb.txt 抬头；`import puppy` 在无 torch 时成功，transformers 只打一行提示。",
+    "跑在 uv 装的 CPython 3.10 上，而不是基座的 3.12：上游 pyproject 写死 `>= 3.10, < 3.11`，冻结清单每一行都带同样的环境标记（在 3.12 上 pip 会一个包都不装且不报错）。",
+    "向量后端不是 OpenAI embeddings：见 README「已知限制」§4.1。运行时先真打一次 `/embeddings`，打不通才退到离线确定性向量，探针结果打在 stdout 上。",
+    "`character_string` 不是上游示例配置里那段 TSLA 先验，换成了一段只陈述题面与本环境事实的中性 persona：见 run.py 的 CHARACTER 注释。"
+  ],
+  "runnable_check_note": "在 gb-finmem-u:r1（sha256:5c57f606…）里 `docker run --network none --user 1000:1000` 跑的；stderr 另有 transformers 的一行 `None of PyTorch, TensorFlow >= 2.0, or Flax have been found` —— 那是不装 torch 的预期表现，见 deviations。",
+  "image": "gb-finmem-u:r1",
+  "image_id": "sha256:5c57f60660d94c535d5491b50e1940f3b40e3860084d447c4b1b11b5f41ae980"
+}
